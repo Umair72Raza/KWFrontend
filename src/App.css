@@ -1,0 +1,10 @@
+.greenButton{
+    background-color: #33cc33; /* Green */
+    color: #ffffff; /* White */
+    border: 1px solid #008000; 
+}
+.redButton{
+    background-color: #ff4444; /* Red */
+    color: #ffffff; /* White */
+    border: 1px solid #cc0000; /* Darker shade of red or a complementary color */
+}

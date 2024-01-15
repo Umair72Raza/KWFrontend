@@ -1,0 +1,230 @@
+.w-full{
+    width: 100%;
+}
+.y{
+    color:#f9d004 !important;
+  }
+  
+ul {
+    
+  list-style: none !important;
+  padding: 0 !important;
+}
+
+li {
+  
+  text-decoration: none !important;
+}
+.hover-pointer {
+  cursor: pointer;
+}
+
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: #fff;
+  }
+
+  
+  
+
+
+.chat-list {
+  border-right: 1px solid #ccc !important;
+}
+
+.chat-preview {
+  cursor: pointer !important;
+  padding: 10px !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+.selected-chat {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.chat-header {
+  padding: 10px !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+.messages {
+  flex-grow: 1 !important;
+  overflow-y: scroll !important;
+  padding: 10px !important;
+}
+
+.received-message {
+  background-color: #f2f2f2 !important;
+  padding: 8px !important;
+  margin-bottom: 5px !important;
+  border-radius: 10px !important;
+  max-width: 70% !important;
+}
+
+.sent-message {
+  background-color: #DCF8C6 !important;
+  padding: 8px !important;
+  margin-bottom: 5px !important;
+  border-radius: 10px !important;
+  align-self: flex-end !important;
+  max-width: 70% !important;
+}
+
+.message-input {
+  display: flex !important;
+  align-items: center !important;
+  padding: 10px !important;
+}
+
+.message-input input {
+  flex-grow: 1 !important;
+  padding: 8px !important;
+  margin-right: 10px !important;
+  border-radius: 5px !important;
+  border: 1px solid #ccc !important;
+}
+/* 
+.message-input button {
+  padding: 8px 16px !important;
+  border: none !important;
+  border-radius: 5px !important;
+  background-color: #007bff !important;
+  color: #fff !important;
+  cursor: pointer !important;
+} */
+
+.max-height-message{
+  height: 300px !important;
+}
+
+.max-height-chat-users{
+  height: 400px !important;
+}
+
+.chat-width{
+  width: 60% !important;
+  height: 550px !important;
+}
+
+@media only screen and (min-width:0px) and (max-width: 768px) {
+  .chat-width{
+    width: 100% !important;
+     height: 400px !important;
+     position: relative !important;
+     top: 90px !important;
+  }
+    .max-height-message{
+  height: 250px !important;
+}
+.modal-height{
+  height: 80vh !important;
+}
+.max-height-chat-users{
+  height: 470px !important;
+}
+   
+}
+ @media only screen and (min-width:769px) and (max-width: 1024px) {
+  .chat-width{
+    width: 90% !important;
+  }
+  .Modal-Height{
+    height: 50vh !important;
+  }
+}
+
+.icon-width{
+  width: 50px !important;
+}
+
+.online-dot {
+  background-color: #4CAF50 !important; 
+  color: #fff !important;
+  padding: 5px !important;
+  z-index: 10;
+  border-radius: 50%;
+  position: relative !important;
+  margin-top:28% !important;
+  left: -10px !important;
+  border: 2px solid #fff !important;
+}
+.offline-dot {
+  background-color: #ee0c0c !important; 
+  color: #fff !important;
+  padding: 5px !important;
+  z-index: 10;
+  border-radius: 50%;
+  position: relative !important;
+  margin-top:20% !important;
+  left: -10px !important;
+  border: 2px solid #fff !important;
+}
+
+  .online-dot-chatBox {
+  background-color: #4CAF50 !important; 
+  color: #fff !important;
+  padding: 5px !important;
+  z-index: 10;
+  border-radius: 50%;
+  position: relative !important;
+  margin-top:5% !important;
+  left: -10px !important;
+  border: 2px solid #fff !important;
+}
+.offline-dot-chatBox {
+  background-color: #ee0c0c !important; 
+  color: #fff !important;
+  padding: 5px !important;
+  z-index: 10;
+  border-radius: 50%;
+  position: relative !important;
+  margin-top:5% !important;
+  left: -10px !important;
+  border: 2px solid #fff !important;
+}
+
+.message-separator {
+  width: 90px !important;
+  padding: 5px !important;
+  background-color: #e1f2fa !important;
+}
+
+.adjust-latestMessage{
+  padding-top: 0px !important;
+}
+
+
+
+/* Notification */
+.Notification-Position{
+  top:10% !important;
+}
+
+/* @media only screen and (min-width:0px) and (max-width: 768px) {
+.Notification-icon{
+  margin-left: 410px !important;
+}
+}
+@media only screen and (min-width:769px) and (max-width: 1024px) {
+
+  .Notification-icon{
+    margin-left: 650px !important;
+  }
+} */
+/* .Notification-icon{
+  margin-left:  69vw !important;
+} */
+.Z-index {
+z-index:99 !important;
+}
+
+
+
+
+
+
+
+
