@@ -2,7 +2,7 @@
 const user = JSON.parse(localStorage.getItem("user"));
 import { io } from "socket.io-client";
 
-const ENDPOINT = `http://localhost:${import.meta.env.VITE_PORT}`;
+const ENDPOINT = `${import.meta.env.VITE_BASE_URL}`;
 console.log(ENDPOINT);
 const socket = io(ENDPOINT);
 if (user && user._id) {
