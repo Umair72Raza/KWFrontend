@@ -1,24 +1,26 @@
 import axios from "axios";
-const API = axios.create({ baseURL: "http://localhost:3000/order" });
+const API = axios.create({ baseURL: import.meta.env.VITE_BASE_URL });
 
 export const fetchOrders = async (data) => {
   try {
     const { users, status, token } = data;
-    const response = await API.get(`/getOrderbyIdnStatus/${users}/${status}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(response.data, "getting past orders");
+    const response = await API.get(
+      `order/getOrderbyIdnStatus/${users}/${status}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
-    console.log(error, "error getting orders");
+    throw error.response.data;
   }
 };
 
 export const fetchAllOrders = async (id) => {
   try {
-    const response = await API.get(`/getAllOrderbyId/${id}`);
+    const response = await API.get(`order/getAllOrderbyId/${id}`);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -28,51 +30,55 @@ export const fetchAllOrders = async (id) => {
 export const fetchSchOrders = async (data) => {
   try {
     const { users, status, token } = data;
-    //const { users, status } = params;
-    const response = await API.get(`/getScheduledOrders/${users}/${status}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(response);
+    const response = await API.get(
+      `order/getScheduledOrders/${users}/${status}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
-    console.log(error, "error getting orders");
+    throw error.response.data;
   }
 };
 
 export const fetchCancOrders = async (data) => {
   try {
     const { users, status, token } = data;
-    const response = await API.get(`/getCancelledOrder/${users}/${status}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await API.get(
+      `order/getCancelledOrder/${users}/${status}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
-    console.log(error, "error getting orders");
+    throw error.response.data;
   }
 };
 
 export const fetchActiveOrders = async (data) => {
   try {
     const { users, status, token } = data;
-    const response = await API.get(`/getActiveOrder/${users}/${status}`, {
+    const response = await API.get(`order/getActiveOrder/${users}/${status}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
   } catch (error) {
-    console.log(error, "error getting orders");
+    throw error.response.data;
   }
 };
 
 export const cancelOrder = async (dataWithToken) => {
   try {
     const { data, token } = dataWithToken;
-    const response = await API.put("/updateStatus", data, {
+    const response = await API.put("order/updateStatus", data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -81,29 +87,29 @@ export const cancelOrder = async (dataWithToken) => {
       return response.data;
     }
   } catch (error) {
-    console.log(error, "error cancelling order");
+    throw error.response.data;
   }
 };
 
 export const activateOrder = async (data) => {
   try {
     console.log(data);
-    const response = await API.put("/activateStatus", data);
+    const response = await API.put("order/activateStatus", data);
     if (response.status === 200) {
       return response.data;
     }
   } catch (error) {
-    console.log(error, "error cancelling order");
+    throw error.response.data;
   }
 };
 export const changeToPast = async (data) => {
   try {
     console.log(data);
-    const response = await API.put("/changeToPast", data);
+    const response = await API.put("order/changeToPast", data);
     if (response.status === 200) {
       return response.data;
     }
   } catch (error) {
-    console.log(error, "error changning status to past");
+    throw error.response.data;
   }
 };

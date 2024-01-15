@@ -1,10 +1,10 @@
 import axios from "axios";
-const API = axios.create({ baseURL: "http://localhost:3000/feedback" });
+const API = axios.create({ baseURL: import.meta.env.VITE_BASE_URL });
 
 
 export const AddFeedback= async (data)=>{
   try {   
-    const response = await API.post(`/addFeedback`, data.params,{
+    const response = await API.post(`feedback/addFeedback`, data.params,{
       headers: {
         Authorization: `Bearer ${data.token}`
       }

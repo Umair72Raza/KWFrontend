@@ -1,14 +1,13 @@
 import axios from "axios";
-const API = axios.create({ baseURL: "http://localhost:3000/admin" });
+const API = axios.create({ baseURL: import.meta.env.VITE_BASE_URL });
 
 export const getAllTheUsers = async (token) => {
   try {
-    const response = await API.get(`/users`, {
+    const response = await API.get(`admin/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data, "response in the apis ");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -17,12 +16,11 @@ export const getAllTheUsers = async (token) => {
 
 export const getAllTheWorkers = async (token) => {
   try {
-    const response = await API.get(`/workers`, {
+    const response = await API.get(`admin/workers`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data,"response in get worker the apis ");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -33,7 +31,7 @@ export const togglePersonAccess = async (token, id, access) => {
   try {
     
     const response = await API.put(
-      `/users/${id}`,
+      `admin/users/${id}`,
       { access },
       {
         headers: {
@@ -41,7 +39,6 @@ export const togglePersonAccess = async (token, id, access) => {
         },
       }
     );
-    //console.log(response.data,"response in put newAccess apis");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -50,8 +47,7 @@ export const togglePersonAccess = async (token, id, access) => {
 
 export const getAllServicesAdmin = async () => {
   try {
-    const response = await API.get(`/services`);
-    console.log(response.data,"response in get all services apis");
+    const response = await API.get(`admin/services`);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -61,7 +57,7 @@ export const getAllServicesAdmin = async () => {
 export const createNewService = async (token, name, id) => {
   try {
     const response = await API.post(
-      `/newService/`,
+      `admin/newService/`,
       { name, id },
       {
         headers: {
@@ -79,14 +75,13 @@ export const createNewService = async (token, name, id) => {
 export const deleteAService = async(token, id) => {
   try {
     const response = await API.delete(
-      `/services/${id}`,
+      `admin/services/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
-    //console.log(response, "response in del service apis");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -96,12 +91,11 @@ export const deleteAService = async(token, id) => {
 ///users/:id
 export const getAllUserOrders = async (token, id) => {
   try {
-    const response = await API.get(`/orders/${id}`, {
+    const response = await API.get(`admin/orders/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    //console.log(response, "response in set apis");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -111,14 +105,11 @@ export const getAllUserOrders = async (token, id) => {
 export const fetchFeedbacksofUser = async (data) => {
     try {
       const {_id,token} = data
-      console.log(_id,"id for feedbacks")
-      console.log(token,"token in the ap[is admin")
-      const response = await API.get(`/feedbacks/${_id}`, {
+      const response = await API.get(`admin/feedbacks/${_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("response getting feedbacks", response.data);
       return response.data;
     } catch (error) {
       throw error.response.data;

@@ -1,9 +1,9 @@
 import axios from "axios";
-const API = axios.create({ baseURL: "http://localhost:3000/user" });
+const API = axios.create({ baseURL: import.meta.env.VITE_BASE_URL });
 
 export const sendOTP = async (email) => {
   try {
-    const response = await API.post(`/forgot-password`, { email: email });
+    const response = await API.post(`user/forgot-password`, { email: email });
     return response;
   } catch (error) {
     throw error.response.data; // Throw the response error data
@@ -12,12 +12,10 @@ export const sendOTP = async (email) => {
 
 export const newPasswordSetter = async (email, newPass) => {
   try {
-    console.log(email,newPass)
-    const response = await API.put(`/newPassword`, {
+    const response = await API.put(`user/newPassword`, {
       email: email,
       password: newPass,
     });
-    console.log(response);
     return response;
   } catch (error) {
     throw error.response.data; // Throw the response error data
@@ -26,18 +24,21 @@ export const newPasswordSetter = async (email, newPass) => {
 
 export const OTPverify = async (otp) => {
   try {
-    const response = await API.put(`/reset-password/${otp}`);
-    console.log(response);
+    const response = await API.put(`user/reset-password/${otp}`);
+
     return response;
   } catch (error) {
     throw error.response.data;
   }
 };
 
-export const loginUser =async (email, password) =>{
-  const response = await  API.post(`/loginUser`, { email: email, password: password });
-return response.data;
- }
+export const loginUser = async (email, password) => {
+  const response = await API.post(`user/loginUser`, {
+    email: email,
+    password: password,
+  });
+  return response.data;
+};
 
 export const signUpUser = async (
   firstName,
@@ -50,7 +51,7 @@ export const signUpUser = async (
   address,
   services
 ) =>
-  API.post(`/signUp`, {
+  API.post(`user/signUp`, {
     firstName,
     lastName,
     email,
@@ -59,22 +60,24 @@ export const signUpUser = async (
     longitude,
     latitude,
     address,
-    services
+    services,
   });
 
-  // /updateOnlineStatus/:id
-  export const toggleStatus=  async (data) => {
-    try {
-      const {id,status} = data
-      console.log(data);
-      const response = await API.put(`/updateOnlineStatus/${id}`, {status}, {
+// /updateOnlineStatus/:id
+export const toggleStatus = async (data) => {
+  try {
+    const { id, status } = data;
+    const response = await API.put(
+      `user/updateOnlineStatus/${id}`,
+      { status },
+      {
         headers: {
           Authorization: `Bearer ${data.token}`,
         },
-      });
-      console.log(response.data);
-      return response.data;
-    } catch (error) {
-      throw error.response.data;
-    }
-  };
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

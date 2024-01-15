@@ -1,5 +1,5 @@
 import axios from "axios";
-const API = axios.create({ baseURL: "http://localhost:3000/" });
+const API = axios.create({ baseURL: import.meta.env.VITE_BASE_URL });
 
 export const GetChats = async (UserId, token) => {
   try {
