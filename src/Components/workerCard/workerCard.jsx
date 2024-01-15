@@ -22,8 +22,8 @@ const WorkerCard = ({worker}) => {
 
     const HandleChat = ()=>{
       setShowModal(true);
-      const isWorkerInChats = copyOfChats.some((chat) =>
-        chat.users.some((chatUser) => chatUser._id === worker._id));
+      const isWorkerInChats = copyOfChats?.some((chat) =>
+        chat?.users?.some((chatUser) => chatUser?._id === worker?._id));
       if (!isWorkerInChats) {
         // Create a fake chat
         const fakeChat = {
