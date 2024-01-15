@@ -186,7 +186,6 @@ const adminSlice = createSlice({
       })
       .addCase(allServicesAsync.fulfilled, (state, action) => {
         state.services = action.payload;
-        console.log(state.services,"stae")
         state.status = "succeeded";
       })
       .addCase(allServicesAsync.rejected, (state, action) => {

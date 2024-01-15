@@ -204,18 +204,15 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     dispatch(fetchChatsAsync({ user, token }));
-  }, [user._id, dispatch]);
+  }, []);
 
   useEffect(() => {
     if (chats) {
       setOriginalChats(chats);
-      setCopyOfChats(OriginalChats);
+      setCopyOfChats(chats);
     }
   }, [chats]);
 
-  useEffect(() => {
-    dispatch(fetchChatsAsync({ user, token }));
-  }, [user._id, dispatch]);
 
   useEffect(() => {
     const fetchData = async () => {

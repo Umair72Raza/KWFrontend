@@ -51,20 +51,19 @@ const HomePageUser = () => {
   useEffect(() => {
     if (user && user._id) {
       dispatch(getAllWorker({ userId: user._id, token }));
-      dispatch(fetchChatsAsync({ user, token }));
+     dispatch(fetchChatsAsync({ user, token }));
       dispatch(allServicesAsync());
     } else {
       console.error("User object or _id is missing");
     }
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    if (chats) {
-      setOriginalChats(chats);
-      setCopyOfChats(OriginalChats);
+    if (chats && chats.length > 0) {
+    setOriginalChats(chats);
+      setCopyOfChats(chats);
     }
   }, [chats]);
-
   //popup states
   const [finishOrderReq, setFinishOrderReq] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
