@@ -92,18 +92,7 @@ const Filter = ({ sortOption, setSortOption, sortOption2,
         </FormGroup>
         <FormGroup>
           <Label>{Labels.filter1}</Label>
-          <FormGroup check>
-            <Label check>
-              <Input
-                type="radio"
-                name="rateFilter"
-                value={5}
-                checked={rateFilter == 5}
-                onChange={(e) => setRateFilter(e.target.value)}
-              />
-              {Labels.l1to5}
-            </Label>
-          </FormGroup>
+         
           <FormGroup check>
             <Label check>
               <Input
