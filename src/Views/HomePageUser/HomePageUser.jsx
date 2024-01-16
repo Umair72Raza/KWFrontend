@@ -30,9 +30,9 @@ import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 import socket from "../../SocketManager/socketManager.js";
 import { activateOrderAsync } from "../../Redux/Slices/orderSlice.js";
 import Swal from "sweetalert2";
-import {allServicesAsync} from "../../Redux/Slices/Admin.js"
+import { allServicesAsync } from "../../Redux/Slices/Admin.js"
 const HomePageUser = () => {
- 
+
   let list = useSelector((state) => state?.admin?.services);
   console.log(list);
   const dispatch = useDispatch();
@@ -65,13 +65,13 @@ const HomePageUser = () => {
         setLoading(false); // Stop loading spinner
       }
     };
-  
+
     fetchData();
   }, []);
 
   useEffect(() => {
     if (chats && chats.length > 0) {
-    setOriginalChats(chats);
+      setOriginalChats(chats);
       setCopyOfChats(chats);
     }
   }, [chats]);
@@ -81,6 +81,22 @@ const HomePageUser = () => {
   const [order, setOrder] = useState("");
   const [fOrder, setFOrder] = useState("");
 
+  useEffect(() => {
+    
+      socket.on("status-change", (user) => {
+        
+        const userIndex =   users?.findIndex(u => u?._id === user?._id);
+        if (userIndex !== -1 && user.status === 'offline') {
+             users?.splice(userIndex, 1);
+             console.log(users,"users")
+        }
+      });
+      return () => {
+        socket.off("status-change");
+      };
+    
+
+  });
   useEffect(() => {
     socket.on("startjob-request", (order) => {
       setOrder(order);
@@ -203,6 +219,9 @@ const HomePageUser = () => {
   //filter
   const filteredAndSortedUsers = useMemo(() => {
     let filteredUsers = users;
+    console.log(users,"memo")
+
+
 
     if (sortOption !== "none" && sortOption === "highToLowRating") {
       filteredUsers = [...filteredUsers].sort(
@@ -332,12 +351,12 @@ const HomePageUser = () => {
         </Row>
         <Row>
           <Col className="mt-3" md={7}>
-          {loading ? (
-              <Spinner   style={{
+            {loading ? (
+              <Spinner style={{
                 height: '3rem',
                 width: '3rem'
-              }}/>
-              
+              }} />
+
             ) : (
               filteredAndSortedUsers ? (
                 filteredAndSortedUsers.map((worker, index) => (
