@@ -9,6 +9,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import Navbar from "../../Components/Navbar/UserNavbar";
 import {
   getAllWorker,
+  updateWorkers,
   WorkersByType,
 } from "../../Redux/Slices/homepageSlice.js";
 import { useDebounce } from "../../Hooks/Debounce.jsx";
@@ -49,7 +50,6 @@ const HomePageUser = () => {
   const [distanceFilter, setDistanceFilter] = useState(0);
   const [rateFilter, setRateFilter] = useState(0);
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -83,12 +83,11 @@ const HomePageUser = () => {
 
   useEffect(() => {
     
-      socket.on("status-change", (user) => {
-        
-        const userIndex =   users?.findIndex(u => u?._id === user?._id);
-        if (userIndex !== -1 && user.status === 'offline') {
-             users?.splice(userIndex, 1);
-             console.log(users,"users")
+      socket.on("status-change",  (User) => {
+       
+        if ( users && User.status === 'offline') {
+             let filteruser = users.filter((u)=>u._id!==User._id);
+             dispatch(updateWorkers(filteruser))  
         }
       });
       return () => {
@@ -265,7 +264,7 @@ const HomePageUser = () => {
     sortOption,
     sortOption2,
     distanceFilter,
-    rateFilter,
+    rateFilter
   ]);
 
   return (

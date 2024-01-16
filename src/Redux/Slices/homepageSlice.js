@@ -18,7 +18,12 @@ const homepageSlice = createSlice({
     Status: "idle",
     error: null,
   },
-  reducers: {},
+  reducers: {
+    updateWorkers: (state, action) => {
+      state.workers = action.payload;
+    },
+    
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getAllWorker.pending, (state) => {
@@ -45,5 +50,5 @@ const homepageSlice = createSlice({
       })
   }
 });
-
+export const { updateWorkers } = homepageSlice.actions;
 export default homepageSlice.reducer;

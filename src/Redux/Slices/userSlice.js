@@ -146,6 +146,7 @@ const authSlice = createSlice({
     updateOtpStatus: (state, action) => {
       state.otpStatus = action.payload;
     },
+    
   },
   extraReducers: (builder) => {
     builder
