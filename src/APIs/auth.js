@@ -1,5 +1,5 @@
 import axios from "axios";
-const API = axios.create({ baseURL: import.meta.env.VITE_BASE_URL });
+const API = axios.create({ baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT });
 
 export const sendOTP = async (email) => {
   try {
