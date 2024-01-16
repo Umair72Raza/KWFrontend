@@ -1,3 +1,5 @@
+import AdminUsers from "./Views/AdminUsers/AdminUsers";
+import AdminWorkers from "./Views/AdminWorkers/AdminWorkers";
 import HomePageAdmin from "./Views/HomePageAdminPage/HomePageAdmin";
 import Services from "./Views/Services/Services";
 
@@ -14,6 +16,18 @@ var routes = [
     name: "service",
     component: <Services />,
     layout: "/admin",
+  },
+  {
+    path: '/adminusers',
+    name: 'adminusers',
+    component: <AdminUsers />,
+    layout: '/admin'
+  },
+  {
+    path: '/adminworkers',
+    name: 'adminworkers',
+    component: <AdminWorkers />,
+    layout: '/admin'
   },
 
 ];

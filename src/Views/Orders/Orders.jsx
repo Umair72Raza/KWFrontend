@@ -29,6 +29,7 @@ import ActiveOrders from "./ActiveOrders";
 import { setnewOrderValue } from "../../Redux/Slices/bookingSlice";
 import OrderCard from "./OrderCard";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
+import { useNavigate } from "react-router-dom";
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -45,6 +46,7 @@ const Orders = () => {
   const [isCacelledOrdersFetched, setIsCancelledOrdersFetched] =
     useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
+  const navigate = useNavigate();
   const { newOrder } = useSelector((state) => state.booking);
   // const user = JSON.parse(localStorage.getItem("user"));
   // const userId = user._id;
@@ -175,6 +177,13 @@ const Orders = () => {
     newOrderFound();
   }, [dispatch, newOrder, scheduledOrders.length]);
 
+  const goBack = () =>{
+    navigate(-1);
+  }
+
+
+
+
   return (
     <>
       <Container>
@@ -182,8 +191,11 @@ const Orders = () => {
           <UserNavbar />
         </Row>
         <Row></Row>
-        <Row>
+        <Row style={{marginTop:"0.5%"}}>
           <Nav tabs>
+            <NavItem>
+              <Button color="danger" style={{marginRight:'10px'}} onClick={goBack}>Back</Button>
+            </NavItem>
             <NavItem>
               <NavLink
                 className={classnames({ active: activeTab === "1" })}
