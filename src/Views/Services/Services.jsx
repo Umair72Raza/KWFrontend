@@ -9,14 +9,16 @@ import {
 import { Input, InputGroup, Button, Col, Row } from "reactstrap";
 import Swal from "sweetalert2";
 import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
-import cross from '../../assets/cross.png'
+import cross from "../../assets/cross.png";
+import { useNavigate } from "react-router-dom";
 const Services = () => {
   const [services, setServices] = useState([]);
-  const [showEditButtons,setShowEditButton]= useState(false);
+  const [showEditButtons, setShowEditButton] = useState(false);
   const [showErrorPopUp, setShowErrorPopUp] = useState(false);
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const id = user._id;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -40,16 +42,32 @@ const Services = () => {
     setNewService(e.target.value);
   };
 
-  const displayErrorMessage = () => {
+  const displayErrorMessage = (reason) => {
     Swal.fire({
-      title: "This Service already exists!",
+      title: `This Service cannot be added ${reason}!`,
       icon: "error",
+    }).then(() => {
+      // Reset the error state
+      setShowErrorPopUp(false);
     });
   };
 
   const handleAddService = async () => {
-    if (newService.trim() !== "") {
-      const normalizedNewService = newService.toLowerCase();
+    const MAX_LETTERS = 24; // Adjust the maximum allowed letters as needed
+    let reason;
+    // Trim the input and remove extra spaces
+    const trimmedService = newService.trim();
+
+    if (trimmedService.length > 0 && trimmedService.length <= MAX_LETTERS) {
+      // Check for spaces in the service name
+      if (trimmedService.includes(" ")) {
+        // Show an error for spaces
+        reason = "because of spaces!";
+        displayErrorMessage(reason);
+        return;
+      }
+
+      const normalizedNewService = trimmedService.toLowerCase();
       // Check if the service already exists
       if (
         !services.some(
@@ -57,22 +75,28 @@ const Services = () => {
         )
       ) {
         // Dispatch addServiceAsync with the new service
-        const data = { token, name: newService, id };
+        const data = { token, name: trimmedService, id };
         const result = await dispatch(addServiceAsync(data));
+
         if (result.type === "/admin/addServices/fulfilled") {
           console.log(result);
 
           // Update the local services array
           setServices((prevServices) => [
             ...prevServices,
-            { name: newService },
+            { name: trimmedService },
           ]);
+
+          // Clear the input field
+          setNewService("");
         }
       } else {
-        setShowErrorPopUp(true);
+        reason = "because this service already exists!";
+        displayErrorMessage(reason);
       }
-      // Clear the input field
-      setNewService("");
+    } else {
+      reason = "because you exceeded letters limit!";
+      displayErrorMessage(reason);
     }
   };
 
@@ -94,21 +118,39 @@ const Services = () => {
     }
   };
   const toggleshowEdits = () => {
-    setShowEditButton(!showEditButtons)
-  }
+    setShowEditButton(!showEditButtons);
+  };
 
   return (
     <div>
       <AdminNavbar />
       <div>
-        <Row style={{marginTop:"2%"}}> 
+        <Row style={{ marginTop: "2%" }}>
           <Col>
-            {" "}
+            <Button
+              style={{
+                marginRight: "10px",
+                backgroundColor: "#48629b",
+                border: "none",
+              }}
+              onClick={() => navigate(-1)}
+            >
+              Back
+            </Button>
+          </Col>
+          <Col>
             <h2>Services</h2>
           </Col>
           <Col>
-           {!showEditButtons ?<Button color="primary" onClick={toggleshowEdits}>Edit</Button>:
-           <><img src={cross} alt="cross" onClick={toggleshowEdits}  /></>}
+            {!showEditButtons ? (
+              <Button color="primary" onClick={toggleshowEdits}>
+                Edit
+              </Button>
+            ) : (
+              <>
+                <img src={cross} alt="cross" onClick={toggleshowEdits} />
+              </>
+            )}
           </Col>
         </Row>
 
@@ -117,38 +159,45 @@ const Services = () => {
             <ListGroupItem key={service._id}>
               <Row>
                 <Col> {service.name}</Col>
-                {showEditButtons ? <><Col>
-                  <Button
-                    color="danger"
-                    size="sm"
-                    className="ml-2"
-                    onClick={() => handleRemoveService(service)}
-                  >
-                    Remove
-                  </Button>
-                </Col></>:<></>}
-                
+                {showEditButtons ? (
+                  <>
+                    <Col>
+                      <Button
+                        color="danger"
+                        size="sm"
+                        className="ml-2"
+                        onClick={() => handleRemoveService(service)}
+                      >
+                        Remove
+                      </Button>
+                    </Col>
+                  </>
+                ) : (
+                  <></>
+                )}
               </Row>
             </ListGroupItem>
           ))}
         </ListGroup>
       </div>
 
-{showEditButtons ? 
-    <InputGroup>
-        <Input
-          type="text"
-          placeholder="Add a new service"
-          value={newService}
-          onChange={handleInputChange}
-        />
-        <Button color="primary" onClick={handleAddService}>
-          Add New Service
-        </Button>
-      </InputGroup>:<></> }
-      
+      {showEditButtons ? (
+        <InputGroup>
+          <Input
+            type="text"
+            placeholder="Add a new service"
+            value={newService}
+            onChange={handleInputChange}
+          />
+          <Button color="primary" onClick={handleAddService}>
+            Add New Service
+          </Button>
+        </InputGroup>
+      ) : (
+        <></>
+      )}
 
-      {showErrorPopUp ? <>{displayErrorMessage()}</> : <></>}
+      {/* {showErrorPopUp ? <>{displayErrorMessage()}</> : <></>} */}
     </div>
   );
 };
