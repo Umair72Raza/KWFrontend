@@ -11,19 +11,45 @@ import {
   togglePersonAccessAsync,
 } from "../../Redux/Slices/Admin";
 import FeedbacksComp from "../FeedbacksComp/FeedbacksComp";
+import Swal from "sweetalert2";
 
 const WorkerDetails = ({ person, setNewFilWorkers }) => {
+
   const [orders, setOrders] = useState();
   const [feedbacks, setFeedbacks] = useState([]);
   const dispatch = useDispatch();
   const [showFeedbacksState,setShowFeedbacksState] = useState(false);
   const [showDetailsCard, setShowDetailsCard] = useState(false);
   const { token } = useSelector((state) => state.auth);
+
+  const confirmationPop = (person) => { 
+    let newAccess;
+    person.access === "accepted" ? (newAccess = "Blocked") : (newAccess = "Unblocked");
+    Swal.fire({
+      title: "Are you sure?",
+      text:   `${person.firstName} will be ${newAccess}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        toggleAccess();
+        Swal.fire({
+          title: `${newAccess}`,
+          icon: "warning"
+        });
+      }
+    })
+  }
   const toggleAccess = async () => {
     let access;
     person.access === "accepted" ? (access = "denied") : (access = "accepted");
     const id = person._id;
     const data = { token, id, access };
+
+
     const result = await dispatch(togglePersonAccessAsync(data));
     if (result.type === "/admin/toggleAccess/fulfilled") {
       setNewFilWorkers(person);
@@ -47,31 +73,48 @@ const WorkerDetails = ({ person, setNewFilWorkers }) => {
     const data = { token, _id };
     const result = await dispatch(fetchFeedbacksAsync(data));
     if (result.type==="/admin/getFeedbacks/fulfilled") {
-      console.log(result.payload,"details feedb");
       setFeedbacks(result.payload);
       setShowFeedbacksState(true)
     }
   };
 
+  const starRating = (numStars) => {
+    const stars = [];
+    for (let i = 0; i < numStars; i++) {
+      stars.push(
+        <span key={i} className="y">
+          ★
+        </span>
+      );
+    }
+    return stars;
+  };
+
+
   return (
     <div>
-      <Col xs="12" sm="8" md="8" lg="10">
+      <Col xs="12" sm="10" md="10" lg="10">
         <Card className="mb-4" style={{ width: "100%" }}>
           <CardBody>
             <CardTitle tag="h5">{`${person.firstName} ${person.lastName}`}</CardTitle>
             <CardText>Role: {person.role}</CardText>
             <CardText>Access: {person.access}</CardText>
+            <CardText>
+              {" "}
+              <b>Rating:</b>{" "}
+              {person.rating > 0 ? starRating(person.rating) : "Not Rated Yet!"}
+            </CardText>
             <Col>
             <Button
-              color={person.access === "accepted" ? "success" : "danger"}
+              color={person.access === "accepted" ? "danger" : "success"}
               style={{ margin: "10px" }}
-              onClick={toggleAccess}
+              onClick={()=>confirmationPop(person)}
             >
-              {person.access === "accepted" ? "Block" : "UnBlock"}
+              {person.access === "accepted" ? "Block" : "Unblock"}
             </Button>
 
-            <Button onClick={() => getOrders(person)}>See More Details</Button>
-            <Button style={{ margin: "10px" }} onClick={()=>seeFeedbacks(person)}>See Feedbacks</Button>
+            <Button style={{backgroundColor:"#5dafff", border:"none"}}  onClick={() => getOrders(person)}>See More Details</Button>
+            <Button color="warning"  style={{ margin: "10px", color:"" }} onClick={()=>seeFeedbacks(person)}>See Feedbacks</Button>
             </Col>
           </CardBody>
         </Card>

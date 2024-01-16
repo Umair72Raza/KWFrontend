@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 
 
 
+
 export const Logout = ()=>{
   localStorage.removeItem('token');
   localStorage.removeItem('user');
@@ -90,6 +91,8 @@ export const handleNameChange = (formData, setFormData, setError, fieldName, e) 
       progress: undefined,
     });
   }
+
+
 
   export const failureToast = (message) =>{
     toast.error(message, {

@@ -41,8 +41,7 @@ const OrderCard = ({
   setCancelledOrders,
 }) => {
   //get these from local storage
-  const user = JSON.parse(localStorage.getItem("user"));
-  const { token } = useSelector((state) => state.auth);
+  const {user,token} =  useSelector((state) => state.auth);
   const userId = user._id;
   const userRole = user.role;
   const userName = user.firstName;
