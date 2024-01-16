@@ -47,6 +47,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     socket.on("offerResult", (result) => {
       if (result == "accept") {
         setOfferResult('true')
+        clear();
       }
       else if (result == "cancel") {
         setOfferResult('false')
@@ -97,7 +98,6 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       icon: "success",
       confirmButtonText: "Cool",
     });
-    clear();
     toggle();
     return () => {
       socket.off("newOffer");
@@ -139,12 +139,11 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const clear =()=>
   {
     resetForm();
-    toggle();
   }
   return (
     <div>
       <Modal isOpen={modal} centered>
-        <ModalHeader toggle={clear} className="justify-content-center fw-bold ">
+        <ModalHeader toggle={toggle} className="justify-content-center fw-bold ">
           {heading.book}
         </ModalHeader>
         <ModalBody>
@@ -176,12 +175,13 @@ const Booking = ({ modal, toggle, worker, chat }) => {
             </div>
           </FormGroup>
           <FormGroup>
-            <Label for="taskDetails" className="fw-bold">{Labels.taskDetail}</Label>
+            <Label for="taskDetails" className="fw-bold ">{Labels.taskDetail}</Label>
             <Input
               type="textarea"
               id="taskDetails"
               value={taskDetails}
               onChange={(e) => setTaskDetails(e.target.value)}
+            
             />
           </FormGroup>
           <FormGroup>
@@ -226,7 +226,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           <Button color="primary" disabled={!formComplete} onClick={handleSend}>
             {button.send}
           </Button>{" "}
-          <Button color="secondary" onClick={clear}>
+          <Button color="secondary" onClick={toggle}>
             {button.cancel}
           </Button>
         </ModalFooter>
