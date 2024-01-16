@@ -2,7 +2,7 @@
 const user = JSON.parse(localStorage.getItem("user"));
 import { io } from "socket.io-client";
 
-const ENDPOINT = `${import.meta.env.VITE_ENDPOINT}`;
+const ENDPOINT = `${import.meta.env.VITE_SOCKET_ENDPOINT}`;
 console.log(ENDPOINT);
 const socket = io(ENDPOINT);
 if (user && user._id) {
