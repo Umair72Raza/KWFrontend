@@ -21,6 +21,7 @@ import {
   Offcanvas,
   OffcanvasHeader,
   OffcanvasBody,
+  Spinner
 } from "reactstrap";
 import ChatPopup from "../../Components/Chat Box/ChatPop.jsx";
 import { ChatState } from "../../Context/ChatProvider.jsx";
@@ -47,15 +48,25 @@ const HomePageUser = () => {
   const [searchInput, setSearchInput] = useState("");
   const [distanceFilter, setDistanceFilter] = useState(0);
   const [rateFilter, setRateFilter] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user && user._id) {
-      dispatch(getAllWorker({ userId: user._id, token }));
-     dispatch(fetchChatsAsync({ user, token }));
-      dispatch(allServicesAsync());
-    } else {
-      console.error("User object or _id is missing");
-    }
+    const fetchData = async () => {
+      try {
+        setLoading(true); // Start loading spinner
+        if (user && user._id) {
+          await dispatch(getAllWorker({ userId: user._id, token }));
+          await dispatch(fetchChatsAsync({ user, token }));
+          await dispatch(allServicesAsync());
+        } else {
+          console.error("User object or _id is missing");
+        }
+      } finally {
+        setLoading(false); // Stop loading spinner
+      }
+    };
+  
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -321,12 +332,20 @@ const HomePageUser = () => {
         </Row>
         <Row>
           <Col className="mt-3" md={7}>
-            {filteredAndSortedUsers ? (
-              filteredAndSortedUsers?.map((worker, index) => (
-                <WorkerCard worker={worker} key={index} />
-              ))
+          {loading ? (
+              <Spinner   style={{
+                height: '3rem',
+                width: '3rem'
+              }}/>
+              
             ) : (
-              <h3> No Workers found!</h3>
+              filteredAndSortedUsers ? (
+                filteredAndSortedUsers.map((worker, index) => (
+                  <WorkerCard worker={worker} key={index} />
+                ))
+              ) : (
+                <h3>No Workers found!</h3>
+              )
             )}
           </Col>
           <Col className="d-none d-md-block   mt-3" md={5}>

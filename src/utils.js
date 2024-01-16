@@ -1,25 +1,26 @@
-
 import { toast } from "react-toastify";
-
 
 import { jwtDecode } from "jwt-decode";
 
+export const Toast_Notification = (string, type) => {
+  toast[type](string, {
+    position: toast.POSITION.TOP_CENTER,
+  });
+};
 
-
-
-export const Logout = ()=>{
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+export const Logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
   return "200";
-}
+};
 
 export const checkRole = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  if(user){
- const role = user.role;
-   return role;
+  if (user) {
+    const role = user.role;
+    return role;
   }
-}
+};
 
 export const checkToken = () => {
   const token = localStorage.getItem("token");
@@ -35,11 +36,10 @@ export const checkToken = () => {
 };
 
 export const validatePassword = (password) => {
-    const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
-  
-    return password.match(passwordPattern);
-  };
+  const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
 
+  return password.match(passwordPattern);
+};
 
 export const hasOnlyWhiteSpace = (str) => {
   return !str.trim();
@@ -49,9 +49,15 @@ export const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const handleNameChange = (formData, setFormData, setError, fieldName, e) => {
+export const handleNameChange = (
+  formData,
+  setFormData,
+  setError,
+  fieldName,
+  e
+) => {
   const { value } = e.target;
-  const trimmedValue = value.trim();
+  const trimmedValue = value.trimStart().replace(/ +/g, " ");
   const capitalizedValue = capitalizeFirstLetter(trimmedValue);
 
   setFormData({
@@ -64,71 +70,62 @@ export const handleNameChange = (formData, setFormData, setError, fieldName, e) 
     setError(`${fieldName} cannot be empty or contain only spaces`);
   } else {
     // Clear error message if the user has entered a valid value
-    setError('');
+    setError("");
   }
 };
 
-  export const validateEmail = (email) => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return email.match(emailPattern);
-  };
+export const validateEmail = (email) => {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return email.match(emailPattern);
+};
 
-  
-  export const validatePhoneNumber = (phoneNumber) => {
-    const phonePattern = /^\d{10}$/;
-    return phoneNumber.match(phonePattern);
-  };
-  
+export const validatePhoneNumber = (phoneNumber) => {
+  const phonePattern = /^\d{10}$/;
+  return phoneNumber.match(phonePattern);
+};
 
-  export const successToast = (message) =>{
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 3000, // Duration in milliseconds
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }
+export const successToast = (message) => {
+  toast.success(message, {
+    position: "top-center",
+    autoClose: 3000, // Duration in milliseconds
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+};
 
+export const failureToast = (message) => {
+  toast.error(message, {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+};
 
+// select the to show
 
-  export const failureToast = (message) =>{
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }
+export const SelectChat = (chat) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (chat && chat.users && Array.isArray(chat.users)) {
+    const otherUser = chat.users.find((u) => u._id !== user._id);
 
-
-  // select the to show
-
-  export  const SelectChat = (chat) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (chat && chat.users && Array.isArray(chat.users)) {
-      const otherUser = chat.users.find((u) => u._id !== user._id);
-   
-      if (otherUser) {
-        return otherUser
-      } else {
-        console.log("No other user found in this chat");
-        // Optionally handle the case where there's no other user
-      }
+    if (otherUser) {
+      return otherUser;
     } else {
-      console.log("Invalid chat or users array");
-      // Handle cases where the chat or users array is null or not an array
+      console.log("No other user found in this chat");
+      // Optionally handle the case where there's no other user
     }
-  };
-
-
-
- 
+  } else {
+    console.log("Invalid chat or users array");
+    // Handle cases where the chat or users array is null or not an array
+  }
+};
 
 export const loadGoogleMapsScript = (apiKey, callback) => {
   const googleMapsScript = document.createElement("script");
@@ -138,7 +135,7 @@ export const loadGoogleMapsScript = (apiKey, callback) => {
   document.head.appendChild(googleMapsScript);
 };
 
-export const initMap = (setAutocomplete, setAddress, setFormData ) => {
+export const initMap = (setAutocomplete, setAddress, setFormData) => {
   const google = window.google;
   const autocompleteService = new google.maps.places.AutocompleteService();
   const newAutocomplete = new google.maps.places.Autocomplete(
@@ -169,13 +166,11 @@ export const initMap = (setAutocomplete, setAddress, setFormData ) => {
   });
 };
 
-
-
 export const getPlacePredictions = (debouncedAddress, autocomplete) => {
   if (autocomplete) {
     const google = window.google;
     const autocompleteService = new google.maps.places.AutocompleteService();
-    
+
     autocompleteService.getPlacePredictions(
       { input: debouncedAddress },
       (predictions, status) => {
@@ -191,10 +186,9 @@ export const getPlacePredictions = (debouncedAddress, autocomplete) => {
   }
 };
 
-
 // get the current location of the user
- 
-export  const getLocation = () => {
+
+export const getLocation = () => {
   return new Promise((resolve, reject) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -224,5 +218,3 @@ export  const getLocation = () => {
     }
   });
 };
-
-

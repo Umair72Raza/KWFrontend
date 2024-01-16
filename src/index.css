@@ -25,7 +25,10 @@ li {
     color: #fff;
   }
 
-  
+  .Service-overflow-y-scroll{
+    overflow-y: auto;
+  max-height: 300px;
+  }
   
 
 

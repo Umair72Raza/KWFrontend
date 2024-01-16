@@ -8,9 +8,16 @@ import {
   Container,
   Row,
   Col,
+  Spinner,
 } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom"; // Assuming React Router is properly set up
-import { validatePassword, validateEmail, handleNameChange } from "../../utils";
+import {
+  validatePassword,
+  validateEmail,
+  handleNameChange,
+  successToast,
+  failureToast,
+} from "../../utils";
 import { RegisterPage } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import { signUpUserAsync } from "../../Redux/Slices/userSlice";
@@ -18,8 +25,8 @@ import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import Map from "../../Components/Map/Map";
-import { IoMdClose } from "react-icons/io";
 import { allServicesAsync } from "../../Redux/Slices/Admin.js";
+import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown.jsx";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -46,6 +53,7 @@ const UserRegister = ({ ShowServices }) => {
   const [firstNameError, setFirstNameError] = useState("");
   const [lastNameError, setLastNameError] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const isFormValid =
@@ -64,8 +72,8 @@ const UserRegister = ({ ShowServices }) => {
   }, [formData, passwordError, confirmPasswordError, emailError, phoneError]);
 
   useEffect(() => {
-    if(ShowServices){
-    dispatch(allServicesAsync());
+    if (ShowServices) {
+      dispatch(allServicesAsync());
     }
   }, [dispatch]);
 
@@ -140,7 +148,18 @@ const UserRegister = ({ ShowServices }) => {
       (service) => service.name === selectedService
     );
 
-    if (!serviceExists) {
+    if (serviceExists) {
+      // Uncheck: Remove the service from the list
+      const updatedServices = formData.services.filter(
+        (service) => service.name !== selectedService
+      );
+
+      setFormData({
+        ...formData,
+        services: updatedServices,
+      });
+    } else {
+      // Check: Add the service to the list with a default rate of 10
       const updatedServices = [
         ...formData.services,
         { name: selectedService, rate: 10 },
@@ -166,35 +185,34 @@ const UserRegister = ({ ShowServices }) => {
     });
   };
 
-  const removeService = (serviceName) => {
-    const updatedServices = formData.services.filter(
-      (service) => service.name !== serviceName
-    );
-
-    setFormData({
-      ...formData,
-      services: updatedServices,
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    const result = await dispatch(signUpUserAsync(formData));
-    if (result.type === "auth/signup/fulfilled") {
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        password: "",
-        confirmPassword: "",
-        latitude: "",
-        longitude: "",
-        address: "",
-        services: [],
-      });
-      navigate("/auth/login");
+
+    try {
+      setLoading(true); // Start loading spinner
+
+      const result = await dispatch(signUpUserAsync(formData));
+
+      if (result.type === "auth/signup/fulfilled") {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phoneNumber: "",
+          password: "",
+          confirmPassword: "",
+          latitude: "",
+          longitude: "",
+          address: "",
+          services: [],
+        });
+        successToast("SignUP Successful!");
+        navigate("/auth/login");
+      } else {
+        failureToast("SignUP Failed Please Try Again!");
+      }
+    } finally {
+      setLoading(false); // Stop loading spinner
     }
   };
 
@@ -220,6 +238,7 @@ const UserRegister = ({ ShowServices }) => {
                     placeholder={
                       RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
                     }
+                    maxLength={12}
                     value={formData.firstName}
                     onChange={(e) =>
                       handleNameChange(
@@ -248,6 +267,7 @@ const UserRegister = ({ ShowServices }) => {
                     placeholder={
                       RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
                     }
+                    maxLength={12}
                     value={formData.lastName}
                     onChange={(e) =>
                       handleNameChange(
@@ -317,6 +337,7 @@ const UserRegister = ({ ShowServices }) => {
                     placeholder={RegisterPage.INPUT_FIELDS.PASSWORD.placeholder}
                     value={formData.password}
                     onChange={handlePasswordChange}
+                    autoComplete="on"
                   />
                   {passwordError && (
                     <span className="text-danger">{passwordError}</span>
@@ -337,6 +358,7 @@ const UserRegister = ({ ShowServices }) => {
                     }
                     value={formData.confirmPassword}
                     onChange={handleConfirmPasswordChange}
+                    autoComplete="on"
                   />
                   {confirmPasswordError && (
                     <span className="text-danger">{confirmPasswordError}</span>
@@ -344,6 +366,28 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
             </Row>
+            {ShowServices && (
+              <>
+                <Row className="my-4">
+                  <Label className="fw-semibold">
+                    {RegisterPage.LABELS.SERVICES}
+                  </Label>
+                  <Col
+                    md={12}
+                    className="d-flex flex-row Service-overflow-y-scroll"
+                  >
+                    <FormGroup>
+                      <CustomServiceDropdown
+                        list={list}
+                        selectedServices={formData.services}
+                        handleServiceChange={handleServiceChange}
+                        handleRateChange={handleRateChange}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+              </>
+            )}
             <Row>
               <Col>
                 <FormGroup>
@@ -354,60 +398,6 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
             </Row>
-            {ShowServices && (
-              <>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label className="fw-semibold">
-                        {RegisterPage.LABELS.SERVICES}
-                      </Label>
-                      <Input
-                        type={RegisterPage.INPUT_FIELDS.SERVICES.type}
-                        name={RegisterPage.INPUT_FIELDS.SERVICES.name}
-                        onChange={handleServiceChange}
-                        value=""
-                      >
-                        <option value="" disabled>
-                          {RegisterPage.INPUT_FIELDS.SERVICES.placeholder}
-                        </option>
-                        {list?.length > 0 &&
-                          list.map((service) => (
-                            <option key={service._id} value={service.name}>
-                              {service.name}
-                            </option>
-                          ))}
-                      </Input>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="d-flex flex-wrap">
-                      {formData.services.map((service) => (
-                        <div
-                          className="mr-3 mb-2 d-flex align-items-center"
-                          key={service.name}
-                        >
-                          <Label className="fw-semibold me-2">
-                            {service.name}:
-                          </Label>
-                          <Input
-                            type="number"
-                            min="10"
-                            placeholder={`Rate ($/hr)`}
-                            value={service.rate || ""}
-                            onChange={(e) => handleRateChange(e, service.name)}
-                          />
-                          <IoMdClose
-                            className="ms-2 fs-4 fw-bold text-danger cursor-pointer"
-                            onClick={() => removeService(service.name)}
-                          />
-                        </div>
-                      ))}
-                    </FormGroup>
-                  </Col>
-                </Row>
-              </>
-            )}
 
             <div className="text-center mb-3">
               {isSignupDisabled && (
@@ -416,8 +406,16 @@ const UserRegister = ({ ShowServices }) => {
                 </span>
               )}
             </div>
-            <Button color="primary" disabled={isSignupDisabled} block>
-              {RegisterPage.LABELS.SIGNUP}
+            <Button
+              color="primary"
+              disabled={isSignupDisabled || loading}
+              block
+            >
+              {loading ? (
+                <Spinner size="sm" color="light" />
+              ) : (
+                RegisterPage.LABELS.SIGNUP
+              )}
             </Button>
           </Form>
 
