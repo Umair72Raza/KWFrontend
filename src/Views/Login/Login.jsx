@@ -9,6 +9,7 @@ import {
   Container,
   Row,
   Col,
+  Spinner
 } from "reactstrap";
 import {
   LoginPage
@@ -22,10 +23,12 @@ const Login = () => {
     [LoginPage.FORM_FIELDS.EMAIL]: "",
     [LoginPage.FORM_FIELDS.PASSWORD]: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [emailError, setEmailError] = useState("");
+
 
   const handleEmailChange = (e) => {
     const email = e.target.value;
@@ -52,15 +55,22 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(loginAsync(formData));
-    if (result.type === "auth/login/fulfilled") {
-      setFormData({
-        [LoginPage.FORM_FIELDS.EMAIL]: "",
-        [LoginPage.FORM_FIELDS.PASSWORD]: "",
-      });
-      navigate("/user/homepage");
-    } else {
-      console.log("login failed or is still pending");
+    try {
+      setLoading(true); // Start loading spinner
+
+      const result = await dispatch(loginAsync(formData));
+
+      if (result.type === "auth/login/fulfilled") {
+        setFormData({
+          [LoginPage.FORM_FIELDS.EMAIL]: "",
+          [LoginPage.FORM_FIELDS.PASSWORD]: "",
+        });
+        navigate("/user/homepage");
+      } else {
+        console.log("login failed or is still pending");
+      }
+    } finally {
+      setLoading(false); // Stop loading spinner
     }
   };
 
@@ -103,7 +113,7 @@ const Login = () => {
               />
             </FormGroup>
             <Button color="primary" className="w-25" block>
-              {LoginPage.LABELS.LOGIN}
+            {loading ? <Spinner size="sm" color="light" /> : LoginPage.LABELS.LOGIN}
             </Button>
           </Form>
           <Col className="mt-3 text-center">
