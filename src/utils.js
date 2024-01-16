@@ -49,30 +49,37 @@ export const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const handleNameChange = (
-  formData,
-  setFormData,
-  setError,
-  fieldName,
-  e
-) => {
+export const handleNameChange = (formData, setFormData, setError, fieldName, e) => {
   const { value } = e.target;
-  const trimmedValue = value.trimStart().replace(/ +/g, " ");
-  const capitalizedValue = capitalizeFirstLetter(trimmedValue);
 
-  setFormData({
-    ...formData,
-    [fieldName]: capitalizedValue,
-  });
+  // Check if the entered value is a valid string (only letters and spaces)
+  const isValidString = /^[a-zA-Z\s]*$/.test(value);
 
-  if (hasOnlyWhiteSpace(value) && value.length > 0) {
-    // Display error message only when there is at least one non-space character
-    setError(`${fieldName} cannot be empty or contain only spaces`);
+  if (isValidString) {
+    // Trim spaces from the beginning and end, replace consecutive spaces with a single space
+    const cleanedValue = value.trimStart().replace(/ +/g, " ");
+
+    // Capitalize the cleaned value
+    const capitalizedValue = capitalizeFirstLetter(cleanedValue);
+
+    setFormData({
+      ...formData,
+      [fieldName]: capitalizedValue,
+    });
+
+    if (hasOnlyWhiteSpace(value) && value.length > 0) {
+      // Display error message only when there is at least one non-space character
+      setError(`${fieldName} cannot be empty or contain only spaces.`);
+    } else {
+      // Clear error message if the user has entered a valid value
+      setError("");
+    }
   } else {
-    // Clear error message if the user has entered a valid value
-    setError("");
+    setError(`${fieldName} should only contain letters.`);
   }
 };
+
+
 
 export const validateEmail = (email) => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -1,10 +1,10 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import { Container, Row } from "reactstrap";
-import routes from "../routes.Admin";
+import { Row } from "reactstrap";
+import AdminRoutes from "../Routes/AdminRoutes";
 
 const AdminLayout = () => {
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
+  const getRoutes = (AdminRoutes) => {
+    return AdminRoutes.map((prop, key) => {
       if (prop.layout === "/admin") {
         return (
           <Route path={prop.path} element={prop.component} key={key} exact />
@@ -20,7 +20,7 @@ const AdminLayout = () => {
       <div className="mt-8 pb-5">
         <Row className="justify-content-center">
           <Routes>
-            {getRoutes(routes)}
+            {getRoutes(AdminRoutes)}
             <Route
               path="*"
               element={<Navigate to="/admin/homepage" replace />}
