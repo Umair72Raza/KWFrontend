@@ -5,6 +5,13 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 
 
+export const Toast_Notification = (string, type) => {
+  toast[type](string, {
+    position: toast.POSITION.TOP_CENTER,
+  });
+};
+
+
 
 export const Logout = ()=>{
   localStorage.removeItem('token');
@@ -81,7 +88,7 @@ export const handleNameChange = (formData, setFormData, setError, fieldName, e) 
 
   export const successToast = (message) =>{
     toast.success(message, {
-      position: "top-right",
+      position: "top-center",
       autoClose: 3000, // Duration in milliseconds
       hideProgressBar: false,
       closeOnClick: true,
@@ -93,7 +100,7 @@ export const handleNameChange = (formData, setFormData, setError, fieldName, e) 
 
   export const failureToast = (message) =>{
     toast.error(message, {
-      position: "top-right",
+      position: "top-center",
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
