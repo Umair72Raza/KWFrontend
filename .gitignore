@@ -25,5 +25,10 @@ dist-ssr
 
 
 .env 
+.firebase
+dist.zip
+_redirects
+.firebaserc
+firebase.json
 
 
