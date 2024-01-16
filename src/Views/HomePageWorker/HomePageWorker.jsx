@@ -30,7 +30,7 @@ import StartJob from "../../Components/StartJob/StartJob";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { ChatState } from "../../Context/ChatProvider";
-
+import { Spinner } from 'reactstrap';
 import socket from "../../SocketManager/socketManager";
 import Swal from "sweetalert2";
 
@@ -41,12 +41,10 @@ const HomePageWorker = () => {
   const [cancelledClicked, setCancelledClicked] = useState(false);
   const [isScheduledOrdersFetched, setIsScheduledOrdersFetched] =
     useState(false);
-  const [isPastOrdersFetched, setIsPastOrdersFetched] =
+  const [isPastOrdersFetched, setIsPastOrdersFetched] = useState(false);
+  const [isCacelledOrdersFetched, setIsCancelledOrdersFetched] =
     useState(false);
-    const [isCacelledOrdersFetched, setIsCancelledOrdersFetched] =
-      useState(false);
-      const [isActiveOrdersFetched, setIsActiveOrdersFetched] =
-        useState(false);  
+  const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
   const [startJobVerified, setStartJobVerified] = useState(false); //make it true if the user sends back finalize order start
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
@@ -213,7 +211,6 @@ const HomePageWorker = () => {
     }
   }, [chats]);
 
-
   useEffect(() => {
     const fetchData = async () => {
       let result;
@@ -226,7 +223,6 @@ const HomePageWorker = () => {
               setScheduledOrders(result.payload.orders);
               setIsScheduledOrdersFetched(true);
             }
-          
           }
           if (!isActiveOrdersFetched) {
             let respo = await dispatch(fetchActiveOrdersAsync(token));
@@ -257,7 +253,6 @@ const HomePageWorker = () => {
           }
           break;
         case "4":
-
           break;
         default:
           break;
@@ -351,7 +346,7 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket.on("new-order-result", (newOrderResult) => {
-      console.log(newOrderResult)
+      console.log(newOrderResult);
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });
@@ -409,22 +404,29 @@ const HomePageWorker = () => {
                 <h2>Scheduled Orders</h2>
 
                 <div style={{ marginTop: "10px !important" }}>
-                  {scheduledOrders? (
-                    <ScheduledOrdersCardWorker
-                      scheduledOrdersObject={scheduledOrders}
-                      toggleCancel={toggleCancel}
-                      setToggleCancel={setToggleCancel}
-                      setScheduledOrders={setScheduledOrders}
-                      cancelledOrders={cancelledOrders}
-                      setCancelledOrders={setCancelledOrders}
-                      setLatestOrders={setLatestOrders}
-                      latestOrder={latestOrder}
-                      setUpdateScheduled={setUpdateScheduled}
-                      updateScheduled={updateScheduled}
-                      activeOrder={activeOrder}
-                    />
+                  {isScheduledOrdersFetched ? (
+                    scheduledOrders ? (
+                      <ScheduledOrdersCardWorker
+                        scheduledOrdersObject={scheduledOrders}
+                        toggleCancel={toggleCancel}
+                        setToggleCancel={setToggleCancel}
+                        setScheduledOrders={setScheduledOrders}
+                        cancelledOrders={cancelledOrders}
+                        setCancelledOrders={setCancelledOrders}
+                        setLatestOrders={setLatestOrders}
+                        latestOrder={latestOrder}
+                        setUpdateScheduled={setUpdateScheduled}
+                        updateScheduled={updateScheduled}
+                        activeOrder={activeOrder}
+                      />
+                    ) : (
+                      <>No Orders Scheduled</>
+                    )
                   ) : (
-                    <>No Orders Scheduled</>
+                    <div className="text-center">
+                      <Spinner color="primary" />
+                      <p>Loading scheduled orders...</p>
+                    </div>
                   )}
                 </div>
               </Col>
@@ -447,7 +449,7 @@ const HomePageWorker = () => {
           <TabPane tabId="3">
             <Row>
               <Col>
-                {cancelledOrders? (
+                {cancelledOrders ? (
                   //  &&
                   // cancelledData?.orders &&
                   // cancelledData?.orders?.length > 0
