@@ -18,7 +18,6 @@ import checkpng from "../../assets/check.png";
 import { useSelector } from "react-redux";
 const SimpleOrdersCard = ({ scheduledOrdersObject }) => {
   const { user } = useSelector((state) => state.auth);
-  const userId = user._id;
   const userRole = user.role;
   let person = null;
   if (userRole === "user") {
@@ -28,6 +27,7 @@ const SimpleOrdersCard = ({ scheduledOrdersObject }) => {
   }
 
   return (
+    
     <Container>
       <Row>
         {scheduledOrdersObject?.map((order) => (

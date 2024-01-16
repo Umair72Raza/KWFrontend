@@ -112,7 +112,9 @@ export const toggleStatusAsync = createAsyncThunk(
       console.log(data)
       const response = await toggleStatus(data);
       console.log(response.updatedStatus,'resp.datat in the slice')
-      localStorage.setItem("user", JSON.stringify(response.updatedStatus));
+      const user = JSON.parse(localStorage.getItem('user'));
+      user.status = response.updatedStatus.status;
+      localStorage.setItem('user', JSON.stringify(user));
       return response; // Assuming your relevant data is in response.data
     } catch (error) {
       // You can handle errors here, e.g., show a toast message
@@ -164,7 +166,6 @@ const authSlice = createSlice({
       })
       .addCase(signUpUserAsync.fulfilled, (state) => {
         state.signupStatus = "succeeded";
-        // Handle signup success data if needed
       })
       .addCase(signUpUserAsync.rejected, (state, action) => {
         state.signupStatus = "failed";
@@ -205,10 +206,9 @@ const authSlice = createSlice({
       })
       .addCase(logoutAsync.fulfilled, (state) => {
         state.loginStatus = "failed";
-        // state.username = null;
       })
       .addCase(toggleStatusAsync.fulfilled, (state,action) => {
-        state.newStatus= action.payload
+         state.user= action.payload.updatedStatus;
       });
   },
 });
