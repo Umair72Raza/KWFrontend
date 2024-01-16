@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "reactstrap";
 import { toggleStatusAsync } from "../../Redux/Slices/userSlice";
+import socket from "../../SocketManager/socketManager";
 
 const OnOffButton = ({ user }) => {
 
@@ -13,6 +14,7 @@ const OnOffButton = ({ user }) => {
 
   useEffect(() => {
     user.status === "online" ? setIsOn(true) : setIsOn(false);
+    socket.emit("online-offline",user);
   }, [user]);
 
   const toggleSwitch = async () => {
@@ -28,7 +30,9 @@ const OnOffButton = ({ user }) => {
     console.log(result)
     if (result.type === "/auth/toggleStatus/fulfilled") {
       setIsOn(!isOn);
+     
     }
+    
   };
 
   return (
