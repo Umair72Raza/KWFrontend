@@ -7,7 +7,6 @@ const CustomServiceDropdown = ({
   handleServiceChange,
   handleRateChange,
 }) => {
-    const [rateError, setRateError] = React.useState("");
  
 const handleInputKeyDown = (e) => {
     const keyCode = e.which || e.keyCode;
@@ -17,26 +16,12 @@ const handleInputKeyDown = (e) => {
       e.preventDefault();
     }
   };
-      const handleInputBlur = (e, serviceName) => {
-        let { value } = e.target;
-        value = parseFloat(value);
-    
-        // Check if the value is less than 10 and reset it to 10
-        if (value < 10 || isNaN(value)) {
-          value = 10;
-        }
-    
-        handleRateChange({ target: { value } }, serviceName);
-      };
-    
-
-
-    
+  
   return (
     <div>
       {list?.length > 0 &&
         list.map((service) => (
-          <FormGroup key={service._id} check>
+          <FormGroup  key={service._id} check>
             <Row className="align-items-center">
               <Col xs="auto">
                 <Input
@@ -47,7 +32,7 @@ const handleInputKeyDown = (e) => {
                 />
               </Col>
               <Col>
-                <Label check className="ml-2">
+                <Label check className="ml-2 my-1">
                   {service.name}
                 </Label>
               </Col>
@@ -62,10 +47,10 @@ const handleInputKeyDown = (e) => {
                       selectedServices.find((s) => s.name === service.name)?.rate || ""
                     }
                     onChange={(e) => handleRateChange(e, service.name)}
-                    onBlur={(e) => handleInputBlur(e, service.name)}
                     onKeyDown={handleInputKeyDown}
+                    style={{ height: "25px" }}
                   />
-                    <span className="align-self-center" >($/hr)</span>
+                    <span className="align-self-center fw-bold" >($/hr)</span>
                 </Col>
               )}
             </Row>
