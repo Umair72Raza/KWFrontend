@@ -14,7 +14,7 @@ import {
 import {
   LoginPage
 } from "../../Constants/Constants"; // Import constants
-import { validateEmail } from "../../utils";
+import { failureToast, successToast, validateEmail } from "../../utils";
 import { useDispatch } from "react-redux";
 import { loginAsync } from "../../Redux/Slices/userSlice";
 
@@ -65,9 +65,10 @@ const Login = () => {
           [LoginPage.FORM_FIELDS.EMAIL]: "",
           [LoginPage.FORM_FIELDS.PASSWORD]: "",
         });
+        successToast("Login successful! Welcome back!")
         navigate("/user/homepage");
       } else {
-        console.log("login failed or is still pending");
+        failureToast("Login failed! Please try again.")
       }
     } finally {
       setLoading(false); // Stop loading spinner
@@ -109,10 +110,11 @@ const Login = () => {
                 placeholder={LoginPage.PLACEHOLDERS.PASSWORD}
                 value={formData[LoginPage.FORM_FIELDS.PASSWORD]}
                 onChange={handleChange}
+                autoComplete="on"
                 required
               />
             </FormGroup>
-            <Button color="primary" className="w-25" block>
+            <Button color="primary" className="w-25" block disabled={loading}>
             {loading ? <Spinner size="sm" color="light" /> : LoginPage.LABELS.LOGIN}
             </Button>
           </Form>
