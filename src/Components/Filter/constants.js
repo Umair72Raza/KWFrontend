@@ -13,7 +13,6 @@ export const Labels={
     l15:"15 km",
     l20:"20 km",
     filter1: "Filter by Rate:",
-    l1to5:"Less then Equal $5",
     l6to10:"Less then Equal $10",
     l11to15:"Less then Equal $15",
     l16to20:"Less then Equal $20",
