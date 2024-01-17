@@ -9,7 +9,7 @@ import {
   Navbar,
   Row,
 } from "reactstrap";
-import { fetchUsersAsync } from "../../Redux/Slices/Admin";
+import { fetchUsersAsync } from "../../Redux/Slices/AdminSlice";
 import { useDispatch, useSelector } from "react-redux";
 import PersonDetails from "../../Components/PersonDetails/PersonDetails";
 import { useNavigate } from "react-router-dom";

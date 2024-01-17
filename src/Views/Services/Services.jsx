@@ -5,7 +5,7 @@ import {
   addServiceAsync,
   allServicesAsync,
   deleteServiceAsync,
-} from "../../Redux/Slices/Admin";
+} from "../../Redux/Slices/AdminSlice";
 import { Input, InputGroup, Button, Col, Row } from "reactstrap";
 import Swal from "sweetalert2";
 import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";

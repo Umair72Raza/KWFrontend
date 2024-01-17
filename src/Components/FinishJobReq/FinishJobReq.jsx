@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
-import { changeStatusToPastAsync } from "../../Redux/Slices/orderSlice";
+import { changeStatusToPastAsync } from "../../Redux/Slices/OrderSlice";
 import socket from "../../SocketManager/socketManager";
 import Feedback from "../../Components/feedback/feedback";
 const FinishJobReq = ({ order, setFinishOrderReq }) => {

@@ -4,7 +4,7 @@ import WorkerDetails from "../../Components/WorkerDetails/WorkerDetails";
 import { useNavigate } from "react-router-dom";
 import classnames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWorkersAsync } from "../../Redux/Slices/Admin";
+import { fetchWorkersAsync } from "../../Redux/Slices/AdminSlice";
 
 const AdminWorkers = () => {
   const navigate = useNavigate();

@@ -16,9 +16,8 @@ import {
 import forgotpng from "../../assets/forgot.png";
 import { FORGET_ROUTES, FP_FIELDS } from "./constants";
 import { failureToast, successToast } from "../../utils";
-import { requestOTPAsync } from "../../Redux/Slices/userSlice";
+import { requestOTPAsync,updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
 import { useDispatch, useSelector } from "react-redux";
-import { updateOtpStatus } from "../../Redux/Slices/userSlice.js";
 
 const ForgetPassword = () => {
   useEffect(() => {

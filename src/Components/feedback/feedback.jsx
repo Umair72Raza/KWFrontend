@@ -11,7 +11,7 @@ import {
 import { FaStar } from "react-icons/fa";
 import { heading } from "./constants";
 import { useDispatch, useSelector } from "react-redux";
-import { AddFeedBack } from "../../Redux/Slices/feedBackSlice";
+import { AddFeedBack } from "../../Redux/Slices/FeedBackSlice";
 const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
   const { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();

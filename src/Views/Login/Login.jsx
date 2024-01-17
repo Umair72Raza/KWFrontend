@@ -16,7 +16,7 @@ import {
 } from "../../Constants/Constants"; // Import constants
 import { failureToast, successToast, validateEmail } from "../../utils";
 import { useDispatch } from "react-redux";
-import { loginAsync } from "../../Redux/Slices/userSlice";
+import { loginAsync } from "../../Redux/Slices/AuthSlice";
 
 const Login = () => {
   const [formData, setFormData] = useState({

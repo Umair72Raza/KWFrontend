@@ -9,7 +9,7 @@ import {
     fetchFeedbacksAsync,
   ordersOfUserByUid,
   togglePersonAccessAsync,
-} from "../../Redux/Slices/Admin";
+} from "../../Redux/Slices/AdminSlice";
 import FeedbacksComp from "../FeedbacksComp/FeedbacksComp";
 import Swal from "sweetalert2";
 
