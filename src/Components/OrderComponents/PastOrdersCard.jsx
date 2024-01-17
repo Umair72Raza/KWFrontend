@@ -16,7 +16,8 @@ import {
 import pastpng from "../../assets/past.png";
 import checkpng from "../../assets/check.png";
 import { useSelector } from "react-redux";
-const SimpleOrdersCard = ({ scheduledOrdersObject }) => {
+
+const PastOrdersCard = ({ scheduledOrdersObject }) => {
   const { user } = useSelector((state) => state.auth);
   const userRole = user.role;
   let person = null;
@@ -100,4 +101,4 @@ const SimpleOrdersCard = ({ scheduledOrdersObject }) => {
   );
 };
 
-export default SimpleOrdersCard;
+export default PastOrdersCard;

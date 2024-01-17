@@ -18,21 +18,20 @@ import {
   fetchCancelledOrdersAsync,
   fetchPastOrdersAsync,
   fetchScheduledOrdersAsync,
-} from "../../Redux/Slices/orderSlice";
+} from "../../Redux/Slices/OrderSlice";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
-import CancelledOrders from "../Orders/CancelledOrders";
-import SimpleOrdersCard from "../Orders/SimpleOrdersCard";
-import ScheduledOrdersCardWorker from "../WorkerOrders/SchOrdersWorker";
-import ActiveOrders from "../Orders/ActiveOrders";
-
+import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
+import ScheduledOrdersCardWorker from "../../Components/OrderComponents/SchOrdersWorker";
+import ActiveOrders from "../../Components/OrderComponents/ActiveOrders";
 import GotOffer from "../../Components/GotOffer/GotOffer";
 import StartJob from "../../Components/StartJob/StartJob";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { ChatState } from "../../Context/ChatProvider";
-import { Spinner } from 'reactstrap';
+import { Spinner } from "reactstrap";
 import socket from "../../SocketManager/socketManager";
 import Swal from "sweetalert2";
+import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -439,7 +438,7 @@ const HomePageWorker = () => {
                   //  &&
                   // pastOrder?.orders &&
                   // pastOrder?.orders?.length > 0
-                  <SimpleOrdersCard scheduledOrdersObject={pastOrders} />
+                  <PastOrdersCard scheduledOrdersObject={pastOrders} />
                 ) : (
                   <h1>No Past Orders</h1>
                 )}

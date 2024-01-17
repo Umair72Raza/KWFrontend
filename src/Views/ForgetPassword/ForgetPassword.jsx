@@ -13,7 +13,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import forgotpng from "../../assets/forgot.png";
+import forgotpng from "../../assets/images/ForgetPasswordpng/forgot.png";
 import { FORGET_ROUTES, FP_FIELDS } from "./constants";
 import { failureToast, successToast } from "../../utils";
 import { requestOTPAsync,updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
