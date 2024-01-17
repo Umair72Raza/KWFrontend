@@ -9,7 +9,7 @@ import {
 import { Input, InputGroup, Button, Col, Row } from "reactstrap";
 import Swal from "sweetalert2";
 import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
-import cross from "../../assets/cross.png";
+import cross from "../../assets/images/servicespngs/cross.png";
 import { useNavigate } from "react-router-dom";
 const Services = () => {
   const [services, setServices] = useState([]);

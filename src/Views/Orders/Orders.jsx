@@ -12,7 +12,7 @@ import {
   Button,
 } from "reactstrap";
 import classnames from "classnames";
-import ScheduledOrdersTable from "./OrderCard";
+import ScheduledOrdersTable from "../../Components/OrderComponents/OrderCard";
 import { useDispatch, useSelector } from "react-redux";
 import {
   activateOrderAsync,
@@ -21,15 +21,15 @@ import {
   fetchPastOrdersAsync,
   fetchScheduledOrdersAsync,
 } from "../../Redux/Slices/orderSlice";
-import SimpleOrdersCard from "./SimpleOrdersCard";
-import CancelledOrders from "./CancelledOrders";
+import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
 import { ORDER_CONSTANTS } from "./constant";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
-import ActiveOrders from "./ActiveOrders";
+import ActiveOrders from "../../Components/OrderComponents/ActiveOrders";
 import { setnewOrderValue } from "../../Redux/Slices/bookingSlice";
-import OrderCard from "./OrderCard";
+import OrderCard from "../../Components/OrderComponents/OrderCard";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { useNavigate } from "react-router-dom";
+import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -177,12 +177,9 @@ const Orders = () => {
     newOrderFound();
   }, [dispatch, newOrder, scheduledOrders.length]);
 
-  const goBack = () =>{
+  const goBack = () => {
     navigate(-1);
-  }
-
-
-
+  };
 
   return (
     <>
@@ -191,10 +188,16 @@ const Orders = () => {
           <UserNavbar />
         </Row>
         <Row></Row>
-        <Row style={{marginTop:"0.5%"}}>
+        <Row style={{ marginTop: "0.5%" }}>
           <Nav tabs>
             <NavItem>
-              <Button color="danger" style={{marginRight:'10px'}} onClick={goBack}>Back</Button>
+              <Button
+                color="danger"
+                style={{ marginRight: "10px" }}
+                onClick={goBack}
+              >
+                Back
+              </Button>
             </NavItem>
             <NavItem>
               <NavLink
@@ -257,7 +260,7 @@ const Orders = () => {
               <Row>
                 <Col>
                   {pastOrders ? (
-                    <SimpleOrdersCard scheduledOrdersObject={pastOrders} />
+                    <PastOrdersCard scheduledOrdersObject={pastOrders} />
                   ) : (
                     <h1>No Past Orders</h1>
                   )}

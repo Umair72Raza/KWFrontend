@@ -3,9 +3,9 @@ import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
 import { Button, Col, Container, Row } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import CustomAdminCard from "../../Components/CustomAdminCard/CustomAdminCard";
-import man from "../../assets/images/man.png";
-import workerspng from "../../assets/images/workers.png";
-import servicepng from "../../assets/images/service.png";
+import man from "../../assets/images/AdminPngs/man.png";
+import workerspng from "../../assets/images/AdminPngs/workers.png";
+import servicepng from "../../assets/images/AdminPngs/service.png";
 const HomePageAdmin = () => {
   const navigate = useNavigate();
 
