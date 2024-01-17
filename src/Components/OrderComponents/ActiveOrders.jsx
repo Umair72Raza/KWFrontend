@@ -10,7 +10,7 @@ import {
   Container,
   Row,
 } from "reactstrap";
-import FinishJob from "../../Components/FinishJob/FinishJob";
+import FinishJob from "../FinishJob/FinishJob";
 import Swal from "sweetalert2";
 import socket from "../../SocketManager/socketManager";
 import { useSelector } from "react-redux";
@@ -29,7 +29,7 @@ const ActiveOrders = ({
   }
   const [finishJobVerified, setFinishJobVerified] = useState(false);
   const [confirmed, SetConfirm] = useState("");
-  
+
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {

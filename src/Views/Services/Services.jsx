@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { ListGroup, ListGroupItem } from "reactstrap";
+import { Container, ListGroup, ListGroupItem } from "reactstrap";
 import {
   addServiceAsync,
   allServicesAsync,
@@ -9,7 +9,7 @@ import {
 import { Input, InputGroup, Button, Col, Row } from "reactstrap";
 import Swal from "sweetalert2";
 import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
-import cross from "../../assets/cross.png";
+import cross from "../../assets/images/servicespngs/cross.png";
 import { useNavigate } from "react-router-dom";
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -122,9 +122,9 @@ const Services = () => {
   };
 
   return (
-    <div>
+    <>
       <AdminNavbar />
-      <div>
+      <Container>
         <Row style={{ marginTop: "2%" }}>
           <Col>
             <Button
@@ -179,7 +179,7 @@ const Services = () => {
             </ListGroupItem>
           ))}
         </ListGroup>
-      </div>
+      </Container>
 
       {showEditButtons ? (
         <InputGroup>
@@ -198,7 +198,7 @@ const Services = () => {
       )}
 
       {/* {showErrorPopUp ? <>{displayErrorMessage()}</> : <></>} */}
-    </div>
+    </>
   );
 };
 

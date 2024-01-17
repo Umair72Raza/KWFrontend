@@ -15,9 +15,9 @@ import {
 } from "reactstrap";
 import { OTPverify, newPasswordSetter } from "../../APIs/auth";
 import { NP_CONSTANTS } from "./constants";
-import resetpasswordpng from "../../assets/resetpassword.png";
-import confirmpassword from "../../assets/confirmpassword.png";
-import otppng from "../../assets/securedata.png";
+import resetpasswordpng from "../../assets/images/NewPasswordpngs/resetpassword.png";
+import confirmpassword from "../../assets/images/NewPasswordpngs/confirmpassword.png";
+import otppng from "../../assets/images/NewPasswordpngs/securedata.png";
 import { failureToast, successToast } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { requestOTPverification, setNewPassAsync } from "../../Redux/Slices/AuthSlice";

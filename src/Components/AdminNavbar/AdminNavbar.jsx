@@ -13,6 +13,7 @@ import {
   DropdownToggle,
   DropdownItem,
   DropdownMenu,
+  Container,
 } from "reactstrap";
 import { FiUser, FiMessageCircle } from "react-icons/fi";
 import { useNavigate } from "react-router";
@@ -23,18 +24,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { SelectChat } from "../../utils";
 
 const AdminNavbar = () => {
-  const {
-    setShowModal,
-    setCopyOfChats,
-    OriginalChats,
-    notification,
-    setNotification,
-    setChat,
-    setSelectedChat,
-  } = ChatState();
-
   const [isOpen, setIsOpen] = useState(false);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
@@ -45,17 +35,11 @@ const AdminNavbar = () => {
     }
   };
 
-  const HandleNotificationSelection = (notify) => {
-    setSelectedChat(() => SelectChat(notify.chat));
-    setChat(notify.chat);
-    setNotification(notification.filter((n) => n !== notify));
-    setShowModal(true);
-  };
 
   return (
-    <>
+    <Container>
       <Navbar className="bg-primary w-full" expand="sm" dark container="fluid">
-        <NavbarBrand href="/" className="fs-bold">
+        <NavbarBrand style={{ paddingLeft: "5%" }} href="/" className="fs-bold">
           KW APP
         </NavbarBrand>
         <NavbarToggler onClick={toggle} />
@@ -64,15 +48,15 @@ const AdminNavbar = () => {
             className=" d-flex flex-row gap-4 justify-content-end mt-1 mb-md-1 align-items-center"
             navbar
           >
-            <NavItem className="text-white ">
-              <Button color="danger" className="p-1 " onClick={Logout}>
+            <NavItem style={{ paddingRight: "45%" }} className="text-white ">
+              <Button color="danger" className="p-1" onClick={Logout}>
                 Logout
               </Button>
             </NavItem>
           </Nav>
         </Collapse>
       </Navbar>
-    </>
+    </Container>
   );
 };
 

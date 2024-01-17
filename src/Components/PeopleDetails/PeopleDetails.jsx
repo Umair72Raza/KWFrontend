@@ -1,62 +1,60 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
+
 // PersonDetails.jsx
 import React, { useState } from "react";
-import { Card, CardBody, CardTitle, CardText, Col, Button } from "reactstrap";
+import { Card, CardBody, CardTitle, CardText, Col, Button, Container } from "reactstrap";
 import DetailsCard from "../DetailsCard/DetailsCard";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    fetchFeedbacksAsync,
+  fetchFeedbacksAsync,
   ordersOfUserByUid,
   togglePersonAccessAsync,
 } from "../../Redux/Slices/AdminSlice";
 import FeedbacksComp from "../FeedbacksComp/FeedbacksComp";
 import Swal from "sweetalert2";
-
-const WorkerDetails = ({ person, setNewFilWorkers }) => {
-
+const PeopleDetails = ({ person, setNewFilPerson }) => {
   const [orders, setOrders] = useState();
   const [feedbacks, setFeedbacks] = useState([]);
+  const [showFeedbacksState, setShowFeedbacksState] = useState(false);
   const dispatch = useDispatch();
-  const [showFeedbacksState,setShowFeedbacksState] = useState(false);
   const [showDetailsCard, setShowDetailsCard] = useState(false);
   const { token } = useSelector((state) => state.auth);
 
-  const confirmationPop = (person) => { 
+  const confirmationPopUp = (person) => {
     let newAccess;
-    person.access === "accepted" ? (newAccess = "Blocked") : (newAccess = "Unblocked");
+    person.access === "accepted"
+      ? (newAccess = "Blocked")
+      : (newAccess = "Unblocked");
     Swal.fire({
       title: "Are you sure?",
-      text:   `${person.firstName} will be ${newAccess}`,
+      text: `${person.firstName} will be ${newAccess}`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes"
+      confirmButtonText: "Yes",
     }).then((result) => {
       if (result.isConfirmed) {
         toggleAccess();
         Swal.fire({
-          title: `${newAccess}`,
-          icon: "warning"
+          title:  `${newAccess}`,
+          icon: "warning",
         });
       }
-    })
-  }
+    });
+  };
+
   const toggleAccess = async () => {
     let access;
     person.access === "accepted" ? (access = "denied") : (access = "accepted");
     const id = person._id;
+    //dispatch the change status api here
     const data = { token, id, access };
-
-
     const result = await dispatch(togglePersonAccessAsync(data));
     if (result.type === "/admin/toggleAccess/fulfilled") {
-      setNewFilWorkers(person);
+      setNewFilPerson(person);
     }
   };
   const getOrders = async (person) => {
-
     const id = person._id;
     const data = { token, id };
     const result = await dispatch(ordersOfUserByUid(data));
@@ -66,18 +64,16 @@ const WorkerDetails = ({ person, setNewFilWorkers }) => {
     }
   };
 
-  const seeFeedbacks = async(person) => {
+  const seeFeedbacks = async (person) => {
     // Fetch feedbacks for the person using _id
     const _id = person._id;
-
     const data = { token, _id };
     const result = await dispatch(fetchFeedbacksAsync(data));
-    if (result.type==="/admin/getFeedbacks/fulfilled") {
+    if (result.type === "/admin/getFeedbacks/fulfilled") {
       setFeedbacks(result.payload);
-      setShowFeedbacksState(true)
+      setShowFeedbacksState(true);
     }
   };
-
   const starRating = (numStars) => {
     const stars = [];
     for (let i = 0; i < numStars; i++) {
@@ -90,10 +86,9 @@ const WorkerDetails = ({ person, setNewFilWorkers }) => {
     return stars;
   };
 
-
   return (
-    <div>
-      <Col xs="12" sm="10" md="10" lg="10">
+    <Container>
+      <Col xs="12" sm="12" md="12" lg="8">
         <Card className="mb-4" style={{ width: "100%" }}>
           <CardBody>
             <CardTitle tag="h5">{`${person.firstName} ${person.lastName}`}</CardTitle>
@@ -104,18 +99,28 @@ const WorkerDetails = ({ person, setNewFilWorkers }) => {
               <b>Rating:</b>{" "}
               {person.rating > 0 ? starRating(person.rating) : "Not Rated Yet!"}
             </CardText>
-            <Col>
             <Button
               color={person.access === "accepted" ? "danger" : "success"}
               style={{ margin: "10px" }}
-              onClick={()=>confirmationPop(person)}
+              onClick={() => confirmationPopUp(person)}
             >
               {person.access === "accepted" ? "Block" : "Unblock"}
             </Button>
 
-            <Button style={{backgroundColor:"#5dafff", border:"none"}}  onClick={() => getOrders(person)}>See More Details</Button>
-            <Button color="warning"  style={{ margin: "10px", color:"" }} onClick={()=>seeFeedbacks(person)}>See Feedbacks</Button>
-            </Col>
+            <Button
+              style={{ backgroundColor: "#5dafff", border: "none" }}
+              onClick={() => getOrders(person)}
+            >
+              See More Details
+            </Button>
+
+            <Button
+              color="warning"
+              style={{ margin: "10px", color: "" }}
+              onClick={() => seeFeedbacks(person)}
+            >
+              See Feedbacks
+            </Button>
           </CardBody>
         </Card>
       </Col>
@@ -124,6 +129,7 @@ const WorkerDetails = ({ person, setNewFilWorkers }) => {
           <DetailsCard
             person={person}
             setShowDetailsCard={setShowDetailsCard}
+            setShowFeedbacksState={setShowFeedbacksState}
             orders={orders}
           />
         </>
@@ -141,8 +147,8 @@ const WorkerDetails = ({ person, setNewFilWorkers }) => {
       ) : (
         <></>
       )}
-    </div>
+    </Container>
   );
 };
 
-export default WorkerDetails;
+export default PeopleDetails;

@@ -8,12 +8,14 @@ import {
   NavLink,
   Navbar,
   Row,
+  Spinner,
 } from "reactstrap";
 import { fetchUsersAsync } from "../../Redux/Slices/AdminSlice";
 import { useDispatch, useSelector } from "react-redux";
-import PersonDetails from "../../Components/PersonDetails/PersonDetails";
 import { useNavigate } from "react-router-dom";
 import classnames from "classnames";
+import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
+import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
@@ -24,31 +26,28 @@ const AdminUsers = () => {
   const dispatch = useDispatch();
   const [activeUsers, setActiveUsers] = useState([]);
   const [inactiveUsers, setInactiveUsers] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   const handleButtonClick = (tab) => {
     setActiveTab(tab);
   };
 
   useEffect(() => {
     const gettingUsers = async () => {
-      await getALLTHEUSERS();
+      try {
+        setLoading(true); // Set loading to true when fetching starts
+        const result = await dispatch(fetchUsersAsync(token));
+        if (result.type === "/admin/getUsers/fulfilled") {
+          setApiUsers(result.payload);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false); // Set loading to false when fetching is done
+        handleButtonClick("users");
+      }
     };
     gettingUsers();
-    handleButtonClick("users");
-  }, []);
-
-  //gets users from the db
-  const getALLTHEUSERS = async () => {
-    try {
-      const result = await dispatch(fetchUsersAsync(token));
-      if (result.type === "/admin/getUsers/fulfilled") {
-        console.log(result.payload, "ALL Users");
-        setApiUsers(result.payload);
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
+  }, [dispatch, token]);
 
   const getALLUSERS = () => {
     if (apiUsers !== null) {
@@ -93,66 +92,172 @@ const AdminUsers = () => {
   }, [newfilUsers]);
 
   return (
-    <Container>
-      <Row>
-      <h1 style={{ textAlign: "center" }}>Users</h1>
-      </Row>
-      <Row>
-      <Navbar color="light" light expand="md">
-        <Nav tabs>
-          <NavItem>
-            <Button
-              style={{
-                marginRight: "10px",
-                backgroundColor: "#48629b",
-                border: "none",
-              }}
-              onClick={() => navigate(-1)}
+    // <>
+    // <AdminNavbar />
+    //   <Container>
+    //     <Row>
+    //       <h1 style={{ textAlign: "center" }}>Users</h1>
+    //     </Row>
+    //     <Row>
+    //       <Navbar color="light" light expand="md">
+    //         <Nav tabs>
+    //           <NavItem>
+    //             <Button
+    //               style={{
+    //                 marginRight: "10px",
+    //                 backgroundColor: "#48629b",
+    //                 border: "none",
+    //               }}
+    //               onClick={() => navigate(-1)}
+    //             >
+    //               Back
+    //             </Button>
+    //           </NavItem>
+    //           <NavItem>
+    //             <NavLink
+    //               onClick={() => handleButtonClick("users")}
+    //               className={classnames({ active: activeTab === "users" })}
+    //             >
+    //               Active Users
+    //             </NavLink>
+    //           </NavItem>
+    //           <NavItem>
+    //             <NavLink
+    //               onClick={() => handleButtonClick("inactiveUsers")}
+    //               className={classnames({
+    //                 active: activeTab === "inactiveUsers",
+    //               })}
+    //             >
+    //               Inactive Users
+    //             </NavLink>
+    //           </NavItem>
+    //         </Nav>
+    //       </Navbar>
+    //     </Row>
+    //     <Row>
+    //       {loading ? (
+    //         <div
+    //           className="d-flex justify-content-center align-items-center"
+    //           style={{ height: "200px" }}
+    //         >
+    //           <Spinner
+    //             color="primary"
+    //             style={{ width: "3rem", height: "3rem" }}
+    //           />
+    //         </div>
+    //       ) : (
+    //         <Row xs="1" md="2" lg="3">
+    //           {activeTab === "users"
+    //             ? activeUsers.map((person, index) => (
+    //                 <Col key={index}>
+    //                   <PeopleDetails
+    //                     key={index}
+    //                     person={person}
+    //                     setNewFilPerson={setNewFilUsers}
+    //                   />
+    //                 </Col>
+    //               ))
+    //             : inactiveUsers.map((person, index) => (
+    //                 <Col key={index}>
+    //                   <PeopleDetails
+    //                     key={index}
+    //                     person={person}
+    //                     setNewFilPerson={setNewFilUsers}
+    //                   />
+    //                 </Col>
+    //               ))}
+    //         </Row>
+    //       )}
+    //     </Row>
+    //   </Container>
+    // </>
+    <>
+      <AdminNavbar />
+      <Container>
+        <Row>
+          <h1 style={{ textAlign: "center" }}>Users</h1>
+        </Row>
+        <Row>
+          <Navbar color="light" light expand="md">
+            <Nav tabs>
+              <NavItem>
+                <Button
+                  style={{
+                    marginRight: "10px",
+                    backgroundColor: "#48629b",
+                    border: "none",
+                  }}
+                  onClick={() => navigate(-1)}
+                >
+                  Back
+                </Button>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  onClick={() => handleButtonClick("users")}
+                  className={classnames({ active: activeTab === "users" })}
+                >
+                  Active Users
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  onClick={() => handleButtonClick("inactiveUsers")}
+                  className={classnames({
+                    active: activeTab === "inactiveUsers",
+                  })}
+                >
+                  Inactive Users
+                </NavLink>
+              </NavItem>
+            </Nav>
+          </Navbar>
+        </Row>
+        <Row>
+          {loading ? (
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ height: "200px" }}
             >
-              Back
-            </Button>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              onClick={() => handleButtonClick("users")}
-              className={classnames({ active: activeTab === "users" })}
-            >
-              Active Users
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              onClick={() => handleButtonClick("inactiveUsers")}
-              className={classnames({ active: activeTab === "inactiveUsers" })}
-            >
-              Inactive Users
-            </NavLink>
-          </NavItem>
-        </Nav>
-      </Navbar>
-      </Row>
-      <Row>
-        {activeTab === "users"
-          ? activeUsers.map((person, index) => (
-              <Col key={index}>
-                <PersonDetails
-                  key={index}
-                  person={person}
-                  setNewFilUsers={setNewFilUsers}
-                />
-              </Col>
-            ))
-          : inactiveUsers.map((person, index) => (
-              <Col key={index}>
-                <PersonDetails
-                  key={index}
-                  person={person}
-                  setNewFilUsers={setNewFilUsers}
-                />
-              </Col>
-            ))}
-      </Row>
-    </Container>
+              <Spinner
+                color="primary"
+                style={{ width: "3rem", height: "3rem" }}
+              />
+            </div>
+          ) : activeTab === "users" && activeUsers.length === 0 ? (
+            <p style={{ textAlign: "center", marginTop: "20px" }}>
+              No Active Users found
+            </p>
+          ) : activeTab === "inactiveUsers" && inactiveUsers.length === 0 ? (
+            <p style={{ textAlign: "center", marginTop: "20px" }}>
+              No Inactive Users found
+            </p>
+          ) : (
+            <Row xs="1" md="2" lg="3">
+              {activeTab === "users"
+                ? activeUsers.map((person, index) => (
+                    <Col key={index}>
+                      <PeopleDetails
+                        key={index}
+                        person={person}
+                        setNewFilPerson={setNewFilUsers}
+                      />
+                    </Col>
+                  ))
+                : inactiveUsers.map((person, index) => (
+                    <Col key={index}>
+                      <PeopleDetails
+                        key={index}
+                        person={person}
+                        setNewFilPerson={setNewFilUsers}
+                      />
+                    </Col>
+                  ))}
+            </Row>
+          )}
+        </Row>
+      </Container>
+    </>
   );
 };
 
