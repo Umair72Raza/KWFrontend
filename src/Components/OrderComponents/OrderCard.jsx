@@ -30,7 +30,7 @@ import {
   activateOrderAsync,
   cancelOrderAsync,
   fetchScheduledOrdersAsync,
-} from "../../Redux/Slices/orderSlice";
+} from "../../Redux/Slices/OrderSlice";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import socket from "../../SocketManager/socketManager";
 const OrderCard = ({

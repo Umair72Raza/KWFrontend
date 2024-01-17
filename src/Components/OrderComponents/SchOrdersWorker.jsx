@@ -26,7 +26,7 @@ import {
 
 import completedtask from "../../assets/completedtask.png";
 import activeOrderspng from "../../assets/activestatus.png";
-import { cancelOrderAsync } from "../../Redux/Slices/orderSlice";
+import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
 import Swal from "sweetalert2";
 
 const ScheduledOrdersCardWorker = ({
@@ -81,9 +81,9 @@ const ScheduledOrdersCardWorker = ({
       return () => {
         socket.off("cancel-order");
       };
-    }
-    cancelSocketEvent();  
-    const dataWithToken = {token:token,data:data}  
+    };
+    cancelSocketEvent();
+    const dataWithToken = { token: token, data: data };
     dispatch(cancelOrderAsync(dataWithToken));
     setCancelReason("");
     //send the event to show order cancelled
@@ -102,7 +102,7 @@ const ScheduledOrdersCardWorker = ({
 
   const sendStartRequest = async (order, Uid) => {
     //  emit socket event to show Worker wants to start the job modal.
-    
+
     const data = {
       order,
       Uid,

@@ -20,12 +20,12 @@ import {
   fetchCancelledOrdersAsync,
   fetchPastOrdersAsync,
   fetchScheduledOrdersAsync,
-} from "../../Redux/Slices/orderSlice";
+} from "../../Redux/Slices/OrderSlice";
 import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
 import { ORDER_CONSTANTS } from "./constant";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import ActiveOrders from "../../Components/OrderComponents/ActiveOrders";
-import { setnewOrderValue } from "../../Redux/Slices/bookingSlice";
+import { setnewOrderValue } from "../../Redux/Slices/BookingSlice";
 import OrderCard from "../../Components/OrderComponents/OrderCard";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { useNavigate } from "react-router-dom";

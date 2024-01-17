@@ -1,6 +1,6 @@
 import AdminUsers from "../Views/AdminUsers/AdminUsers";
 import AdminWorkers from "../Views/AdminWorkers/AdminWorkers";
-import HomePageAdmin from "../Views/HomePageAdminPage/HomePageAdmin";
+import HomePageAdmin from "../Views/HomePageAdmin/HomePageAdmin";
 import Services from "../Views/Services/Services";
 
 const AdminRoutes = [

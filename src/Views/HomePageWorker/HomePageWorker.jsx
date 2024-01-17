@@ -18,7 +18,7 @@ import {
   fetchCancelledOrdersAsync,
   fetchPastOrdersAsync,
   fetchScheduledOrdersAsync,
-} from "../../Redux/Slices/orderSlice";
+} from "../../Redux/Slices/OrderSlice";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
 import ScheduledOrdersCardWorker from "../../Components/OrderComponents/SchOrdersWorker";

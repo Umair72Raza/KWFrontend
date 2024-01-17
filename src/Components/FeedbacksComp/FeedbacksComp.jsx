@@ -1,6 +1,5 @@
 import React from 'react'
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
- import { feedbacks } from './dummyData';
 
 const FeedbacksComp = ({feedbacks, showFeedbacksState,setShowFeedbacksState }) => {
 
