@@ -6,8 +6,9 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import UserNavbar from '../../Components/Navbar/UserNavbar';
 import { fetchUsersDataAsync } from '../../Redux/Slices/EditProfileSlice';
 import { RegisterPage } from '../../Constants/Constants';
-import PhoneInput from 'react-phone-number-input';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import Map from '../../Components/Map/Map';
+import { handleNameChange, validateEmail } from '../../utils';
 
 const EditProfilePage = () => {
   const { user,token } = useSelector((state) => state.auth);
@@ -17,16 +18,14 @@ const EditProfilePage = () => {
   const [editedName, setEditedName] = useState(user.firstName);
   const [editedLastName, setEditedLastName] = useState(user.lastName);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
-    confirmPassword: "",
-    latitude: "",
-    longitude: "",
-    address: "",
-    services: [],
+    firstName: UsersData?.firstName,
+    lastName: UsersData?.lastName,
+    email: UsersData?.email,
+    phoneNumber: UsersData?.phoneNumber,
+    latitude: UsersData?.latitude,
+    longitude: UsersData?.longitude,
+    address: UsersData?.address,
+    services: UsersData?.services || [],
   });
 
 
@@ -35,7 +34,6 @@ const EditProfilePage = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const [isSignupDisabled, setIsSignupDisabled] = useState(true);
   const [firstNameError, setFirstNameError] = useState("");
   const [lastNameError, setLastNameError] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -51,36 +49,6 @@ const EditProfilePage = () => {
         dispatch(fetchUsersDataAsync(data))
     }
   },[]);
-
-  const handlePasswordChange = (e) => {
-    const password = e.target.value;
-
-    if (!validatePassword(password)) {
-      setPasswordError(RegisterPage.ERROR_MESSAGES.invalidPassword);
-    } else {
-      setPasswordError("");
-    }
-
-    setFormData({
-      ...formData,
-      password,
-    });
-  };
-
-  const handleConfirmPasswordChange = (e) => {
-    const confirmPassword = e.target.value;
-
-    if (confirmPassword !== formData.password) {
-      setConfirmPasswordError(RegisterPage.ERROR_MESSAGES.passwordsNotMatch);
-    } else {
-      setConfirmPasswordError("");
-    }
-
-    setFormData({
-      ...formData,
-      confirmPassword,
-    });
-  };
 
   const handleEmailChange = (e) => {
     const email = e.target.value;
@@ -164,24 +132,24 @@ const EditProfilePage = () => {
     e.preventDefault();
 
    // try {
-      setLoading(true); // Start loading spinner
+    //   setLoading(true); // Start loading spinner
 
      // const result = await dispatch(signUpUserAsync(formData));
 
   //    if (result.type === "auth/signup/fulfilled") {
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phoneNumber: "",
-          password: "",
-          confirmPassword: "",
-          latitude: "",
-          longitude: "",
-          address: "",
-          services: [],
-        });
-        successToast("SignUP Successful!");
+        // setFormData({
+        //   firstName: "",
+        //   lastName: "",
+        //   email: "",
+        //   phoneNumber: "",
+        //   password: "",
+        //   confirmPassword: "",
+        //   latitude: "",
+        //   longitude: "",
+        //   address: "",
+        //   services: [],
+        // });
+        // successToast("SignUP Successful!");
  //       navigate("/auth/login");
    //   } else {
      //   failureToast("SignUP Failed Please Try Again!");
@@ -192,11 +160,30 @@ const EditProfilePage = () => {
   };
 
   const handleEditModeToggle = () => {
+    setFormData({
+        firstName: UsersData?.firstName,
+        lastName: UsersData?.lastName,
+        email: UsersData?.email,
+        phoneNumber: UsersData?.phoneNumber,
+        latitude: UsersData?.latitude,
+        longitude: UsersData?.longitude,
+        address: UsersData?.address,
+        services: UsersData?.services || [],
+      })
     setEditMode(!editMode);
   };
+
   const handleCancelEdit = () => {
-    // Reset edited values to the original values
-    // setEditedUserData({});
+    setFormData({
+      firstName: UsersData?.firstName,
+      lastName: UsersData?.lastName,
+      email: UsersData?.email,
+      phoneNumber: UsersData?.phoneNumber,
+      latitude: UsersData?.latitude,
+      longitude: UsersData?.longitude,
+      address: UsersData?.address,
+      services: UsersData?.services || [],
+    });
     setEditMode(false);
   };
 
@@ -311,54 +298,12 @@ const EditProfilePage = () => {
                </Col>
              </Row>
              <Row>
-               <Col md={6}>
-                 <FormGroup>
-                   <Label className="fw-semibold" for="password">
-                     {RegisterPage.LABELS.PASSWORD}
-                   </Label>
-                   <Input
-                     type={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                     name={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                     id={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                     placeholder={RegisterPage.INPUT_FIELDS.PASSWORD.placeholder}
-                     value={formData.password}
-                     onChange={handlePasswordChange}
-                     autoComplete="on"
-                   />
-                   {passwordError && (
-                     <span className="text-danger">{passwordError}</span>
-                   )}
-                 </FormGroup>
-               </Col>
-               <Col md={6}>
-                 <FormGroup>
-                   <Label className="fw-semibold" for="confirmPassword">
-                     {RegisterPage.LABELS.CONFIRM_PASSWORD}
-                   </Label>
-                   <Input
-                     type={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                     name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
-                     id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
-                     placeholder={
-                       RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
-                     }
-                     value={formData.confirmPassword}
-                     onChange={handleConfirmPasswordChange}
-                     autoComplete="on"
-                   />
-                   {confirmPasswordError && (
-                     <span className="text-danger">{confirmPasswordError}</span>
-                   )}
-                 </FormGroup>
-               </Col>
-             </Row>
-             <Row>
               <Col>
                 <FormGroup>
                   <Label className="fw-semibold" for="address">
                     {RegisterPage.LABELS.ADDRESS}
                   </Label>
-                  <Map setFormData={setFormData} />
+                  <Map setFormData={setFormData} formData={formData} />
                 </FormGroup>
               </Col>
             </Row>
