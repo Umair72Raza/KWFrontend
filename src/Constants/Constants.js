@@ -2,7 +2,8 @@ export const LoginPage = {
   ROUTES: {
     LOGIN: "/auth/login",
     REGISTER: "/auth/register",
-    WORKER_REGISTER: "/auth/workerregister",
+    WORKER_REGISTER: "/auth/workerRegister",
+    FORGET_PASSWORD: "/auth/forgetPassword",
   },
   FORM_FIELDS: {
     EMAIL: "email",
@@ -11,6 +12,7 @@ export const LoginPage = {
   LABELS: {
     EMAIL: "Email",
     PASSWORD: "Password",
+    FORGET_PASSWORD: "Forgot Password?",
     WORKER_DESCRIPTION: "Want to offer services?",
     WORKER_DESCRIPTION2: "Register yourself!",
     LOGIN: "Login",

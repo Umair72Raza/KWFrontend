@@ -16,7 +16,7 @@ const Worker = () => {
   };
   return (
     <>
-      <Container className="mt-8 pb-5">
+      <Container fluid  className="mt-8 pb-5">
         <Row className="justify-content-center">
           <Routes>
             {getRoutes(WorkerRoutes)}

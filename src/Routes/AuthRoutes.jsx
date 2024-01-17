@@ -18,7 +18,7 @@ const AuthRoutes = [
       layout: "/auth",
     },
     {
-      path: "/Workerregister",
+      path: "/WorkerRegister",
       name: "Worker Register",
       component: <UserRegister ShowServices={true} />,
       layout: "/auth",

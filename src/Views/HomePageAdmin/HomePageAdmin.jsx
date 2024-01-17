@@ -10,6 +10,7 @@ import CustomAdminCard from "../../Components/CustomAdminCard/CustomAdminCard";
 import man from "../../assets/images/AdminPngs/man.png";
 import workerspng from "../../assets/images/AdminPngs/workers.png";
 import servicepng from "../../assets/images/AdminPngs/service.png";
+import UserNavbar from "../../Components/Navbar/UserNavbar";
 const HomePageAdmin = () => {
   const navigate = useNavigate();
 
@@ -26,7 +27,8 @@ const HomePageAdmin = () => {
   };
   return (
     <>
-      <AdminNavbar />
+      {/* <AdminNavbar /> */}
+      <UserNavbar />
       <div>
       <Container>
         <Row className="justify-content-center mt-5">

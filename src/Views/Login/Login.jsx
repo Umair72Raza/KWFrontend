@@ -81,7 +81,7 @@ const Login = () => {
       style={{ minHeight: "90vh" }}
     >
       <Row className="w-100 d-flex justify-content-center">
-        <Col md={6} lg={4} xl={4}>
+        <Col md={6} lg={4} xl={3}>
           <h2 className="text-center mt-5 mb-4">{LoginPage.LABELS.LOGIN}</h2>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
@@ -100,9 +100,12 @@ const Login = () => {
               {emailError && <span className="text-danger">{emailError}</span>}
             </FormGroup>
             <FormGroup>
+              <Col className="d-flex flex-row justify-content-between">
               <Label className="fw-semibold" for={LoginPage.FORM_FIELDS.PASSWORD}>
                 {LoginPage.LABELS.PASSWORD}
               </Label>
+              <Link to={LoginPage.ROUTES.FORGET_PASSWORD}  className="text-primary" >{LoginPage.LABELS.FORGET_PASSWORD}</Link>
+              </Col>
               <Input
                 type="password"
                 name={LoginPage.FORM_FIELDS.PASSWORD}
