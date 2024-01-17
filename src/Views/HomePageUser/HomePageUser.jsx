@@ -11,6 +11,7 @@ import {
   getAllWorker,
   updateWorkers,
   WorkersByType,
+  updateRemoveWorker
 } from "../../Redux/Slices/HomepageSlice.js";
 import { useDebounce } from "../../Hooks/Debounce.jsx";
 import {
@@ -32,6 +33,7 @@ import socket from "../../SocketManager/socketManager.js";
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js"
+
 const HomePageUser = () => {
 
   let list = useSelector((state) => state?.admin?.services);
@@ -51,6 +53,7 @@ const HomePageUser = () => {
   const [rateFilter, setRateFilter] = useState(0);
   const [loading, setLoading] = useState(false);
   let removedUsers=[] ;
+  removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -85,37 +88,27 @@ const HomePageUser = () => {
   useEffect(() => {
     
       socket.on("status-change",  (User) => {
-       
-        if ( users && User.status === 'offline') {
-             let filteruser = users.filter((u)=>{
-              u._id!==User._id
-              if(u._id===User._id)
-              {
-                removedUsers.push(u._id);
-              }
-             });
-
-             dispatch(updateWorkers(filteruser))  
-             console.log(removedUsers,"remove ")
-        }
-        else if ( users && User.status === 'online') {
-          let filteruser = removedUsers.filter((u)=>{
-           u._id===User._id
-           if(u._id===User._id)
-           {
-             removedUsers.pop(u._id);
-           }
-          });
-
-          if(filteruser.length>0)
-          {
-            users.push(User);
+          if (users && User.status === 'offline') {
+            let remove=[]; 
+            const userIndexRemoved = users.findIndex(u => u._id === User._id);
+            if(userIndexRemoved !== -1) 
+            {
+            const filteredUsers = users.filter(u => u._id !== User._id);
+            remove.push(users[userIndexRemoved]); 
+            dispatch(updateWorkers(filteredUsers));
+            dispatch(updateRemoveWorker(remove)); 
+            }
           }
-
-
-          dispatch(updateWorkers(users))  
-          console.log(users,"adding users")
-        } 
+           else if (removedUsers && User.status === 'online') {
+            let worker=users;
+            const userIndexInRemoved = removedUsers?.findIndex(u => u._id === User._id);
+            if (userIndexInRemoved !== -1) {
+              worker=[removedUsers[userIndexInRemoved],...worker]
+              const remove=removedUsers.filter(u => u._id !== User._id);
+              dispatch(updateWorkers(worker));
+              dispatch(updateRemoveWorker(remove)); 
+            }
+          }
       });
       return () => {
         socket.off("status-change");
