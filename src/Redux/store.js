@@ -6,6 +6,7 @@ import HomepageSlice from "./Slices/HomepageSlice"
 import BookingSlice from "./Slices/BookingSlice"
 import FeedbackSlice from "./Slices/FeedBackSlice"
 import AdminSlice from "./Slices/AdminSlice"
+import LoaderSlice from  './Slices/LoaderSlice'
 export const store = configureStore({
   reducer: {
     auth: AuthSlice,
@@ -14,7 +15,8 @@ export const store = configureStore({
     homepage:HomepageSlice,
     booking:BookingSlice,
     feedback:FeedbackSlice,
-    admin: AdminSlice
+    admin: AdminSlice,
+    spinner: LoaderSlice,
   },
 });
 export default store;
