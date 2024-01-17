@@ -79,6 +79,8 @@ const DetailsCard = ({
         <p>Cancelled: ${cancelledCount}</p>
       `,
       icon: "info",
+      showCloseButton: false, // Don't show the close button
+      allowOutsideClick: false, // Don't close on clicking outsid
     }).then(() => {
       // After clicking OK, set setShowDetailsCard(false)
       setShowDetailsCard(false);
