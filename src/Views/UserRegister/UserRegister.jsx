@@ -20,12 +20,12 @@ import {
 } from "../../utils";
 import { RegisterPage } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { signUpUserAsync } from "../../Redux/Slices/userSlice";
+import { signUpUserAsync } from "../../Redux/Slices/AuthSlice.js";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import Map from "../../Components/Map/Map";
-import { allServicesAsync } from "../../Redux/Slices/Admin.js";
+import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown.jsx";
 
 const UserRegister = ({ ShowServices }) => {

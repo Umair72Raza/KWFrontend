@@ -21,7 +21,7 @@ import { RiInboxArchiveLine } from "react-icons/ri";
 import { NavBar } from "./constants";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutAsync } from "../../Redux/Slices/userSlice";
+import { logoutAsync } from "../../Redux/Slices/AuthSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import { IoIosNotifications } from "react-icons/io";
 import { SelectChat } from "../../utils";

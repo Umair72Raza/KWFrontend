@@ -12,7 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import classnames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWorkersAsync } from "../../Redux/Slices/Admin";
+import { fetchWorkersAsync } from "../../Redux/Slices/AdminSlice";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
 import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
 

@@ -1,11 +1,11 @@
+import React from 'react'
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Container, Row } from "reactstrap";
-import routes from "../routes";
-
-const Auth = () => {
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/auth") {
+import WorkerRoutes from '../Routes/WorkerRoutes';
+const Worker = () => {
+  const getRoutes = (WorkerRoutes) => {
+    return WorkerRoutes.map((prop, key) => {
+      if (prop.layout === "/worker") {
         return (
           <Route path={prop.path} element={prop.component} key={key} exact />
         );
@@ -19,8 +19,8 @@ const Auth = () => {
       <Container className="mt-8 pb-5">
         <Row className="justify-content-center">
           <Routes>
-            {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/auth/login" replace />} />
+            {getRoutes(WorkerRoutes)}
+            <Route path="*" element={<Navigate to="/worker/workerhomepage" replace />} />
           </Routes>
         </Row>
       </Container>
@@ -28,4 +28,4 @@ const Auth = () => {
   )
 }
 
-export default Auth
+export default Worker

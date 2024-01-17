@@ -2,12 +2,12 @@
 
 import "./App.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import AuthLayout from "./Layouts/Auth";
-import UserLayout from "./Layouts/User";
+import AuthLayout from "./Layouts/AuthLayout";
+import UserLayout from "./Layouts/UserLayout";
 import { checkRole, checkToken } from "./utils";
 import { useEffect, useState } from "react";
 import {  useSelector } from "react-redux";
-import Worker from "./Layouts/Worker";
+import Worker from "./Layouts/WorkerLayout";
 import AdminLayout from "./Layouts/AdminLayout";
 
 

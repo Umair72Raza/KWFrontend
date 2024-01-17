@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "reactstrap";
-import { toggleStatusAsync } from "../../Redux/Slices/userSlice";
+import { toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import socket from "../../SocketManager/socketManager";
 
 const OnOffButton = ({ user }) => {

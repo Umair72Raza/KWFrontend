@@ -1,6 +1,6 @@
-import HomePageWorker from "./Views/HomePageWorker/HomePageWorker";
+import HomePageWorker from "../Views/HomePageWorker/HomePageWorker";
 
-const routes = [
+const WorkerRoutes = [
   {
     path: "/workerHomepage",
     name: "workerhomepage",
@@ -9,4 +9,4 @@ const routes = [
   },
 ];
 
-export default routes;
+export default WorkerRoutes;

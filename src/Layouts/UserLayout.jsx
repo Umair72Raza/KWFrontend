@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Container, Row } from "reactstrap";
-import routes from '../routes.Worker';
-const Worker = () => {
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/worker") {
+import UserRoutes from "../Routes/UserRoutes";
+const User = () => {
+  const getRoutes = (UserRoutes) => {
+    return UserRoutes.map((prop, key) => {
+      if (prop.layout === "/user") {
         return (
           <Route path={prop.path} element={prop.component} key={key} exact />
         );
@@ -19,13 +19,16 @@ const Worker = () => {
       <Container className="mt-8 pb-5">
         <Row className="justify-content-center">
           <Routes>
-            {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/worker/workerhomepage" replace />} />
+            {getRoutes(UserRoutes)}
+            <Route
+              path="*"
+              element={<Navigate to="/user/homepage" replace />}
+            />
           </Routes>
         </Row>
       </Container>
     </>
-  )
-}
+  );
+};
 
-export default Worker
+export default User;

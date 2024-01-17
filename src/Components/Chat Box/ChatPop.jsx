@@ -8,6 +8,7 @@ import socket from "../../SocketManager/socketManager";
 import { SelectChat } from "../../utils";
 import { useSelector } from "react-redux";
 import Booking from "../booking popup/booking";
+import { ChatPopUpPage } from "../../Constants/Constants";
 
 const ChatPopup = () => {
   let {
@@ -210,12 +211,12 @@ const ChatPopup = () => {
               key={`separator-${message._id}`}
             >
               {isSameDay(new Date(), messageDate)
-                ? "Today"
+                ? ChatPopUpPage.MESSAGE_TODAY
                 : isSameDay(
                     new Date(new Date().setDate(new Date().getDate() - 1)),
                     messageDate
                   )
-                ? "Yesterday"
+                ? ChatPopUpPage.MESSAGE_YESTERDAY
                 : messageDate.toLocaleDateString()}
             </div>
           );
@@ -254,7 +255,7 @@ const ChatPopup = () => {
         );
       })
     ) : (
-      <div className="no-messages">Start Conversation</div>
+      <div className="no-messages">{ChatPopUpPage.START_CONVERSATION}</div>
     );
   };
 
@@ -272,7 +273,7 @@ const ChatPopup = () => {
               toggle={() => Toggler()}
               className="d-flex flex-row justify-content-between align-items-center hover-pointer"
             >
-              <h5 className="ms-3 fw-bold">Chats</h5>
+              <h5 className="ms-3 fw-bold">{ChatPopUpPage.CHAT_TITLE}</h5>
             </ModalHeader>
             <ModalBody className="Modal-Height" style={{ overflowY: "auto" }}>
               {window.innerWidth <= 768 ? (
@@ -302,10 +303,10 @@ const ChatPopup = () => {
                                   <div>
                                     {" "}
                                     <Button
-                                      color="success"
+                                      color={ChatPopUpPage.BOOK_BUTTON_COLOR}
                                       onClick={() => book(selectedChat)}
                                     >
-                                      Book
+                                      {ChatPopUpPage.BOOK_BUTTON_LABEL}
                                     </Button>
                                   </div>
                                 ) : null}
@@ -329,8 +330,8 @@ const ChatPopup = () => {
                                   setNewMessageText(e.target.value)
                                 }
                               />
-                              <Button color="primary" outline>
-                                Send
+                              <Button color={ChatPopUpPage.SEND_BUTTON_COLOR} outline>
+                                {ChatPopUpPage.SEND_BUTTON_LABEL}
                               </Button>
                             </form>
                           </div>
@@ -433,10 +434,10 @@ const ChatPopup = () => {
                                 <div>
                                   {" "}
                                   <Button
-                                    color="success"
+                                    color={ChatPopUpPage.BOOK_BUTTON_COLOR}
                                     onClick={() => book(selectedChat)}
                                   >
-                                    Book
+                                    {ChatPopUpPage.BOOK_BUTTON_LABEL}
                                   </Button>
                                 </div>
                               ) : null}
@@ -460,15 +461,15 @@ const ChatPopup = () => {
                                 setNewMessageText(e.target.value)
                               }
                             />
-                            <Button color="primary" outline>
-                              Send
+                            <Button color={ChatPopUpPage.SEND_BUTTON_COLOR} outline>
+                              {ChatPopUpPage.SEND_BUTTON_LABEL}
                             </Button>
                           </form>
                         </div>
                       ) : (
                         <div className="no-chat-selected">
                           {/* Empty div when no chat is selected */}
-                          Please select a chat to start messaging
+                          {ChatPopUpPage.SELECT_CHAT_LABEL}
                         </div>
                       )}
                     </div>
