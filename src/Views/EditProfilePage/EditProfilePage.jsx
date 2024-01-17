@@ -24,6 +24,7 @@ const EditProfilePage = () => {
     phoneNumber: UsersData?.phoneNumber,
     latitude: UsersData?.latitude,
     longitude: UsersData?.longitude,
+    country: UsersData?.country,
     address: UsersData?.address,
     services: UsersData?.services || [],
   });
@@ -167,6 +168,7 @@ const EditProfilePage = () => {
         phoneNumber: UsersData?.phoneNumber,
         latitude: UsersData?.latitude,
         longitude: UsersData?.longitude,
+        country: UsersData?.country,
         address: UsersData?.address,
         services: UsersData?.services || [],
       })
@@ -181,6 +183,7 @@ const EditProfilePage = () => {
       phoneNumber: UsersData?.phoneNumber,
       latitude: UsersData?.latitude,
       longitude: UsersData?.longitude,
+      country: UsersData?.country,
       address: UsersData?.address,
       services: UsersData?.services || [],
     });
