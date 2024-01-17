@@ -14,11 +14,12 @@ import Booking from "../booking popup/booking";
 import { ChatState } from "../../Context/ChatProvider";
 import { useSelector } from "react-redux";
 
+
 const WorkerCard = ({ worker }) => {
   const { user } = useSelector((state) => state.auth);
   const { copyOfChats, setCopyOfChats, setShowModal, chat } = ChatState();
   const [modal, setModal] = useState(false);
-
+  const [bookingWorker,SetBookingWorker]=useState()
   const starRating = (numStars) => {
     const stars = [];
     for (let i = 0; i < numStars; i++) {
@@ -30,6 +31,10 @@ const WorkerCard = ({ worker }) => {
     }
     return stars;
   };
+  
+    
+    
+  
 
   const HandleChat = () => {
     setShowModal(true);
@@ -55,7 +60,8 @@ const WorkerCard = ({ worker }) => {
     setModal(!modal);
   };
 
-  const book = () => {
+  const book = (worker) => {
+    SetBookingWorker(worker);
     toggleModal();
   };
 
@@ -63,7 +69,8 @@ const WorkerCard = ({ worker }) => {
     <Container className="mt-2">
       <Row>
         <Col md={10}>
-          {worker?.status == "online" ? (
+          
+          {worker && worker?.status == "online" ? (
             <>
               <Card className="d-flex flex-column flex-md-row">
                 <CardBody className="py-1 ">
@@ -97,19 +104,18 @@ const WorkerCard = ({ worker }) => {
                     <Button color="primary" onClick={HandleChat}>
                       {WorkerCardButtons.chat}
                     </Button>
-                    <Button color="primary" onClick={book}>
+                    <Button color="primary" onClick={()=>book(worker)}>
                       {WorkerCardButtons.book}
                     </Button>
                   </div>
                 </CardBody>
               </Card>
             </>
-          ) : (
-            ""
-          )}
+          ) : {}}
+
         </Col>
       </Row>
-      <Booking modal={modal} toggle={toggleModal} worker={worker} chat={chat} />
+      <Booking modal={modal} toggle={toggleModal} worker={bookingWorker} chat={chat} />
     </Container>
   );
 };
