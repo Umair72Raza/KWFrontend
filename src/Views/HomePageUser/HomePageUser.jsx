@@ -50,6 +50,7 @@ const HomePageUser = () => {
   const [distanceFilter, setDistanceFilter] = useState(0);
   const [rateFilter, setRateFilter] = useState(0);
   const [loading, setLoading] = useState(false);
+  let removedUsers=[] ;
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -86,9 +87,35 @@ const HomePageUser = () => {
       socket.on("status-change",  (User) => {
        
         if ( users && User.status === 'offline') {
-             let filteruser = users.filter((u)=>u._id!==User._id);
+             let filteruser = users.filter((u)=>{
+              u._id!==User._id
+              if(u._id===User._id)
+              {
+                removedUsers.push(u._id);
+              }
+             });
+
              dispatch(updateWorkers(filteruser))  
+             console.log(removedUsers,"remove ")
         }
+        else if ( users && User.status === 'online') {
+          let filteruser = removedUsers.filter((u)=>{
+           u._id===User._id
+           if(u._id===User._id)
+           {
+             removedUsers.pop(u._id);
+           }
+          });
+
+          if(filteruser.length>0)
+          {
+            users.push(User);
+          }
+
+
+          dispatch(updateWorkers(users))  
+          console.log(users,"adding users")
+        } 
       });
       return () => {
         socket.off("status-change");
