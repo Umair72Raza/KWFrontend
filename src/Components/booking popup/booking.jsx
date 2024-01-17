@@ -12,7 +12,7 @@ import {
 import Swal from "sweetalert2";
 import { button, heading, Labels, div } from "./constants.js";
 import { useDispatch, useSelector } from "react-redux";
-import { CreateOrder } from "../../Redux/Slices/bookingSlice.js";
+import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 import socket from "../../SocketManager/socketManager.js";
 import OfferResult from "../../Components/OfferResult/OfferResult.jsx";
 

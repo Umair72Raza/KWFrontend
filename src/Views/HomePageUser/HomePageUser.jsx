@@ -11,7 +11,7 @@ import {
   getAllWorker,
   updateWorkers,
   WorkersByType,
-} from "../../Redux/Slices/homepageSlice.js";
+} from "../../Redux/Slices/HomepageSlice.js";
 import { useDebounce } from "../../Hooks/Debounce.jsx";
 import {
   Container,
@@ -29,9 +29,9 @@ import { ChatState } from "../../Context/ChatProvider.jsx";
 import ModalComponent from "../../Components/ModalComponent/ModalComponent.jsx";
 import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 import socket from "../../SocketManager/socketManager.js";
-import { activateOrderAsync } from "../../Redux/Slices/orderSlice.js";
+import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
-import { allServicesAsync } from "../../Redux/Slices/Admin.js"
+import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js"
 const HomePageUser = () => {
 
   let list = useSelector((state) => state?.admin?.services);

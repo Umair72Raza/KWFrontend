@@ -14,7 +14,7 @@ import {
 } from "reactstrap";
 import PersonDetails from "../../Components/PersonDetails/PersonDetails";
 import WorkerDetails from "../../Components/WorkerDetails/WorkerDetails";
-import { fetchUsersAsync, fetchWorkersAsync } from "../../Redux/Slices/Admin";
+import { fetchUsersAsync, fetchWorkersAsync } from "../../Redux/Slices/AdminSlice";
 import { useNavigate } from "react-router-dom";
 import CustomAdminCard from "../../Components/CustomAdminCard/CustomAdminCard";
 import man from "../../assets/images/man.png";
