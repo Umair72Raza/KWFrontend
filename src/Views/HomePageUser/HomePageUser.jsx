@@ -54,28 +54,18 @@ const HomePageUser = () => {
   const [loading, setLoading] = useState(false);
   let removedUsers=[] ;
   removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
-  // useEffect(() => {
-  //   if (user && user._id) {
-  //     socket.emit("setup", user);
-     
-      
-  //   } else {
-  //     socket.disconnect();
-  //   }
-  //   if(user && user._id ){
-  //     socket.emit("new-user-add", user._id);
-  //   } else {
-  //     socket.disconnect();
-  //   }
-  //   if(user && user._id ){
-  //     socket.on("connection", "true");
-  //   } else {
-  //     socket.disconnect();
-  //   }
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // },[user]);
+
+  useEffect(() => {
+    console.log(user)
+    if (user && user._id) {
+      socket.emit("setup", user);
+      socket.emit("new-user-add", user._id);
+      socket.on("connection", "true");
+    } else {
+      socket.disconnect();
+    }
+   
+  },[user]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -326,10 +316,10 @@ const HomePageUser = () => {
             </Button>
           </Col>
           <Col className="   d-flex flex-column py-0" xs={6}>
-            <div className="d-flex">
+            <div className="d-flex gap-1 ">
               <Input
                 type="text"
-                className="px-sm-5 text-contain"
+                className="  search-border"
                 placeholder="Search..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}

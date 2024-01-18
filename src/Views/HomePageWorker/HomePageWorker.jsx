@@ -77,26 +77,16 @@ const HomePageWorker = () => {
   } = ChatState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
-  // useEffect(() => {
-  //   if (user && user._id) {
-  //     socket.emit("setup", user);
-  //   } else {
-  //     socket.disconnect();
-  //   }
-  //   if (user && user._id) {
-  //     socket.emit("new-user-add", user._id);
-  //   } else {
-  //     socket.disconnect();
-  //   }
-  //   if (user && user._id) {
-  //     socket.on("connection", "true");
-  //   } else {
-  //     socket.disconnect();
-  //   }
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, [user]);
+  useEffect(() => {
+    if (user && user._id) {
+      socket.emit("setup", user);
+      socket.emit("new-user-add", user._id);
+      socket.on("connection", "true");
+    } else {
+      socket.disconnect();
+    }
+    
+  },[user]);
 
   useEffect(() => {
     if (!socket) return;

@@ -84,9 +84,10 @@ const Booking = ({ modal, toggle, worker, chat }) => {
 
 
   const handleSend = () => {
-    const present =removedUsers?.filter((u)=>u._id === worker._id)
+    let present =[];
+    present = removedUsers?.filter((u)=>u._id === worker._id)
     console.log(present )
-    if(present.length<=0){
+    if(present?.length<=0){
     const data = {
       Title: taskTitle,
       Status: "Scheduled",
