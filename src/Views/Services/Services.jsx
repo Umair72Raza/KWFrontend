@@ -5,6 +5,7 @@ import {
   addServiceAsync,
   allServicesAsync,
   deleteServiceAsync,
+  updateServiceAsync,
 } from "../../Redux/Slices/AdminSlice";
 import { Input, InputGroup, Button, Col, Row } from "reactstrap";
 import Swal from "sweetalert2";
@@ -13,8 +14,11 @@ import cross from "../../assets/images/servicespngs/cross.png";
 import { useNavigate } from "react-router-dom";
 const Services = () => {
   const [services, setServices] = useState([]);
+  const [addButtonDisabled, setAddButtonDisabled] = useState(false);
   const [showEditButtons, setShowEditButton] = useState(false);
   const [showErrorPopUp, setShowErrorPopUp] = useState(false);
+  const [editedService, setEditedService] = useState({ id: null, name: "" });
+  const [updateButtonDisabled, setUpdateButtonDisabled] = useState(false);
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const id = user._id;
@@ -42,6 +46,10 @@ const Services = () => {
     setNewService(e.target.value);
   };
 
+  const handleEditInputChange = (e) => {
+    setEditedService({ ...editedService, name: e.target.value });
+  };
+
   const displayErrorMessage = (reason) => {
     Swal.fire({
       title: `This Service cannot be added ${reason}!`,
@@ -53,6 +61,7 @@ const Services = () => {
   };
 
   const handleAddService = async () => {
+    setAddButtonDisabled(true); // Disable the button
     const MAX_LETTERS = 24; // Adjust the maximum allowed letters as needed
     let reason;
     // Trim the input and remove extra spaces
@@ -68,10 +77,12 @@ const Services = () => {
       }
 
       const normalizedNewService = trimmedService.toLowerCase();
-      // Check if the service already exists
+
       if (
         !services.some(
-          (service) => service.name.toLowerCase() === normalizedNewService
+          (service) =>
+            service.name.toLowerCase() === normalizedNewService ||
+            service.name.toLowerCase().startsWith(normalizedNewService + " ")
         )
       ) {
         // Dispatch addServiceAsync with the new service
@@ -79,24 +90,21 @@ const Services = () => {
         const result = await dispatch(addServiceAsync(data));
 
         if (result.type === "/admin/addServices/fulfilled") {
-          console.log(result);
-
-          // Update the local services array
           setServices((prevServices) => [
             ...prevServices,
             { name: trimmedService },
           ]);
-
-          // Clear the input field
           setNewService("");
+          setAddButtonDisabled(false); // Enable the button
         }
       } else {
-        reason = "because this service already exists!";
-        displayErrorMessage(reason);
+        displayErrorMessage("because this service already exists!");
+        setAddButtonDisabled(false); // Enable the button
       }
     } else {
       reason = "because you exceeded letters limit!";
       displayErrorMessage(reason);
+      setAddButtonDisabled(false); // Enable the button
     }
   };
 
@@ -104,32 +112,112 @@ const Services = () => {
     const id = service._id;
     const data = { token, id };
 
-    try {
-      const result = await dispatch(deleteServiceAsync(data));
+    // Display a confirmation popup
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to remove this service?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, remove it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const removeResult = await dispatch(deleteServiceAsync(data));
 
-      if (result.type === "/admin/deleteService/fulfilled") {
-        console.log(result);
-        setServices((prevServices) =>
-          prevServices.filter((s) => s._id !== service._id)
-        );
+          if (removeResult.type === '/admin/deleteService/fulfilled') {
+            setServices((prevServices) =>
+              prevServices.filter((s) => s._id !== service._id)
+            );
+            Swal.fire('Removed!', 'The service has been removed.', 'success');
+          } else {
+            Swal.fire('Error!', 'An error occurred during removal.', 'error');
+          }
+        } catch (error) {
+          console.error('Error removing service:', error);
+          Swal.fire('Error!', 'An error occurred during removal.', 'error');
+        }
       }
-    } catch (error) {
-      console.error("Error deleting service:", error);
-    }
+    });
   };
+
   const toggleshowEdits = () => {
     setShowEditButton(!showEditButtons);
   };
 
+  const handleEditService = async () => {
+    setUpdateButtonDisabled(true);
+    // Validate the edited service name
+    const MAX_LETTERS = 24;
+    const trimmedEditedService = editedService.name.trim();
+
+    if (
+      trimmedEditedService.length > 0 &&
+      trimmedEditedService.length <= MAX_LETTERS
+    ) {
+      const normalizedEditedService = trimmedEditedService.toLowerCase();
+
+      if (
+        !services.some(
+          (s) =>
+            s.name.toLowerCase() === normalizedEditedService &&
+            s._id !== editedService.id
+        )
+      ) {
+        // Dispatch updateServiceAsync with the edited service
+        try {
+          // Dispatch updateServiceAsync with the edited service
+          const data = {
+            token,
+            name: trimmedEditedService,
+            id: editedService.id,
+          };
+          const result = await dispatch(updateServiceAsync(data));
+
+          if (result.type === "/admin/updateService/fulfilled") {
+            setServices((prevServices) =>
+              prevServices.map((s) =>
+                s._id === editedService.id
+                  ? { ...s, name: trimmedEditedService }
+                  : s
+              )
+            );
+            setEditedService({ id: null, name: "" });
+          } else {
+            displayErrorMessage("because this service cannot be updated!");
+          }
+        } catch (error) {
+          console.error("Error updating service:", error);
+          displayErrorMessage("because an error occurred during update!");
+        } finally {
+          setUpdateButtonDisabled(false);
+        }
+      } else {
+        displayErrorMessage("because this service already exists!");
+        setUpdateButtonDisabled(false);
+      }
+    } else {
+      displayErrorMessage("because you exceeded letters limit!");
+    }
+  };
+
+  const startEditingService = (service) => {
+    setEditedService({ id: service._id, name: service.name });
+  };
+
+  const handleCancelEdit = () => {
+    setEditedService({ id: null, name: "" });
+  };
   return (
     <>
       <AdminNavbar />
-      <Container style={{ padding:"4%"}}>
-        <Row style={{ marginTop: "1%", textAlign:"center" }}>
+      <Container style={{ padding: "4%" }}>
+        <Row style={{ marginTop: "1%", textAlign: "center" }}>
           <Col>
             <Button
               style={{
-                marginRight: "10px",
+                marginRight: "",
                 backgroundColor: "#48629b",
                 border: "none",
               }}
@@ -143,8 +231,11 @@ const Services = () => {
           </Col>
           <Col>
             {!showEditButtons ? (
-              <Button color="primary" onClick={toggleshowEdits}>
-                Edit
+              <Button
+                style={{ backgroundColor: "#a817ff", border: "none" }}
+                onClick={toggleshowEdits}
+              >
+                Add a service
               </Button>
             ) : (
               <>
@@ -155,29 +246,60 @@ const Services = () => {
         </Row>
 
         <ListGroup>
-          {services.map((service) => (
-            <ListGroupItem key={service._id}>
-              <Row>
-                <Col> {service.name}</Col>
-                {showEditButtons ? (
-                  <>
-                    <Col>
+          <ListGroup>
+            {services.map((service) => (
+              <ListGroupItem key={service._id}>
+                <Row style={{ textAlign: "center" }}>
+                  <Col>
+                    {editedService.id === service._id ? (
+                      <Input
+                        type="text"
+                        value={editedService.name}
+                        onChange={handleEditInputChange}
+                      />
+                    ) : (
+                      <span onClick={() => startEditingService(service)}>
+                        {service.name}
+                      </span>
+                    )}
+                  </Col>
+                  <Col>
+                    <Button
+                      color="danger"
+                      size="sm"
+                      className="ml-2"
+                      onClick={() => handleRemoveService(service)}
+                    >
+                      Remove
+                    </Button>
+                  </Col>
+                  <Col>
+                    {editedService.id === service._id ? (
+                      <>
+                        <Button
+                          color="primary"
+                          onClick={() => handleEditService(service)}
+                        >
+                          Update
+                        </Button>
+                        <Button color="secondary" onClick={handleCancelEdit}>
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
                       <Button
-                        color="danger"
-                        size="sm"
-                        className="ml-2"
-                        onClick={() => handleRemoveService(service)}
+                        color="primary"
+                        onClick={() => startEditingService(service)}
                       >
-                        Remove
+                        Edit
                       </Button>
-                    </Col>
-                  </>
-                ) : (
-                  <></>
-                )}
-              </Row>
-            </ListGroupItem>
-          ))}
+                    )}
+                  </Col>
+                </Row>
+              </ListGroupItem>
+            ))}
+          </ListGroup>
+          {/* ))} */}
         </ListGroup>
       </Container>
 

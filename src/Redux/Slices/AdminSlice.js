@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   createNewService,
   deleteAService,
+  editNewService,
   fetchFeedbacksofUser,
   getAllServicesAdmin,
   getAllTheUsers,
@@ -93,6 +94,19 @@ export const deleteServiceAsync = createAsyncThunk(
   }
 );
 
+export const updateServiceAsync = createAsyncThunk(
+  "/admin/updateService",
+  async (data) => {
+    try {
+      const { token, name, id } = data;
+      const response = await editNewService(token, name, id);
+      return response;
+    } catch (error) {
+      console.log(error, "error editing service");
+    }
+  }
+);
+
 //get orders of a user.
 
 export const ordersOfUserByUid = createAsyncThunk(
@@ -130,9 +144,10 @@ const adminSlice = createSlice({
     personAccess: null,
     services: null,
     newService: null,
-    feedbacks:null,
+    updatedService: null,
+    feedbacks: null,
     deletedPerson: null,
-    ordersofAUser:null,
+    ordersofAUser: null,
     data: null,
     error: null,
     status: null,
@@ -246,6 +261,20 @@ const adminSlice = createSlice({
       })
       .addCase(fetchFeedbacksAsync.rejected, (state, action) => {
         state.feedbacks = {
+          data: null,
+          status: "failed",
+          error: action.error.message,
+        };
+      })
+      .addCase(updateServiceAsync.pending, (state) => {
+        state.updatedService = { data: null, status: "loading" };
+      })
+      .addCase(updateServiceAsync.fulfilled, (state, action) => {
+        state.updatedService = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(updateServiceAsync.rejected, (state, action) => {
+        state.updatedService = {
           data: null,
           status: "failed",
           error: action.error.message,

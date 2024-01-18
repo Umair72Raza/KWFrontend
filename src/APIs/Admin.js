@@ -88,6 +88,23 @@ export const deleteAService = async(token, id) => {
   }
 };
 
+export const editNewService = async(token,name,id) =>{
+  try {
+    const response = await API.put(
+      `admin/updateService/${id}`, {name}, 
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response.data,"resposne of edit in api")
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
+
 ///users/:id
 export const getAllUserOrders = async (token, id) => {
   try {
