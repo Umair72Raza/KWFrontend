@@ -32,6 +32,11 @@ import { Spinner } from "reactstrap";
 import socket from "../../SocketManager/socketManager";
 import Swal from "sweetalert2";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
+import {
+  hideSpinner,
+  selectSpinnerVisibility,
+  showSpinner,
+} from "../../Redux/Slices/LoaderSlice";
 
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -53,6 +58,7 @@ const HomePageWorker = () => {
   const [pastOrders, setPastOrders] = useState([]);
   const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
+  const spinnerVisible = useSelector(selectSpinnerVisibility);
 
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   let {
@@ -158,7 +164,7 @@ const HomePageWorker = () => {
     };
   });
   useEffect(() => {
-    socket.on("order-canceled", (order) => {
+    socket.on("order-cancelled", (order) => {
       if (order) {
         Swal.fire({
           title: "Order Canceled",
@@ -183,7 +189,7 @@ const HomePageWorker = () => {
       }
     });
     return () => {
-      socket.off("order-canceled");
+      socket.off("order-cancelled");
     };
   });
 
@@ -229,37 +235,47 @@ const HomePageWorker = () => {
         case "1":
           // Check if scheduledOrders is already available locally
           if (!isScheduledOrdersFetched) {
+            dispatch(showSpinner());
             result = await dispatch(fetchScheduledOrdersAsync(token));
             if (result.type === "orders/fetchScheduledOrders/fulfilled") {
               setScheduledOrders(result.payload.orders);
               setIsScheduledOrdersFetched(true);
+              dispatch(hideSpinner());
             }
           }
           if (!isActiveOrdersFetched) {
+            dispatch(showSpinner());
             let respo = await dispatch(fetchActiveOrdersAsync(token));
             if (respo.type === "orders/fetchActiveOrders/fulfilled") {
               setActiveOrder(respo.payload.orders);
               setIsActiveOrdersFetched(true);
+              dispatch(hideSpinner());
             }
           }
           break;
         case "2":
+          
           // Check if pastOrders is already available locally
           if (!isPastOrdersFetched) {
+            dispatch(showSpinner());
             result = await dispatch(fetchPastOrdersAsync(token));
             if (result.type === "orders/fetchPastOrders/fulfilled") {
               setPastOrders(result.payload.orders);
               setIsPastOrdersFetched(true);
+              dispatch(hideSpinner());
             }
           }
+
           break;
         case "3":
           // Check if cancelledOrders is already available locally
           if (!isCacelledOrdersFetched) {
+            dispatch(showSpinner());
             result = await dispatch(fetchCancelledOrdersAsync(token));
             if (result.type === "orders/fetchCancelledOrders/fulfilled") {
               setCancelledOrders(result.payload.orders);
               setIsCancelledOrdersFetched(true);
+              dispatch(hideSpinner());
             }
           }
           break;
@@ -415,8 +431,8 @@ const HomePageWorker = () => {
                 <h2>Scheduled Orders</h2>
 
                 <div style={{ marginTop: "10px !important" }}>
-                  {isScheduledOrdersFetched ? (
-                    scheduledOrders ? (
+                  
+                   { isScheduledOrdersFetched  && scheduledOrders ? (
                       <ScheduledOrdersCardWorker
                         scheduledOrdersObject={scheduledOrders}
                         toggleCancel={toggleCancel}
@@ -432,13 +448,8 @@ const HomePageWorker = () => {
                       />
                     ) : (
                       <>No Orders Scheduled</>
-                    )
-                  ) : (
-                    <div className="text-center">
-                      <Spinner color="primary" />
-                      <p>Loading scheduled orders...</p>
-                    </div>
-                  )}
+                    )}
+                  
                 </div>
               </Col>
             </Row>
@@ -498,7 +509,7 @@ const HomePageWorker = () => {
       {gotOffer ? (
         <>
           <GotOffer
-            formattedOfferDetails={formattedOfferDetails}
+            formattedOfferDetails={receiveMessage}
             onConfirm={handleConfirm}
             onCancel={handleCancel}
           />
@@ -518,6 +529,7 @@ const HomePageWorker = () => {
         <></>
       )}
       <ChatPopup />
+      {spinnerVisible && <Spinner />}
     </Container>
   );
 };
