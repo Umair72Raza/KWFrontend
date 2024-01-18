@@ -6,10 +6,16 @@ import HomepageSlice from "./Slices/HomepageSlice"
 import BookingSlice from "./Slices/BookingSlice"
 import FeedbackSlice from "./Slices/FeedBackSlice"
 import AdminSlice from "./Slices/AdminSlice"
+
 import LoaderSlice from  './Slices/LoaderSlice'
+
+import EditProfileSlice from "./Slices/EditProfileSlice"
+
+
 export const store = configureStore({
   reducer: {
     auth: AuthSlice,
+    editProfile:EditProfileSlice,
     order: OrderSlice,
     chat:ChatSlice,
     homepage:HomepageSlice,
