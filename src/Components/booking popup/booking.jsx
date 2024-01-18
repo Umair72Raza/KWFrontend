@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 import socket from "../../SocketManager/socketManager.js";
 import OfferResult from "../../Components/OfferResult/OfferResult.jsx";
+import { failureToast } from "../../utils.js";
 
 const Booking = ({ modal, toggle, worker, chat }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -32,9 +33,11 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const timePart = dateTimeObject.toLocaleTimeString();
   const [formComplete, setFormComplete] = useState(false);
   const [dateTimeError, setDateTimeError] = useState("");
+  
+  let removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
 
   useEffect(() => {
-
+    
     setFormComplete(
       taskTitle.trim() !== "" &&
       taskDetails.trim() !== `` &&
@@ -57,6 +60,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       socket.off("offerResult");
     }
   });
+  
 
   useEffect(() => {
     if (user && user._id && offerResult == "true") {
@@ -80,6 +84,9 @@ const Booking = ({ modal, toggle, worker, chat }) => {
 
 
   const handleSend = async () => {
+    const present =removedUsers.filter((u)=>u._id === worker._id)
+    console.log(present )
+    if(present.length<=0){
     const data = {
       Title: taskTitle,
       Status: "Scheduled",
@@ -102,6 +109,9 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     return () => {
       socket.off("newOffer");
     }
+  }
+  failureToast("Worker Gets Offline!")
+  toggle();
   };
 
   const starRating = (numStars) => {
@@ -161,17 +171,20 @@ const Booking = ({ modal, toggle, worker, chat }) => {
             <div className="d-flex flex-column flex-md-row justify-content-start gap-4">
               <div>
                 <b>{div.name}</b>
-                {worker.firstName + " " + worker.lastName + "  "}
+                {worker?.firstName + " " + worker?.lastName + "  "}
               </div>
               <div>
                 {" "}
                 <b>{div.status}</b>
-                {worker.status}
+                {worker?.status}
               </div>
               <div>
                  <b>{div.rating}</b>
-                {starRating(worker.rating)}
+                {starRating(worker?.rating)}
               </div>
+
+
+
             </div>
           </FormGroup>
           <FormGroup>
