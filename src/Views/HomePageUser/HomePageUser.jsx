@@ -37,7 +37,7 @@ import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js"
 const HomePageUser = () => {
 
   let list = useSelector((state) => state?.admin?.services);
-  console.log(list);
+  
   const dispatch = useDispatch();
   const { setOriginalChats, setCopyOfChats, OriginalChats } = ChatState();
   const navigate = useNavigate();
@@ -54,6 +54,18 @@ const HomePageUser = () => {
   const [loading, setLoading] = useState(false);
   let removedUsers=[] ;
   removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
+  useEffect(() => {
+    if (user && user._id) {
+      socket.emit("setup", user);
+      socket.emit("new-user-add", user._id);
+      socket.on("connection", "true");
+    } else {
+      socket.disconnect();
+    }
+    return () => {
+      socket.disconnect();
+    };
+  },[user]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -116,6 +128,7 @@ const HomePageUser = () => {
     
 
   });
+
   useEffect(() => {
     socket.on("startjob-request", (order) => {
       setOrder(order);

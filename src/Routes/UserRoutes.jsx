@@ -1,4 +1,5 @@
 
+import EditProfilePage from "../Views/EditProfilePage/EditProfilePage";
 import HomePageUser from "../Views/HomePageUser/HomePageUser";
 import Orders from "../Views/Orders/Orders";
 
@@ -17,5 +18,11 @@ const UserRoutes = [
     component: <Orders />,
     layout: "/user",
   },
+  {
+    path:"/editprofile",
+    name:"editprofile",
+    component:<EditProfilePage />,
+    layout:"/user"
+  }
 ];
 export default UserRoutes;

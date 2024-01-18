@@ -71,6 +71,18 @@ const HomePageWorker = () => {
   } = ChatState();
   //console.log(selectedChatCompare);
   const [startJobStatus, setStartJobStatus] = useState("");
+  useEffect(() => {
+    if (user && user._id) {
+      socket.emit("setup", user);
+      socket.emit("new-user-add", user._id);
+      socket.on("connection", "true");
+    } else {
+      socket.disconnect();
+    }
+    return () => {
+      socket.disconnect();
+    };
+  },[user]);
 
   useEffect(() => {
     if (!socket) return;

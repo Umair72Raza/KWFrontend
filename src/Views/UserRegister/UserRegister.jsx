@@ -222,7 +222,7 @@ const UserRegister = ({ ShowServices }) => {
       style={{ minHeight: "90vh" }}
     >
       <Row className="w-100 d-flex justify-content-center">
-        <Col md={10} lg={8} xl={8}>
+        <Col md={10} lg={8} xl={6}>
           <h2 className="text-center mt-5 mb-4">{RegisterPage.LABELS.TITLE}</h2>
           <Form onSubmit={handleSubmit}>
             <Row>
