@@ -124,8 +124,8 @@ const Services = () => {
   return (
     <>
       <AdminNavbar />
-      <Container>
-        <Row style={{ marginTop: "2%" }}>
+      <Container style={{ padding:"4%"}}>
+        <Row style={{ marginTop: "1%", textAlign:"center" }}>
           <Col>
             <Button
               style={{
