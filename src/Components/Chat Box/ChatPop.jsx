@@ -52,11 +52,9 @@ const ChatPopup = () => {
           socket.emit("join chat", chat._id);
         } else {
           setMessages([]);
-          console.log("API for messages did not work!");
         }
       } else {
         setMessages([]);
-        console.log("No selected chat to fetch messages!");
       }
     };
     getMessages();

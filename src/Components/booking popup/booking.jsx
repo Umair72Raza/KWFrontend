@@ -83,8 +83,8 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   };
 
 
-  const handleSend = async () => {
-    const present =removedUsers.filter((u)=>u._id === worker._id)
+  const handleSend = () => {
+    const present =removedUsers?.filter((u)=>u._id === worker._id)
     console.log(present )
     if(present.length<=0){
     const data = {

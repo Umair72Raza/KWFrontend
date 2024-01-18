@@ -30,6 +30,7 @@ const EditProfilePage = () => {
   });
 
 
+
   
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
@@ -48,6 +49,7 @@ const EditProfilePage = () => {
             token:token
         }
         dispatch(fetchUsersDataAsync(data))
+
     }
   },[]);
 
