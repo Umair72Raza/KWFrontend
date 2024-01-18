@@ -49,7 +49,6 @@ GoogleMapContainer.propTypes = {
   onMapClick: PropTypes.func.isRequired,
 };
 
-
 const Map = ({ setFormData, formData }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -60,23 +59,24 @@ const Map = ({ setFormData, formData }) => {
   const location = useLocation();
   const [loadScriptKey, setLoadScriptKey] = useState(0);
   const [isMapLoaded, setMapLoaded] = useState(false);
+  const [isInputEnabled, setInputEnabled] = useState(false);
  const { UsersData } =useSelector((state) => state.editProfile);
 
-//  useEffect(() => {     if (location.pathname === "/user/editprofile") {
-//   const latitude = UsersData?.latitude;
-//   const longitude = UsersData?.longitude;
-//   const userCurrentCountry = UsersData?.country;
+ useEffect(() => {     if (location.pathname === "/user/editprofile") {
+  const latitude = UsersData?.latitude;
+  const longitude = UsersData?.longitude;
+  const userCurrentCountry = UsersData?.country;
 
-//   if (latitude && longitude) {
-//     // Use latitude and longitude from formData to set current and selected location
-//     setCurrentLocation({
-//       lat: latitude,
-//       lng: longitude,
-//       country: userCurrentCountry,
-//     });
-//     setCountry(formData?.country);
-//   }
-// }},[])
+  if (latitude && longitude) {
+    // Use latitude and longitude from formData to set current and selected location
+    setCurrentLocation({
+      lat: latitude,
+      lng: longitude,
+      country: userCurrentCountry,
+    });
+    setCountry(formData?.country);
+  }
+}},[])
 
 
 //   const handleLoadScript = () => {
@@ -282,9 +282,6 @@ const setupAutocomplete = () => {
   }
 };
 
-useEffect(() => {
-  setupAutocomplete();
-}, [newinput, country]);
 
 const handleLoadScript = () => {
   if (window.google && window.google.maps) {
@@ -322,25 +319,30 @@ const handleLoadScript = () => {
                   country,
                 });
                 setMapLoaded(true);
+                setInputEnabled(true); // Enable input field when map is loaded
               } else {
                 console.error(
                   "Geocoder failed to get country due to:",
                   status
                 );
+                setMapLoaded(true); // Ensure setMapLoaded is called even if geocoding fails
               }
             });
           },
           (error) => {
             console.error("Error getting user location:", error);
             setMapLoaded(true);
+            setInputEnabled(true);
           }
         );
       } else {
         console.error("Geolocation is not supported");
         setMapLoaded(true);
+        setInputEnabled(true);
       }
     } else {
       setMapLoaded(true);
+      setInputEnabled(true); // Enable input field when not in registration
     }
   }
 };
@@ -372,16 +374,25 @@ useEffect(() => {
   }
 }, [selectedLocation]);
 
+useEffect(() => {
+  setupAutocomplete();
+}, [newinput, country]);
+
 return (
   <Container>
-    <Input
-      innerRef={autocompleteRef}
-      type="text"
-      placeholder="Search for a place"
-      value={newinput}
-      onChange={(e) => setNewinput(e.target.value)}
-      onDoubleClick={(e) => e.target.select()}
-    />
+     <Input
+        innerRef={autocompleteRef}
+        type="text"
+        placeholder={
+          isInputEnabled
+            ? "Search for a place"
+            : "Please allow location access to search for a place"
+        }
+        value={newinput}
+        onChange={(e) => setNewinput(e.target.value)}
+        onDoubleClick={(e) => e.target.select()}
+        disabled={!isInputEnabled}
+      />
     <LoadScript
       key={loadScriptKey}
       googleMapsApiKey={import.meta.env.VITE_GOOGLE_API}
@@ -404,5 +415,6 @@ Map.propTypes = {
 setFormData: PropTypes.func.isRequired,
 formData: PropTypes.object,
 };
+
 
 export default Map;
