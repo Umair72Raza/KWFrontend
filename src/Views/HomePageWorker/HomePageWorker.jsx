@@ -85,9 +85,7 @@ const HomePageWorker = () => {
     } else {
       socket.disconnect();
     }
-    return () => {
-      socket.disconnect();
-    };
+    
   },[user]);
 
   useEffect(() => {

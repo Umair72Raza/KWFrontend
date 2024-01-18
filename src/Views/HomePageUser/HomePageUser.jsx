@@ -54,7 +54,9 @@ const HomePageUser = () => {
   const [loading, setLoading] = useState(false);
   let removedUsers=[] ;
   removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
+
   useEffect(() => {
+    console.log(user)
     if (user && user._id) {
       socket.emit("setup", user);
       socket.emit("new-user-add", user._id);
@@ -62,9 +64,7 @@ const HomePageUser = () => {
     } else {
       socket.disconnect();
     }
-    return () => {
-      socket.disconnect();
-    };
+   
   },[user]);
   useEffect(() => {
     const fetchData = async () => {
