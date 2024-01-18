@@ -11,9 +11,11 @@ import {
 } from "../../Redux/Slices/AdminSlice";
 import FeedbacksComp from "../FeedbacksComp/FeedbacksComp";
 import Swal from "sweetalert2";
+import { capitalizeFirstLetter } from "../../utils";
 const PeopleDetails = ({ person, setNewFilPerson }) => {
   const [orders, setOrders] = useState();
   const [feedbacks, setFeedbacks] = useState([]);
+  const [disableFeedbackButton,setDisableFeebackButton] = useState(false);
   const [showFeedbacksState, setShowFeedbacksState] = useState(false);
   const dispatch = useDispatch();
   const [showDetailsCard, setShowDetailsCard] = useState(false);
@@ -72,6 +74,7 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
     if (result.type === "/admin/getFeedbacks/fulfilled") {
       setFeedbacks(result.payload);
       setShowFeedbacksState(true);
+      setDisableFeebackButton(false);
     }
   };
   const starRating = (numStars) => {
@@ -85,6 +88,11 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
     }
     return stars;
   };
+  const feedbackfunction = (person) => {
+    setDisableFeebackButton(true);
+    seeFeedbacks(person);
+  }
+
 
   return (
     <Container>
@@ -92,23 +100,24 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
         <Card className="mb-4" style={{ width: "100%" }}>
           <CardBody>
             <CardTitle tag="h5">{`${person.firstName} ${person.lastName}`}</CardTitle>
-            <CardText>Role: {person.role}</CardText>
-            <CardText>Access: {person.access}</CardText>
+            <CardText>Role: {capitalizeFirstLetter(person.role)}</CardText>
+            <CardText>Access: {capitalizeFirstLetter(person.access)}</CardText>
             <CardText>
               {" "}
               <b>Rating:</b>{" "}
               {person.rating > 0 ? starRating(person.rating) : "Not Rated Yet!"}
             </CardText>
+            <Col className="d-flex flex-column gap-2 flex-md-row ">
             <Button
               color={person.access === "accepted" ? "danger" : "success"}
-              style={{ margin: "10px" }}
+             
               onClick={() => confirmationPopUp(person)}
             >
               {person.access === "accepted" ? "Block" : "Unblock"}
             </Button>
 
             <Button
-              style={{ backgroundColor: "#5dafff", border: "none" }}
+              style={{ backgroundColor: "#5d12cf", border: "none" }}
               onClick={() => getOrders(person)}
             >
               See More Details
@@ -116,11 +125,12 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
 
             <Button
               color="warning"
-              style={{ margin: "10px", color: "" }}
-              onClick={() => seeFeedbacks(person)}
+              onClick={() => feedbackfunction(person)}
+              disabled={disableFeedbackButton}
             >
               See Feedbacks
             </Button>
+            </Col>
           </CardBody>
         </Card>
       </Col>
@@ -129,7 +139,6 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
           <DetailsCard
             person={person}
             setShowDetailsCard={setShowDetailsCard}
-            setShowFeedbacksState={setShowFeedbacksState}
             orders={orders}
           />
         </>

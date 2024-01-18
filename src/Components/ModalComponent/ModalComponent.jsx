@@ -16,6 +16,7 @@ import {
 const ModalComponent = (props) => {
   const {
     modalHeader,
+    isFinalize,
     isModalOpen,
     toggleModal,
     inputLabel,
@@ -26,16 +27,14 @@ const ModalComponent = (props) => {
     finalizeButtonLabel,
     showInput,
     cancel,
-    order
+    order,
   } = props;
-
 
   return (
     <Modal isOpen={isModalOpen} toggle={toggleModal} centered>
       <ModalHeader toggle={toggleModal}>{modalHeader}</ModalHeader>
       <ModalBody>
-
-      {order && (
+        {order && (
           <>
             <div>
               <strong>Order Title:</strong> {order.Title}
@@ -51,7 +50,6 @@ const ModalComponent = (props) => {
             </div>
           </>
         )}
-        
 
         {showInput && (
           <Form>
@@ -72,7 +70,10 @@ const ModalComponent = (props) => {
         <Button color="secondary" onClick={cancel}>
           {cancelButtonLabel}
         </Button>
-        <Button color="danger" onClick={finalizeFunction}>
+        <Button
+          color={isFinalize ? "success" : "danger"}
+          onClick={finalizeFunction}
+        >
           {finalizeButtonLabel}
         </Button>
       </ModalFooter>
