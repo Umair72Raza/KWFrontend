@@ -52,6 +52,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
       };
       if (flag == "true") {
         dispatch(AddFeedBack({params,token}));
+        SetConfirm("");
       }
       SetConfirm("");
     }

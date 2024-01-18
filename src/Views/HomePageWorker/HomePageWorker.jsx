@@ -85,8 +85,7 @@ const HomePageWorker = () => {
     } else {
       socket.disconnect();
     }
-    
-  },[user]);
+  }, [user]);
 
   useEffect(() => {
     if (!socket) return;
@@ -245,6 +244,7 @@ const HomePageWorker = () => {
             dispatch(showSpinner());
             let respo = await dispatch(fetchActiveOrdersAsync(token));
             if (respo.type === "orders/fetchActiveOrders/fulfilled") {
+              console.log(respo.payload.orders)
               setActiveOrder(respo.payload.orders);
               setIsActiveOrdersFetched(true);
               dispatch(hideSpinner());
@@ -425,8 +425,8 @@ const HomePageWorker = () => {
           <TabPane tabId="1">
             <Row>
               <Col>
-                <h2>Scheduled Orders</h2>
-
+                <h2 style={{textAlign:"center"}}>Scheduled Orders</h2>
+                <Row>
                 <div style={{ marginTop: "10px !important" }}>
                   {isScheduledOrdersFetched && scheduledOrders ? (
                     <ScheduledOrdersCardWorker
@@ -446,16 +446,15 @@ const HomePageWorker = () => {
                     <>No Orders Scheduled</>
                   )}
                 </div>
+                </Row>
               </Col>
             </Row>
           </TabPane>
           <TabPane tabId="2">
             <Row>
+              <h2 style={{textAlign:"center"}}>Past Orders</h2>
               <Col>
                 {pastOrders ? (
-                  //  &&
-                  // pastOrder?.orders &&
-                  // pastOrder?.orders?.length > 0
                   <PastOrdersCard scheduledOrdersObject={pastOrders} />
                 ) : (
                   <h1>No Past Orders</h1>
@@ -465,11 +464,9 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="3">
             <Row>
+            <h2 style={{textAlign:"center"}}>Cancelled Orders</h2>
               <Col>
                 {cancelledOrders ? (
-                  //  &&
-                  // cancelledData?.orders &&
-                  // cancelledData?.orders?.length > 0
                   <>
                     <CancelledOrders scheduledOrdersObject={cancelledOrders} />
                   </>
@@ -481,11 +478,9 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="4">
             <Row>
+            <h2 style={{textAlign:"center"}}>Active Orders</h2>
               <Col>
                 {activeOrder ? (
-                  // &&
-                  // activeData?.orders &&
-                  // activeData?.orders?.length > 0
                   <>
                     <ActiveOrders
                       scheduledOrdersObject={activeOrder}

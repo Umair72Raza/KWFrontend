@@ -20,7 +20,6 @@ const ActiveOrders = ({
   setPastOrders,
   updateActiveOrders,
 }) => {
-  // const user = JSON.parse(localStorage.getItem("user"));
   const { user } = useSelector((state) => state.auth);
   const [order, SetOrder] = useState(null);
   let isUser;
@@ -62,7 +61,6 @@ const ActiveOrders = ({
     };
   }, [scheduledOrdersObject, setPastOrders]);
 
-  // useEf
   const sendFinishRequest = (order, UserId) => {
     //send event to finish the job
     const data = {
@@ -75,11 +73,10 @@ const ActiveOrders = ({
       title: "Finish Request Job Request Sent!",
       icon: "success",
     });
-
-    //emit the event to socket with User Id and orderId
   };
   return (
     <Container>
+      {console.log(scheduledOrdersObject)}
       <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
@@ -98,11 +95,6 @@ const ActiveOrders = ({
                     alignItems: "center",
                   }}
                 >
-                  {/* <img
-                    src={pastpng}
-                    alt="schTask"
-                    style={{ height: "27px", marginRight: "10px" }}
-                  /> */}
                   <h5 style={{ marginTop: "4%", textAlign: "center" }}>
                     {order.Title}
                   </h5>
@@ -118,15 +110,6 @@ const ActiveOrders = ({
                   <span style={{ marginTop: "10px" }}>
                     Status: {order.Status}
                   </span>
-                  {/* <img
-                    src={checkpng}
-                    alt="schTask"
-                    style={{
-                      height: "25px",
-                      marginLeft: "1%",
-                      marginTop: "-1%",
-                    }}
-                  /> */}
                 </CardText>
                 <CardText>Time: {order.Time}</CardText>
                 <CardText>Date: {order.date}</CardText>
@@ -134,17 +117,11 @@ const ActiveOrders = ({
                 <CardText>OrderId: {order._id}</CardText>
                 <CardText>
                   {" "}
-                  {order.users.map((user) => {
-                    if (user.name) {
-                      return user.name;
-                    } else {
-                      return user.firstName;
-                    }
-                  })}
+                  {isUser ? `Worker: ${order.users[1].firstName}`:`User: ${order.users[0].firstName}`}
+                  
                 </CardText>
                 <Col style={{ margin: "2%" }} xs="12" md="3">
                   {" "}
-                  {/* Half width on small screens, one-third width on medium and larger screens */}
                   <CardText>
                     {!isUser ? (
                       <>

@@ -78,6 +78,7 @@ const Orders = () => {
             dispatch(showSpinner());
             let respo = await dispatch(fetchActiveOrdersAsync(token));
             if (respo.type === "orders/fetchActiveOrders/fulfilled") {
+              console.log(respo.payload.orders)
               setActiveOrder(respo.payload.orders);
               setIsActiveOrdersFetched(true);
               dispatch(hideSpinner());
@@ -249,7 +250,7 @@ const Orders = () => {
             <TabPane tabId="1">
               <Row>
                 <Col>
-                  <h2>Scheduled Orders</h2>
+                <h2 style={{textAlign:"center"}}>Scheduled Orders</h2>
 
                   <div style={{ marginTop: "10px !important" }}>
                     {scheduledOrders.length> 0 ? (
@@ -269,6 +270,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="2">
               <Row>
+              <h2 style={{textAlign:"center"}}>Past Orders</h2>
                 <Col>
                   {pastOrders ? (
                     <PastOrdersCard scheduledOrdersObject={pastOrders} />
@@ -280,6 +282,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="3">
               <Row>
+              <h2 style={{textAlign:"center"}}>Cancelled Orders</h2>
                 <Col>
                   {cancelledOrders ? (
                     <>
@@ -295,6 +298,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="4">
               <Row>
+              <h2 style={{textAlign:"center"}}>Active Orders</h2>
                 <Col>
                   {activeOrder ? (
                     <>

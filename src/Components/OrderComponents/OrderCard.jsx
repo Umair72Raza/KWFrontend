@@ -169,14 +169,9 @@ const OrderCard = ({
                   <CardText>Details: {order.details}</CardText>
                   <CardText>OrderId: {order._id}</CardText>
                   <CardText>
-                    Worker
-                    {order.users.map((user) => {
-                      if (user.firstName == userName) {
-                        //do nothing
-                      } else {
-                        return user.firstName;
-                      }
-                    })}
+                    Worker:{" "}
+                    {order.users.length > 0 && order.users[1].firstName}
+                    
                   </CardText>
                   <Row>
                     <Col></Col>
