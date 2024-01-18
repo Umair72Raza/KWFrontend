@@ -22,7 +22,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
 
   const dispatch = useDispatch();
   const [taskTitle, setTaskTitle] = useState("");
-  const [taskDetails, setTaskDetails] = useState("");
+  const [taskDetails, setTaskDetails] = useState(``);
   const [dateTime, setDateTime] = useState("");
   const [amountPerHour, setAmountPerHour] = useState("");
   const [serviceOption, setServiceOption] = useState("none");
@@ -40,7 +40,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     
     setFormComplete(
       taskTitle.trim() !== "" &&
-      taskDetails.trim() !== "" &&
+      taskDetails.trim() !== `` &&
       dateTime !== "" &&
       amountPerHour !== "" &&
       serviceOption !== "none"
@@ -83,8 +83,8 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   };
 
 
-  const handleSend = async () => {
-    const present =removedUsers.filter((u)=>u._id === worker._id)
+  const handleSend = () => {
+    const present =removedUsers?.filter((u)=>u._id === worker._id)
     console.log(present )
     if(present.length<=0){
     const data = {
@@ -93,7 +93,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       users: [user._id, worker._id],
       date: datePart,
       time: timePart,
-      details: taskDetails,
+      details: taskDetails.replace(/\n/g, '<br>'),
       amount: amountPerHour,
       service: serviceOption,
     };
@@ -139,7 +139,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
 
   const resetForm = () => {
     setTaskTitle("");
-    setTaskDetails("");
+    setTaskDetails(``);
     setDateTime("");
     setAmountPerHour("");
     setServiceOption("none");

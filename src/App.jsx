@@ -9,13 +9,14 @@ import { useEffect, useState } from "react";
 import {  useSelector } from "react-redux";
 import Worker from "./Layouts/WorkerLayout";
 import AdminLayout from "./Layouts/AdminLayout";
-
+import socket from "./SocketManager/socketManager";
 
 
 function App() {
 const [authenticated , setAuthenticated] = useState(null);
 const [role,setRole] = useState(null);
-let { loginStatus, } = useSelector((state) => state.auth);
+let { loginStatus,user } = useSelector((state) => state.auth);
+
 
 
 useEffect(() => {

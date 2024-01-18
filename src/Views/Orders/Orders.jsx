@@ -10,19 +10,17 @@ import {
   Col,
   Container,
   Button,
+  Spinner,
 } from "reactstrap";
 import classnames from "classnames";
-import ScheduledOrdersTable from "../../Components/OrderComponents/OrderCard";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  activateOrderAsync,
   fetchActiveOrdersAsync,
   fetchCancelledOrdersAsync,
   fetchPastOrdersAsync,
   fetchScheduledOrdersAsync,
 } from "../../Redux/Slices/OrderSlice";
 import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
-import { ORDER_CONSTANTS } from "./constant";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import ActiveOrders from "../../Components/OrderComponents/ActiveOrders";
 import { setnewOrderValue } from "../../Redux/Slices/BookingSlice";
@@ -30,6 +28,7 @@ import OrderCard from "../../Components/OrderComponents/OrderCard";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { useNavigate } from "react-router-dom";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
+import { hideSpinner, selectSpinnerVisibility, showSpinner } from "../../Redux/Slices/LoaderSlice";
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -46,39 +45,48 @@ const Orders = () => {
   const [isCacelledOrdersFetched, setIsCancelledOrdersFetched] =
     useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
+  const spinnerVisible = useSelector(selectSpinnerVisibility);
+
+
+
   const navigate = useNavigate();
   const { newOrder } = useSelector((state) => state.booking);
-  // const user = JSON.parse(localStorage.getItem("user"));
-  // const userId = user._id;
-
   const toggleTab = (tab) => {
     if (activeTab !== tab) {
       setActiveTab(tab);
     }
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {
       let result;
       switch (activeTab) {
         case "1":
+          
           // Check if scheduledOrders is already available locally
           if (!isScheduledOrdersFetched) {
+            dispatch(showSpinner());
             result = await dispatch(fetchScheduledOrdersAsync(token));
             if (result.type === "orders/fetchScheduledOrders/fulfilled") {
               setScheduledOrders(result.payload.orders);
               setIsScheduledOrdersFetched(true);
+              dispatch(hideSpinner());
             }
           }
           if (!isActiveOrdersFetched) {
+            dispatch(showSpinner());
             let respo = await dispatch(fetchActiveOrdersAsync(token));
             if (respo.type === "orders/fetchActiveOrders/fulfilled") {
               setActiveOrder(respo.payload.orders);
               setIsActiveOrdersFetched(true);
+              dispatch(hideSpinner());
             }
           }
+          
           break;
         case "2":
+          dispatch(showSpinner());
           // Check if pastOrders is already available locally
           if (!isPastOrdersFetched) {
             result = await dispatch(fetchPastOrdersAsync(token));
@@ -87,8 +95,10 @@ const Orders = () => {
               setIsPastOrdersFetched(true);
             }
           }
+          dispatch(hideSpinner());
           break;
         case "3":
+          dispatch(showSpinner());
           // Check if cancelledOrders is already available locally
           if (!isCacelledOrdersFetched) {
             result = await dispatch(fetchCancelledOrdersAsync(token));
@@ -97,6 +107,7 @@ const Orders = () => {
               setIsCancelledOrdersFetched(true);
             }
           }
+          dispatch(hideSpinner());
           break;
         case "4":
           break;
@@ -241,7 +252,7 @@ const Orders = () => {
                   <h2>Scheduled Orders</h2>
 
                   <div style={{ marginTop: "10px !important" }}>
-                    {scheduledOrders ? (
+                    {scheduledOrders.length> 0 ? (
                       <OrderCard
                         scheduledOrdersObject={scheduledOrders}
                         toggleCancel={toggleCancel}
@@ -303,6 +314,7 @@ const Orders = () => {
         </Row>
         <ChatPopup />
       </Container>
+      {spinnerVisible && <Spinner />}
       {/* Will be use to activate the order when user start the order working */}
     </>
   );
