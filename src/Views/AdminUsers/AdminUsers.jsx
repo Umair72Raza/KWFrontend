@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import classnames from "classnames";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
-import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
+import UserNavbar from "../../Components/Navbar/UserNavbar";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
@@ -93,7 +93,7 @@ const AdminUsers = () => {
 
   return (
     <>
-      <AdminNavbar />
+      <UserNavbar />
       <Container>
         <Row>
           <h1 style={{ textAlign: "center" }}>Users</h1>
@@ -138,7 +138,7 @@ const AdminUsers = () => {
           {loading ? (
             <div
               className="d-flex justify-content-center align-items-center"
-              style={{ height: "200px", margin:"2%" }}
+              style={{ height: "200px" }}
             >
               <Spinner
                 color="primary"

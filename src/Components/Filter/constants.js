@@ -5,7 +5,7 @@ export const button ={
 
 
 export const Labels={
-    sort1:"Sort by Rateing:",
+    sort1:"Sort by Rating:",
     sort2:"Sort by Distance:",
     filter:"Filter by Distance:",
     l5:"5 km",

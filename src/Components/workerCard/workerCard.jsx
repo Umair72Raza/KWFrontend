@@ -49,7 +49,11 @@ const WorkerCard = ({ worker }) => {
         latestMessage: null,
       };
       // Add the fake chat to the chats array
-      setCopyOfChats([fakeChat, ...copyOfChats]);
+      if(copyOfChats.length>0){
+        setCopyOfChats([fakeChat, ...copyOfChats]);
+      } else {
+        setCopyOfChats([fakeChat]);
+      }
     } else {
       // Worker is already in a chat, no action needed
       console.log("Worker is already in a chat");

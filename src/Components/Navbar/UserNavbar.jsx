@@ -42,6 +42,7 @@ const UserNavbar = () => {
     setReceiveMessage,
     setGotOffer,
     userOffering,
+    setSelectedChatCompare
   } = ChatState();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -64,6 +65,7 @@ const UserNavbar = () => {
 
   const HandleNotificationSelection = (notify) => {
     setSelectedChat(() => SelectChat(notify.chat));
+    setSelectedChatCompare(notify.chat)
     setChat(notify.chat);
     setNotification(notification.filter((n) => n !== notify));
     setShowModal(true);

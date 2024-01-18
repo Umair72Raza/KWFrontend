@@ -14,7 +14,7 @@ import classnames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWorkersAsync } from "../../Redux/Slices/AdminSlice";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
-import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
+import UserNavbar from "../../Components/Navbar/UserNavbar";
 
 const AdminWorkers = () => {
   const navigate = useNavigate();
@@ -96,7 +96,7 @@ const AdminWorkers = () => {
 
   return (
     <>
-      <AdminNavbar />
+      <UserNavbar />
       <h1 style={{ textAlign: "center" }}>Workers</h1>
       <Navbar color="light" light expand="md" style={{marginLeft:"2%"}}>
         <Nav tabs>
@@ -144,7 +144,15 @@ const AdminWorkers = () => {
               style={{ width: "3rem", height: "3rem" }}
             />
           </div>
-        ) : (
+        ): activeTab === "workers" && activeWorkers.length === 0 ? (
+          <p style={{ textAlign: "center", marginTop: "20px" }}>
+            No Active Workers found
+          </p>
+        ) : activeTab === "inactiveWorkers" && inactiveWorkers.length === 0 ? (
+          <p style={{ textAlign: "center", marginTop: "20px" }}>
+            No Inactive Workers found
+          </p>
+        )  : (
           <Row xs="1" md="2" lg="3">
             {activeTab === "workers"
               ? activeWorkers.map((person, index) => (

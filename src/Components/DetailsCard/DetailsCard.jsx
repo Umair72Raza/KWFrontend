@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Modal from "react-modal";
 import { Button, Modal as RsModal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 
 const DetailsCard = ({
   person,
   setShowDetailsCard,
-  setShowFeedbacksState,
   orders,
 }) => {
   const { firstName, lastName, role } = person;
@@ -71,10 +69,10 @@ const DetailsCard = ({
         </p>
       </ModalBody>
       <ModalFooter>
-        <Button color="info" onClick={closeModal}>
+        <Button color="primary" onClick={closeModal}>
           Okay
         </Button>
-        <Button color="primary" onClick={openSecondModal}>
+        <Button style={{backgroundColor:"#5d12cf"}}  onClick={openSecondModal}>
           Details
         </Button>
       </ModalFooter>

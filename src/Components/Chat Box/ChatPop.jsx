@@ -35,7 +35,7 @@ const ChatPopup = () => {
 
   const { user, token } = useSelector((state) => state.auth);
 
-  document.body.style.overflow = showModal ? "hidden" : "auto";
+ 
   const messagesContainerRef = useRef(null);
   const dispatch = useDispatch();
   const [modal, setModal] = useState(false);
@@ -148,7 +148,7 @@ const ChatPopup = () => {
   };
 
   const handleBack = () => {
-    // setSelectedChatCompare(null);
+    setSelectedChatCompare(null);
     setSelectedChat(null);
     setChat(null);
     setNewMessageText("");
@@ -156,7 +156,8 @@ const ChatPopup = () => {
 
   const Toggler = () => {
     setShowModal(!showModal);
-    // setSelectedChatCompare(null);
+    document.body.style.overflow = showModal ? "hidden" : "auto";
+    setSelectedChatCompare(null);
     setSelectedChat(null);
     setChat(null);
     setNewMessageText("");
@@ -205,7 +206,7 @@ const ChatPopup = () => {
         if (!lastMessageDate || !isSameDay(lastMessageDate, messageDate)) {
           separator = (
             <div
-              className="message-separator  text-center my-4 rounded-5 align-self-center"
+              className="message-separator text-center my-4 rounded-5 align-self-center"
               key={`separator-${message._id}`}
             >
               {isSameDay(new Date(), messageDate)
@@ -263,7 +264,7 @@ const ChatPopup = () => {
         {showModal && copyOfChats && (
           <Modal
             isOpen={showModal}
-            toggle={() => setShowModal(!showModal)}
+            toggle={() => Toggler()}
             size="lg"
             centered
           >
