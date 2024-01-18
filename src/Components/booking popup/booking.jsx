@@ -33,55 +33,50 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const timePart = dateTimeObject.toLocaleTimeString();
   const [formComplete, setFormComplete] = useState(false);
   const [dateTimeError, setDateTimeError] = useState("");
-  
-  let removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
+
+  let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
 
   useEffect(() => {
-    
     setFormComplete(
       taskTitle.trim() !== "" &&
-      taskDetails.trim() !== `` &&
-      dateTime !== "" &&
-      amountPerHour !== "" &&
-      serviceOption !== "none"
+        taskDetails.trim() !== `` &&
+        dateTime !== "" &&
+        amountPerHour !== "" &&
+        serviceOption !== "none"
     );
   }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption]);
   useEffect(() => {
     socket.on("offerResult", (result) => {
       if (result == "accept") {
-        setOfferResult('true')
+        setOfferResult("true");
         clear();
-      }
-      else if (result == "cancel") {
-        setOfferResult('false')
+      } else if (result == "cancel") {
+        setOfferResult("false");
       }
     });
     return () => {
       socket.off("offerResult");
-    }
+    };
   });
-  
 
   useEffect(() => {
     if (user && user._id && offerResult == "true") {
-   dispatch(CreateOrder({ params, token }));
+      dispatch(CreateOrder({ params, token }));
     }
   }, [dispatch, offerResult]);
-
 
   const handleDateTimeChange = (e) => {
     const selectedDateTime = e.target.value;
     const currentDate = new Date();
     const selectedDate = new Date(selectedDateTime);
     if (selectedDate < currentDate) {
-      setDateTimeError('Please choose a future date and time.');
+      setDateTimeError("Please choose a future date and time.");
       setDateTime("");
     } else {
       setDateTimeError("");
       setDateTime(selectedDateTime);
     }
   };
-
 
   const handleSend = () => {
     const data = {
@@ -90,21 +85,42 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       users: [user._id, worker._id],
       date: datePart,
       time: timePart,
-      details: taskDetails.replace(/\n/g, '<br>'),
+      details: taskDetails.replace(/\n/g, "<br>"),
       amount: amountPerHour,
       service: serviceOption,
     };
     SetParams(data);
 
-    if(removedUsers)
-    {
-      const present = removedUsers?.findIndex(u => u._id === worker._id);
-      if(present !== -1){
-        failureToast("Worker Gets Offline!")
+    if (removedUsers) {
+      const present = removedUsers?.findIndex((u) => u._id === worker._id);
+      if (present !== -1) {
+        failureToast("Worker Gets Offline!");
         toggle();
+      } else {
+        socket.emit("newOffer", {
+          params: data,
+          Wid: worker._id,
+          chat: chat,
+          user,
+        });
+        Swal.fire({
+          title: "Offer Sent",
+          text: "Continue",
+          icon: "success",
+          confirmButtonText: "Cool",
+        });
+        toggle();
+        return () => {
+          socket.off("newOffer");
+        };
       }
-      else{
-        socket.emit("newOffer", { params: data, Wid: worker._id, chat: chat, user });
+    } else {
+      socket.emit("newOffer", {
+        params: data,
+        Wid: worker._id,
+        chat: chat,
+        user,
+      });
       Swal.fire({
         title: "Offer Sent",
         text: "Continue",
@@ -114,30 +130,8 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       toggle();
       return () => {
         socket.off("newOffer");
-      }
-      }
+      };
     }
-    else 
-    {
-      socket.emit("newOffer", { params: data, Wid: worker._id, chat: chat, user });
-      Swal.fire({
-        title: "Offer Sent",
-        text: "Continue",
-        icon: "success",
-        confirmButtonText: "Cool",
-      });
-      toggle();
-      return () => {
-        socket.off("newOffer");
-      }
-    }
-   
-    //present = removedUsers?.filter((u)=>u._id === worker._id)
-    console.log(present )
-    
-    
-  
- 
   };
 
   const starRating = (numStars) => {
@@ -172,19 +166,23 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     setDateTimeError("");
     setFormComplete(false);
   };
-  const clear =()=>
-  {
+  const clear = () => {
     resetForm();
-  }
+  };
   return (
     <div>
       <Modal isOpen={modal} centered>
-        <ModalHeader toggle={toggle} className="justify-content-center fw-bold ">
+        <ModalHeader
+          toggle={toggle}
+          className="justify-content-center fw-bold "
+        >
           {heading.book}
         </ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label for="taskTitle" className="fw-bold">{Labels.taskTitle}</Label>
+            <Label for="taskTitle" className="fw-bold">
+              {Labels.taskTitle}
+            </Label>
             <Input
               type="text"
               id="taskTitle"
@@ -205,26 +203,26 @@ const Booking = ({ modal, toggle, worker, chat }) => {
                 {worker?.status}
               </div>
               <div>
-                 <b>{div.rating}</b>
+                <b>{div.rating}</b>
                 {starRating(worker?.rating)}
               </div>
-
-
-
             </div>
           </FormGroup>
           <FormGroup>
-            <Label for="taskDetails" className="fw-bold ">{Labels.taskDetail}</Label>
+            <Label for="taskDetails" className="fw-bold ">
+              {Labels.taskDetail}
+            </Label>
             <Input
               type="textarea"
               id="taskDetails"
               value={taskDetails}
               onChange={(e) => setTaskDetails(e.target.value)}
-            
             />
           </FormGroup>
           <FormGroup>
-            <Label for="serviceOption " className="fw-bold">{Labels.service}</Label>
+            <Label for="serviceOption " className="fw-bold">
+              {Labels.service}
+            </Label>
             <Input
               type="select"
               id="serviceOption"
@@ -242,17 +240,23 @@ const Booking = ({ modal, toggle, worker, chat }) => {
             </Input>
           </FormGroup>
           <FormGroup>
-            <Label for="dateTime" className="fw-bold">{Labels.datetime}</Label>
+            <Label for="dateTime" className="fw-bold">
+              {Labels.datetime}
+            </Label>
             <Input
               type="datetime-local"
               id="dateTime"
               value={dateTime}
               onChange={handleDateTimeChange}
             />
-            {dateTimeError && <div style={{ color: 'red' }}>{dateTimeError}</div>}
+            {dateTimeError && (
+              <div style={{ color: "red" }}>{dateTimeError}</div>
+            )}
           </FormGroup>
           <FormGroup>
-            <Label for="amountPerHour" className="fw-bold">{Labels.amount}</Label>
+            <Label for="amountPerHour" className="fw-bold">
+              {Labels.amount}
+            </Label>
             <Input
               type="number"
               id="amountPerHour"
