@@ -38,6 +38,7 @@ export const signUpUserAsync = createAsyncThunk(
       longitude,
       latitude,
       address,
+      country,
       services,
     } = credentials;
     const response = await signUpUser(
@@ -49,6 +50,7 @@ export const signUpUserAsync = createAsyncThunk(
       longitude,
       latitude,
       address,
+      country,
       services
     );
 return response.data;

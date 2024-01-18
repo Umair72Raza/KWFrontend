@@ -49,6 +49,7 @@ export const signUpUser = async (
   longitude,
   latitude,
   address,
+  country,
   services
 ) =>
   API.post(`user/signUp`, {
@@ -60,6 +61,7 @@ export const signUpUser = async (
     longitude,
     latitude,
     address,
+    country,
     services,
   });
 
