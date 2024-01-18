@@ -419,6 +419,7 @@ const HomePageUser = () => {
       </Container>
       <ModalComponent
         modalHeader={"Order Activation"}
+        isFinalize= {true}
         isModalOpen={isModalOpen}
         toggleModal={toggleModal}
         finalizeFunction={activatingOrder}

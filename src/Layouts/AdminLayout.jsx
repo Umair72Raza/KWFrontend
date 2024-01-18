@@ -21,10 +21,10 @@ const AdminLayout = () => {
         <Row className="justify-content-center">
           <Routes>
             {getRoutes(AdminRoutes)}
-            <Route
+            {/* <Route
               path="*"
               element={<Navigate to="/admin/homepage" replace />}
-            />
+            /> */}
           </Routes>
         </Row>
       </div>

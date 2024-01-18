@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
 import cross from "../../assets/images/servicespngs/cross.png";
 import { useNavigate } from "react-router-dom";
+import UserNavbar from "../../Components/Navbar/UserNavbar";
 const Services = () => {
   const [services, setServices] = useState([]);
   const [addButtonDisabled, setAddButtonDisabled] = useState(false);
@@ -211,7 +212,7 @@ const Services = () => {
   };
   return (
     <>
-      <AdminNavbar />
+      <UserNavbar />
       <Container style={{ padding: "4%" }}>
         <Row style={{ marginTop: "1%", textAlign: "center" }}>
           <Col>
@@ -232,7 +233,7 @@ const Services = () => {
           <Col>
             {!showEditButtons ? (
               <Button
-                style={{ backgroundColor: "#a817ff", border: "none" }}
+                color="success"
                 onClick={toggleshowEdits}
               >
                 Add a service
@@ -245,7 +246,28 @@ const Services = () => {
           </Col>
         </Row>
 
+        {showEditButtons ? (
+        <InputGroup style={{padding:"1%"}}>
+          <Input
+            type="text"
+            placeholder="Add a new service"
+            value={newService}
+            onChange={handleInputChange}
+          />
+          <Button color="primary" onClick={handleAddService}>
+            Add New Service
+          </Button>
+        </InputGroup>
+      ) : (
+        <></>
+      )}
+
         <ListGroup>
+        {services.length === 0 ? (
+            <ListGroupItem style={{ textAlign: "center" }}>
+              No services available.
+            </ListGroupItem>
+          ) : (
           <ListGroup>
             {services.map((service) => (
               <ListGroupItem key={service._id}>
@@ -277,12 +299,13 @@ const Services = () => {
                     {editedService.id === service._id ? (
                       <>
                         <Button
+                        style={{marginRight:"2%", marginBottom:"1%"}}
                           color="primary"
                           onClick={() => handleEditService(service)}
                         >
                           Update
                         </Button>
-                        <Button color="secondary" onClick={handleCancelEdit}>
+                        <Button   color="secondary" onClick={handleCancelEdit}>
                           Cancel
                         </Button>
                       </>
@@ -299,25 +322,11 @@ const Services = () => {
               </ListGroupItem>
             ))}
           </ListGroup>
-          {/* ))} */}
+          )}
         </ListGroup>
       </Container>
 
-      {showEditButtons ? (
-        <InputGroup>
-          <Input
-            type="text"
-            placeholder="Add a new service"
-            value={newService}
-            onChange={handleInputChange}
-          />
-          <Button color="primary" onClick={handleAddService}>
-            Add New Service
-          </Button>
-        </InputGroup>
-      ) : (
-        <></>
-      )}
+      
 
       {/* {showErrorPopUp ? <>{displayErrorMessage()}</> : <></>} */}
     </>
