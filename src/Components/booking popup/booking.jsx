@@ -84,10 +84,6 @@ const Booking = ({ modal, toggle, worker, chat }) => {
 
 
   const handleSend = () => {
-    let present =[];
-    present = removedUsers?.filter((u)=>u._id === worker._id)
-    console.log(present )
-    if(present?.length<=0){
     const data = {
       Title: taskTitle,
       Status: "Scheduled",
@@ -99,20 +95,49 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       service: serviceOption,
     };
     SetParams(data);
-    socket.emit("newOffer", { params: data, Wid: worker._id, chat: chat, user });
-    Swal.fire({
-      title: "Offer Sent",
-      text: "Continue",
-      icon: "success",
-      confirmButtonText: "Cool",
-    });
-    toggle();
-    return () => {
-      socket.off("newOffer");
+
+    if(removedUsers)
+    {
+      const present = removedUsers?.findIndex(u => u._id === worker._id);
+      if(present !== -1){
+        failureToast("Worker Gets Offline!")
+        toggle();
+      }
+      else{
+        socket.emit("newOffer", { params: data, Wid: worker._id, chat: chat, user });
+      Swal.fire({
+        title: "Offer Sent",
+        text: "Continue",
+        icon: "success",
+        confirmButtonText: "Cool",
+      });
+      toggle();
+      return () => {
+        socket.off("newOffer");
+      }
+      }
     }
-  }
-  failureToast("Worker Gets Offline!")
-  toggle();
+    else 
+    {
+      socket.emit("newOffer", { params: data, Wid: worker._id, chat: chat, user });
+      Swal.fire({
+        title: "Offer Sent",
+        text: "Continue",
+        icon: "success",
+        confirmButtonText: "Cool",
+      });
+      toggle();
+      return () => {
+        socket.off("newOffer");
+      }
+    }
+   
+    //present = removedUsers?.filter((u)=>u._id === worker._id)
+    console.log(present )
+    
+    
+  
+ 
   };
 
   const starRating = (numStars) => {
