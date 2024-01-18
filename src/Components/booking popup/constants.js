@@ -9,8 +9,8 @@ export const heading ={
 
 export const div={
     "name":"Name: ",
-    "status":"Status:",
-    "rating":"Rating:"
+    "status":"Status: ",
+    "rating":"Rating: "
 }
 export const Labels={
     taskTitle:"Task Title",
