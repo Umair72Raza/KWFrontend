@@ -17,6 +17,29 @@ const [authenticated , setAuthenticated] = useState(null);
 const [role,setRole] = useState(null);
 let { loginStatus,user } = useSelector((state) => state.auth);
 
+useEffect(() => {
+  if (loginStatus === "succeeded" && user) {
+    if (user && user._id) {
+      socket.emit("setup", user);
+    } else {
+      socket.disconnect();
+    }
+    if (user && user._id) {
+      socket.emit("new-user-add", user._id);
+    } else {
+      socket.disconnect();
+    }
+    if (user && user._id) {
+      socket.on("connection", "true");
+    } else {
+      socket.disconnect();
+    }
+    return () => {
+      socket.disconnect();
+    };
+  }
+});
+
 
 
 useEffect(() => {

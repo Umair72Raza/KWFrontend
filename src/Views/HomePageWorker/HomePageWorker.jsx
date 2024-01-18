@@ -75,20 +75,28 @@ const HomePageWorker = () => {
     setGotOffer,
     setUserOffering,
   } = ChatState();
-  //console.log(selectedChatCompare);
+
   const [startJobStatus, setStartJobStatus] = useState("");
-  useEffect(() => {
-    if (user && user._id) {
-      socket.emit("setup", user);
-      socket.emit("new-user-add", user._id);
-      socket.on("connection", "true");
-    } else {
-      socket.disconnect();
-    }
-    return () => {
-      socket.disconnect();
-    };
-  },[user]);
+  // useEffect(() => {
+  //   if (user && user._id) {
+  //     socket.emit("setup", user);
+  //   } else {
+  //     socket.disconnect();
+  //   }
+  //   if (user && user._id) {
+  //     socket.emit("new-user-add", user._id);
+  //   } else {
+  //     socket.disconnect();
+  //   }
+  //   if (user && user._id) {
+  //     socket.on("connection", "true");
+  //   } else {
+  //     socket.disconnect();
+  //   }
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, [user]);
 
   useEffect(() => {
     if (!socket) return;
@@ -254,7 +262,6 @@ const HomePageWorker = () => {
           }
           break;
         case "2":
-          
           // Check if pastOrders is already available locally
           if (!isPastOrdersFetched) {
             dispatch(showSpinner());
@@ -431,25 +438,23 @@ const HomePageWorker = () => {
                 <h2>Scheduled Orders</h2>
 
                 <div style={{ marginTop: "10px !important" }}>
-                  
-                   { isScheduledOrdersFetched  && scheduledOrders ? (
-                      <ScheduledOrdersCardWorker
-                        scheduledOrdersObject={scheduledOrders}
-                        toggleCancel={toggleCancel}
-                        setToggleCancel={setToggleCancel}
-                        setScheduledOrders={setScheduledOrders}
-                        cancelledOrders={cancelledOrders}
-                        setCancelledOrders={setCancelledOrders}
-                        setLatestOrders={setLatestOrders}
-                        latestOrder={latestOrder}
-                        setUpdateScheduled={setUpdateScheduled}
-                        updateScheduled={updateScheduled}
-                        activeOrder={activeOrder}
-                      />
-                    ) : (
-                      <>No Orders Scheduled</>
-                    )}
-                  
+                  {isScheduledOrdersFetched && scheduledOrders ? (
+                    <ScheduledOrdersCardWorker
+                      scheduledOrdersObject={scheduledOrders}
+                      toggleCancel={toggleCancel}
+                      setToggleCancel={setToggleCancel}
+                      setScheduledOrders={setScheduledOrders}
+                      cancelledOrders={cancelledOrders}
+                      setCancelledOrders={setCancelledOrders}
+                      setLatestOrders={setLatestOrders}
+                      latestOrder={latestOrder}
+                      setUpdateScheduled={setUpdateScheduled}
+                      updateScheduled={updateScheduled}
+                      activeOrder={activeOrder}
+                    />
+                  ) : (
+                    <>No Orders Scheduled</>
+                  )}
                 </div>
               </Col>
             </Row>

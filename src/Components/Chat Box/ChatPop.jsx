@@ -148,7 +148,7 @@ const ChatPopup = () => {
   };
 
   const handleBack = () => {
-    // setSelectedChatCompare(null);
+    setSelectedChatCompare(null);
     setSelectedChat(null);
     setChat(null);
     setNewMessageText("");
@@ -156,7 +156,7 @@ const ChatPopup = () => {
 
   const Toggler = () => {
     setShowModal(!showModal);
-    // setSelectedChatCompare(null);
+    setSelectedChatCompare(null);
     setSelectedChat(null);
     setChat(null);
     setNewMessageText("");
