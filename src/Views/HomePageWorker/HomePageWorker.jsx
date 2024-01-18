@@ -111,7 +111,6 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket.on("startjob-result", (data) => {
-      console.log(data);
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
@@ -193,7 +192,6 @@ const HomePageWorker = () => {
 
   //accept the offer
   const handleConfirm = async () => {
-    console.log("Accepted");
 
     setGotOffer(false);
     // send true to the event to socket
@@ -206,7 +204,6 @@ const HomePageWorker = () => {
 
   //reject the offer
   const handleCancel = () => {
-    console.log("Cancelled");
     setGotOffer(false);
     //  send false to the event to socket
     socket.emit("accept-reject", {
@@ -370,7 +367,6 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket.on("new-order-result", (newOrderResult) => {
-      console.log(newOrderResult);
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });
@@ -453,9 +449,6 @@ const HomePageWorker = () => {
             <Row>
               <Col>
                 {pastOrders ? (
-                  //  &&
-                  // pastOrder?.orders &&
-                  // pastOrder?.orders?.length > 0
                   <PastOrdersCard scheduledOrdersObject={pastOrders} />
                 ) : (
                   <h1>No Past Orders</h1>
@@ -467,9 +460,6 @@ const HomePageWorker = () => {
             <Row>
               <Col>
                 {cancelledOrders ? (
-                  //  &&
-                  // cancelledData?.orders &&
-                  // cancelledData?.orders?.length > 0
                   <>
                     <CancelledOrders scheduledOrdersObject={cancelledOrders} />
                   </>
@@ -483,9 +473,6 @@ const HomePageWorker = () => {
             <Row>
               <Col>
                 {activeOrder ? (
-                  // &&
-                  // activeData?.orders &&
-                  // activeData?.orders?.length > 0
                   <>
                     <ActiveOrders
                       scheduledOrdersObject={activeOrder}

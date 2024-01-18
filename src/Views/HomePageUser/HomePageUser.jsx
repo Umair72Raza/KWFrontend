@@ -56,7 +56,6 @@ const HomePageUser = () => {
   removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
 
   useEffect(() => {
-    console.log(user)
     if (user && user._id) {
       socket.emit("setup", user);
       socket.emit("new-user-add", user._id);
@@ -251,7 +250,6 @@ const HomePageUser = () => {
   //filter
   const filteredAndSortedUsers = useMemo(() => {
     let filteredUsers = users;
-    console.log(users,"memo")
 
 
 
