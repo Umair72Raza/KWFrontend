@@ -189,7 +189,7 @@ const ScheduledOrdersCardWorker = ({
                   </CardText>
                   <CardText>Time: {order.Time}</CardText>
                   <CardText>Date: {order.date}</CardText>
-                  <CardText>Details: {order.details}</CardText>
+                  <CardText>Details: {order.details.replace(/\\n/g, '').replace(/<br>/g, '')}</CardText>
                   <CardText>OrderId: {order._id}</CardText>
                   <CardText>
                     Order By:{" "}

@@ -1,8 +1,7 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-
 import React, { useEffect, useState } from "react";
-import Swal from "sweetalert2";
+import Modal from "react-modal";
+import { Button, Modal as RsModal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 
 const DetailsCard = ({
   person,
@@ -10,52 +9,16 @@ const DetailsCard = ({
   setShowFeedbacksState,
   orders,
 }) => {
-  const { _id, firstName, lastName, role, status } = person;
+  const { firstName, lastName, role } = person;
 
   const [scheduledCount, setScheduledCount] = useState(0);
   const [activeCount, setActiveCount] = useState(0);
   const [pastCount, setPastCount] = useState(0);
   const [cancelledCount, setCancelledCount] = useState(0);
 
-  useEffect(() => {
-    if (orders !== undefined && orders.length > 0) {
-      updateCounts(orders);
-    }
-  }, [orders]);
-
-  useEffect(() => {
-    Swal.fire({
-      title: `<strong> ${firstName}</strong>`,
-      icon: "info",
-      html: `
-        First Name: ${firstName}  </br>
-        Last Name: ${lastName} </br>
-        Status: ${status} </br>
-        Role: ${role} </br>
-        ID: ${_id}</br>
-        </br>
-      `,
-      focusConfirm: false,
-      confirmButtonText: `
-        Okay
-      `,
-      confirmButtonAriaLabel: "Thumbs up, great!",
-      showCancelButton: true,
-      showCloseButton: false, // Don't show the close button
-      allowOutsideClick: false, // Don't close on clicking outsid
-      cancelButtonText: `
-        Show Order Details
-      `,
-      cancelButtonAriaLabel: "Show Order Details",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setShowDetailsCard(false);
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        setShowDetailsCard(false);
-        showOrderDetails();
-      }
-    });
-  }, [scheduledCount, activeCount, pastCount, cancelledCount]);
+  const [modalIsOpen, setModalIsOpen] = useState(true);
+  const [secondModalIsOpen, setSecondModalIsOpen] = useState(false);
+  const [disableScroll, setDisableScroll] = useState(true);
 
   const updateCounts = (orders) => {
     setScheduledCount(
@@ -68,26 +31,71 @@ const DetailsCard = ({
     );
   };
 
-  const showOrderDetails = () => {
-    // Show another Swal.fire with the updated counts
-    Swal.fire({
-      title: "Order Details",
-      html: `
-        <p>Scheduled: ${scheduledCount}</p>
-        <p>Active: ${activeCount}</p>
-        <p>Past: ${pastCount}</p>
-        <p>Cancelled: ${cancelledCount}</p>
-      `,
-      icon: "info",
-      showCloseButton: false, // Don't show the close button
-      allowOutsideClick: false, // Don't close on clicking outsid
-    }).then(() => {
-      // After clicking OK, set setShowDetailsCard(false)
-      setShowDetailsCard(false);
-    });
+  useEffect(() => {
+    if (orders !== undefined && orders.length > 0) {
+      updateCounts(orders);
+    }
+  }, [orders]);
+
+  useEffect(() => {
+    document.body.style.overflow = disableScroll ? "hidden" : "auto";
+  }, [disableScroll]);
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setShowDetailsCard(false);
+    setDisableScroll(true);
   };
 
-  return <div></div>;
+  const openSecondModal = () => {
+    setSecondModalIsOpen(true);
+    setDisableScroll(true);
+  };
+
+  const closeSecondModal = () => {
+    setSecondModalIsOpen(false);
+    setDisableScroll(modalIsOpen);
+  };
+
+  return (
+    <>
+    <RsModal isOpen={modalIsOpen} toggle={closeModal} centered>
+      <ModalHeader toggle={closeModal}>
+        <strong>{firstName}</strong>
+      </ModalHeader>
+      <ModalBody>
+        <p>
+          First Name: {firstName} <br />
+          Last Name: {lastName} <br />
+          Role: {role} <br />
+        </p>
+      </ModalBody>
+      <ModalFooter>
+        <Button color="info" onClick={closeModal}>
+          Okay
+        </Button>
+        <Button color="primary" onClick={openSecondModal}>
+          Details
+        </Button>
+      </ModalFooter>
+    </RsModal>
+
+    <RsModal isOpen={secondModalIsOpen} toggle={closeSecondModal} centered>
+      <ModalHeader toggle={closeSecondModal}>Order Details</ModalHeader>
+      <ModalBody>
+        <p>Scheduled: {scheduledCount}</p>
+        <p>Active: {activeCount}</p>
+        <p>Past: {pastCount}</p>
+        <p>Cancelled: {cancelledCount}</p>
+      </ModalBody>
+      <ModalFooter>
+        <Button color="primary" onClick={closeSecondModal}>
+          Close
+        </Button>
+      </ModalFooter>
+    </RsModal>
+  </>
+  );
 };
 
 export default DetailsCard;
