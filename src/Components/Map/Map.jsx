@@ -28,7 +28,7 @@ const Map = ({ setFormData ,formData}) => {
           // Use latitude and longitude from formData to set current and selected location
         //   setNewinput(formData?.address);
          setCurrentLocation({ lat: latitude, lng: longitude,country });
-          // setSelectedLocation({ lat: latitude, lng: longitude,country }); 
+           //setSelectedLocation({ lat: latitude, lng: longitude,country }); 
           setCountry(formData?.country);
         }
       } else {
