@@ -42,6 +42,7 @@ const handleInputKeyDown = (e) => {
                   <Input
                     type="number"
                     min="10"
+                    required
                     placeholder={`Rate ($/hr)`}
                     value={
                       selectedServices.find((s) => s.name === service.name)?.rate || ""

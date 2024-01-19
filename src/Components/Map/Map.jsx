@@ -200,7 +200,7 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
           setLoading(false);
           setCountry("");
         }
-      } else if (location.pathname === "/user/editprofile" && editMode) {
+      } else if (location.pathname === "/user/editprofile" || location.pathname=== "/worker/editprofile" && editMode) {
         setCountry(formData?.country);
         if (editMode) {
           const latitude = UsersData?.latitude;
@@ -209,7 +209,7 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
           setTimeout(() => {  
           setMapLoaded(true);
           setInputEnabled(true);
-          setLoading(false); }, 1000);
+          setLoading(false); }, 500);
           if (latitude !== undefined || longitude !== undefined) {
             setCurrentLocation({
               lat: latitude,

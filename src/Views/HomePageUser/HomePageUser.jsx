@@ -63,7 +63,6 @@ const HomePageUser = () => {
     } else {
       socket.disconnect();
     }
-   
   },[]);
   useEffect(() => {
     const fetchData = async () => {

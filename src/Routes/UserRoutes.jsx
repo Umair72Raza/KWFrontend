@@ -21,7 +21,7 @@ const UserRoutes = [
   {
     path:"/editprofile",
     name:"editprofile",
-    component:<EditProfilePage />,
+    component:<EditProfilePage ShowServices={false} />,
     layout:"/user"
   }
 ];
