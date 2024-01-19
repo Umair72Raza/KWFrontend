@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 
-//cards for Scheduled Orders
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,22 +12,12 @@ import {
   CardTitle,
   CardText,
   Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Form,
-  FormGroup,
-  Label,
-  Input,
 } from "reactstrap";
 
 import completedtask from "../../assets/completedtask.png";
 import activeOrder from "../../assets/activestatus.png";
 import {
-  activateOrderAsync,
   cancelOrderAsync,
-  fetchScheduledOrdersAsync,
 } from "../../Redux/Slices/OrderSlice";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import socket from "../../SocketManager/socketManager";
@@ -43,14 +31,10 @@ const OrderCard = ({
   //get these from local storage
   const { user, token } = useSelector((state) => state.auth);
   const userId = user._id;
-  const userRole = user.role;
-  const userName = user.firstName;
-
   const [showModal, setShowModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [startJobConfirmed, setStartJobConfirmed] = useState(false);
   const openModal = () => setShowModal(true);
 
   const toggleModal = (order) => {
@@ -147,7 +131,7 @@ const OrderCard = ({
                           alignItems: "center",
                         }}
                       >
-                        <span style={{ marginTop: "10px", zIndex: "10" }}>
+                        <span style={{ marginTop: "10px", marginRight: "1%" }}>
                           Status: {order.Status}
                         </span>
                         <img
@@ -169,9 +153,7 @@ const OrderCard = ({
                   <CardText>Details: {order.details}</CardText>
                   <CardText>OrderId: {order._id}</CardText>
                   <CardText>
-                    Worker:{" "}
-                    {order.users.length > 0 && order.users[1].firstName}
-                    
+                    Worker: {order.users.length > 0 && order.users[1].firstName}
                   </CardText>
                   <Row>
                     <Col></Col>
@@ -205,6 +187,7 @@ const OrderCard = ({
         finalizeFunction={cancelingOrder}
         cancelButtonLabel={"Cancel Order Cancellation"}
         finalizeButtonLabel={"Finalize Order Cancellation"}
+        cancel={toggleModal}
         showInput={true}
       />
     </>

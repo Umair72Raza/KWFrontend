@@ -129,12 +129,10 @@ const Orders = () => {
 
   const scheduleClick = (e) => {
     toggleTab("1");
-    // handleFetchOrders("scheduled");
   };
 
   const pastClick = (e) => {
     toggleTab("2");
-    // handleFetchOrders("past");
   };
 
   const cancelOrders = async () => {
@@ -165,7 +163,6 @@ const Orders = () => {
 
   const activeOrders = (e) => {
     toggleTab("4");
-    //handleFetchOrders("active");
   };
 
   useEffect(() => {
@@ -201,7 +198,7 @@ const Orders = () => {
         </Row>
         <Row></Row>
         <Row style={{ marginTop: "0.5%" }}>
-          <Nav tabs>
+          <Nav tabs style={{cursor:"pointer"}}>
             <NavItem>
               <Button
                 color="danger"

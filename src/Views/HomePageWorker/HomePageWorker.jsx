@@ -161,28 +161,66 @@ const HomePageWorker = () => {
     };
   });
   useEffect(() => {
-    socket.on("order-cancelled", (order) => {
-      if (order) {
+    socket.on("order-cancelled", (Corder) => {
+      if (Corder) {
         Swal.fire({
           title: "Order Canceled",
           html: `<div>
                 <strong>Order Title:</strong>
-                 ${order.Title}
+                 ${Corder.Title}
                 </div>
                   <div>
                     <strong>Order Details:</strong>
-                     ${order.details}
+                     ${Corder.details}
                   </div>
                 <div>
                   <strong>Service:</strong>
-                   ${order.service}
+                   ${Corder.service}
                 </div>
                 <div>
                 <strong>Amount:</strong>
-                 ${order.ammount}
+                 ${Corder.amount}
               </div>`,
           icon: "error",
         });
+
+        setScheduledOrders((prevScheduledOrders) => {
+          // Check if the order exists in scheduledOrders
+          const scheduledOrderIndex = prevScheduledOrders.findIndex(
+            (order) => order.id === Corder.id
+          );
+
+          if (scheduledOrderIndex !== -1) {
+            // Remove from scheduledOrders
+            const updatedScheduledOrders = [...prevScheduledOrders];
+            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+
+            // Set the updated scheduled orders to the local state
+            setScheduledOrders(updatedScheduledOrders);
+
+            setCancelledOrders((prevCancelledOrders) => {
+              // Check if the order is already present in active orders
+              const isOrderAlreadyPresent = prevCancelledOrders.some(
+                (order) => order._id === Corder._id
+              );
+
+              if (!isOrderAlreadyPresent) {
+                // Add the order to active orders if it's not present
+                return [...prevCancelledOrders, Corder];
+              }
+
+              // If the order is already present, return the current state
+              return prevCancelledOrders;
+            });
+
+            return updatedScheduledOrders;
+          }
+
+          return prevScheduledOrders;
+        });
+
+
+
       }
     });
     return () => {
@@ -192,11 +230,7 @@ const HomePageWorker = () => {
 
   //accept the offer
   const handleConfirm = async () => {
-    console.log("Accepted");
-
     setGotOffer(false);
-    // send true to the event to socket
-
     socket.emit("accept-reject", {
       result: "accept",
       Uid: receiveMessage.users[0],
@@ -205,9 +239,7 @@ const HomePageWorker = () => {
 
   //reject the offer
   const handleCancel = () => {
-    console.log("Cancelled");
     setGotOffer(false);
-    //  send false to the event to socket
     socket.emit("accept-reject", {
       result: "cancel",
       Uid: receiveMessage.users[0],
@@ -299,15 +331,6 @@ const HomePageWorker = () => {
     }
   };
 
-  const formattedOfferDetails = `
-  <p><strong>Title:</strong> ${receiveMessage?.Title}</p>
-  <p><strong>Details:</strong> ${receiveMessage?.details}</p>
-  <p><strong>Date:</strong> ${receiveMessage?.date}</p> 
-  <p><strong>Time:</strong> ${receiveMessage?.time}</p>
-  <p><strong>Amount:</strong> ${receiveMessage?.amount}</p>
-  <p><strong>Service:</strong> ${receiveMessage?.service}</p>
-`;
-
   const scheduleClick = () => {
     toggleTab("1");
   };
@@ -384,7 +407,7 @@ const HomePageWorker = () => {
         <UserNavbar />
       </Row>
       <Row>
-        <Nav tabs>
+        <Nav tabs style={{cursor:"pointer"}}>
           <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "1" })}

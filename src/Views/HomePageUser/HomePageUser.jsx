@@ -11,7 +11,7 @@ import {
   getAllWorker,
   updateWorkers,
   WorkersByType,
-  updateRemoveWorker
+  updateRemoveWorker,
 } from "../../Redux/Slices/HomepageSlice.js";
 import { useDebounce } from "../../Hooks/Debounce.jsx";
 import {
@@ -23,7 +23,7 @@ import {
   Offcanvas,
   OffcanvasHeader,
   OffcanvasBody,
-  Spinner
+  Spinner,
 } from "reactstrap";
 import ChatPopup from "../../Components/Chat Box/ChatPop.jsx";
 import { ChatState } from "../../Context/ChatProvider.jsx";
@@ -32,12 +32,11 @@ import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 import socket from "../../SocketManager/socketManager.js";
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
-import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js"
+import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
 
 const HomePageUser = () => {
-
   let list = useSelector((state) => state?.admin?.services);
-  
+
   const dispatch = useDispatch();
   const { setOriginalChats, setCopyOfChats, OriginalChats } = ChatState();
   const navigate = useNavigate();
@@ -52,11 +51,11 @@ const HomePageUser = () => {
   const [distanceFilter, setDistanceFilter] = useState(0);
   const [rateFilter, setRateFilter] = useState(0);
   const [loading, setLoading] = useState(false);
-  let removedUsers=[] ;
-  removedUsers=useSelector((state) => state?.homepage?.removeWorker);  
+  let removedUsers = [];
+  removedUsers = useSelector((state) => state?.homepage?.removeWorker);
 
   useEffect(() => {
-    console.log(user)
+    console.log(user);
     if (user && user._id) {
       socket.emit("setup", user);
       socket.emit("new-user-add", user._id);
@@ -64,8 +63,7 @@ const HomePageUser = () => {
     } else {
       socket.disconnect();
     }
-   
-  },[user]);
+  }, [user]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -98,35 +96,32 @@ const HomePageUser = () => {
   const [fOrder, setFOrder] = useState("");
 
   useEffect(() => {
-    
-      socket.on("status-change",  (User) => {
-          if (users && User.status === 'offline') {
-            let remove=[]; 
-            const userIndexRemoved = users.findIndex(u => u._id === User._id);
-            if(userIndexRemoved !== -1) 
-            {
-            const filteredUsers = users.filter(u => u._id !== User._id);
-            remove.push(users[userIndexRemoved]); 
-            dispatch(updateWorkers(filteredUsers));
-            dispatch(updateRemoveWorker(remove)); 
-            }
-          }
-           else if (removedUsers && User.status === 'online') {
-            let worker=users;
-            const userIndexInRemoved = removedUsers?.findIndex(u => u._id === User._id);
-            if (userIndexInRemoved !== -1) {
-              worker=[removedUsers[userIndexInRemoved],...worker]
-              const remove=removedUsers.filter(u => u._id !== User._id);
-              dispatch(updateWorkers(worker));
-              dispatch(updateRemoveWorker(remove)); 
-            }
-          }
-      });
-      return () => {
-        socket.off("status-change");
-      };
-    
-
+    socket.on("status-change", (User) => {
+      if (users && User.status === "offline") {
+        let remove = [];
+        const userIndexRemoved = users.findIndex((u) => u._id === User._id);
+        if (userIndexRemoved !== -1) {
+          const filteredUsers = users.filter((u) => u._id !== User._id);
+          remove.push(users[userIndexRemoved]);
+          dispatch(updateWorkers(filteredUsers));
+          dispatch(updateRemoveWorker(remove));
+        }
+      } else if (removedUsers && User.status === "online") {
+        let worker = users;
+        const userIndexInRemoved = removedUsers?.findIndex(
+          (u) => u._id === User._id
+        );
+        if (userIndexInRemoved !== -1) {
+          worker = [removedUsers[userIndexInRemoved], ...worker];
+          const remove = removedUsers.filter((u) => u._id !== User._id);
+          dispatch(updateWorkers(worker));
+          dispatch(updateRemoveWorker(remove));
+        }
+      }
+    });
+    return () => {
+      socket.off("status-change");
+    };
   });
 
   useEffect(() => {
@@ -140,8 +135,8 @@ const HomePageUser = () => {
   });
 
   useEffect(() => {
-    socket.on("order-canceled", (order) => {
-      if (order) {
+    socket.on("order-canceled", (Corder) => {
+      if (Corder) {
         Swal.fire({
           title: "Order Canceled",
           html: `<div> <strong>Order Title:</strong> ${order.Title}</div>
@@ -150,7 +145,42 @@ const HomePageUser = () => {
                  <div> <strong>Amount:</strong> ${order.amount}</div>`,
           icon: "error",
         });
+        setScheduledOrders((prevScheduledOrders) => {
+          // Check if the order exists in scheduledOrders
+          const scheduledOrderIndex = prevScheduledOrders.findIndex(
+            (order) => order.id === Corder.id
+          );
+
+          if (scheduledOrderIndex !== -1) {
+            // Remove from scheduledOrders
+            const updatedScheduledOrders = [...prevScheduledOrders];
+            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+
+            // Set the updated scheduled orders to the local state
+            setScheduledOrders(updatedScheduledOrders);
+
+            setCancelledOrders((prevCancelledOrders) => {
+              // Check if the order is already present in active orders
+              const isOrderAlreadyPresent = prevCancelledOrders.some(
+                (order) => order._id === Corder._id
+              );
+
+              if (!isOrderAlreadyPresent) {
+                // Add the order to active orders if it's not present
+                return [...prevCancelledOrders, Corder];
+              }
+
+              // If the order is already present, return the current state
+              return prevCancelledOrders;
+            });
+
+            return updatedScheduledOrders;
+          }
+
+          return prevScheduledOrders;
+        });
       }
+
     });
     return () => {
       socket.off("order-canceled");
@@ -171,7 +201,6 @@ const HomePageUser = () => {
 
   useEffect(() => {
     if (newOrder !== null) {
-      console.log(newOrder);
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
       socket.emit("new-order-created", data);
     }
@@ -221,7 +250,7 @@ const HomePageUser = () => {
   //search
   let debouncedsearch = useDebounce(searchInput);
   let memoizedSuggestions = useMemo(() => {
-    const nameValues = list?.map(service => service.name);
+    const nameValues = list?.map((service) => service.name);
     return nameValues?.filter((item) =>
       item.toLowerCase().includes(debouncedsearch.toLowerCase())
     );
@@ -251,9 +280,7 @@ const HomePageUser = () => {
   //filter
   const filteredAndSortedUsers = useMemo(() => {
     let filteredUsers = users;
-    console.log(users,"memo")
-
-
+    console.log(users, "memo");
 
     if (sortOption !== "none" && sortOption === "highToLowRating") {
       filteredUsers = [...filteredUsers].sort(
@@ -297,7 +324,7 @@ const HomePageUser = () => {
     sortOption,
     sortOption2,
     distanceFilter,
-    rateFilter
+    rateFilter,
   ]);
 
   return (
@@ -384,19 +411,18 @@ const HomePageUser = () => {
         <Row>
           <Col className="mt-3" md={7}>
             {loading ? (
-              <Spinner style={{
-                height: '3rem',
-                width: '3rem'
-              }} />
-
+              <Spinner
+                style={{
+                  height: "3rem",
+                  width: "3rem",
+                }}
+              />
+            ) : filteredAndSortedUsers ? (
+              filteredAndSortedUsers.map((worker, index) => (
+                <WorkerCard worker={worker} key={index} />
+              ))
             ) : (
-              filteredAndSortedUsers ? (
-                filteredAndSortedUsers.map((worker, index) => (
-                  <WorkerCard worker={worker} key={index} />
-                ))
-              ) : (
-                <h3>No Workers found!</h3>
-              )
+              <h3>No Workers found!</h3>
             )}
           </Col>
           <Col className="d-none d-md-block   mt-3" md={5}>
@@ -419,7 +445,7 @@ const HomePageUser = () => {
       </Container>
       <ModalComponent
         modalHeader={"Order Activation"}
-        isFinalize= {true}
+        isFinalize={true}
         isModalOpen={isModalOpen}
         toggleModal={toggleModal}
         finalizeFunction={activatingOrder}

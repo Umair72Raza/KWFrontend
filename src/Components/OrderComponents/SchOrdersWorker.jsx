@@ -43,9 +43,6 @@ const ScheduledOrdersCardWorker = ({
   const { user } = useSelector((state) => state.auth);
   const { token } = useSelector((state) => state.auth);
   const userId = user._id;
-  const userRole = user.role;
-  const userName = user.firstName;
-
   const [showModal, setShowModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
@@ -170,7 +167,7 @@ const ScheduledOrdersCardWorker = ({
                           alignItems: "center",
                         }}
                       >
-                        <span style={{ marginTop: "10px", zIndex: "10" }}>
+                        <span style={{ marginTop: "10px", marginRight:"1%" }}>
                           Status: {order.Status}
                         </span>
                         <img
@@ -187,10 +184,12 @@ const ScheduledOrdersCardWorker = ({
                       </div>
                     </Col>
                   </CardText>
-                  <CardText>Time: {order.Time}</CardText>
+                  {console.log(order)}
+                  <CardText>Time: {order.time}</CardText>
+                  {console.log(order.date)}
                   <CardText>Date: {order.date}</CardText>
                   <CardText>Details: {order.details.replace(/\\n/g, '').replace(/<br>/g, '')}</CardText>
-                  <CardText>OrderId: {order._id}</CardText>
+                  {/* <CardText>OrderId: {order._id}</CardText> */}
                   <CardText>
                     Order By:{" "}
                     {order.users.length > 0 && order.users[0].firstName}
