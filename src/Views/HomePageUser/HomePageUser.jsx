@@ -239,10 +239,12 @@ const HomePageUser = () => {
     const type = searchInput;
     const params = { userId: user._id, type, token };
     dispatch(WorkersByType(params));
+
   };
 
   const clearFilters = () => {
     setSortOption("none");
+    setSortOption2("none");
     setDistanceFilter(0);
     setRateFilter(0);
   };
@@ -250,6 +252,7 @@ const HomePageUser = () => {
   //filter
   const filteredAndSortedUsers = useMemo(() => {
     let filteredUsers = users;
+   
 
 
 
@@ -287,7 +290,7 @@ const HomePageUser = () => {
         return filteredUser;
       });
     }
-
+    console.log(filteredUsers,"memo")
     return filteredUsers;
   }, [
     users,
@@ -318,7 +321,7 @@ const HomePageUser = () => {
               <Input
                 type="text"
                 className="  search-border"
-                placeholder="Search..."
+                placeholder="Search For Category"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
@@ -388,13 +391,13 @@ const HomePageUser = () => {
               }} />
 
             ) : (
-              filteredAndSortedUsers ? (
+              (filteredAndSortedUsers && filteredAndSortedUsers?.length>0) ? (
                 filteredAndSortedUsers.map((worker, index) => (
                   <WorkerCard worker={worker} key={index} />
                 ))
-              ) : (
+              ) : 
                 <h3>No Workers found!</h3>
-              )
+              
             )}
           </Col>
           <Col className="d-none d-md-block   mt-3" md={5}>

@@ -71,8 +71,8 @@ const WorkerCard = ({ worker }) => {
 
   return (
     <Container className="mt-2">
-      <Row>
-        <Col md={10}>
+      <Row className="d-flex justify-content-center">
+        <Col md={7} lg={7} xl={7} className="">
           
           {worker && worker?.status == "online" ? (
             <>
@@ -81,29 +81,27 @@ const WorkerCard = ({ worker }) => {
                   <CardTitle className="fw-bold pt-0 fs-3">
                     {worker.firstName + " " + worker.lastName}
                   </CardTitle>
-                  <CardSubtitle>
-                    <b>Status: </b> {worker.status}
+                  <CardSubtitle className="d-flex flex-row  justify-content-between">
+                    <div>Status:</div>  <div>{worker.status}</div>  
                   </CardSubtitle>
                   <CardSubtitle>
                     <b>{WorkerCardText.Services}</b>
                     {worker?.services.map((service, key) => (
-                      <div key={key} className="d-flex flex-row gap-5 ">
-                        <CardSubtitle>{service.name}</CardSubtitle>
-                        <CardSubtitle>{service.rate + "$"}</CardSubtitle>
+                      <div key={key} className="d-flex flex-row  justify-content-between">
+                        <div><CardSubtitle>{service.name}</CardSubtitle></div>
+                        <div><CardSubtitle>{service.rate + "$"}</CardSubtitle></div>
                       </div>
                     ))}
                   </CardSubtitle>
-                  <CardSubtitle>
-                    <b>Rating:</b>{" "}
-                    {worker.rating > 0
+                  <CardSubtitle className="d-flex flex-row justify-content-between">
+                    <div><b>Rating:</b>{" "}</div>
+                    <div>{worker.rating > 0
                       ? starRating(worker.rating)
-                      : "not rated yet"}
+                      : "not rated yet"}</div>
                   </CardSubtitle>
-                  <CardSubtitle>
-                    <b>Distance:</b> {worker.distance}
+                  <CardSubtitle className="d-flex flex-row  justify-content-between">
+                    <div>Distance: </div>  <div>{worker.distance} </div>
                   </CardSubtitle>
-                </CardBody>
-                <CardBody className="py-1" d-flex>
                   <div className="gap-3 d-flex flex-md-column pt-md-4">
                     <Button color="primary" onClick={HandleChat}>
                       {WorkerCardButtons.chat}
@@ -113,6 +111,9 @@ const WorkerCard = ({ worker }) => {
                     </Button>
                   </div>
                 </CardBody>
+                {/* <CardBody className="py-1" d-flex>
+                 
+                </CardBody> */}
               </Card>
             </>
           ) : {}}

@@ -8,7 +8,7 @@ import {
   toggleStatus,
 } from "../../APIs/auth";
 import { Logout, failureToast } from "../../utils";
-import socket from "../../SocketManager/socketManager";
+//import socket from "../../SocketManager/socketManager";
 
 export const loginAsync = createAsyncThunk(
   "auth/login",
@@ -210,7 +210,7 @@ const authSlice = createSlice({
       })
       .addCase(logoutAsync.fulfilled, (state) => {
         state.loginStatus = "failed";
-        socket.disconnect();
+        //socket.disconnect();
       })
       .addCase(toggleStatusAsync.fulfilled, (state,action) => {
          state.user= action.payload.updatedStatus;
