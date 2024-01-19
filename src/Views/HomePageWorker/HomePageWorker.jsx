@@ -82,11 +82,12 @@ const HomePageWorker = () => {
       socket.emit("setup", user);
       socket.emit("new-user-add", user._id);
       socket.on("connection", "true");
+      console.log("user in connection",user)
     } else {
       socket.disconnect();
     }
     
-  },[user]);
+  },[]);
 
   useEffect(() => {
     if (!socket) return;
