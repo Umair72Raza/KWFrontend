@@ -4,9 +4,10 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { changeStatusToPastAsync } from "../../Redux/Slices/OrderSlice";
-import socket from "../../SocketManager/socketManager";
+
 import Feedback from "../../Components/feedback/feedback";
 const FinishJobReq = ({ order, setFinishOrderReq }) => {
+  const socket=useSelector((state) => state?.socket?.socket);
   let modal = "false";
   const dispatch = useDispatch();
   Swal.fire({
@@ -41,7 +42,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
             order: result.payload,
             result: "true",
           };
-          socket.emit("finishjob-response", data);
+          socket?.emit("finishjob-response", data);
         }
       }
 
@@ -63,7 +64,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
         order,
         result: "false",
       };
-      socket.emit("finishjob-response", data);
+      socket?.emit("finishjob-response", data);
       setFinishOrderReq(false);
     }
   });

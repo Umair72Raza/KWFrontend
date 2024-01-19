@@ -27,7 +27,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
-
+import Swal from "sweetalert2";
 const UserNavbar = () => {
   const {
     setShowModal,
@@ -44,6 +44,7 @@ const UserNavbar = () => {
     userOffering,
     setSelectedChatCompare
   } = ChatState();
+  const socket=useSelector((state) => state?.socket?.socket);
 
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
@@ -51,12 +52,23 @@ const UserNavbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-
+  
   const Logout = async () => {
-    const result = await dispatch(logoutAsync());
-    if (result.type === "auth/logout/fulfilled") {
-      navigate("/auth/login");
-    }
+    Swal.fire({
+      title: "Are You Sure You want to Logout?",
+      showCancelButton: true,
+      confirmButtonText: "LogOut",
+    }).then(async(result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        await socket?.disconnect();
+        const result = await dispatch(logoutAsync());
+        if (result.type === "auth/logout/fulfilled") {
+          navigate("/auth/login");
+        }
+      }
+    });
+
   };
 
   const orders = () => {
@@ -93,7 +105,7 @@ const UserNavbar = () => {
             {user.role !== "admin" ? (
               <>
                 <NavItem className="fs-3 text-white">
-                  <CgProfile onClick={()=>navigate("/user/editprofile")} />
+                  <CgProfile onClick={() => navigate("/user/editprofile")} />
                 </NavItem>
                 <UncontrolledDropdown className=" fs-3" nav inNavbar>
                   <DropdownToggle nav className="d-flex">

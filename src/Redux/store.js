@@ -8,7 +8,7 @@ import FeedbackSlice from "./Slices/FeedBackSlice"
 import AdminSlice from "./Slices/AdminSlice"
 
 import LoaderSlice from  './Slices/LoaderSlice'
-
+import socketslice from "./Slices/SocketSlice";
 import EditProfileSlice from "./Slices/EditProfileSlice"
 
 
@@ -23,6 +23,7 @@ export const store = configureStore({
     feedback:FeedbackSlice,
     admin: AdminSlice,
     spinner: LoaderSlice,
+    socket:socketslice
   },
 });
 export default store;
