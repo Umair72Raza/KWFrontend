@@ -16,6 +16,7 @@ export const Labels={
     l6to10:"Less then Equal $10",
     l11to15:"Less then Equal $15",
     l16to20:"Less then Equal $20",
+    g20:"Greater then    $20",
 }
 export const options={
     none:"None",

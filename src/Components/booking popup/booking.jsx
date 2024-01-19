@@ -14,13 +14,13 @@ import Swal from "sweetalert2";
 import { button, heading, Labels, div } from "./constants.js";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
-import socket from "../../SocketManager/socketManager.js";
+
 import OfferResult from "../../Components/OfferResult/OfferResult.jsx";
 import { failureToast } from "../../utils.js";
 
 const Booking = ({ modal, toggle, worker, chat }) => {
   const { user, token } = useSelector((state) => state.auth);
-
+  const socket=useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDetails, setTaskDetails] = useState(``);
@@ -47,7 +47,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     );
   }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption]);
   useEffect(() => {
-    socket.on("offerResult", (result) => {
+    socket?.on("offerResult", (result) => {
       if (result == "accept") {
         setOfferResult("true");
         clear();
@@ -56,7 +56,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       }
     });
     return () => {
-      socket.off("offerResult");
+      socket?.off("offerResult");
     };
   });
 
@@ -98,7 +98,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         failureToast("Worker Gets Offline!");
         toggle();
       } else {
-        socket.emit("newOffer", {
+        socket?.emit("newOffer", {
           params: data,
           Wid: worker._id,
           chat: chat,
@@ -111,11 +111,11 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         });
         toggle();
         return () => {
-          socket.off("newOffer");
+          socket?.off("newOffer");
         };
       }
     } else {
-      socket.emit("newOffer", {
+      socket?.emit("newOffer", {
         params: data,
         Wid: worker._id,
         chat: chat,
@@ -128,7 +128,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       });
       toggle();
       return () => {
-        socket.off("newOffer");
+        socket?.off("newOffer");
       };
     }
   };

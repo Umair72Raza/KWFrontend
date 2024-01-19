@@ -12,7 +12,6 @@ import {
 } from "reactstrap";
 import FinishJob from "../FinishJob/FinishJob";
 import Swal from "sweetalert2";
-import socket from "../../SocketManager/socketManager";
 import { useSelector } from "react-redux";
 
 const ActiveOrders = ({
@@ -29,7 +28,7 @@ const ActiveOrders = ({
   }
   const [finishJobVerified, setFinishJobVerified] = useState(false);
   const [confirmed, SetConfirm] = useState("");
-
+  const socket=useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {
@@ -55,10 +54,10 @@ const ActiveOrders = ({
       }
     };
 
-    socket.on("finishjob-result", handleFinishJobResult);
-
+    socket?.on("finishjob-result", handleFinishJobResult);
+    
     return () => {
-      socket.off("finishjob-result", handleFinishJobResult);
+      socket?.off("finishjob-result", handleFinishJobResult);
     };
   }, [scheduledOrdersObject, setPastOrders]);
 
@@ -70,7 +69,7 @@ const ActiveOrders = ({
       Uid: UserId,
     };
     console.log(data);
-    socket.emit("finishJob-accept-reject", data);
+    socket?.emit("finishJob-accept-reject", data);
     Swal.fire({
       title: "Finish Request Job Request Sent!",
       icon: "success",

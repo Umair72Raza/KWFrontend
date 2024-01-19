@@ -32,7 +32,7 @@ import {
   fetchScheduledOrdersAsync,
 } from "../../Redux/Slices/OrderSlice";
 import ModalComponent from "../ModalComponent/ModalComponent";
-import socket from "../../SocketManager/socketManager";
+
 const OrderCard = ({
   scheduledOrdersObject,
   toggleCancel,
@@ -40,6 +40,7 @@ const OrderCard = ({
   setScheduledOrders,
   setCancelledOrders,
 }) => {
+  const socket=useSelector((state) => state?.socket?.socket);
   //get these from local storage
   const { user, token } = useSelector((state) => state.auth);
   const userId = user._id;
@@ -77,9 +78,9 @@ const OrderCard = ({
 
     const cancelOrderSocketEvent = () => {
       if (!socket) return;
-      socket.emit("cancel-order-user", order);
+      socket?.emit("cancel-order-user", order);
       return () => {
-        socket.off("cancel-order-user");
+        socket?.off("cancel-order-user");
       };
     };
     const dataWithToken = { token: token, data: data };

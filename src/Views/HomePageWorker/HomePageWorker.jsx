@@ -29,7 +29,6 @@ import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { ChatState } from "../../Context/ChatProvider";
 import { Spinner } from "reactstrap";
-import socket from "../../SocketManager/socketManager";
 import Swal from "sweetalert2";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 import {
@@ -37,6 +36,8 @@ import {
   selectSpinnerVisibility,
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
+import { setSocket } from "../../Redux/Slices/SocketSlice";
+
 
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -59,7 +60,7 @@ const HomePageWorker = () => {
   const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
-
+  const socket=useSelector((state) => state?.socket?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   let {
     setOriginalChats,
@@ -77,21 +78,26 @@ const HomePageWorker = () => {
   } = ChatState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
-  useEffect(() => {
-    if (user && user._id) {
-      socket.emit("setup", user);
-      socket.emit("new-user-add", user._id);
-      socket.on("connection", "true");
-      console.log("user in connection",user)
-    } else {
-      socket.disconnect();
-    }
+  useEffect(()=>
+  {
+     dispatch(setSocket(user));
+  },[])
+  // useEffect(() => {
+  // //  let socket=createSocket()
+  //   if (user && user._id) {
+  //     socket?.emit("setup", user);
+  //     socket?.emit("new-user-add", user._id);
+  //     socket?.on("connection", "true");
+  //     console.log("user in connection",user)
+  //   } else {
+  //     socket?.disconnect();
+  //   }
     
-  },[]);
+  // },[]);
 
   useEffect(() => {
     if (!socket) return;
-    socket.on("gotNewOffer", (data) => {
+    socket?.on("gotNewOffer", (data) => {
       if (!chat || !data.chat || chat._id !== data.chat._id) {
         if (!offerNotification.includes(data.params)) {
           console.log(selectedChatCompare, data.chat);
@@ -106,12 +112,13 @@ const HomePageWorker = () => {
       }
     });
     return () => {
-      socket.off("gotNewOffer");
+      socket?.off("gotNewOffer");
     };
   });
 
   useEffect(() => {
-    socket.on("startjob-result", (data) => {
+    socket?.on("startjob-result", (data) => {
+      console.log(data);
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
@@ -158,11 +165,11 @@ const HomePageWorker = () => {
       }
     });
     return () => {
-      socket.off("startjob-result");
+      socket?.off("startjob-result");
     };
   });
   useEffect(() => {
-    socket.on("order-cancelled", (order) => {
+    socket?.on("order-cancelled", (order) => {
       if (order) {
         Swal.fire({
           title: "Order Canceled",
@@ -187,7 +194,7 @@ const HomePageWorker = () => {
       }
     });
     return () => {
-      socket.off("order-cancelled");
+      socket?.off("order-cancelled");
     };
   });
 
@@ -197,7 +204,7 @@ const HomePageWorker = () => {
     setGotOffer(false);
     // send true to the event to socket
 
-    socket.emit("accept-reject", {
+    socket?.emit("accept-reject", {
       result: "accept",
       Uid: receiveMessage.users[0],
     });
@@ -207,7 +214,7 @@ const HomePageWorker = () => {
   const handleCancel = () => {
     setGotOffer(false);
     //  send false to the event to socket
-    socket.emit("accept-reject", {
+    socket?.emit("accept-reject", {
       result: "cancel",
       Uid: receiveMessage.users[0],
     });
@@ -367,12 +374,13 @@ const HomePageWorker = () => {
   };
 
   useEffect(() => {
-    socket.on("new-order-result", (newOrderResult) => {
+    socket?.on("new-order-result", (newOrderResult) => {
+      console.log(newOrderResult);
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });
     return () => {
-      socket.off("new-order-result");
+      socket?.off("new-order-result");
     };
   }, []);
   return (

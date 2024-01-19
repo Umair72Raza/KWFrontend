@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { Button, Modal, ModalHeader, ModalBody } from "reactstrap";
 import { SendMessageAsync, fetchMessages } from "../../Redux/Slices/ChatSlice";
 import { ChatState } from "../../Context/ChatProvider";
-import socket from "../../SocketManager/socketManager";
+
 import { SelectChat } from "../../utils";
 import { useSelector } from "react-redux";
 import Booking from "../booking popup/booking";
@@ -34,7 +34,7 @@ const ChatPopup = () => {
   } = ChatState();
 
   const { user, token } = useSelector((state) => state.auth);
-
+  const socket=useSelector((state) => state?.socket?.socket);
  
   const messagesContainerRef = useRef(null);
   const dispatch = useDispatch();
@@ -49,7 +49,7 @@ const ChatPopup = () => {
         );
         if (result.type === "Chat/messages/fulfilled") {
           setMessages(result.payload || []);
-          socket.emit("join chat", chat._id);
+          socket?.emit("join chat", chat._id);
         } else {
           setMessages([]);
         }
@@ -62,12 +62,12 @@ const ChatPopup = () => {
 
   useEffect(() => {
     if (user && user._id) {
-      socket.on("get-users", (users) => {
+      socket?.on("get-users", (users) => {
         setOnlineUsers(users);
       });
     } else {
       return () => {
-        socket.disconnect();
+        socket?.disconnect();
       };
     }
   }, []);
@@ -75,7 +75,7 @@ const ChatPopup = () => {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on("message received", (newMessageReceived) => {
+    socket?.on("message received", (newMessageReceived) => {
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.newMessage.chatId
@@ -92,7 +92,7 @@ const ChatPopup = () => {
       }
     });
     return () => {
-      socket.off("message received");
+      socket?.off("message received");
     };
   });
 
@@ -128,7 +128,7 @@ const ChatPopup = () => {
             newMessage: result.payload.message,
             chat: chat,
           };
-          socket.emit("new message", NewMessageAndUserId);
+          socket?.emit("new message", NewMessageAndUserId);
           if (messages) {
             setMessages([...messages, result.payload.message]);
           } else {

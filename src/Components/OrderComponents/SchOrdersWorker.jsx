@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 
 //cards for Scheduled Orders
-import socket from "../../SocketManager/socketManager";
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -45,6 +45,7 @@ const ScheduledOrdersCardWorker = ({
   const userId = user._id;
   const userRole = user.role;
   const userName = user.firstName;
+  const socket=useSelector((state) => state?.socket?.socket);
 
   const [showModal, setShowModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
@@ -77,9 +78,9 @@ const ScheduledOrdersCardWorker = ({
     // there could be problem down here
     const cancelSocketEvent = () => {
       if (!socket) return;
-      socket.emit("cancel-order", order);
+      socket?.emit("cancel-order", order);
       return () => {
-        socket.off("cancel-order");
+        socket?.off("cancel-order");
       };
     };
     cancelSocketEvent();
@@ -108,7 +109,7 @@ const ScheduledOrdersCardWorker = ({
       Uid,
     };
     console.log(data);
-    socket.emit("startJob-accept-reject", data);
+    socket?.emit("startJob-accept-reject", data);
     Swal.fire({
       title: "Start Job request sent!",
       icon: "success",
