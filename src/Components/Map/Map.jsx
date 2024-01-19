@@ -206,9 +206,10 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
           const latitude = UsersData?.latitude;
           const longitude = UsersData?.longitude;
           const userCurrentCountry = UsersData?.country;
+          setTimeout(() => {  
           setMapLoaded(true);
           setInputEnabled(true);
-          setLoading(false);
+          setLoading(false); }, 1000);
           if (latitude !== undefined || longitude !== undefined) {
             setCurrentLocation({
               lat: latitude,
