@@ -135,7 +135,8 @@ const ScheduledOrdersCardWorker = ({
   return (
     <>
       <Container>
-        <Row>
+        {scheduledOrdersObject.length > 0 ? <>
+          <Row>
           {scheduledOrdersObject?.map((order) => (
             <Col
               key={order._id}
@@ -260,6 +261,8 @@ const ScheduledOrdersCardWorker = ({
             </Col>
           ))}
         </Row>
+        </>:<>No Scheduled Orders</>}
+  
       </Container>
 
       <Modal isOpen={isModalOpen} toggle={toggleModal} centered>

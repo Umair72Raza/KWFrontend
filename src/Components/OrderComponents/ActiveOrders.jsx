@@ -93,7 +93,8 @@ const ActiveOrders = ({
   };
   return (
     <Container>
-      <Row>
+      {scheduledOrdersObject.length > 0  ? <>
+        <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
             key={order._id}
@@ -183,6 +184,8 @@ const ActiveOrders = ({
           </Col>
         ))}
       </Row>
+      </>:<>No Active Orders</>}
+     
       {finishJobVerified && !isUser ? (
         <>
           <FinishJob

@@ -43,8 +43,8 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
   };
 
   return (
-    <Container style={{}}>
-      <Row>
+    <Container>
+      {scheduledOrdersObject.length > 0 ? <>      <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
             key={order._id}
@@ -117,6 +117,10 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
           </Col>
         ))}
       </Row>
+      </>:<>
+      No Cancelled Orders
+      </>}
+
     </Container>
   );
 };

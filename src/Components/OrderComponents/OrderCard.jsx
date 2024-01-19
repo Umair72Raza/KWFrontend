@@ -99,7 +99,8 @@ const OrderCard = ({
   return (
     <>
       <Container>
-        <Row>
+        {scheduledOrdersObject.length > 0 ?<>
+          <Row>
           {scheduledOrdersObject?.map((order) => (
             <Col
               key={order._id}
@@ -208,6 +209,8 @@ const OrderCard = ({
             </Col>
           ))}
         </Row>
+        </>:<>No Scheduled Orders</>}
+
       </Container>
       <ModalComponent
         modalHeader={"Order Cancellation"}

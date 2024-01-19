@@ -49,7 +49,8 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
   };
   return (
     <Container>
-      <Row>
+      {scheduledOrdersObject.length > 0 ? <>
+        <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
             key={order._id}
@@ -141,6 +142,8 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
           </Col>
         ))}
       </Row>
+      </>:<>No Past Orders</>}
+
     </Container>
   );
 };
