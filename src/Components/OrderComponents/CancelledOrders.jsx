@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 //cards for cancelled orders
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardBody,
@@ -15,9 +15,10 @@ import {
 } from "reactstrap";
 import cancelled from "../../assets/cancelled.png";
 import { useSelector } from "react-redux";
+import { truncateText } from "../../utils";
 const CancelledOrders = ({ scheduledOrdersObject }) => {
   const { user } = useSelector((state) => state.auth);
-  const userId = user._id;
+  const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const userRole = user.role;
   let person = null;
   if (userRole === "user") {
@@ -26,8 +27,23 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
     person = "Was Assigned By";
   }
 
+  const transformOrderDetails = (order) => {
+    let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+
+    return showFullDetailsMap[order._id]
+      ? order.details
+      : truncateText(transformedDetails, 5);
+  };
+
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  };
+
   return (
-    <Container>
+    <Container style={{}}>
       <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
@@ -37,7 +53,7 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
             lg="3"
             style={{ marginTop: "10px" }}
           >
-            <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
+            <Card className="shadow" style={{ backgroundColor: "#f6f8fc",height:"100%" }}>
               <CardBody>
                 <CardTitle>
                   <Col>
@@ -61,8 +77,27 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
                 </CardTitle>
                 <CardText>Status: {order.Status}</CardText>
                 <CardText>Date and Time: {order.date}</CardText>
-                <CardText>Details: {order.details}</CardText>
-                <CardText>OrderId: {order._id}</CardText>
+                <CardText>
+                    Details:{" "}
+                    {showFullDetailsMap[order._id]
+                      ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order.details,
+                            }}
+                          />
+                        )
+                      : transformOrderDetails(order)}
+                    {order.details.length > 5 && (
+                     <Button
+                     style={{ marginTop: "-5px" }}
+                     color="link"
+                     onClick={() => toggleDetails(order._id)}
+                   >
+                     {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
+                   </Button>
+                    )}
+                  </CardText>
                 {order.cancelReason ? (
                   <>
                     <CardText>

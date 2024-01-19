@@ -14,6 +14,7 @@ import FinishJob from "../FinishJob/FinishJob";
 import Swal from "sweetalert2";
 import socket from "../../SocketManager/socketManager";
 import { useSelector } from "react-redux";
+import { truncateText } from "../../utils";
 
 const ActiveOrders = ({
   scheduledOrdersObject,
@@ -26,13 +27,14 @@ const ActiveOrders = ({
   if (user.role === "user") {
     isUser = true;
   }
+  
+  const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [finishJobVerified, setFinishJobVerified] = useState(false);
   const [confirmed, SetConfirm] = useState("");
 
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {
-        console.log("true");
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -47,7 +49,6 @@ const ActiveOrders = ({
         // Add the removed order to the past orders
         setPastOrders((prevPastOrders) => [...prevPastOrders, data.order]);
       } else if (data.result === "false") {
-        console.log("finish job false");
         SetConfirm("false");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -61,22 +62,37 @@ const ActiveOrders = ({
     };
   }, [scheduledOrdersObject, setPastOrders]);
 
+
+
   const sendFinishRequest = (order, UserId) => {
     //send event to finish the job
     const data = {
       order,
       Uid: UserId,
     };
-    console.log(data);
     socket.emit("finishJob-accept-reject", data);
     Swal.fire({
       title: "Finish Request Job Request Sent!",
       icon: "success",
     });
   };
+
+  const transformOrderDetails = (order) => {
+    let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+
+    return showFullDetailsMap[order._id]
+      ? order.details
+      : truncateText(transformedDetails, 5);
+  };
+
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  };
   return (
     <Container>
-      {console.log(scheduledOrdersObject)}
       <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
@@ -86,7 +102,7 @@ const ActiveOrders = ({
             lg="3"
             style={{ marginTop: "10px" }}
           >
-            <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
+            <Card className="shadow" style={{ backgroundColor: "#f6f8fc",height:"100%" }}>
               <CardBody>
                 <Col
                   style={{
@@ -113,7 +129,27 @@ const ActiveOrders = ({
                 </CardText>
                 <CardText>Time: {order.Time}</CardText>
                 <CardText>Date: {order.date}</CardText>
-                <CardText>Details: {order.details}</CardText>
+                <CardText>
+                    Details:{" "}
+                    {showFullDetailsMap[order._id]
+                      ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order.details,
+                            }}
+                          />
+                        )
+                      : transformOrderDetails(order)}
+                    {order.details.length > 5 && (
+                     <Button
+                     style={{ marginTop: "-5px" }}
+                     color="link"
+                     onClick={() => toggleDetails(order._id)}
+                   >
+                     {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
+                   </Button>
+                    )}
+                  </CardText>
                 <CardText>OrderId: {order._id}</CardText>
                 <CardText>
                   {" "}

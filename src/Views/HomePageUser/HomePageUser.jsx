@@ -55,7 +55,6 @@ const HomePageUser = () => {
   removedUsers = useSelector((state) => state?.homepage?.removeWorker);
 
   useEffect(() => {
-    console.log(user);
     if (user && user._id) {
       socket.emit("setup", user);
       socket.emit("new-user-add", user._id);
@@ -138,11 +137,11 @@ const HomePageUser = () => {
     socket.on("order-canceled", (Corder) => {
       if (Corder) {
         Swal.fire({
-          title: "Order Canceled",
-          html: `<div> <strong>Order Title:</strong> ${order.Title}</div>
-                 <div> <strong>Order Details:</strong> ${order.details}</div>
-                 <div> <strong>Service:</strong> ${order.service}</div>
-                 <div> <strong>Amount:</strong> ${order.amount}</div>`,
+          title: "Order Cancelled",
+          html: `<div> <strong>Order Title:</strong> ${Corder.Title}</div>
+                 <div> <strong>Order Details:</strong> ${Corder.details}</div>
+                 <div> <strong>Service:</strong> ${Corder.service}</div>
+                 <div> <strong>Amount:</strong> ${Corder.amount}</div>`,
           icon: "error",
         });
         setScheduledOrders((prevScheduledOrders) => {
@@ -190,7 +189,6 @@ const HomePageUser = () => {
   useEffect(() => {
     if (!socket) return;
     socket.on("finishjob-request", (order) => {
-      console.log(order);
       setFinishOrderReq(true);
       setFOrder(order);
     });
@@ -320,7 +318,6 @@ const HomePageUser = () => {
         return filteredUser;
       });
     }
-    console.log(filteredUsers,"memo")
     return filteredUsers;
   }, [
     users,

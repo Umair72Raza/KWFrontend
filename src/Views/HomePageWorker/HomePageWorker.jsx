@@ -1,4 +1,4 @@
-/ eslint-disable no-unused-vars /;
+// / eslint-disable no-unused-vars /;
 import React, { useEffect, useState } from "react";
 import {
   TabContent,
@@ -82,7 +82,6 @@ const HomePageWorker = () => {
       socket.emit("setup", user);
       socket.emit("new-user-add", user._id);
       socket.on("connection", "true");
-      console.log("user in connection",user)
     } else {
       socket.disconnect();
     }
@@ -94,9 +93,7 @@ const HomePageWorker = () => {
     socket.on("gotNewOffer", (data) => {
       if (!chat || !data.chat || chat._id !== data.chat._id) {
         if (!offerNotification.includes(data.params)) {
-          console.log(selectedChatCompare, data.chat);
           SetONotification([data.params, ...offerNotification]);
-          console.log(offerNotification);
           setUserOffering(data.user);
         }
       } else {
@@ -112,7 +109,6 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket.on("startjob-result", (data) => {
-      console.log(data);
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
@@ -153,7 +149,6 @@ const HomePageWorker = () => {
           return prevScheduledOrders;
         });
       } else if (data.result == "false") {
-        console.log("startjob cancel");
         setStartJobStatus("false");
         setStartJobVerified(true);
       }
@@ -163,17 +158,24 @@ const HomePageWorker = () => {
     };
   });
   useEffect(() => {
+
     socket.on("order-cancelled", (Corder) => {
+      const formattedDetails = Corder?.details || "";
+      const truncatedDetails =
+        formattedDetails.length > 5
+          ? formattedDetails.slice(0, 5) + "..."
+          : formattedDetails;
+    
       if (Corder) {
         Swal.fire({
-          title: "Order Canceled",
+          title: "Order Cancelled",
           html: `<div>
                 <strong>Order Title:</strong>
                  ${Corder.Title}
                 </div>
                   <div>
                     <strong>Order Details:</strong>
-                     ${Corder.details}
+                     ${truncatedDetails}
                   </div>
                 <div>
                   <strong>Service:</strong>
@@ -278,7 +280,6 @@ const HomePageWorker = () => {
             dispatch(showSpinner());
             let respo = await dispatch(fetchActiveOrdersAsync(token));
             if (respo.type === "orders/fetchActiveOrders/fulfilled") {
-              console.log(respo.payload.orders)
               setActiveOrder(respo.payload.orders);
               setIsActiveOrdersFetched(true);
               dispatch(hideSpinner());
@@ -395,7 +396,6 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket.on("new-order-result", (newOrderResult) => {
-      console.log(newOrderResult);
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });

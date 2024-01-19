@@ -78,7 +78,6 @@ const Orders = () => {
             dispatch(showSpinner());
             let respo = await dispatch(fetchActiveOrdersAsync(token));
             if (respo.type === "orders/fetchActiveOrders/fulfilled") {
-              console.log(respo.payload.orders)
               setActiveOrder(respo.payload.orders);
               setIsActiveOrdersFetched(true);
               dispatch(hideSpinner());
@@ -172,7 +171,6 @@ const Orders = () => {
           setScheduledOrders([newOrder]);
           dispatch(setnewOrderValue(null));
         } else {
-          console.log(newOrder, "new order");
           setScheduledOrders((prevScheduledOrders) => [
             ...prevScheduledOrders,
             newOrder,

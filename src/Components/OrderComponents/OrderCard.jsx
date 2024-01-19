@@ -21,6 +21,7 @@ import {
 } from "../../Redux/Slices/OrderSlice";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import socket from "../../SocketManager/socketManager";
+import { truncateText } from "../../utils";
 const OrderCard = ({
   scheduledOrdersObject,
   toggleCancel,
@@ -31,21 +32,30 @@ const OrderCard = ({
   //get these from local storage
   const { user, token } = useSelector((state) => state.auth);
   const userId = user._id;
-  const [showModal, setShowModal] = useState(false);
+  const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setShowModal(true);
+
 
   const toggleModal = (order) => {
     setOrderToCancel(order);
     setIsModalOpen(!isModalOpen);
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    // Clear the reason input when the modal is closed
-    setCancelReason("");
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  };
+
+  const transformOrderDetails = (order) => {
+    let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+
+    return showFullDetailsMap[order._id]
+      ? order.details
+      : truncateText(transformedDetails, 25);
   };
 
   const dispatch = useDispatch();
@@ -150,7 +160,29 @@ const OrderCard = ({
                   </CardText>
                   <CardText>Time: {order.Time}</CardText>
                   <CardText>Date: {order.date}</CardText>
-                  <CardText>Details: {order.details}</CardText>
+                  <CardText>
+                    Details:{" "}
+                    {showFullDetailsMap[order._id]
+                      ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order.details,
+                            }}
+                          />
+                        )
+                      : transformOrderDetails(order)}
+                    {order.details.length > 25 && (
+                      <Button
+                      style={{marginTop:"-5px"}}
+                        color="link"
+                        onClick={() => toggleDetails(order._id)}
+                      >
+                        {showFullDetailsMap[order._id]
+                          ? "Show Less"
+                          : "Show More"}
+                      </Button>
+                    )}
+                  </CardText>
                   <CardText>OrderId: {order._id}</CardText>
                   <CardText>
                     Worker: {order.users.length > 0 && order.users[1].firstName}
