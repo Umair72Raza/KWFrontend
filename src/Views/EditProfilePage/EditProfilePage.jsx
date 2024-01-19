@@ -17,7 +17,10 @@ import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import { fetchUsersDataAsync } from "../../Redux/Slices/EditProfileSlice";
 import { RegisterPage } from "../../Constants/Constants";
-import PhoneInput, { isValidPhoneNumber,parsePhoneNumber } from "react-phone-number-input";
+import PhoneInput, {
+  isValidPhoneNumber,
+  parsePhoneNumber,
+} from "react-phone-number-input";
 import Map from "../../Components/Map/Map";
 import { handleNameChange, validateEmail } from "../../utils";
 import { useNavigate } from "react-router-dom";
@@ -60,25 +63,6 @@ const EditProfilePage = () => {
       dispatch(fetchUsersDataAsync(data));
     }
   }, []);
-
-  useEffect(() => {
-    if (formData && formData.phoneNumber) {
-      try {
-        const phoneNumberInfo = parsePhoneNumber(formData.phoneNumber);
-        console.log("PhoneNumberInfo:", phoneNumberInfo);
-  
-        if (phoneNumberInfo) {
-          setFormData({
-            ...formData,
-            country: phoneNumberInfo.country,
-          });
-        }
-      } catch (error) {
-        console.error("Error parsing phone number:", error);
-      }
-    }
-  }, [formData]);
-  
 
   const handleEmailChange = (e) => {
     const email = e.target.value;
@@ -229,17 +213,16 @@ const EditProfilePage = () => {
         <Container>
           <Row className="d-flex flex-row  align-items-center">
             {" "}
-           {!editMode && 
-            <Col xs={2} md={1} className="text-start">
-            <Button color="danger" onClick={handleGoBack}>
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </Button>
-          </Col>
-          }
+            {!editMode && (
+              <Col xs={2} md={1} className="text-start">
+                <Button color="danger" onClick={handleGoBack}>
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </Button>
+              </Col>
+            )}
             <Col className="fw-bold fs-3">Your Profile</Col>
           </Row>
           <Row>
-          
             {editMode ? (
               <Form className="mt-5" onSubmit={handleSubmit}>
                 <Row>
@@ -351,7 +334,14 @@ const EditProfilePage = () => {
                       <Label className="fw-semibold" for="address">
                         {RegisterPage.LABELS.ADDRESS}
                       </Label>
-                      <Map setFormData={setFormData} formData={formData} />
+                      {editMode && (
+                        // Render map only when in edit mode
+                        <Map
+                          setFormData={setFormData}
+                          formData={formData}
+                          editMode={editMode}
+                        />
+                      )}
                     </FormGroup>
                   </Col>
                 </Row>
