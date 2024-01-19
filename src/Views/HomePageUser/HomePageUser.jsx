@@ -291,10 +291,7 @@ const HomePageUser = () => {
   //filter
   const filteredAndSortedUsers = useMemo(() => {
     let filteredUsers = users;
-   
-
-
-
+  
     if (sortOption !== "none" && sortOption === "highToLowRating") {
       filteredUsers = [...filteredUsers].sort(
         (a, b) => Number(b.rating) - Number(a.rating)
@@ -339,6 +336,7 @@ const HomePageUser = () => {
       });
     }
     return filteredUsers;
+  }
   }, [
     users,
     debouncedsearch,
