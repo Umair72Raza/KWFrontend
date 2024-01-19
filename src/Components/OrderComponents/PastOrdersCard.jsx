@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 //cards for the past orders
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardBody,
@@ -16,8 +16,10 @@ import {
 import pastpng from "../../assets/past.png";
 import checkpng from "../../assets/check.png";
 import { useSelector } from "react-redux";
+import { truncateText } from "../../utils";
 
 const PastOrdersCard = ({ scheduledOrdersObject }) => {
+  const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const { user } = useSelector((state) => state.auth);
   const userRole = user.role;
   let person = null;
@@ -26,11 +28,29 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
   } else {
     person = "Was Assigned By";
   }
+  let isUser;
+  if (user.role === "user") {
+    isUser = true;
+  }
 
+  const transformOrderDetails = (order) => {
+    let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+
+    return showFullDetailsMap[order._id]
+      ? order.details
+      : truncateText(transformedDetails, 5);
+  };
+
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  };
   return (
-    
     <Container>
-      <Row>
+      {scheduledOrdersObject.length > 0 ? <>
+        <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
             key={order._id}
@@ -39,7 +59,10 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
             lg="3"
             style={{ marginTop: "10px" }}
           >
-            <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
+            <Card
+              className="shadow"
+              style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+            >
               <CardBody>
                 <Col
                   style={{
@@ -78,25 +101,49 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
                     }}
                   />
                 </CardText>
-                <CardText>Time: {order.Time}</CardText>
+                <CardText>Time: {order.time}</CardText>
                 <CardText>Date: {order.date}</CardText>
-                <CardText>Details: {order.details}</CardText>
+                <CardText>
+                  Details:{" "}
+                  {showFullDetailsMap[order._id] ? (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: order.details,
+                      }}
+                    />
+                  ) : (
+                    transformOrderDetails(order)
+                  )}
+                  {order.details.length > 5 && (
+                    <Button
+                      style={{ marginTop: "-5px" }}
+                      color="link"
+                      onClick={() => toggleDetails(order._id)}
+                    >
+                      {showFullDetailsMap[order._id]
+                        ? "Show Less"
+                        : "Show More"}
+                    </Button>
+                  )}
+                </CardText>
                 <CardText>OrderId: {order._id}</CardText>
                 <CardText>
                   {person}{" "}
-                  {order.users.map((user) => {
-                    if (user.name) {
-                      return user.name;
-                    } else {
-                      return user.firstName;
-                    }
-                  })}
+                  {isUser
+                    ? `Worker: 
+                   ${order?.users[1]?.firstName}
+                  `
+                    : `User: 
+                   ${order?.users[0]?.firstName}
+                  `}
                 </CardText>
               </CardBody>
             </Card>
           </Col>
         ))}
       </Row>
+      </>:<>No Past Orders</>}
+
     </Container>
   );
 };

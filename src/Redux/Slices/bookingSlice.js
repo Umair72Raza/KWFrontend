@@ -3,7 +3,6 @@ import { createOrder } from "../../APIs/booking";
 
 export const CreateOrder = createAsyncThunk("booking", async (data) => {
   const response = await createOrder(data);
-  console.log(response.newOrder,"''create order response api");
   return response.newOrder;
 });
 

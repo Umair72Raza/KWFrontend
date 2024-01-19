@@ -40,6 +40,7 @@ const UserRegister = ({ ShowServices }) => {
     latitude: "",
     longitude: "",
     address: "",
+    country:"",
     services: [],
   });
   const dispatch = useDispatch();
@@ -187,9 +188,9 @@ const UserRegister = ({ ShowServices }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+console.log(formData,"this is form data form si")
     try {
-      setLoading(true); // Start loading spinner
+     setLoading(true); // Start loading spinner
 
       const result = await dispatch(signUpUserAsync(formData));
 
@@ -204,6 +205,7 @@ const UserRegister = ({ ShowServices }) => {
           latitude: "",
           longitude: "",
           address: "",
+          country:"",
           services: [],
         });
         successToast("SignUP Successful!");

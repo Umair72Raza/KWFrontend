@@ -8,6 +8,7 @@ import {
   fetchSchOrders,
   changeToPast,
   fetchAllOrders,
+  fetchActiveOrders,
 } from "../../APIs/orders";
 
 export const getAllTheOrders = createAsyncThunk(
@@ -58,7 +59,7 @@ export const fetchActiveOrdersAsync = createAsyncThunk(
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user._id;
     const data = { token: token, users: userId, status: "Active" };
-    const response = await fetchCancOrders(data);
+    const response = await fetchActiveOrders(data);
     return response;
   }
 );

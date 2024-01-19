@@ -1,4 +1,4 @@
-/ eslint-disable no-unused-vars /;
+// / eslint-disable no-unused-vars /;
 import React, { useEffect, useState } from "react";
 import {
   TabContent,
@@ -29,7 +29,6 @@ import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice";
 import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { ChatState } from "../../Context/ChatProvider";
 import { Spinner } from "reactstrap";
-import socket from "../../SocketManager/socketManager";
 import Swal from "sweetalert2";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 import {
@@ -37,6 +36,8 @@ import {
   selectSpinnerVisibility,
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
+import { setSocket } from "../../Redux/Slices/SocketSlice";
+
 
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -59,7 +60,7 @@ const HomePageWorker = () => {
   const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
-
+  const socket=useSelector((state) => state?.socket?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   let {
     setOriginalChats,
@@ -77,26 +78,29 @@ const HomePageWorker = () => {
   } = ChatState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
-  useEffect(() => {
-    if (user && user._id) {
-      socket.emit("setup", user);
-      socket.emit("new-user-add", user._id);
-      socket.on("connection", "true");
-      console.log("user in connection",user)
-    } else {
-      socket.disconnect();
-    }
+  useEffect(()=>
+  {
+     dispatch(setSocket(user));
+  },[])
+  // useEffect(() => {
+  // //  let socket=createSocket()
+  //   if (user && user._id) {
+  //     socket?.emit("setup", user);
+  //     socket?.emit("new-user-add", user._id);
+  //     socket?.on("connection", "true");
+  //     console.log("user in connection",user)
+  //   } else {
+  //     socket?.disconnect();
+  //   }
     
-  },[]);
+  // },[]);
 
   useEffect(() => {
     if (!socket) return;
-    socket.on("gotNewOffer", (data) => {
+    socket?.on("gotNewOffer", (data) => {
       if (!chat || !data.chat || chat._id !== data.chat._id) {
         if (!offerNotification.includes(data.params)) {
-          console.log(selectedChatCompare, data.chat);
           SetONotification([data.params, ...offerNotification]);
-          console.log(offerNotification);
           setUserOffering(data.user);
         }
       } else {
@@ -106,12 +110,12 @@ const HomePageWorker = () => {
       }
     });
     return () => {
-      socket.off("gotNewOffer");
+      socket?.off("gotNewOffer");
     };
   });
 
   useEffect(() => {
-    socket.on("startjob-result", (data) => {
+    socket?.on("startjob-result", (data) => {
       console.log(data);
       if (data.result === "true") {
         setStartJobStatus("true");
@@ -153,53 +157,96 @@ const HomePageWorker = () => {
           return prevScheduledOrders;
         });
       } else if (data.result == "false") {
-        console.log("startjob cancel");
         setStartJobStatus("false");
         setStartJobVerified(true);
       }
     });
     return () => {
-      socket.off("startjob-result");
+      socket?.off("startjob-result");
     };
   });
   useEffect(() => {
-    socket.on("order-cancelled", (order) => {
-      if (order) {
+
+    socket?.on("order-cancelled", (Corder) => {
+      const formattedDetails = Corder?.details || "";
+      const truncatedDetails =
+        formattedDetails.length > 5
+          ? formattedDetails.slice(0, 5) + "..."
+          : formattedDetails;
+    
+      if (Corder) {
         Swal.fire({
-          title: "Order Canceled",
+          title: "Order Cancelled",
           html: `<div>
                 <strong>Order Title:</strong>
-                 ${order.Title}
+                 ${Corder.Title}
                 </div>
                   <div>
                     <strong>Order Details:</strong>
-                     ${order.details}
+                     ${truncatedDetails}
                   </div>
                 <div>
                   <strong>Service:</strong>
-                   ${order.service}
+                   ${Corder.service}
                 </div>
                 <div>
                 <strong>Amount:</strong>
-                 ${order.ammount}
+                 ${Corder.amount}
               </div>`,
           icon: "error",
         });
+
+        setScheduledOrders((prevScheduledOrders) => {
+          // Check if the order exists in scheduledOrders
+          const scheduledOrderIndex = prevScheduledOrders.findIndex(
+            (order) => order.id === Corder.id
+          );
+
+          if (scheduledOrderIndex !== -1) {
+            // Remove from scheduledOrders
+            const updatedScheduledOrders = [...prevScheduledOrders];
+            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+
+            // Set the updated scheduled orders to the local state
+            setScheduledOrders(updatedScheduledOrders);
+
+            setCancelledOrders((prevCancelledOrders) => {
+              // Check if the order is already present in active orders
+              const isOrderAlreadyPresent = prevCancelledOrders.some(
+                (order) => order._id === Corder._id
+              );
+
+              if (!isOrderAlreadyPresent) {
+                // Add the order to active orders if it's not present
+                return [...prevCancelledOrders, Corder];
+              }
+
+              // If the order is already present, return the current state
+              return prevCancelledOrders;
+            });
+
+            return updatedScheduledOrders;
+          }
+
+          return prevScheduledOrders;
+        });
+
+
+
       }
     });
     return () => {
-      socket.off("order-cancelled");
+      socket?.off("order-cancelled");
     };
   });
 
   //accept the offer
   const handleConfirm = async () => {
-    console.log("Accepted");
 
     setGotOffer(false);
     // send true to the event to socket
 
-    socket.emit("accept-reject", {
+    socket?.emit("accept-reject", {
       result: "accept",
       Uid: receiveMessage.users[0],
     });
@@ -207,10 +254,9 @@ const HomePageWorker = () => {
 
   //reject the offer
   const handleCancel = () => {
-    console.log("Cancelled");
     setGotOffer(false);
     //  send false to the event to socket
-    socket.emit("accept-reject", {
+    socket?.emit("accept-reject", {
       result: "cancel",
       Uid: receiveMessage.users[0],
     });
@@ -300,15 +346,6 @@ const HomePageWorker = () => {
     }
   };
 
-  const formattedOfferDetails = `
-  <p><strong>Title:</strong> ${receiveMessage?.Title}</p>
-  <p><strong>Details:</strong> ${receiveMessage?.details}</p>
-  <p><strong>Date:</strong> ${receiveMessage?.date}</p> 
-  <p><strong>Time:</strong> ${receiveMessage?.time}</p>
-  <p><strong>Amount:</strong> ${receiveMessage?.amount}</p>
-  <p><strong>Service:</strong> ${receiveMessage?.service}</p>
-`;
-
   const scheduleClick = () => {
     toggleTab("1");
   };
@@ -370,13 +407,13 @@ const HomePageWorker = () => {
   };
 
   useEffect(() => {
-    socket.on("new-order-result", (newOrderResult) => {
+    socket?.on("new-order-result", (newOrderResult) => {
       console.log(newOrderResult);
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });
     return () => {
-      socket.off("new-order-result");
+      socket?.off("new-order-result");
     };
   }, []);
   return (
@@ -385,7 +422,7 @@ const HomePageWorker = () => {
         <UserNavbar />
       </Row>
       <Row>
-        <Nav tabs>
+        <Nav tabs style={{cursor:"pointer"}}>
           <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "1" })}
@@ -426,8 +463,8 @@ const HomePageWorker = () => {
           <TabPane tabId="1">
             <Row>
               <Col>
-                <h2>Scheduled Orders</h2>
-
+                <h2 style={{textAlign:"center"}}>Scheduled Orders</h2>
+                <Row>
                 <div style={{ marginTop: "10px !important" }}>
                   {isScheduledOrdersFetched && scheduledOrders ? (
                     <ScheduledOrdersCardWorker
@@ -447,16 +484,15 @@ const HomePageWorker = () => {
                     <>No Orders Scheduled</>
                   )}
                 </div>
+                </Row>
               </Col>
             </Row>
           </TabPane>
           <TabPane tabId="2">
             <Row>
+              <h2 style={{textAlign:"center"}}>Past Orders</h2>
               <Col>
                 {pastOrders ? (
-                  //  &&
-                  // pastOrder?.orders &&
-                  // pastOrder?.orders?.length > 0
                   <PastOrdersCard scheduledOrdersObject={pastOrders} />
                 ) : (
                   <h1>No Past Orders</h1>
@@ -466,11 +502,9 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="3">
             <Row>
+            <h2 style={{textAlign:"center"}}>Cancelled Orders</h2>
               <Col>
                 {cancelledOrders ? (
-                  //  &&
-                  // cancelledData?.orders &&
-                  // cancelledData?.orders?.length > 0
                   <>
                     <CancelledOrders scheduledOrdersObject={cancelledOrders} />
                   </>
@@ -482,11 +516,9 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="4">
             <Row>
+            <h2 style={{textAlign:"center"}}>Active Orders</h2>
               <Col>
                 {activeOrder ? (
-                  // &&
-                  // activeData?.orders &&
-                  // activeData?.orders?.length > 0
                   <>
                     <ActiveOrders
                       scheduledOrdersObject={activeOrder}

@@ -12,28 +12,28 @@ import {
 } from "reactstrap";
 import FinishJob from "../FinishJob/FinishJob";
 import Swal from "sweetalert2";
-import socket from "../../SocketManager/socketManager";
 import { useSelector } from "react-redux";
+import { truncateText } from "../../utils";
 
 const ActiveOrders = ({
   scheduledOrdersObject,
   setPastOrders,
   updateActiveOrders,
 }) => {
-  // const user = JSON.parse(localStorage.getItem("user"));
   const { user } = useSelector((state) => state.auth);
   const [order, SetOrder] = useState(null);
   let isUser;
   if (user.role === "user") {
     isUser = true;
   }
+  
+  const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [finishJobVerified, setFinishJobVerified] = useState(false);
   const [confirmed, SetConfirm] = useState("");
-
+  const socket=useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {
-        console.log("true");
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -48,39 +48,52 @@ const ActiveOrders = ({
         // Add the removed order to the past orders
         setPastOrders((prevPastOrders) => [...prevPastOrders, data.order]);
       } else if (data.result === "false") {
-        console.log("finish job false");
         SetConfirm("false");
         SetOrder(data.order);
         setFinishJobVerified(true);
       }
     };
 
-    socket.on("finishjob-result", handleFinishJobResult);
-
+    socket?.on("finishjob-result", handleFinishJobResult);
+    
     return () => {
-      socket.off("finishjob-result", handleFinishJobResult);
+      socket?.off("finishjob-result", handleFinishJobResult);
     };
   }, [scheduledOrdersObject, setPastOrders]);
 
-  // useEf
+
+
   const sendFinishRequest = (order, UserId) => {
     //send event to finish the job
     const data = {
       order,
       Uid: UserId,
     };
-    console.log(data);
     socket.emit("finishJob-accept-reject", data);
     Swal.fire({
       title: "Finish Request Job Request Sent!",
       icon: "success",
     });
+  };
 
-    //emit the event to socket with User Id and orderId
+  const transformOrderDetails = (order) => {
+    let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+
+    return showFullDetailsMap[order._id]
+      ? order.details
+      : truncateText(transformedDetails, 5);
+  };
+
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
   };
   return (
     <Container>
-      <Row>
+      {scheduledOrdersObject.length > 0  ? <>
+        <Row>
         {scheduledOrdersObject?.map((order) => (
           <Col
             key={order._id}
@@ -89,7 +102,7 @@ const ActiveOrders = ({
             lg="3"
             style={{ marginTop: "10px" }}
           >
-            <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
+            <Card className="shadow" style={{ backgroundColor: "#f6f8fc",height:"100%" }}>
               <CardBody>
                 <Col
                   style={{
@@ -98,11 +111,6 @@ const ActiveOrders = ({
                     alignItems: "center",
                   }}
                 >
-                  {/* <img
-                    src={pastpng}
-                    alt="schTask"
-                    style={{ height: "27px", marginRight: "10px" }}
-                  /> */}
                   <h5 style={{ marginTop: "4%", textAlign: "center" }}>
                     {order.Title}
                   </h5>
@@ -118,33 +126,38 @@ const ActiveOrders = ({
                   <span style={{ marginTop: "10px" }}>
                     Status: {order.Status}
                   </span>
-                  {/* <img
-                    src={checkpng}
-                    alt="schTask"
-                    style={{
-                      height: "25px",
-                      marginLeft: "1%",
-                      marginTop: "-1%",
-                    }}
-                  /> */}
                 </CardText>
                 <CardText>Time: {order.Time}</CardText>
                 <CardText>Date: {order.date}</CardText>
-                <CardText>Details: {order.details}</CardText>
+                <CardText>
+                    Details:{" "}
+                    {showFullDetailsMap[order._id]
+                      ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order.details,
+                            }}
+                          />
+                        )
+                      : transformOrderDetails(order)}
+                    {order.details.length > 5 && (
+                     <Button
+                     style={{ marginTop: "-5px" }}
+                     color="link"
+                     onClick={() => toggleDetails(order._id)}
+                   >
+                     {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
+                   </Button>
+                    )}
+                  </CardText>
                 <CardText>OrderId: {order._id}</CardText>
                 <CardText>
                   {" "}
-                  {order.users.map((user) => {
-                    if (user.name) {
-                      return user.name;
-                    } else {
-                      return user.firstName;
-                    }
-                  })}
+                  {isUser ? `Worker: ${order.users[1].firstName}`:`User: ${order.users[0].firstName}`}
+                  
                 </CardText>
                 <Col style={{ margin: "2%" }} xs="12" md="3">
                   {" "}
-                  {/* Half width on small screens, one-third width on medium and larger screens */}
                   <CardText>
                     {!isUser ? (
                       <>
@@ -170,6 +183,8 @@ const ActiveOrders = ({
           </Col>
         ))}
       </Row>
+      </>:<>No Active Orders</>}
+     
       {finishJobVerified && !isUser ? (
         <>
           <FinishJob

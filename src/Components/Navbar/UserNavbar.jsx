@@ -27,7 +27,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
-
+import Swal from "sweetalert2";
 const UserNavbar = () => {
   const {
     setShowModal,
@@ -42,8 +42,9 @@ const UserNavbar = () => {
     setReceiveMessage,
     setGotOffer,
     userOffering,
-    setSelectedChatCompare
+    setSelectedChatCompare,
   } = ChatState();
+  const socket=useSelector((state) => state?.socket?.socket);
 
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
@@ -51,12 +52,23 @@ const UserNavbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-
+  
   const Logout = async () => {
-    const result = await dispatch(logoutAsync());
-    if (result.type === "auth/logout/fulfilled") {
-      navigate("/auth/login");
-    }
+    Swal.fire({
+      title: "Are You Sure You want to Logout?",
+      showCancelButton: true,
+      confirmButtonText: "LogOut",
+    }).then(async(result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        await socket?.disconnect();
+        const result = await dispatch(logoutAsync());
+        if (result.type === "auth/logout/fulfilled") {
+          navigate("/auth/login");
+        }
+      }
+    });
+
   };
 
   const orders = () => {
@@ -65,7 +77,7 @@ const UserNavbar = () => {
 
   const HandleNotificationSelection = (notify) => {
     setSelectedChat(() => SelectChat(notify.chat));
-    setSelectedChatCompare(notify.chat)
+    setSelectedChatCompare(notify.chat);
     setChat(notify.chat);
     setNotification(notification.filter((n) => n !== notify));
     setShowModal(true);
@@ -76,6 +88,14 @@ const UserNavbar = () => {
     setGotOffer(true);
     setReceiveMessage(notify);
     SetShowOffer(!offer);
+  };
+
+  const HandleEditProfile = () => {
+    if (user.role === "user") {
+      navigate("/user/editprofile");
+    } else if (user.role === "worker") {
+      navigate("/worker/editprofile");
+    }
   };
 
   return (
@@ -92,13 +112,13 @@ const UserNavbar = () => {
           >
             {user.role !== "admin" ? (
               <>
-                <NavItem className="fs-3 text-white">
-                  <CgProfile onClick={()=>navigate("/user/editprofile")} />
+                <NavItem className="fs-3 text-white hover-pointer " title="Edit Profile">
+                  <CgProfile className="hover-text-3d rounded-5"  onClick={HandleEditProfile} />
                 </NavItem>
-                <UncontrolledDropdown className=" fs-3" nav inNavbar>
+                <UncontrolledDropdown className=" fs-3" nav inNavbar title="View Notifications">
                   <DropdownToggle nav className="d-flex">
                     <div>
-                      <IoIosNotifications className=" text-white hover-pointer" />
+                      <IoIosNotifications className=" text-white hover-pointer hover-text-3d rounded-5 " />
                     </div>
                     {notification.length > 0 && (
                       <h6>
@@ -130,9 +150,9 @@ const UserNavbar = () => {
                 </UncontrolledDropdown>
 
                 {user.role == "worker" ? (
-                  <NavItem className="text-white fs-3  d-flex">
+                  <NavItem className="text-white fs-3  d-flex hover-pointer " title="View New Offers">
                     <div>
-                      <RiInboxArchiveLine onClick={orders} />
+                      <RiInboxArchiveLine className="hover-text-3d rounded-5" onClick={orders} />
                     </div>
                     {offerNotification.length > 0 && (
                       <h6>
@@ -148,8 +168,8 @@ const UserNavbar = () => {
                 ) : (
                   []
                 )}
-                <NavItem className="text-white fs-3 ">
-                  <FiMessageCircle
+                <NavItem className="text-white fs-3 hover-pointer " title="Chats">
+                  <FiMessageCircle className="hover-text-3d rounded-5"
                     onClick={() => {
                       setShowModal(true);
                       setCopyOfChats(OriginalChats);

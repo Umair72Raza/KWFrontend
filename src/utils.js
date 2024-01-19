@@ -22,6 +22,27 @@ export const checkRole = () => {
   }
 };
 
+
+export const truncateText = (text, maxLength) => {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
+export const transformOrderDetails = (order, showFullDetailsMap) => {
+  let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+
+  return showFullDetailsMap[order._id]
+    ? order.details
+    : truncateText(transformedDetails, 25);
+};
+
+export const toggleDetails = (prevMap, orderId) => {
+  return {
+    ...prevMap,
+    [orderId]: !prevMap[orderId],
+  };
+};
+
+
 export const checkToken = () => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -51,7 +72,7 @@ export const capitalizeFirstLetter = (str) => {
 
 export const handleNameChange = (formData, setFormData, setError, fieldName, e) => {
   const { value } = e.target;
-
+  setError("");
   // Check if the entered value is a valid string (only letters and spaces)
   const isValidString = /^[a-zA-Z\s]*$/.test(value);
 
@@ -67,16 +88,17 @@ export const handleNameChange = (formData, setFormData, setError, fieldName, e) 
       [fieldName]: capitalizedValue,
     });
 
-    if (hasOnlyWhiteSpace(value) && value.length > 0) {
-      // Display error message only when there is at least one non-space character
-      setError(`${fieldName} cannot be empty or contain only spaces.`);
-    } else {
-      // Clear error message if the user has entered a valid value
-      setError("");
-    }
-  } else {
-    setError(`${fieldName} should only contain letters.`);
+    // if (hasOnlyWhiteSpace(value) && value.length > 0) {
+    //   // Display error message only when there is at least one non-space character
+    //   setError(`${fieldName} cannot be empty or contain only spaces.`);
+    // } else {
+    //   // Clear error message if the user has entered a valid value
+    //   setError("");
+    // }
   }
+  //  else {
+  //   setError(`${fieldName} should only contain letters.`);
+  // }
 };
 
 

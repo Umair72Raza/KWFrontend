@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 
 //cards for Scheduled Orders
-import socket from "../../SocketManager/socketManager";
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -28,6 +28,7 @@ import completedtask from "../../assets/completedtask.png";
 import activeOrderspng from "../../assets/activestatus.png";
 import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
 import Swal from "sweetalert2";
+import { truncateText } from "../../utils";
 
 const ScheduledOrdersCardWorker = ({
   scheduledOrdersObject,
@@ -43,24 +44,26 @@ const ScheduledOrdersCardWorker = ({
   const { user } = useSelector((state) => state.auth);
   const { token } = useSelector((state) => state.auth);
   const userId = user._id;
-  const userRole = user.role;
-  const userName = user.firstName;
 
-  const [showModal, setShowModal] = useState(false);
+  const socket=useSelector((state) => state?.socket?.socket);
+
+ 
+  const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setShowModal(true);
+ 
+
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  };
 
   const toggleModal = (order) => {
     setOrderToCancel(order);
     setIsModalOpen(!isModalOpen);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    // Clear the reason input when the modal is closed
-    setCancelReason("");
   };
   //const user = localStorage.getItem('user')
   const dispatch = useDispatch();
@@ -77,9 +80,9 @@ const ScheduledOrdersCardWorker = ({
     // there could be problem down here
     const cancelSocketEvent = () => {
       if (!socket) return;
-      socket.emit("cancel-order", order);
+      socket?.emit("cancel-order", order);
       return () => {
-        socket.off("cancel-order");
+        socket?.off("cancel-order");
       };
     };
     cancelSocketEvent();
@@ -107,7 +110,6 @@ const ScheduledOrdersCardWorker = ({
       order,
       Uid,
     };
-    console.log(data);
     socket.emit("startJob-accept-reject", data);
     Swal.fire({
       title: "Start Job request sent!",
@@ -125,10 +127,20 @@ const ScheduledOrdersCardWorker = ({
     setUpdateScheduled(false);
   }, [updateScheduled]);
 
+
+  const transformOrderDetails = (order) => {
+    let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+
+    return showFullDetailsMap[order._id]
+      ? order.details
+      : truncateText(transformedDetails, 25);
+  };
+
   return (
     <>
       <Container>
-        <Row>
+        {scheduledOrdersObject.length > 0 ? <>
+          <Row>
           {scheduledOrdersObject?.map((order) => (
             <Col
               key={order._id}
@@ -140,7 +152,7 @@ const ScheduledOrdersCardWorker = ({
             >
               <Card
                 className="shadow"
-                style={{ backgroundColor: "#f6f8fc", color: "#0d6efd" }}
+                style={{ backgroundColor: "#f6f8fc",height:"100%" }}
               >
                 <CardBody>
                   <CardTitle>
@@ -170,7 +182,7 @@ const ScheduledOrdersCardWorker = ({
                           alignItems: "center",
                         }}
                       >
-                        <span style={{ marginTop: "10px", zIndex: "10" }}>
+                        <span style={{ marginTop: "10px", marginRight: "1%" }}>
                           Status: {order.Status}
                         </span>
                         <img
@@ -187,10 +199,31 @@ const ScheduledOrdersCardWorker = ({
                       </div>
                     </Col>
                   </CardText>
-                  <CardText>Time: {order.Time}</CardText>
+                  <CardText>Time: {order.time}</CardText>
                   <CardText>Date: {order.date}</CardText>
-                  <CardText>Details: {order.details.replace(/\\n/g, '').replace(/<br>/g, '')}</CardText>
-                  <CardText>OrderId: {order._id}</CardText>
+                  <CardText>
+                    Details:{" "}
+                    {showFullDetailsMap[order._id]
+                      ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order.details,
+                            }}
+                          />
+                        )
+                      : transformOrderDetails(order)}
+                    {order.details.length > 25 && (
+                      <Button
+                      style={{marginTop:"-5px"}}
+                        color="link"
+                        onClick={() => toggleDetails(order._id)}
+                      >
+                        {showFullDetailsMap[order._id]
+                          ? "Show Less"
+                          : "Show More"}
+                      </Button>
+                    )}
+                  </CardText>
                   <CardText>
                     Order By:{" "}
                     {order.users.length > 0 && order.users[0].firstName}
@@ -232,6 +265,8 @@ const ScheduledOrdersCardWorker = ({
             </Col>
           ))}
         </Row>
+        </>:<>No Scheduled Orders</>}
+  
       </Container>
 
       <Modal isOpen={isModalOpen} toggle={toggleModal} centered>

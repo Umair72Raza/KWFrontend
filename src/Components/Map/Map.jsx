@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { Container, Input } from "reactstrap";
+import { Container, Input, Spinner } from "reactstrap";
 import { useDebounce } from "../../Hooks/Debounce";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
@@ -8,53 +8,151 @@ import { useSelector } from "react-redux";
 
 const libraries = [import.meta.env.VITE_GOOGLE_API_LIBARARY];
 
-const Map = ({ setFormData, formData }) => {
+const GoogleMapContainer = React.memo(
+  ({ currentLocation, selectedLocation, onMapClick }) => {
+    return (
+      <GoogleMap
+        mapContainerStyle={{
+          width: "100%",
+          height: "200px",
+          margin: "40px 0",
+        }}
+        center={currentLocation || { lat: 0, lng: 0 }}
+        zoom={currentLocation ? 12 : 3}
+        options={{
+          styles: [
+            {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }],
+            },
+          ],
+        }}
+        onClick={onMapClick}
+      >
+        {currentLocation && <Marker position={currentLocation} />}
+        {selectedLocation && window.google && (
+          <Marker
+            position={selectedLocation}
+            icon={{
+              url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+              scaledSize: new window.google.maps.Size(40, 40),
+            }}
+          />
+        )}
+      </GoogleMap>
+    );
+  }
+);
+
+GoogleMapContainer.propTypes = {
+  currentLocation: PropTypes.object,
+  selectedLocation: PropTypes.object,
+  onMapClick: PropTypes.func.isRequired,
+};
+
+const Map = React.memo(({ setFormData, formData, editMode }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [newinput, setNewinput] = useState(formData?.address);
+  const [newInput, setNewInput] = useState(formData?.address);
   const [country, setCountry] = useState(formData?.country);
   const autocompleteRef = useRef(null);
-  const debouncedAddress = useDebounce(newinput);
+  const debouncedAddress = useDebounce(newInput);
   const location = useLocation();
-  const [key, setKey] = useState(0);
- const { UsersData } =useSelector((state) => state.editProfile);
+  const [loadScriptKey, setLoadScriptKey] = useState(0);
+  const [isMapLoaded, setMapLoaded] = useState(false);
+  const [isInputEnabled, setInputEnabled] = useState(false);
+  const [isLoading, setLoading] = useState(true);
+  const { UsersData } = useSelector((state) => state.editProfile);
 
- useEffect(() => {     if (location.pathname === "/user/editprofile") {
-  const latitude = UsersData?.latitude;
-  const longitude = UsersData?.longitude;
-  const userCurrentCountry = UsersData?.country;
+  const handleMapClick = useCallback((event) => {
+    const { latLng } = event;
+    const latitude = latLng.lat();
+    const longitude = latLng.lng();
 
-  if (latitude && longitude) {
-    // Use latitude and longitude from formData to set current and selected location
-    //   setNewinput(formData?.address);
-    setCurrentLocation({
-      lat: latitude,
-      lng: longitude,
-      country: userCurrentCountry,
+    setSelectedLocation({ lat: latitude, lng: longitude });
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: latLng }, (results, status) => {
+      if (status === "OK") {
+        if (results[0]) {
+          if (!formData) {
+            setNewInput(results[0].formatted_address);
+            setFormData((prev) => ({
+              ...prev,
+              address: results[0].formatted_address,
+              latitude: results[0].geometry.location.lat(),
+              longitude: results[0].geometry.location.lng(),
+              country:
+                results[0].address_components.find((component) =>
+                  component.types.includes("country")
+                )?.short_name || "",
+            }));
+          } else {
+            setNewInput(formData?.address);
+          }
+        } else {
+          window.alert("No results found");
+        }
+      } else {
+        window.alert("Geocoder failed due to: " + status);
+      }
     });
-    // setSelectedLocation({ lat: latitude, lng: longitude,country });
-    setCountry(formData?.country);
-  }
-}},[])
+  }, [formData, setFormData]);
 
+  const setupAutocomplete = useCallback(() => {
+    if (window.google && autocompleteRef.current) {
+      let autocompleteOptions;
+      if (currentLocation) {
+        autocompleteOptions = {
+          componentRestrictions: { country },
+        };
+      } else {
+        autocompleteOptions = {};
+      }
 
-  const handleLoadScript = () => {
-    if (window.google && window.google.maps && navigator.geolocation) {
-        if (
-          (location.pathname === "/auth/register" ||
-            location.pathname === "/auth/workerRegister") &&
-          !formData?.latitude &&
-          !formData?.longitude
-        ) {
+      const autocomplete = new window.google.maps.places.Autocomplete(
+        autocompleteRef.current,
+        autocompleteOptions
+      );
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry) {
+          const { lat, lng } = place.geometry.location;
+          setCurrentLocation({ lat: lat(), lng: lng() });
+          setNewInput(place.formatted_address);
+          setFormData((prev) => ({
+            ...prev,
+            address: place.formatted_address,
+            latitude: place.geometry.location.lat(),
+            longitude: place.geometry.location.lng(),
+            country:
+              place.address_components.find((component) =>
+                component.types.includes("country")
+              )?.short_name || "",
+          }));
+        }
+      });
+    }
+  }, [currentLocation, country, setFormData]);
+
+  const handleLoadScript = useCallback(() => {
+    if (window.google && window.google.maps) {
+      if (
+        (location.pathname === "/auth/register" ||
+          location.pathname === "/auth/workerRegister") &&
+        !formData?.latitude &&
+        !formData?.longitude
+      ) {
+        if ("geolocation" in navigator) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
               const { latitude, longitude } = position.coords;
 
-              // Get country using reverse geocoding
               const geocoder = new window.google.maps.Geocoder();
-              const latlng = { lat: latitude, lng: longitude };
+              const latLng = { lat: latitude, lng: longitude };
 
-              geocoder.geocode({ location: latlng }, (results, status) => {
+              geocoder.geocode({ location: latLng }, (results, status) => {
                 if (status === "OK" && results[0]) {
                   const countryComponent = results[0].address_components.find(
                     (component) => component.types.includes("country")
@@ -73,170 +171,129 @@ const Map = ({ setFormData, formData }) => {
                     lng: longitude,
                     country,
                   });
+                  setMapLoaded(true);
+                  setInputEnabled(true);
+                  setLoading(false);
                 } else {
                   console.error(
                     "Geocoder failed to get country due to:",
                     status
                   );
+                  setMapLoaded(true);
+                  setCountry("");
+                  setLoading(false);
                 }
               });
             },
             (error) => {
               console.error("Error getting user location:", error);
+              setMapLoaded(true);
+              setInputEnabled(true);
+              setLoading(false);
+              setCountry("");
             }
           );
-        }
-      
-    }
-  };
-
-  useEffect(() => {
-    if (
-      location.pathname === "/auth/register"
-    ) {
-      setCurrentLocation(null);
-      setSelectedLocation(null);
-      setNewinput("");
-      setCountry("");
-      setKey((prevKey) => prevKey + 1); // Increment key to force remount
-    }
-  }, [location.pathname]);
-  
-
-  useEffect(() => {
-    handleLoadScript();
-  }, [location.pathname, formData?.latitude, formData?.longitude]);
-
-  useEffect(() => {
-    // Fetch address based on selected location
-    if (selectedLocation) {
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: selectedLocation }, (results, status) => {
-        if (status === "OK" && results[0]) {
-          setNewinput(results[0].formatted_address);
-          setFormData((prev) => ({
-            ...prev,
-            address: results[0].formatted_address,
-            latitude: results[0].geometry.location.lat(),
-            longitude: results[0].geometry.location.lng(),
-          }));
         } else {
-          console.error("Geocoder failed due to:", status);
+          console.error("Geolocation is not supported");
+          setMapLoaded(true);
+          setInputEnabled(true);
+          setLoading(false);
+          setCountry("");
         }
-      });
-    }
-  }, [selectedLocation]);
-
-  const handleMapClick = (event) => {
-    const { latLng } = event;
-    const latitude = latLng.lat();
-    const longitude = latLng.lng();
-
-      setSelectedLocation({ lat: latitude, lng: longitude });
-   
-
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: latLng }, (results, status) => {
-      if (status === "OK") {
-        if (results[0]) {
-          if (!formData) {
-            setNewinput(results[0].formatted_address);
-            setFormData((prev) => ({
-              ...prev,
-              address: results[0].formatted_address,
-              latitude: results[0].geometry.location.lat(),
-              longitude: results[0].geometry.location.lng(),
-            }));
-          } else {
-            setNewinput(formData?.address);
+      } else if (location.pathname === "/user/editprofile" || location.pathname=== "/worker/editprofile" && editMode) {
+        setCountry(formData?.country);
+        if (editMode) {
+          const latitude = UsersData?.latitude;
+          const longitude = UsersData?.longitude;
+          const userCurrentCountry = UsersData?.country;
+          setTimeout(() => {  
+          setMapLoaded(true);
+          setInputEnabled(true);
+          setLoading(false); }, 500);
+          if (latitude !== undefined || longitude !== undefined) {
+            setCurrentLocation({
+              lat: latitude,
+              lng: longitude,
+              country: userCurrentCountry,
+            });
           }
-        } else {
-          window.alert("No results found");
         }
-      } else {
-        window.alert("Geocoder failed due to: " + status);
       }
-    });
-  };
+    }
+  }, [
+    formData,
+    location.pathname,
+    editMode,
+    UsersData,
+    setCountry,
+    setCurrentLocation,
+    setMapLoaded,
+    setInputEnabled,
+    setLoading,
+  ]);
 
   useEffect(() => {
-    // Initialize Google Autocomplete
-    if (window.google && autocompleteRef.current) {
-      const autocomplete = new window.google.maps.places.Autocomplete(
-        autocompleteRef.current,
-        {
-          componentRestrictions: { country }, // Set the country for suggestions
-        }
-      );
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (place.geometry) {
-          const { lat, lng } = place.geometry.location;
-          setCurrentLocation({ lat: lat(), lng: lng() });
-          setNewinput(place.formatted_address);
-          setFormData((prev) => ({
-            ...prev,
-            address: place.formatted_address,
-            latitude: place.geometry.location.lat(),
-            longitude: place.geometry.location.lng(),
-          }));
-        }
-      });
+    setLoadScriptKey((prevKey) => prevKey + 1);
+  }, [editMode]);
+
+  useEffect(() => {
+    if (!window.google || !window.google.maps) {
+      handleLoadScript();
     }
-  }, [debouncedAddress, country]);
+  }, [location.pathname, formData?.latitude, formData?.longitude, handleLoadScript]);
+
+  useEffect(() => {
+    if (editMode) {
+      handleLoadScript();
+    }
+  }, [editMode, handleLoadScript]);
+
+
+  useEffect(() => {
+    setupAutocomplete();
+  }, [currentLocation, country, setupAutocomplete]);
 
   return (
     <Container>
       <Input
         innerRef={autocompleteRef}
         type="text"
-        placeholder="Search for a place"
-        value={newinput}
-        onChange={(e) => setNewinput(e.target.value)}
+        placeholder={
+          isInputEnabled
+            ? "Search for a place"
+            : "Please allow location access to search for a place"
+        }
+        value={newInput}
+        onChange={(e) => setNewInput(e.target.value)}
         onDoubleClick={(e) => e.target.select()}
+        disabled={!isInputEnabled}
       />
       <LoadScript
-        key={key}
+        key={loadScriptKey}
         googleMapsApiKey={import.meta.env.VITE_GOOGLE_API}
         libraries={libraries}
         onLoad={handleLoadScript}
       >
-        <GoogleMap
-          mapContainerStyle={{
-            width: "100%",
-            height: "200px",
-            margin: "40px 0",
-          }}
-          center={currentLocation}
-          zoom={16}
-          options={{
-            styles: [
-              {
-                featureType: "poi",
-                elementType: "labels",
-                stylers: [{ visibility: "off" }],
-              },
-            ],
-          }}
-          onClick={handleMapClick}
-        >
-          {currentLocation && <Marker position={currentLocation} />}
-          {selectedLocation && window.google && (
-            <Marker
-              position={selectedLocation}
-              icon={{
-                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                scaledSize: new window.google.maps.Size(40, 40),
-              }}
-            />
-          )}
-        </GoogleMap>
+        {isLoading ? (
+          <Spinner style={{ width: "3rem", height: "3rem", marginTop: "25px" }} />
+        ) : isMapLoaded ? (
+          <GoogleMapContainer
+            currentLocation={currentLocation}
+            selectedLocation={selectedLocation}
+            onMapClick={handleMapClick}
+          />
+        ) : (
+          <div>Map is not loaded yet.</div>
+        )}
       </LoadScript>
     </Container>
   );
-};
+});
+
 Map.propTypes = {
   setFormData: PropTypes.func.isRequired,
+  formData: PropTypes.object,
+  editMode: PropTypes.bool,
 };
 
 export default Map;

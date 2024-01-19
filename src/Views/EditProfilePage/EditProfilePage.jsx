@@ -1,22 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Container, Form, FormGroup, Label, Input, Button, Row, Col } from 'reactstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import UserNavbar from '../../Components/Navbar/UserNavbar';
-import { fetchUsersDataAsync } from '../../Redux/Slices/EditProfileSlice';
-import { RegisterPage } from '../../Constants/Constants';
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import Map from '../../Components/Map/Map';
-import { handleNameChange, validateEmail } from '../../utils';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Container,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Button,
+  Row,
+  Col,
+  Card,
+  CardBody,
+  Spinner,
+} from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
+import UserNavbar from "../../Components/Navbar/UserNavbar";
+import {
+  fetchUsersDataAsync,
+  updateProfileAsync,
+} from "../../Redux/Slices/EditProfileSlice";
+import { RegisterPage } from "../../Constants/Constants";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import Map from "../../Components/Map/Map";
+import {
+  failureToast,
+  handleNameChange,
+  hasOnlyWhiteSpace,
+  successToast,
+  validateEmail,
+} from "../../utils";
+import { useNavigate } from "react-router-dom";
+import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown";
+import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
 
-const EditProfilePage = () => {
-  const { user,token } = useSelector((state) => state.auth);
-  const {UsersData} = useSelector((state) => state.editProfile);
+const EditProfilePage = ({ ShowServices }) => {
+  const { user, token } = useSelector((state) => state.auth);
+  const { UsersData } = useSelector((state) => state.editProfile);
+  const list = useSelector((state) => state?.admin?.services);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
-  const [editedName, setEditedName] = useState(user.firstName);
-  const [editedLastName, setEditedLastName] = useState(user.lastName);
   const [formData, setFormData] = useState({
     firstName: UsersData?.firstName,
     lastName: UsersData?.lastName,
@@ -29,98 +53,70 @@ const EditProfilePage = () => {
     services: UsersData?.services || [],
   });
 
-
-
-  
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
-  const [firstNameError, setFirstNameError] = useState("");
-  const [lastNameError, setLastNameError] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+  const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (UsersData) {
+      const isFormValid =
+        !errors.email &&
+        !errors.phone &&
+        !hasOnlyWhiteSpace(formData?.address) &&
+        !hasOnlyWhiteSpace(formData?.firstName) &&
+        !hasOnlyWhiteSpace(formData?.lastName) &&
+        (ShowServices ? formData.services.length > 0 : true);
 
-  useEffect(() => { 
-    if(user && user._id){
-        const data ={
-            id:user._id,
-            token:token
-        }
-        dispatch(fetchUsersDataAsync(data))
-
+      setIsSaveDisabled(!isFormValid);
     }
-  },[]);
+  }, [formData, errors.email, errors.phone]);
+
+  useEffect(() => {
+    if (user && user._id) {
+      dispatch(fetchUsersDataAsync({ id: user._id, token }));
+    }
+  }, [dispatch, user, token]);
+
+  useEffect(() => {
+    if (ShowServices) {
+      dispatch(allServicesAsync());
+    }
+  }, [dispatch, ShowServices]);
 
   const handleEmailChange = (e) => {
-    const email = e.target.value;
-
-    if (!validateEmail(email)) {
-      setEmailError(RegisterPage.ERROR_MESSAGES.invalidEmail);
-    } else {
-      setEmailError("");
-    }
-
+    setErrors({ ...errors, email: "" });
     setFormData({
       ...formData,
-      email,
+      email: e.target.value,
     });
   };
-  const handlePhoneChange = (value) => {
-    setPhoneNumber(value);
 
+  const handlePhoneChange = (value) => {
+    setErrors({ ...errors, phone: "" });
     setFormData({
       ...formData,
       phoneNumber: value,
     });
-
-    if (value && typeof value === "string") {
-      isValidPhoneNumber(value)
-        ? setPhoneError("")
-        : setPhoneError(RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
-    } else {
-      // Handle the case where the value is empty
-      setPhoneError("phone number is required");
-    }
   };
 
-  //If worker is registering
   const handleServiceChange = (e) => {
     const selectedService = e.target.value;
-
-    // Check if the service is already in the list
     const serviceExists = formData.services.some(
       (service) => service.name === selectedService
     );
 
-    if (serviceExists) {
-      // Uncheck: Remove the service from the list
-      const updatedServices = formData.services.filter(
-        (service) => service.name !== selectedService
-      );
+    const updatedServices = serviceExists
+      ? formData.services.filter((service) => service.name !== selectedService)
+      : [...formData.services, { name: selectedService, rate: 10 }];
 
-      setFormData({
-        ...formData,
-        services: updatedServices,
-      });
-    } else {
-      // Check: Add the service to the list with a default rate of 10
-      const updatedServices = [
-        ...formData.services,
-        { name: selectedService, rate: 10 },
-      ];
-
-      setFormData({
-        ...formData,
-        services: updatedServices,
-      });
-    }
+    setFormData({
+      ...formData,
+      services: updatedServices,
+    });
   };
 
   const handleRateChange = (e, serviceName) => {
-    let { value } = e.target;
-    value = parseFloat(value);
+    const value = parseFloat(e.target.value);
     const updatedServices = formData.services.map((service) =>
       service.name === serviceName ? { ...service, rate: value } : service
     );
@@ -131,49 +127,81 @@ const EditProfilePage = () => {
     });
   };
 
+  const FormValidation = (formData) => {
+    const errors = {};
+    if (!validateEmail(formData.email)) {
+      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+    }
+    if (  !formData.email.includes(".com")) {
+      errors.email="Invalid email address";
+    }
+
+    if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
+      isValidPhoneNumber(formData.phoneNumber)
+        ? setErrors({ ...errors, phone: "" })
+        : (errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
+    } else {
+      errors.phone = "Phone number is required";
+    }
+
+    if (ShowServices && formData.services.length === 0) {
+      console.error("Please select at least one service.");
+      errors.services = "Please select at least one service.";
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = FormValidation(formData);
+    setErrors(validationErrors);
+  
+    // Wait for the state to be updated
+    setTimeout(async () => {
+      if (Object.keys(validationErrors).length === 0) {
+         try {
+      setLoading(true);
+      const data = { id: UsersData?._id, token, formData };
+      const result = await dispatch(updateProfileAsync(data));
 
-   // try {
-    //   setLoading(true); // Start loading spinner
-
-     // const result = await dispatch(signUpUserAsync(formData));
-
-  //    if (result.type === "auth/signup/fulfilled") {
-        // setFormData({
-        //   firstName: "",
-        //   lastName: "",
-        //   email: "",
-        //   phoneNumber: "",
-        //   password: "",
-        //   confirmPassword: "",
-        //   latitude: "",
-        //   longitude: "",
-        //   address: "",
-        //   services: [],
-        // });
-        // successToast("SignUP Successful!");
- //       navigate("/auth/login");
-   //   } else {
-     //   failureToast("SignUP Failed Please Try Again!");
-   //   }
- //   } finally {
-    //  setLoading(false); // Stop loading spinner
-  //  }
+      if (result.type === "/UpdateProfile/fulfilled") {
+        successToast("Profile Updated Successfully!");
+        setFormData({
+          firstName: UsersData?.firstName,
+          lastName: result.payload?.lastName,
+          email: result.payload?.email,
+          phoneNumber: result.payload?.phoneNumber,
+          latitude: result.payload?.latitude,
+          longitude: result.payload?.longitude,
+          country: result.payload?.country,
+          address: result.payload?.address,
+          services: result.payload?.services || [],
+        });
+        setEditMode(false);
+      } else {
+        failureToast("Please Try Again!");
+      }
+    } finally {
+      setLoading(false);
+    }
+    }
+    }, 0);
+   
   };
 
   const handleEditModeToggle = () => {
     setFormData({
-        firstName: UsersData?.firstName,
-        lastName: UsersData?.lastName,
-        email: UsersData?.email,
-        phoneNumber: UsersData?.phoneNumber,
-        latitude: UsersData?.latitude,
-        longitude: UsersData?.longitude,
-        country: UsersData?.country,
-        address: UsersData?.address,
-        services: UsersData?.services || [],
-      })
+      firstName: UsersData?.firstName,
+      lastName: UsersData?.lastName,
+      email: UsersData?.email,
+      phoneNumber: UsersData?.phoneNumber,
+      latitude: UsersData?.latitude,
+      longitude: UsersData?.longitude,
+      country: UsersData?.country,
+      address: UsersData?.address,
+      services: UsersData?.services || [],
+    });
     setEditMode(!editMode);
   };
 
@@ -192,201 +220,220 @@ const EditProfilePage = () => {
     setEditMode(false);
   };
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   return (
     <>
-    <UserNavbar />
-    <Container className="d-flex justify-content-center mt-5 vh-100">
-    
-      <Container>
-      <Row>
-        <Col className='fw-bold fs-3 mb-3'>Your Profile</Col>
-        {editMode ? (
-             <Form onSubmit={handleSubmit}>
-             <Row>
-               <Col md={6}>
-                 <FormGroup>
-                   <Label className="fw-semibold" for="firstName">
-                     {RegisterPage.LABELS.FIRST_NAME}
-                   </Label>
-                   <Input
-                     type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
-                     name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
-                     id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
-                     placeholder={
-                       RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
-                     }
-                     maxLength={12}
-                     value={formData.firstName}
-                     onChange={(e) =>
-                       handleNameChange(
-                         formData,
-                         setFormData,
-                         setFirstNameError,
-                         "firstName",
-                         e
-                       )
-                     }
-                   />{" "}
-                   {firstNameError && (
-                     <span className="text-danger">{firstNameError}</span>
-                   )}
-                 </FormGroup>
-               </Col>
-               <Col md={6}>
-                 <FormGroup>
-                   <Label className="fw-semibold" for="lastName">
-                     {RegisterPage.LABELS.LAST_NAME}
-                   </Label>
-                   <Input
-                     type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
-                     name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
-                     id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
-                     placeholder={
-                       RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
-                     }
-                     maxLength={12}
-                     value={formData.lastName}
-                     onChange={(e) =>
-                       handleNameChange(
-                         formData,
-                         setFormData,
-                         setLastNameError,
-                         "lastName",
-                         e
-                       )
-                     }
-                   />{" "}
-                   {lastNameError && (
-                     <span className="text-danger">{lastNameError}</span>
-                   )}
-                 </FormGroup>
-               </Col>
-             </Row>
-             <Row>
-               <Col md={6}>
-                 <FormGroup>
-                   <Label className="fw-semibold" for="email">
-                     {RegisterPage.LABELS.EMAIL}
-                   </Label>
-                   <Input
-                     type={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                     name={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                     id={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                     placeholder={RegisterPage.INPUT_FIELDS.EMAIL.placeholder}
-                     value={formData.email}
-                     onChange={handleEmailChange}
-                   />
-                   {emailError && (
-                     <span className="text-danger">{emailError}</span>
-                   )}
-                 </FormGroup>
-               </Col>
-               <Col md={6}>
-                 <FormGroup>
-                   <Label className="fw-semibold" for="phoneNumber">
-                     {RegisterPage.LABELS.PHONE}
-                   </Label>
-                   <PhoneInput
-                     defaultCountry="PK"
-                     id={RegisterPage.INPUT_FIELDS.PHONE.name}
-                     placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
-                     value={phoneNumber}
-                     onChange={handlePhoneChange}
-                     international
-                     countryCallingCodeEditable={false}
-                   />
-                   {phoneError && (
-                     <span className="text-danger">{phoneError}</span>
-                   )}
-                 </FormGroup>
-               </Col>
-             </Row>
-             <Row>
-              <Col>
-                <FormGroup>
-                  <Label className="fw-semibold" for="address">
-                    {RegisterPage.LABELS.ADDRESS}
-                  </Label>
-                  <Map setFormData={setFormData} formData={formData} />
-                </FormGroup>
-              </Col>
-            </Row>
-
-            <Button type="submit" color="primary" className="me-2">
-                  Save
+      <UserNavbar />
+      <Container className="d-flex justify-content-center mt-5 vh-100">
+        <Container>
+          <Row className="d-flex flex-row  align-items-center">
+            {" "}
+            {!editMode && (
+              <Col xs={2} md={1} className="text-start">
+                <Button color="danger" onClick={handleGoBack}>
+                  <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
-                <Button color="danger" onClick={handleCancelEdit}>
+              </Col>
+            )}
+            <Col className="fw-bold fs-3">Your Profile</Col>
+          </Row>
+          <Row>
+            {editMode ? (
+              <Form className="mt-5" onSubmit={handleSubmit}>
+                <Row>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label className="fw-semibold" for="firstName">
+                        {RegisterPage.LABELS.FIRST_NAME}
+                      </Label>
+                      <Input
+                        type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
+                        name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
+                        id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
+                        placeholder={
+                          RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
+                        }
+                        maxLength={12}
+                        required
+                        value={formData.firstName}
+                        onChange={(e) =>
+                          handleNameChange(
+                            formData,
+                            setFormData,
+                            "firstName",
+                            e
+                          )
+                        }
+                      />{" "}
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label className="fw-semibold" for="lastName">
+                        {RegisterPage.LABELS.LAST_NAME}
+                      </Label>
+                      <Input
+                        type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
+                        name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
+                        id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
+                        placeholder={
+                          RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
+                        }
+                        maxLength={12}
+                        required
+                        value={formData.lastName}
+                        onChange={(e) =>
+                          handleNameChange(formData, setFormData, "lastName", e)
+                        }
+                      />{" "}
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label className="fw-semibold" for="email">
+                        {RegisterPage.LABELS.EMAIL}
+                      </Label>
+                      <Input
+                        type={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                        name={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                        id={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                        placeholder={
+                          RegisterPage.INPUT_FIELDS.EMAIL.placeholder
+                        }
+                        maxLength={70}
+                        value={formData.email}
+                        onChange={handleEmailChange}
+                      />
+                      {errors.email && (
+                        <span className="text-danger">{errors.email}</span>
+                      )}
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label className="fw-semibold" for="phoneNumber">
+                        {RegisterPage.LABELS.PHONE}
+                      </Label>
+                      <PhoneInput
+                        defaultCountry="PK"
+                        id={RegisterPage.INPUT_FIELDS.PHONE.name}
+                        placeholder={
+                          RegisterPage.INPUT_FIELDS.PHONE.placeholder
+                        }
+                        maxLength={16}
+                        required
+                        value={formData.phoneNumber}
+                        onChange={handlePhoneChange}
+                        international
+                        countryCallingCodeEditable={false}
+                      />
+                      {errors.phone && (
+                        <span className="text-danger">{errors.phone}</span>
+                      )}
+                    </FormGroup>
+                  </Col>
+                </Row>
+                {ShowServices && (
+                  <>
+                    <Row className="my-4">
+                      <Label className="fw-semibold">
+                        {RegisterPage.LABELS.SERVICES}
+                      </Label>
+                      <Col
+                        md={12}
+                        className="d-flex flex-row Service-overflow-y-scroll"
+                      >
+                        <FormGroup>
+                          <CustomServiceDropdown
+                            list={list}
+                            selectedServices={formData.services}
+                            handleServiceChange={handleServiceChange}
+                            handleRateChange={handleRateChange}
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                  </>
+                )}
+                <Row>
+                  <Col>
+                    <FormGroup>
+                      <Label className="fw-semibold" for="address">
+                        {RegisterPage.LABELS.ADDRESS}
+                      </Label>
+                      {editMode && (
+                        // Render map only when in edit mode
+                        <Map
+                          setFormData={setFormData}
+                          formData={formData}
+                          editMode={editMode}
+                        />
+                      )}
+                    </FormGroup>
+                  </Col>
+                </Row>
+                <Button
+                  type="submit"
+                  color="primary"
+                  disabled={isSaveDisabled || loading}
+                  className="me-2"
+                >
+                  {loading ? <Spinner size="sm" color="light" /> : <>Save</>}
+                </Button>
+                <Button
+                  color="danger"
+                  onClick={handleCancelEdit}
+                  disabled={loading}
+                >
                   <FontAwesomeIcon icon={faTimes} /> Cancel
                 </Button>
-          </Form>
-
-      
-        ) : (
-          <div className='' >
-            <p className='w-25'>
-              <strong>First Name:</strong>
-            </p>
-            <p className='w-25 d-flex'>
-              {UsersData?.firstName}
-            </p>
-            <p className='w-25'>
-              <strong>Last Name:</strong>
-            </p>
-            <p className='w-25'>
-             {UsersData?.lastName}
-            </p>
-            <p className='w-25'>
-              <strong>Email:</strong>
-            </p>
-            <p className='w-25'>
-             {UsersData?.email}
-            </p>
-            <p className='w-25'>
-              <strong>Phone:</strong>
-            </p>
-            <p className='w-25'>
-             {UsersData?.phoneNumber}
-            </p>
-            <p className='w-25'>
-              <strong>Address:</strong>
-            </p>
-            <p className='w-25'>
-             {UsersData?.address}
-            </p>
-            <Button onClick={handleEditModeToggle}>Edit Profile</Button>
-          </div>
-        )}
-        </Row>
+              </Form>
+            ) : (
+              <Card
+                className="my-4"
+                style={{ boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}
+              >
+                <CardBody>
+                  <Row>
+                    <Col xs={6}>
+                      <p className="fw-semibold">First Name:</p>
+                      <p className="w-100">{UsersData?.firstName}</p>
+                    </Col>
+                    <Col xs={6}>
+                      <p className="fw-semibold">Last Name:</p>
+                      <p className="w-100">{UsersData?.lastName}</p>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs={6}>
+                      <p className="fw-semibold">Email:</p>
+                      <p className="w-100">{UsersData?.email}</p>
+                    </Col>
+                    <Col xs={6}>
+                      <p className="fw-semibold">Phone:</p>
+                      <p className="w-100">{UsersData?.phoneNumber}</p>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <p className="fw-semibold">Address:</p>
+                      <p className="w-100">{UsersData?.address}</p>
+                    </Col>
+                  </Row>
+                  <Button onClick={handleEditModeToggle}>Edit Profile</Button>
+                </CardBody>
+              </Card>
+            )}
+          </Row>
+        </Container>
       </Container>
-    </Container>
     </>
   );
 };
 
 export default EditProfilePage;
-
-
-
-
-
-  {/* //   <Form onSubmit={handleSubmit}>
-        //     <FormGroup className="mb-3">
-        //       <Label for="editedName" className="mb-1 fw-semibold">
-        //         First Name
-        //         <Input type="text" id="editedName" value={editedName} onChange={handleNameChange} />
-        //       </Label>
-        //     </FormGroup>
-        //     <FormGroup className="mb-3">
-        //       <Label for="editedLastName" className="mb-1 fw-semibold">
-        //         Last Name
-        //         <Input type="text" id="editedLastName" value={editedLastName} onChange={handleLastNameChange} />
-        //       </Label>
-        //     </FormGroup>
-        //     <Button type="submit" color="primary" className="me-2">
-        //       Save
-        //     </Button>
-        //     <Button color="danger" onClick={handleCancelEdit}>
-        //       <FontAwesomeIcon icon={faTimes} /> Cancel
-        //     </Button>
-        //   </Form> */}

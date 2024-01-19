@@ -4,17 +4,17 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "reactstrap";
 import { toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
-import socket from "../../SocketManager/socketManager";
+
 
 const OnOffButton = ({ user }) => {
 
   const {token } = useSelector((state) => state.auth);
   const [isOn, setIsOn] = useState(false);
   const dispatch = useDispatch();
-
+  const socket=useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     user.status === "online" ? setIsOn(true) : setIsOn(false);
-    socket.emit("online-offline",user);
+    socket?.emit("online-offline",user);
   }, [user]);
 
   const toggleSwitch = async () => {
@@ -27,7 +27,6 @@ const OnOffButton = ({ user }) => {
     const id = user._id;
     const data = { id, status, token };
     const result = await dispatch(toggleStatusAsync(data));
-    console.log(result)
     if (result.type === "/auth/toggleStatus/fulfilled") {
       setIsOn(!isOn);
      
@@ -36,6 +35,8 @@ const OnOffButton = ({ user }) => {
   };
 
   return (
+    <>
+    <h6>{isOn ? "Online":"Offline"}</h6>
     <Button
       color={isOn ? "success" : "secondary"}
       onClick={toggleSwitch}
@@ -58,6 +59,7 @@ const OnOffButton = ({ user }) => {
         }}
       />
     </Button>
+    </>
   );
 };
 
