@@ -30,14 +30,32 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
 
   return (
     <div>
-      <Modal isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Do you want to save the changes?</ModalHeader>
+      <Modal
+        isOpen={modal}
+        toggle={toggle}
+        backdrop="static"
+        keyboard={false}
+        centered
+      >
+        <ModalHeader toggle={toggle}>
+          Do you want to Accept the Offer?
+        </ModalHeader>
         <ModalBody>
-          <p><strong>Title:</strong> {formattedOfferDetails?.Title}</p>
-          <p><strong>Date:</strong> {formattedOfferDetails?.date}</p>
-          <p><strong>Time:</strong> {formattedOfferDetails?.time}</p>
-          <p><strong>Amount:</strong> {formattedOfferDetails?.amount}</p>
-          <p><strong>Service:</strong> {formattedOfferDetails?.service}</p>
+          <p>
+            <strong>Title:</strong> {formattedOfferDetails?.Title}
+          </p>
+          <p>
+            <strong>Date:</strong> {formattedOfferDetails?.date}
+          </p>
+          <p>
+            <strong>Time:</strong> {formattedOfferDetails?.time}
+          </p>
+          <p>
+            <strong>Amount:</strong> {formattedOfferDetails?.amount}
+          </p>
+          <p>
+            <strong>Service:</strong> {formattedOfferDetails?.service}
+          </p>
           <p>
             <strong>Details:</strong>{" "}
             <div style={{ whiteSpace: "pre-wrap" }}>
@@ -47,10 +65,10 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={handleConfirm}>
-            Save
+            Acept Offer
           </Button>{" "}
-          <Button color="secondary" onClick={handleCancel}>
-            Cancel
+          <Button color="danger" onClick={handleCancel}>
+            Reject Offer
           </Button>{" "}
           <Button color="info" onClick={toggleFullDetailsModal}>
             See Full Details
@@ -69,7 +87,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
           </p>
         </ModalBody>
         <ModalFooter>
-          <Button color="info" onClick={toggleFullDetailsModal}>
+          <Button color="primary" onClick={toggleFullDetailsModal}>
             Close
           </Button>
         </ModalFooter>

@@ -27,7 +27,6 @@ const OnOffButton = ({ user }) => {
     const id = user._id;
     const data = { id, status, token };
     const result = await dispatch(toggleStatusAsync(data));
-    console.log(result)
     if (result.type === "/auth/toggleStatus/fulfilled") {
       setIsOn(!isOn);
      
@@ -36,6 +35,8 @@ const OnOffButton = ({ user }) => {
   };
 
   return (
+    <>
+    <h6>{isOn ? "Online":"Offline"}</h6>
     <Button
       color={isOn ? "success" : "secondary"}
       onClick={toggleSwitch}
@@ -58,6 +59,7 @@ const OnOffButton = ({ user }) => {
         }}
       />
     </Button>
+    </>
   );
 };
 

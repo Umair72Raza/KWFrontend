@@ -31,7 +31,13 @@ const ModalComponent = (props) => {
   } = props;
 
   return (
-    <Modal isOpen={isModalOpen} toggle={toggleModal} centered>
+    <Modal
+      isOpen={isModalOpen}
+      toggle={toggleModal}
+      centered
+      backdrop="static"
+      keyboard={false}
+    >
       <ModalHeader toggle={toggleModal}>{modalHeader}</ModalHeader>
       <ModalBody>
         {order && (
@@ -40,7 +46,8 @@ const ModalComponent = (props) => {
               <strong>Order Title:</strong> {order.Title}
             </div>
             <div>
-              <strong>Order Details:</strong> {order.details}
+              <strong>Order Details:</strong>{" "}
+              {order.details.replace(/<br\s*\/?>/g, "\n")}
             </div>
             <div>
               <strong>Service:</strong> {order.service}

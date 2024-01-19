@@ -128,12 +128,10 @@ const Orders = () => {
 
   const scheduleClick = (e) => {
     toggleTab("1");
-    // handleFetchOrders("scheduled");
   };
 
   const pastClick = (e) => {
     toggleTab("2");
-    // handleFetchOrders("past");
   };
 
   const cancelOrders = async () => {
@@ -164,7 +162,6 @@ const Orders = () => {
 
   const activeOrders = (e) => {
     toggleTab("4");
-    //handleFetchOrders("active");
   };
 
   useEffect(() => {
@@ -174,7 +171,6 @@ const Orders = () => {
           setScheduledOrders([newOrder]);
           dispatch(setnewOrderValue(null));
         } else {
-          console.log(newOrder, "new order");
           setScheduledOrders((prevScheduledOrders) => [
             ...prevScheduledOrders,
             newOrder,
@@ -200,7 +196,7 @@ const Orders = () => {
         </Row>
         <Row></Row>
         <Row style={{ marginTop: "0.5%" }}>
-          <Nav tabs>
+          <Nav tabs style={{cursor:"pointer"}}>
             <NavItem>
               <Button
                 color="danger"
@@ -249,7 +245,7 @@ const Orders = () => {
             <TabPane tabId="1">
               <Row>
                 <Col>
-                  <h2>Scheduled Orders</h2>
+                <h2 style={{textAlign:"center"}}>Scheduled Orders</h2>
 
                   <div style={{ marginTop: "10px !important" }}>
                     {scheduledOrders.length> 0 ? (
@@ -269,6 +265,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="2">
               <Row>
+              <h2 style={{textAlign:"center"}}>Past Orders</h2>
                 <Col>
                   {pastOrders ? (
                     <PastOrdersCard scheduledOrdersObject={pastOrders} />
@@ -280,6 +277,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="3">
               <Row>
+              <h2 style={{textAlign:"center"}}>Cancelled Orders</h2>
                 <Col>
                   {cancelledOrders ? (
                     <>
@@ -295,6 +293,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="4">
               <Row>
+              <h2 style={{textAlign:"center"}}>Active Orders</h2>
                 <Col>
                   {activeOrder ? (
                     <>

@@ -1,4 +1,4 @@
-/ eslint-disable no-unused-vars /;
+// / eslint-disable no-unused-vars /;
 import React, { useEffect, useState } from "react";
 import {
   TabContent,
@@ -100,9 +100,7 @@ const HomePageWorker = () => {
     socket?.on("gotNewOffer", (data) => {
       if (!chat || !data.chat || chat._id !== data.chat._id) {
         if (!offerNotification.includes(data.params)) {
-          console.log(selectedChatCompare, data.chat);
           SetONotification([data.params, ...offerNotification]);
-          console.log(offerNotification);
           setUserOffering(data.user);
         }
       } else {
@@ -159,7 +157,6 @@ const HomePageWorker = () => {
           return prevScheduledOrders;
         });
       } else if (data.result == "false") {
-        console.log("startjob cancel");
         setStartJobStatus("false");
         setStartJobVerified(true);
       }
@@ -169,28 +166,73 @@ const HomePageWorker = () => {
     };
   });
   useEffect(() => {
-    socket?.on("order-cancelled", (order) => {
-      if (order) {
+
+    socket?.on("order-cancelled", (Corder) => {
+      const formattedDetails = Corder?.details || "";
+      const truncatedDetails =
+        formattedDetails.length > 5
+          ? formattedDetails.slice(0, 5) + "..."
+          : formattedDetails;
+    
+      if (Corder) {
         Swal.fire({
-          title: "Order Canceled",
+          title: "Order Cancelled",
           html: `<div>
                 <strong>Order Title:</strong>
-                 ${order.Title}
+                 ${Corder.Title}
                 </div>
                   <div>
                     <strong>Order Details:</strong>
-                     ${order.details}
+                     ${truncatedDetails}
                   </div>
                 <div>
                   <strong>Service:</strong>
-                   ${order.service}
+                   ${Corder.service}
                 </div>
                 <div>
                 <strong>Amount:</strong>
-                 ${order.ammount}
+                 ${Corder.amount}
               </div>`,
           icon: "error",
         });
+
+        setScheduledOrders((prevScheduledOrders) => {
+          // Check if the order exists in scheduledOrders
+          const scheduledOrderIndex = prevScheduledOrders.findIndex(
+            (order) => order.id === Corder.id
+          );
+
+          if (scheduledOrderIndex !== -1) {
+            // Remove from scheduledOrders
+            const updatedScheduledOrders = [...prevScheduledOrders];
+            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+
+            // Set the updated scheduled orders to the local state
+            setScheduledOrders(updatedScheduledOrders);
+
+            setCancelledOrders((prevCancelledOrders) => {
+              // Check if the order is already present in active orders
+              const isOrderAlreadyPresent = prevCancelledOrders.some(
+                (order) => order._id === Corder._id
+              );
+
+              if (!isOrderAlreadyPresent) {
+                // Add the order to active orders if it's not present
+                return [...prevCancelledOrders, Corder];
+              }
+
+              // If the order is already present, return the current state
+              return prevCancelledOrders;
+            });
+
+            return updatedScheduledOrders;
+          }
+
+          return prevScheduledOrders;
+        });
+
+
+
       }
     });
     return () => {
@@ -304,15 +346,6 @@ const HomePageWorker = () => {
     }
   };
 
-  const formattedOfferDetails = `
-  <p><strong>Title:</strong> ${receiveMessage?.Title}</p>
-  <p><strong>Details:</strong> ${receiveMessage?.details}</p>
-  <p><strong>Date:</strong> ${receiveMessage?.date}</p> 
-  <p><strong>Time:</strong> ${receiveMessage?.time}</p>
-  <p><strong>Amount:</strong> ${receiveMessage?.amount}</p>
-  <p><strong>Service:</strong> ${receiveMessage?.service}</p>
-`;
-
   const scheduleClick = () => {
     toggleTab("1");
   };
@@ -389,7 +422,7 @@ const HomePageWorker = () => {
         <UserNavbar />
       </Row>
       <Row>
-        <Nav tabs>
+        <Nav tabs style={{cursor:"pointer"}}>
           <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "1" })}
@@ -430,8 +463,8 @@ const HomePageWorker = () => {
           <TabPane tabId="1">
             <Row>
               <Col>
-                <h2>Scheduled Orders</h2>
-
+                <h2 style={{textAlign:"center"}}>Scheduled Orders</h2>
+                <Row>
                 <div style={{ marginTop: "10px !important" }}>
                   {isScheduledOrdersFetched && scheduledOrders ? (
                     <ScheduledOrdersCardWorker
@@ -451,11 +484,13 @@ const HomePageWorker = () => {
                     <>No Orders Scheduled</>
                   )}
                 </div>
+                </Row>
               </Col>
             </Row>
           </TabPane>
           <TabPane tabId="2">
             <Row>
+              <h2 style={{textAlign:"center"}}>Past Orders</h2>
               <Col>
                 {pastOrders ? (
                   <PastOrdersCard scheduledOrdersObject={pastOrders} />
@@ -467,6 +502,7 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="3">
             <Row>
+            <h2 style={{textAlign:"center"}}>Cancelled Orders</h2>
               <Col>
                 {cancelledOrders ? (
                   <>
@@ -480,6 +516,7 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="4">
             <Row>
+            <h2 style={{textAlign:"center"}}>Active Orders</h2>
               <Col>
                 {activeOrder ? (
                   <>
