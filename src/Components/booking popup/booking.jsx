@@ -8,6 +8,7 @@ import {
   Input,
   Label,
   FormGroup,
+  Row,
 } from "reactstrap";
 import Swal from "sweetalert2";
 import { button, heading, Labels, div } from "./constants.js";
@@ -39,10 +40,10 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   useEffect(() => {
     setFormComplete(
       taskTitle.trim() !== "" &&
-        taskDetails.trim() !== `` &&
-        dateTime !== "" &&
-        amountPerHour !== "" &&
-        serviceOption !== "none"
+      taskDetails.trim() !== `` &&
+      dateTime !== "" &&
+      amountPerHour !== "" &&
+      serviceOption !== "none"
     );
   }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption]);
   useEffect(() => {
@@ -105,9 +106,8 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         });
         Swal.fire({
           title: "Offer Sent",
-          text: "Continue",
           icon: "success",
-          confirmButtonText: "Cool",
+          confirmButtonText: "OK",
         });
         toggle();
         return () => {
@@ -123,9 +123,8 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       });
       Swal.fire({
         title: "Offer Sent",
-        text: "Continue",
         icon: "success",
-        confirmButtonText: "Cool",
+        confirmButtonText: "OK",
       });
       toggle();
       return () => {
@@ -188,11 +187,15 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               id="taskTitle"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
+              maxLength={50}
             />
+            {taskTitle.length >= 50 && (
+              <div style={{ color: "red" }}>Cannot exceed 50 characters</div>
+            )}
           </FormGroup>
           <FormGroup>
             <Label className="fw-bold">{Labels.worker}</Label>
-            <div className="d-flex flex-column flex-md-row justify-content-start gap-4">
+            <div className="d-flex flex-column flex-md-row  gap-md-4">
               <div>
                 <b>{div.name}</b>
                 {worker?.firstName + " " + worker?.lastName + "  "}
@@ -202,7 +205,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
                 <b>{div.status}</b>
                 {worker?.status}
               </div>
-              <div>
+              <div className="">
                 <b>{div.rating}</b>
                 {starRating(worker?.rating)}
               </div>
@@ -217,7 +220,15 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               id="taskDetails"
               value={taskDetails}
               onChange={(e) => setTaskDetails(e.target.value)}
+              maxLength={1000} 
+              style={{ minHeight: '100px' }}
             />
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              {taskDetails.length}/1000
+            </div>
+            {taskDetails.length >= 1000 && (
+              <div style={{ color: "red" }}>Cannot exceed 1000 characters</div>
+            )}
           </FormGroup>
           <FormGroup>
             <Label for="serviceOption " className="fw-bold">
@@ -262,7 +273,10 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               id="amountPerHour"
               value={amountPerHour}
               onChange={(e) => setAmountPerHour(e.target.value)}
+              min={5}
+              max={50}
             />
+           
           </FormGroup>
         </ModalBody>
         <ModalFooter>
