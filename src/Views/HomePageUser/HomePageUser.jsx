@@ -33,7 +33,6 @@ import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js"
-import { setSocket } from "../../Redux/Slices/SocketSlice.js";
 
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
@@ -73,11 +72,12 @@ const HomePageUser = () => {
     const fetchData = async () => {
       try {
         setLoading(true); // Start loading spinner
-        if (user && user._id) {
+        if (user && user._id && token) {
+          
           await dispatch(getAllWorker({ userId: user._id, token }));
           await dispatch(fetchChatsAsync({ user, token }));
           await dispatch(allServicesAsync());
-          await dispatch(setSocket(user));
+         
         } else {
           console.error("User object or _id is missing");
         }
@@ -335,8 +335,9 @@ const HomePageUser = () => {
         return filteredUser;
       });
     }
-    return filteredUsers;
   }
+    return filteredUsers;
+  
   }, [
     users,
     debouncedsearch,
