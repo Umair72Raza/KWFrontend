@@ -20,17 +20,17 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
   const [modal2, setModal] = useState(true);
 
   const toggle = () => {
-    if (user.role === "user") {
+    if (user.role == "user") {
       setFinishOrderReq(false);
       setModal(false);
-    } else if (user.role === "worker") {
-      SetConfirm("false");
+    } else if (user.role == "worker") {
+      SetConfirm("");
       //flag="false";
       setModal(false);
     }
   };
   const send = () => {
-    if (user.role === "user") {
+    if (user.role == "user") {
       console.log("I reached in user for feedback");
       const params = {
         orderId: order._id,
@@ -43,7 +43,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
         dispatch(AddFeedBack({ params, token }));
       }
       setFinishOrderReq(false);
-    } else if (user.role === "worker") {
+    } else if (user.role == "worker") {
       console.log("feedback in worker");
       const params = {
         orderId: order._id,
@@ -56,7 +56,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
         dispatch(AddFeedBack({ params, token }));
         //SetConfirm("");
       }
-      SetConfirm("false");
+      SetConfirm("");
     }
     toggle();
   };

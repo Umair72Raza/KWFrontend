@@ -77,28 +77,16 @@ const HomePageWorker = () => {
 
   const [startJobStatus, setStartJobStatus] = useState("");
 
-  useEffect(() => {
-    dispatch(setSocket(user));
-    return () => {
-      if (user) {
-        dispatch(setSocket(null)); // Disconnect socket on unmount
-      }
-    };
-  }, []);
-
   // useEffect(() => {
-  // //  let socket=createSocket()
-  //   if (user && user._id) {
-  //     socket?.emit("setup", user);
-  //     socket?.emit("new-user-add", user._id);
-  //     socket?.on("connection", "true");
-  //     console.log("user in connection",user)
-  //   } else {
-  //     socket?.disconnect();
-  //   }
-    
-  // },[]);
+  //   dispatch(setSocket(user));
+  //   return () => {
+  //     if (user) {
+  //       dispatch(setSocket(null)); // Disconnect socket on unmount
+  //     }
+  //   };
+  // }, []);
 
+  
   useEffect(() => {
     if (!socket) return;
     socket?.on("gotNewOffer", (data) => {

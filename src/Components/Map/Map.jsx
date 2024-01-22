@@ -263,7 +263,7 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
             ? "Search for a place"
             : "Please allow location access to search for a place"
         }
-        value={newInput}
+        value={newInput || ""}
         onChange={(e) => setNewInput(e.target.value)}
         onDoubleClick={(e) => e.target.select()}
         disabled={!isInputEnabled}

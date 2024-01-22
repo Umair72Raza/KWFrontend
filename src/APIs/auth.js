@@ -33,11 +33,16 @@ export const OTPverify = async (otp) => {
 };
 
 export const loginUser = async (email, password) => {
-  const response = await API.post(`user/loginUser`, {
-    email: email,
-    password: password,
-  });
-  return response.data;
+  try {
+    const response = await API.post(`user/loginUser`, {
+      email: email,
+      password: password,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+
 };
 
 export const signUpUser = async (
@@ -51,19 +56,25 @@ export const signUpUser = async (
   address,
   country,
   services
-) =>
-  API.post(`user/signUp`, {
-    firstName,
-    lastName,
-    email,
-    password,
-    phoneNumber,
-    longitude,
-    latitude,
-    address,
-    country,
-    services,
-  });
+) => {
+  try {
+    const response = await API.post(`user/signUp`, {
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      longitude,
+      latitude,
+      address,
+      country,
+      services,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}
 
 // /updateOnlineStatus/:id
 export const toggleStatus = async (data) => {
