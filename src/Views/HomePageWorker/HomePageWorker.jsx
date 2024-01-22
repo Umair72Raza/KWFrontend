@@ -36,7 +36,6 @@ import {
   selectSpinnerVisibility,
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
-import { setSocket } from "../../Redux/Slices/SocketSlice";
 
 
 const HomePageWorker = () => {
@@ -78,10 +77,6 @@ const HomePageWorker = () => {
   } = ChatState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
-  useEffect(()=>
-  {
-     dispatch(setSocket(user));
-  },[])
   // useEffect(() => {
   // //  let socket=createSocket()
   //   if (user && user._id) {

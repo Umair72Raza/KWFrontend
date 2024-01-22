@@ -15,8 +15,9 @@ import {
   LoginPage
 } from "../../Constants/Constants"; // Import constants
 import { failureToast, successToast, validateEmail } from "../../utils";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginAsync } from "../../Redux/Slices/AuthSlice";
+import { setSocket } from "../../Redux/Slices/SocketSlice";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const Login = () => {
   const [emailError, setEmailError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+ 
 
 
   const handleEmailChange = (e) => {
@@ -65,6 +66,9 @@ const Login = () => {
           [LoginPage.FORM_FIELDS.EMAIL]: "",
           [LoginPage.FORM_FIELDS.PASSWORD]: "",
         });
+        //const { user } = useSelector((state) => state.auth);
+        console.log(result)
+        await dispatch(setSocket(result.payload.user));
         successToast("Login successful! Welcome back!")
         navigate("/user/homepage");
       } else {
