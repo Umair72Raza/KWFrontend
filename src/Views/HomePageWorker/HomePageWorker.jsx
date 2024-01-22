@@ -163,6 +163,7 @@ const HomePageWorker = () => {
   useEffect(() => {
 
     socket?.on("order-cancelled", (Corder) => {
+      console.log("cancelled order: ",Corder)
       const formattedDetails = Corder?.details || "";
       const truncatedDetails =
         formattedDetails.length > 5

@@ -144,8 +144,8 @@ const HomePageUser = () => {
   });
 
   useEffect(() => {
-    socket?.on("order-canceled", (order) => {
-      if (order) {
+    socket?.on("order-canceled", (Corder) => {
+      if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
           html: `<div> <strong>Order Title:</strong> ${Corder.Title}</div>

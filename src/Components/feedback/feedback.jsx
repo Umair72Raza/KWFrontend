@@ -18,7 +18,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
   const [rateing, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [modal2, setModal] = useState(true);
-  
+
   const toggle = () => {
     if (user.role === "user") {
       setFinishOrderReq(false);
@@ -30,6 +30,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
   };
   const send = () => {
     if (user.role === "user") {
+      console.log("I reached in user for feedback");
       const params = {
         orderId: order._id,
         feedbackGiver: user._id,
@@ -37,12 +38,12 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
         text: comment,
         rating: rateing,
       };
-      if (flag == "true") {
-        dispatch(AddFeedBack({params,token}));
+      if (flag == true) {
+        dispatch(AddFeedBack({ params, token }));
       }
       setFinishOrderReq(false);
     } else if (user.role === "worker") {
-      console.log("feedback in worker")
+      console.log("feedback in worker");
       const params = {
         orderId: order._id,
         feedbackGiver: user._id,
@@ -50,8 +51,8 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
         text: comment,
         rating: rateing,
       };
-      if (flag == "true") {
-        dispatch(AddFeedBack({params,token}));
+      if (flag == true) {
+        dispatch(AddFeedBack({ params, token }));
         SetConfirm("");
       }
       SetConfirm("");
