@@ -159,7 +159,9 @@ const HomePageWorker = () => {
   });
   useEffect(() => {
 
-    socket?.on("order-cancelled", (Corder) => {
+    socket?.on("order-cancelled", (data) => {
+      const Corder = data.order;
+      const reason = data.reason;
       console.log("cancelled order: ",Corder)
       const formattedDetails = Corder?.details || "";
       const truncatedDetails =
@@ -188,7 +190,7 @@ const HomePageWorker = () => {
               </div>
               <div>
               <strong>Cancel Reason:</strong>
-               ${Corder.cancelReason}
+               ${reason}
             </div>`,
           icon: "error",
         });
