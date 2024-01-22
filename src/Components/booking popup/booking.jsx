@@ -207,7 +207,9 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               </div>
               <div className="">
                 <b>{div.rating}</b>
-                {starRating(worker?.rating)}
+                {worker?.rating > 0
+                      ? starRating(worker.rating)
+                      : "not rated yet"}
               </div>
             </div>
           </FormGroup>

@@ -97,6 +97,7 @@ const ChatPopup = () => {
   });
 
   const book = (selectedChat) => {
+    console.log(selectedChat,"on clicking the book in chat ");
     SetWorker(selectedChat);
     toggleModal();
   };
