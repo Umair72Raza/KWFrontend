@@ -151,7 +151,13 @@ const EditProfilePage = ({ ShowServices }) => {
 
     return errors;
   };
-
+  const handleKeyPress = (e) => {
+    // Check if the pressed key is "Enter" (key code 13)
+    if (e.key === 'Enter') {
+      // Prevent the default form submission behavior
+      e.preventDefault();
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = FormValidation(formData);
@@ -245,7 +251,7 @@ const EditProfilePage = ({ ShowServices }) => {
           </Row>
           <Row>
             {editMode ? (
-              <Form className="mt-5" onSubmit={handleSubmit}>
+              <Form className="mt-5" onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
                 <Row>
                   <Col md={6}>
                     <FormGroup>

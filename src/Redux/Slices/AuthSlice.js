@@ -19,7 +19,6 @@ export const loginAsync = createAsyncThunk(
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
       const result = response;
-      console.log(result, "result from the slice" )
       return result;
     } catch(error) {
    if(error){
