@@ -16,13 +16,32 @@ export const fetchUsersDataAsync = createAsyncThunk(
 
 export const updateProfileAsync = createAsyncThunk(
   "/UpdateProfile",
-  async (credentials) => {
+  async (credentials, { rejectWithValue }) => {
     try {
       const { id, token, formData } = credentials;
       const response = await updateProfile(id, token, formData);
+
       return response;
     } catch (error) {
-      console.log(error, "error in updating the profile");
+      if (
+        error.error.code === 11000 &&
+        error.error.keyPattern &&
+        error.error.keyPattern.email === 1
+      ) {
+        // Duplicate email error
+        return rejectWithValue(
+          "Email is already in use. Please choose a different email."
+        );
+      } else if (
+        error.error.code === 11000 &&
+        error.error.keyPattern &&
+        error.error.keyPattern.phoneNumber === 1
+      ) {
+        // Duplicate email error
+        return rejectWithValue(
+          "Phone Number is already in use. Please choose a different phone number."
+        );
+      }
     }
   }
 );
@@ -59,11 +78,8 @@ const EditProfileSlice = createSlice({
         state.status = "succeeded";
       })
       .addCase(updateProfileAsync.rejected, (state, action) => {
-        state.UsersData = {
-          data: null,
-          status: "failed",
-          error: action.error.message,
-        };
+        state.error = action.error.message;
+       
       });
   },
 });

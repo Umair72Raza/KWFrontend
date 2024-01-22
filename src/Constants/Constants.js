@@ -15,7 +15,7 @@ export const LoginPage = {
     FORGET_PASSWORD: "Forgot Password?",
     WORKER_DESCRIPTION: "Want to offer services?",
     WORKER_DESCRIPTION2: "Register yourself!",
-    LOGIN: "Login",
+    LOGIN: "Log in",
     MEMBER: "Not a member?",
     ACCOUNT: "Create an account",
   },
@@ -46,7 +46,8 @@ export const RegisterPage = {
     SERVICES: "services",
   },
   LABELS: {
-    TITLE: "Register",
+   USER_TITLE: "Create an account as a user",
+   WORKER_TITLE: "Create an account as a worker",
     FIRST_NAME: "First Name",
     LAST_NAME: "Last Name",
     EMAIL: "Email",
@@ -58,7 +59,7 @@ export const RegisterPage = {
     REGISTER: "Register",
     MEMBER: "Already a member?",
     ACCOUNT: "Login to your account",
-    SIGNUP: "Signup",
+    SIGNUP: "Sign up",
   },
   PLACEHOLDERS: {
     FIRST_NAME: "Enter your first name",
@@ -74,7 +75,7 @@ export const RegisterPage = {
     invalidEmail: "Invalid email address",
     invalidPhoneNumber: "Please enter a valid phone number",
     invalidPassword:
-      "Password must contain at least one special character, one uppercase letter, one number, and be at least 8 characters long.",
+      "Password must contain at least one special character, one uppercase letter, one number, and between 8 to 12 characters long.",
     passwordsNotMatch: "Passwords do not match",
     enterAllFields: "Enter all the fields to sign up",
   },
