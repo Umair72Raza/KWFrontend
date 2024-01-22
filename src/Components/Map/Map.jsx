@@ -5,6 +5,7 @@ import { useDebounce } from "../../Hooks/Debounce";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { set } from "lodash";
 
 const libraries = [import.meta.env.VITE_GOOGLE_API_LIBARARY];
 
@@ -65,6 +66,9 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
   const [isLoading, setLoading] = useState(true);
   const { UsersData } = useSelector((state) => state.editProfile);
 
+
+
+
   const handleMapClick = useCallback((event) => {
     const { latLng } = event;
     const latitude = latLng.lat();
@@ -89,7 +93,17 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
                 )?.short_name || "",
             }));
           } else {
-            setNewInput(formData?.address);
+            setNewInput(results[0].formatted_address);
+            setFormData((prev) => ({
+              ...prev,
+              address: results[0].formatted_address,
+              latitude: results[0].geometry.location.lat(),
+              longitude: results[0].geometry.location.lng(),
+              country:
+                results[0].address_components.find((component) =>
+                  component.types.includes("country")
+                )?.short_name || "",
+            }));
           }
         } else {
           window.alert("No results found");
@@ -206,11 +220,12 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
           const latitude = UsersData?.latitude;
           const longitude = UsersData?.longitude;
           const userCurrentCountry = UsersData?.country;
+          console.log("i ran")
           setTimeout(() => {  
           setMapLoaded(true);
           setInputEnabled(true);
           setLoading(false); }, 500);
-          if (latitude !== undefined || longitude !== undefined) {
+          if (latitude !== undefined || longitude !== undefined && currentLocation === null ) {
             setCurrentLocation({
               lat: latitude,
               lng: longitude,
@@ -221,15 +236,9 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
       }
     }
   }, [
-    formData,
     location.pathname,
     editMode,
     UsersData,
-    setCountry,
-    setCurrentLocation,
-    setMapLoaded,
-    setInputEnabled,
-    setLoading,
   ]);
 
   useEffect(() => {
@@ -263,7 +272,7 @@ const Map = React.memo(({ setFormData, formData, editMode }) => {
             ? "Search for a place"
             : "Please allow location access to search for a place"
         }
-        value={newInput}
+        value={newInput || ""}
         onChange={(e) => setNewInput(e.target.value)}
         onDoubleClick={(e) => e.target.select()}
         disabled={!isInputEnabled}

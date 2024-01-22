@@ -17,6 +17,7 @@ import {
   handleNameChange,
   successToast,
   failureToast,
+  hasOnlyWhiteSpace,
 } from "../../utils";
 import { RegisterPage } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,37 +41,46 @@ const UserRegister = ({ ShowServices }) => {
     latitude: "",
     longitude: "",
     address: "",
-    country:"",
+    country: "",
     services: [],
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
   const [isSignupDisabled, setIsSignupDisabled] = useState(true);
-  const [firstNameError, setFirstNameError] = useState("");
-  const [lastNameError, setLastNameError] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState("");
+
+  // useEffect(() => {
+  //   const isFormValid =
+  //     !passwordError &&
+  //     !confirmPasswordError &&
+  //     !emailError &&
+  //     !phoneError &&
+  //     formData.password &&
+  //     formData.confirmPassword &&
+  //     formData.password === formData.confirmPassword &&
+  //     formData.address.trim() !== "" &&
+  //     formData.firstName.trim() !== "" &&
+  //     formData.lastName.trim() !== "" &&
+  //     (ShowServices ? formData.services.length > 0 : true);
+  //   setIsSignupDisabled(!isFormValid);
+  // }, [formData, passwordError, confirmPasswordError, emailError, phoneError]);
 
   useEffect(() => {
     const isFormValid =
-      !passwordError &&
-      !confirmPasswordError &&
-      !emailError &&
-      !phoneError &&
-      formData.password &&
-      formData.confirmPassword &&
-      formData.password === formData.confirmPassword &&
-      formData.address.trim() !== "" &&
-      formData.firstName.trim() !== "" &&
-      formData.lastName.trim() !== "" &&
+      !errors.email &&
+      !errors.phone &&
+      !hasOnlyWhiteSpace(formData?.address) &&
+      !hasOnlyWhiteSpace(formData?.firstName) &&
+      !hasOnlyWhiteSpace(formData?.lastName) &&
+      !errors.password &&
+      !errors.confirmPassword &&
+      !errors.allField &&
       (ShowServices ? formData.services.length > 0 : true);
+
     setIsSignupDisabled(!isFormValid);
-  }, [formData, passwordError, confirmPasswordError, emailError, phoneError]);
+  }, [formData, errors.email, errors.phone]);
 
   useEffect(() => {
     if (ShowServices) {
@@ -81,11 +91,7 @@ const UserRegister = ({ ShowServices }) => {
   const handlePasswordChange = (e) => {
     const password = e.target.value;
 
-    if (!validatePassword(password)) {
-      setPasswordError(RegisterPage.ERROR_MESSAGES.invalidPassword);
-    } else {
-      setPasswordError("");
-    }
+    setErrors({ ...errors, password: "" });
 
     setFormData({
       ...formData,
@@ -96,11 +102,7 @@ const UserRegister = ({ ShowServices }) => {
   const handleConfirmPasswordChange = (e) => {
     const confirmPassword = e.target.value;
 
-    if (confirmPassword !== formData.password) {
-      setConfirmPasswordError(RegisterPage.ERROR_MESSAGES.passwordsNotMatch);
-    } else {
-      setConfirmPasswordError("");
-    }
+    setErrors({ ...errors, confirmPassword: "" });
 
     setFormData({
       ...formData,
@@ -109,73 +111,39 @@ const UserRegister = ({ ShowServices }) => {
   };
 
   const handleEmailChange = (e) => {
-    const email = e.target.value;
-
-    if (!validateEmail(email)) {
-      setEmailError(RegisterPage.ERROR_MESSAGES.invalidEmail);
-    } else {
-      setEmailError("");
-    }
-
+    setErrors({ ...errors, email: "" });
     setFormData({
       ...formData,
-      email,
+      email: e.target.value,
     });
   };
-  const handlePhoneChange = (value) => {
-    setPhoneNumber(value);
 
+  const handlePhoneChange = (value) => {
+    setErrors({ ...errors, phone: "" });
     setFormData({
       ...formData,
       phoneNumber: value,
     });
-
-    if (value && typeof value === "string") {
-      isValidPhoneNumber(value)
-        ? setPhoneError("")
-        : setPhoneError(RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
-    } else {
-      // Handle the case where the value is empty
-      setPhoneError("phone number is required");
-    }
   };
 
-  //If worker is registering
   const handleServiceChange = (e) => {
     const selectedService = e.target.value;
-
-    // Check if the service is already in the list
     const serviceExists = formData.services.some(
       (service) => service.name === selectedService
     );
 
-    if (serviceExists) {
-      // Uncheck: Remove the service from the list
-      const updatedServices = formData.services.filter(
-        (service) => service.name !== selectedService
-      );
+    const updatedServices = serviceExists
+      ? formData.services.filter((service) => service.name !== selectedService)
+      : [...formData.services, { name: selectedService, rate: 10 }];
 
-      setFormData({
-        ...formData,
-        services: updatedServices,
-      });
-    } else {
-      // Check: Add the service to the list with a default rate of 10
-      const updatedServices = [
-        ...formData.services,
-        { name: selectedService, rate: 10 },
-      ];
-
-      setFormData({
-        ...formData,
-        services: updatedServices,
-      });
-    }
+    setFormData({
+      ...formData,
+      services: updatedServices,
+    });
   };
 
   const handleRateChange = (e, serviceName) => {
-    let { value } = e.target;
-    value = parseFloat(value);
+    const value = parseFloat(e.target.value);
     const updatedServices = formData.services.map((service) =>
       service.name === serviceName ? { ...service, rate: value } : service
     );
@@ -186,36 +154,94 @@ const UserRegister = ({ ShowServices }) => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-console.log(formData,"this is form data form si")
-    try {
-     setLoading(true); // Start loading spinner
-
-      const result = await dispatch(signUpUserAsync(formData));
-
-      if (result.type === "auth/signup/fulfilled") {
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phoneNumber: "",
-          password: "",
-          confirmPassword: "",
-          latitude: "",
-          longitude: "",
-          address: "",
-          country:"",
-          services: [],
-        });
-        successToast("SignUP Successful!");
-        navigate("/auth/login");
-      } else {
-        failureToast("SignUP Failed Please Try Again!");
+  const isFormDataFilled = (formData) => {
+    for (const field in formData) {
+      if (!formData[field]) {
+        // Field is empty
+        return false;
       }
-    } finally {
-      setLoading(false); // Stop loading spinner
     }
+    return true;
+  };
+
+  const FormValidation = (formData) => {
+    const errors = {};
+    if (!validateEmail(formData.email)) {
+      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+    }
+    if (!formData.email.includes(".com")) {
+      errors.email = "Invalid email address";
+    }
+
+    if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
+      isValidPhoneNumber(formData.phoneNumber)
+        ? setErrors({ ...errors, phone: "" })
+        : (errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
+    } else {
+      errors.phone = "Phone number is required";
+    }
+
+    if (ShowServices && formData.services.length === 0) {
+      console.error("Please select at least one service.");
+      errors.services = "Please select at least one service.";
+    }
+
+ 
+  if (!validatePassword(formData.password)) {
+    errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
+  }
+
+  if (formData.confirmPassword !== formData.password) {
+    errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
+  }
+
+    if (!isFormDataFilled(formData)) {
+      errors.allField = RegisterPage.ERROR_MESSAGES.enterAllFields;
+    }
+
+
+    return errors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const validationErrors = FormValidation(formData);
+    setErrors(validationErrors);
+    setTimeout(() => {
+      if (Object.keys(validationErrors).length === 0) {
+        try {
+          setLoading(true); // Start loading spinner
+          dispatch(signUpUserAsync(formData))
+            .then((result) => {
+              if (result.type === "auth/signup/fulfilled") {
+                setFormData({
+                  firstName: "",
+                  lastName: "",
+                  email: "",
+                  phoneNumber: "",
+                  password: "",
+                  confirmPassword: "",
+                  latitude: "",
+                  longitude: "",
+                  address: "",
+                  country: "",
+                  services: [],
+                });
+                successToast("SignUP Successful!");
+                navigate("/auth/login");
+              } else if (result.type === "auth/signup/rejected") {
+                failureToast(result.payload);
+              }
+            })
+            .catch((error) => {
+              console.log("Error updating profile:", error);
+            });
+        } finally {
+          setLoading(false); // Stop loading spinner
+        }
+      }
+    }, 0);
   };
 
   return (
@@ -225,7 +251,7 @@ console.log(formData,"this is form data form si")
     >
       <Row className="w-100 d-flex justify-content-center">
         <Col md={10} lg={8} xl={6}>
-          <h2 className="text-center mt-5 mb-4">{RegisterPage.LABELS.TITLE}</h2>
+          <h2 className="text-center mt-5 mb-4">{ShowServices? RegisterPage.LABELS.WORKER_TITLE :RegisterPage.LABELS.USER_TITLE}</h2>
           <Form onSubmit={handleSubmit}>
             <Row>
               <Col md={6}>
@@ -241,20 +267,17 @@ console.log(formData,"this is form data form si")
                       RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
                     }
                     maxLength={12}
-                    value={formData.firstName}
+                    value={formData.firstName || ""}
                     onChange={(e) =>
                       handleNameChange(
                         formData,
                         setFormData,
-                        setFirstNameError,
+                        setErrors,
                         "firstName",
                         e
                       )
                     }
                   />{" "}
-                  {firstNameError && (
-                    <span className="text-danger">{firstNameError}</span>
-                  )}
                 </FormGroup>
               </Col>
               <Col md={6}>
@@ -270,20 +293,17 @@ console.log(formData,"this is form data form si")
                       RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
                     }
                     maxLength={12}
-                    value={formData.lastName}
+                    value={formData.lastName || ""}
                     onChange={(e) =>
                       handleNameChange(
                         formData,
                         setFormData,
-                        setLastNameError,
+                        setErrors,
                         "lastName",
                         e
                       )
                     }
                   />{" "}
-                  {lastNameError && (
-                    <span className="text-danger">{lastNameError}</span>
-                  )}
                 </FormGroup>
               </Col>
             </Row>
@@ -298,11 +318,12 @@ console.log(formData,"this is form data form si")
                     name={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     id={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     placeholder={RegisterPage.INPUT_FIELDS.EMAIL.placeholder}
-                    value={formData.email}
+                    value={formData.email || ""}
+                    maxLength={70}
                     onChange={handleEmailChange}
                   />
-                  {emailError && (
-                    <span className="text-danger">{emailError}</span>
+                  {errors.email && (
+                    <span className="text-danger">{errors.email}</span>
                   )}
                 </FormGroup>
               </Col>
@@ -315,13 +336,14 @@ console.log(formData,"this is form data form si")
                     defaultCountry="PK"
                     id={RegisterPage.INPUT_FIELDS.PHONE.name}
                     placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
-                    value={phoneNumber}
+                    value={formData.phoneNumber || ""}
+                    maxLength={16}
                     onChange={handlePhoneChange}
                     international
                     countryCallingCodeEditable={false}
                   />
-                  {phoneError && (
-                    <span className="text-danger">{phoneError}</span>
+                  {errors.phone && (
+                    <span className="text-danger">{errors.phone}</span>
                   )}
                 </FormGroup>
               </Col>
@@ -337,12 +359,13 @@ console.log(formData,"this is form data form si")
                     name={RegisterPage.INPUT_FIELDS.PASSWORD.name}
                     id={RegisterPage.INPUT_FIELDS.PASSWORD.name}
                     placeholder={RegisterPage.INPUT_FIELDS.PASSWORD.placeholder}
-                    value={formData.password}
+                    value={formData.password || ""}
+                    maxLength={12}
                     onChange={handlePasswordChange}
                     autoComplete="on"
                   />
-                  {passwordError && (
-                    <span className="text-danger">{passwordError}</span>
+                  {errors.password && (
+                    <span className="text-danger">{errors.password}</span>
                   )}
                 </FormGroup>
               </Col>
@@ -358,12 +381,14 @@ console.log(formData,"this is form data form si")
                     placeholder={
                       RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
                     }
-                    value={formData.confirmPassword}
+                    value={formData.confirmPassword || ""}
+                    maxLength={12}
                     onChange={handleConfirmPasswordChange}
-                    autoComplete="on"
                   />
-                  {confirmPasswordError && (
-                    <span className="text-danger">{confirmPasswordError}</span>
+                  {errors.confirmPassword && (
+                    <span className="text-danger">
+                      {errors.confirmPassword}
+                    </span>
                   )}
                 </FormGroup>
               </Col>
@@ -402,10 +427,8 @@ console.log(formData,"this is form data form si")
             </Row>
 
             <div className="text-center mb-3">
-              {isSignupDisabled && (
-                <span className="text-danger">
-                  {RegisterPage.ERROR_MESSAGES.enterAllFields}
-                </span>
+              {errors.allField && (
+                <span className="text-danger">{errors.allField}</span>
               )}
             </div>
             <Button
@@ -421,9 +444,9 @@ console.log(formData,"this is form data form si")
             </Button>
           </Form>
 
-          <Col className="mt-4 text-center">
+          <Col className="mt-4 text-center fw-medium">
             {RegisterPage.LABELS.MEMBER}
-            <Link className="fw-bold" to={RegisterPage.ROUTES.LOGIN}>
+            <Link className="fw-bold links-hover" to={RegisterPage.ROUTES.LOGIN}>
               {RegisterPage.LABELS.ACCOUNT}
             </Link>
           </Col>

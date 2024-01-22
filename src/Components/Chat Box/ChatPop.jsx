@@ -34,12 +34,13 @@ const ChatPopup = () => {
   } = ChatState();
 
   const { user, token } = useSelector((state) => state.auth);
-  const socket=useSelector((state) => state?.socket?.socket);
- 
+  const socket = useSelector((state) => state?.socket?.socket);
+
   const messagesContainerRef = useRef(null);
   const dispatch = useDispatch();
   const [modal, setModal] = useState(false);
   const [worker, SetWorker] = useState({});
+  const [sendButtonDisabled, setSendButtonDisabled] = useState(false);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -72,7 +73,6 @@ const ChatPopup = () => {
     }
   }, []);
 
-
   useEffect(() => {
     if (!socket) return;
     socket?.on("message received", (newMessageReceived) => {
@@ -80,7 +80,7 @@ const ChatPopup = () => {
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.newMessage.chatId
       ) {
-        if (!notification.includes(newMessageReceived.newMessage)) {
+        if (!notification.includes(newMessageReceived)) {
           setNotification([newMessageReceived, ...notification]);
         }
       } else {
@@ -97,6 +97,7 @@ const ChatPopup = () => {
   });
 
   const book = (selectedChat) => {
+    console.log(selectedChat,"on clicking the book in chat ");
     SetWorker(selectedChat);
     toggleModal();
   };
@@ -106,6 +107,7 @@ const ChatPopup = () => {
 
   const sendMessage = (e) => {
     e.preventDefault();
+    setSendButtonDisabled(true);
     const sendingMessage = async () => {
       if (newMessageText) {
         const messageData = {
@@ -134,6 +136,7 @@ const ChatPopup = () => {
           } else {
             setMessages([result.payload.message]);
           }
+          setSendButtonDisabled(false);
         }
       }
     };
@@ -262,12 +265,7 @@ const ChatPopup = () => {
     <div>
       <>
         {showModal && copyOfChats && (
-          <Modal
-            isOpen={showModal}
-            toggle={() => Toggler()}
-            size="lg"
-            centered
-          >
+          <Modal isOpen={showModal} toggle={() => Toggler()} size="lg" centered>
             <ModalHeader
               toggle={() => Toggler()}
               className="d-flex flex-row justify-content-between align-items-center hover-pointer"
@@ -325,11 +323,16 @@ const ChatPopup = () => {
                                 type="text"
                                 placeholder="Type a message..."
                                 value={newMessageText}
-                                onChange={(e) =>
-                                  setNewMessageText(e.target.value)
-                                }
+                                onChange={(e) => {
+                                  setSendButtonDisabled(false);
+                                  setNewMessageText(e.target.value);
+                                }}
                               />
-                              <Button color={ChatPopUpPage.SEND_BUTTON_COLOR} outline>
+                              <Button
+                                disabled={sendButtonDisabled}
+                                color={ChatPopUpPage.SEND_BUTTON_COLOR}
+                                outline
+                              >
                                 {ChatPopUpPage.SEND_BUTTON_LABEL}
                               </Button>
                             </form>
@@ -456,11 +459,16 @@ const ChatPopup = () => {
                               type="text"
                               placeholder="Type a message..."
                               value={newMessageText}
-                              onChange={(e) =>
-                                setNewMessageText(e.target.value)
-                              }
+                              onChange={(e) => {
+                                setSendButtonDisabled(false);
+                                setNewMessageText(e.target.value);
+                              }}
                             />
-                            <Button color={ChatPopUpPage.SEND_BUTTON_COLOR} outline>
+                            <Button
+                              disabled={sendButtonDisabled}
+                              color={ChatPopUpPage.SEND_BUTTON_COLOR}
+                              outline
+                            >
                               {ChatPopUpPage.SEND_BUTTON_LABEL}
                             </Button>
                           </form>
@@ -490,6 +498,3 @@ const ChatPopup = () => {
 };
 
 export default ChatPopup;
-
-
-

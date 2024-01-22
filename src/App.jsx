@@ -45,6 +45,7 @@ function App() {
   let routes;
 
   if (authenticated && role === "user") {
+    
     routes = (
       <>
         <Route path="/user/*" element={<UserLayout />} />

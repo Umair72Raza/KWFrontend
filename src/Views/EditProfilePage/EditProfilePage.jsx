@@ -132,8 +132,8 @@ const EditProfilePage = ({ ShowServices }) => {
     if (!validateEmail(formData.email)) {
       errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
     }
-    if (  !formData.email.includes(".com")) {
-      errors.email="Invalid email address";
+    if (!formData.email.includes(".com")) {
+      errors.email = "Invalid email address";
     }
 
     if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
@@ -151,43 +151,52 @@ const EditProfilePage = ({ ShowServices }) => {
 
     return errors;
   };
-
+  const handleKeyPress = (e) => {
+    // Check if the pressed key is "Enter" (key code 13)
+    if (e.key === 'Enter') {
+      // Prevent the default form submission behavior
+      e.preventDefault();
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-  
-    // Wait for the state to be updated
-    setTimeout(async () => {
-      if (Object.keys(validationErrors).length === 0) {
-         try {
-      setLoading(true);
-      const data = { id: UsersData?._id, token, formData };
-      const result = await dispatch(updateProfileAsync(data));
 
-      if (result.type === "/UpdateProfile/fulfilled") {
-        successToast("Profile Updated Successfully!");
-        setFormData({
-          firstName: UsersData?.firstName,
-          lastName: result.payload?.lastName,
-          email: result.payload?.email,
-          phoneNumber: result.payload?.phoneNumber,
-          latitude: result.payload?.latitude,
-          longitude: result.payload?.longitude,
-          country: result.payload?.country,
-          address: result.payload?.address,
-          services: result.payload?.services || [],
-        });
-        setEditMode(false);
-      } else {
-        failureToast("Please Try Again!");
+    // Wait for the state to be updated
+    setTimeout(() => {
+      if (Object.keys(validationErrors).length === 0) {
+        try {
+          setLoading(true);
+          const data = { id: UsersData?._id, token, formData };
+          dispatch(updateProfileAsync(data))
+            .then((result) => {
+              if (result.type === "/UpdateProfile/fulfilled") {
+                successToast("Profile Updated Successfully!");
+                setFormData({
+                  firstName: UsersData?.firstName,
+                  lastName: result.payload?.lastName,
+                  email: result.payload?.email,
+                  phoneNumber: result.payload?.phoneNumber,
+                  latitude: result.payload?.latitude,
+                  longitude: result.payload?.longitude,
+                  country: result.payload?.country,
+                  address: result.payload?.address,
+                  services: result.payload?.services || [],
+                });
+                setEditMode(false);
+              } else if (result.type === "/UpdateProfile/rejected") {
+                failureToast(result.payload);
+              }
+            })
+            .catch((err) => {
+              console.log("Error updating profile:", err);
+            });
+        } finally {
+          setLoading(false);
+        }
       }
-    } finally {
-      setLoading(false);
-    }
-    }
     }, 0);
-   
   };
 
   const handleEditModeToggle = () => {
@@ -242,7 +251,7 @@ const EditProfilePage = ({ ShowServices }) => {
           </Row>
           <Row>
             {editMode ? (
-              <Form className="mt-5" onSubmit={handleSubmit}>
+              <Form className="mt-5" onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
                 <Row>
                   <Col md={6}>
                     <FormGroup>

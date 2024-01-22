@@ -12,13 +12,20 @@ import { Logout, failureToast } from "../../utils";
 
 export const loginAsync = createAsyncThunk(
   "auth/login",
-  async (credentials) => {
-    const { email, password } = credentials;
-    const response = await loginUser(email, password);
-    localStorage.setItem("token", response.token);
-    localStorage.setItem("user", JSON.stringify(response.user));
-    const result = response;
-    return result;
+  async (credentials, { rejectWithValue }) => {
+    try{
+      const { email, password } = credentials;
+      const response = await loginUser(email, password);
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
+      const result = response;
+      return result;
+    } catch(error) {
+   if(error){
+    return rejectWithValue(error.error);
+   }
+    }
+ 
   }
 );
 
@@ -29,32 +36,55 @@ export const logoutAsync = createAsyncThunk("auth/logout", async () => {
 
 export const signUpUserAsync = createAsyncThunk(
   "auth/signup",
-  async (credentials) => {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      phoneNumber,
-      longitude,
-      latitude,
-      address,
-      country,
-      services,
-    } = credentials;
-    const response = await signUpUser(
-      firstName,
-      lastName,
-      email,
-      password,
-      phoneNumber,
-      longitude,
-      latitude,
-      address,
-      country,
-      services
-    );
-return response.data;
+  async (credentials,{ rejectWithValue }) => {
+    try{
+      const {
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        longitude,
+        latitude,
+        address,
+        country,
+        services,
+      } = credentials;
+      const response = await signUpUser(
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        longitude,
+        latitude,
+        address,
+        country,
+        services
+      );
+  return response.data;
+    } catch(error) {
+      if (
+        error.error.code === 11000 &&
+        error.error.keyPattern &&
+        error.error.keyPattern.email === 1
+      ) {
+        // Duplicate email error
+        return rejectWithValue(
+          "Email is already in use. Please choose a different email."
+        );
+      } else if (
+        error.error.code === 11000 &&
+        error.error.keyPattern &&
+        error.error.keyPattern.phoneNumber === 1
+      ) {
+        // Duplicate email error
+        return rejectWithValue(
+          "Phone Number is already in use. Please choose a different phone number."
+        );
+      } 
+    }
+   
   }
 );
 
@@ -159,12 +189,15 @@ const authSlice = createSlice({
       })
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.loginStatus = "succeeded";
+      if(action.payload){
         state.token = action.payload.token;
         state.user = action.payload.user;
+      }
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loginStatus = "failed";
         state.error = action.error.message;
+     
       })
       .addCase(signUpUserAsync.pending, (state) => {
         state.signupStatus = "loading";

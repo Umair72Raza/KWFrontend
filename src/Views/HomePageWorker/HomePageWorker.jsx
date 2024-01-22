@@ -36,6 +36,7 @@ import {
   selectSpinnerVisibility,
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
+import { setSocket } from "../../Redux/Slices/SocketSlice";
 
 
 const HomePageWorker = () => {
@@ -59,15 +60,13 @@ const HomePageWorker = () => {
   const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
-  const socket=useSelector((state) => state?.socket?.socket);
+  const {socket}=useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   let {
     setOriginalChats,
     setCopyOfChats,
-    OriginalChats,
     offerNotification,
     SetONotification,
-    selectedChatCompare,
     chat,
     receiveMessage,
     setReceiveMessage,
@@ -77,19 +76,17 @@ const HomePageWorker = () => {
   } = ChatState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
-  // useEffect(() => {
-  // //  let socket=createSocket()
-  //   if (user && user._id) {
-  //     socket?.emit("setup", user);
-  //     socket?.emit("new-user-add", user._id);
-  //     socket?.on("connection", "true");
-  //     console.log("user in connection",user)
-  //   } else {
-  //     socket?.disconnect();
-  //   }
-    
-  // },[]);
 
+  // useEffect(() => {
+  //   dispatch(setSocket(user));
+  //   return () => {
+  //     if (user) {
+  //       dispatch(setSocket(null)); // Disconnect socket on unmount
+  //     }
+  //   };
+  // }, []);
+
+  
   useEffect(() => {
     if (!socket) return;
     socket?.on("gotNewOffer", (data) => {
@@ -162,7 +159,10 @@ const HomePageWorker = () => {
   });
   useEffect(() => {
 
-    socket?.on("order-cancelled", (Corder) => {
+    socket?.on("order-cancelled", (data) => {
+      const Corder = data.order;
+      const reason = data.reason;
+      console.log("cancelled order: ",Corder)
       const formattedDetails = Corder?.details || "";
       const truncatedDetails =
         formattedDetails.length > 5
@@ -187,7 +187,11 @@ const HomePageWorker = () => {
                 <div>
                 <strong>Amount:</strong>
                  ${Corder.amount}
-              </div>`,
+              </div>
+              <div>
+              <strong>Cancel Reason:</strong>
+               ${reason}
+            </div>`,
           icon: "error",
         });
 
@@ -237,7 +241,6 @@ const HomePageWorker = () => {
 
   //accept the offer
   const handleConfirm = async () => {
-
     setGotOffer(false);
     // send true to the event to socket
 
@@ -245,6 +248,7 @@ const HomePageWorker = () => {
       result: "accept",
       Uid: receiveMessage.users[0],
     });
+    document.body.style.overflow = 'auto';
   };
 
   //reject the offer
@@ -255,6 +259,7 @@ const HomePageWorker = () => {
       result: "cancel",
       Uid: receiveMessage.users[0],
     });
+    document.body.style.overflow = "auto";
   };
 
   useEffect(() => {
@@ -403,14 +408,14 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("new-order-result", (newOrderResult) => {
-      console.log(newOrderResult);
+      console.log(newOrderResult,"new order result");
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });
     return () => {
       socket?.off("new-order-result");
     };
-  }, []);
+  });
   return (
     <Container>
       <Row>
@@ -469,7 +474,6 @@ const HomePageWorker = () => {
                       setScheduledOrders={setScheduledOrders}
                       cancelledOrders={cancelledOrders}
                       setCancelledOrders={setCancelledOrders}
-                      setLatestOrders={setLatestOrders}
                       latestOrder={latestOrder}
                       setUpdateScheduled={setUpdateScheduled}
                       updateScheduled={updateScheduled}

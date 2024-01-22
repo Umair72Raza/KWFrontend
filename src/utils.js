@@ -87,18 +87,8 @@ export const handleNameChange = (formData, setFormData, setError, fieldName, e) 
       ...formData,
       [fieldName]: capitalizedValue,
     });
-
-    // if (hasOnlyWhiteSpace(value) && value.length > 0) {
-    //   // Display error message only when there is at least one non-space character
-    //   setError(`${fieldName} cannot be empty or contain only spaces.`);
-    // } else {
-    //   // Clear error message if the user has entered a valid value
-    //   setError("");
-    // }
   }
-  //  else {
-  //   setError(`${fieldName} should only contain letters.`);
-  // }
+
 };
 
 

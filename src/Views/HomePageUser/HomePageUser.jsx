@@ -32,11 +32,12 @@ import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
-import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js"
+import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
+import { setSocket } from "../../Redux/Slices/SocketSlice.js";
 
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
-  const socket=useSelector((state) => state?.socket?.socket);
+  const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   const { setOriginalChats, setCopyOfChats, OriginalChats } = ChatState();
   const navigate = useNavigate();
@@ -53,31 +54,14 @@ const HomePageUser = () => {
   const [loading, setLoading] = useState(false);
   let removedUsers = [];
   removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-
-  // useEffect(() => {
-  //   console.log(user)
-  //  let socket = createSocket()
-  //   if (user && user._id ) {
-  //     socket?.emit("setup", user);
-  //     socket?.emit("new-user-add", user._id);
-  //     socket?.on("connection", "true");
-  //     console.log("user in connection")
-  //   } else {
-  //     socket?.disconnect();
-  //   }
-   
-   
-  // },[]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true); // Start loading spinner
         if (user && user._id && token) {
-          
           await dispatch(getAllWorker({ userId: user._id, token }));
           await dispatch(fetchChatsAsync({ user, token }));
           await dispatch(allServicesAsync());
-         
         } else {
           console.error("User object or _id is missing");
         }
@@ -102,35 +86,32 @@ const HomePageUser = () => {
   const [fOrder, setFOrder] = useState("");
 
   useEffect(() => {
-    
-      socket?.on("status-change",  (User) => {
-          if (users && User.status === 'offline') {
-            let remove=[]; 
-            const userIndexRemoved = users.findIndex(u => u._id === User._id);
-            if(userIndexRemoved !== -1) 
-            {
-            const filteredUsers = users.filter(u => u._id !== User._id);
-            remove.push(users[userIndexRemoved]); 
-            dispatch(updateWorkers(filteredUsers));
-            dispatch(updateRemoveWorker(remove)); 
-            }
-          }
-           else if (removedUsers && User.status === 'online') {
-            let worker=users;
-            const userIndexInRemoved = removedUsers?.findIndex(u => u._id === User._id);
-            if (userIndexInRemoved !== -1) {
-              worker=[removedUsers[userIndexInRemoved],...worker]
-              const remove=removedUsers.filter(u => u._id !== User._id);
-              dispatch(updateWorkers(worker));
-              dispatch(updateRemoveWorker(remove)); 
-            }
-          }
-      });
-      return () => {
-        socket?.off("status-change");
-      };
-    
-
+    socket?.on("status-change", (User) => {
+      if (users && User.status === "offline") {
+        let remove = [];
+        const userIndexRemoved = users.findIndex((u) => u._id === User._id);
+        if (userIndexRemoved !== -1) {
+          const filteredUsers = users.filter((u) => u._id !== User._id);
+          remove.push(users[userIndexRemoved]);
+          dispatch(updateWorkers(filteredUsers));
+          dispatch(updateRemoveWorker(remove));
+        }
+      } else if (removedUsers && User.status === "online") {
+        let worker = users;
+        const userIndexInRemoved = removedUsers?.findIndex(
+          (u) => u._id === User._id
+        );
+        if (userIndexInRemoved !== -1) {
+          worker = [removedUsers[userIndexInRemoved], ...worker];
+          const remove = removedUsers.filter((u) => u._id !== User._id);
+          dispatch(updateWorkers(worker));
+          dispatch(updateRemoveWorker(remove));
+        }
+      }
+    });
+    return () => {
+      socket?.off("status-change");
+    };
   });
 
   useEffect(() => {
@@ -144,14 +125,19 @@ const HomePageUser = () => {
   });
 
   useEffect(() => {
-    socket?.on("order-canceled", (order) => {
-      if (order) {
+    socket?.on("order-canceled", (data) => {
+      const Corder = data.order;
+      const reason = data.reason;
+      if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
           html: `<div> <strong>Order Title:</strong> ${Corder.Title}</div>
                  <div> <strong>Order Details:</strong> ${Corder.details}</div>
                  <div> <strong>Service:</strong> ${Corder.service}</div>
-                 <div> <strong>Amount:</strong> ${Corder.amount}</div>`,
+                 <div> <strong>Amount:</strong> ${Corder.amount}</div>
+                 <div> <strong>Amount:</strong> ${reason}</div>`
+                 ,
+
           icon: "error",
         });
         setScheduledOrders((prevScheduledOrders) => {
@@ -189,7 +175,6 @@ const HomePageUser = () => {
           return prevScheduledOrders;
         });
       }
-
     });
     return () => {
       socket?.off("order-canceled");
@@ -206,11 +191,13 @@ const HomePageUser = () => {
     return () => {
       socket?.off("finishjob-request");
     };
-  }, []);
+  });
 
   useEffect(() => {
     if (newOrder !== null) {
+      
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
+
       socket?.emit("new-order-created", data);
     }
     return () => {
@@ -278,7 +265,6 @@ const HomePageUser = () => {
     const type = searchInput;
     const params = { userId: user._id, type, token };
     dispatch(WorkersByType(params));
-
   };
 
   const clearFilters = () => {
@@ -291,7 +277,7 @@ const HomePageUser = () => {
   //filter
   const filteredAndSortedUsers = useMemo(() => {
     let filteredUsers = users;
-  
+
     if (sortOption !== "none" && sortOption === "highToLowRating") {
       filteredUsers = [...filteredUsers].sort(
         (a, b) => Number(b.rating) - Number(a.rating)
@@ -319,25 +305,23 @@ const HomePageUser = () => {
     }
 
     if (rateFilter !== 0) {
-      if(rateFilter==21)
-      {
+      if (rateFilter == 21) {
         filteredUsers = filteredUsers.filter((worker) => {
           const filteredUser = worker.services.some((services) => {
             return services.rate >= Number(rateFilter);
           });
           return filteredUser;
         });
-      }else{
-      filteredUsers = filteredUsers.filter((worker) => {
-        const filteredUser = worker.services.some((services) => {
-          return services.rate <= Number(rateFilter);
+      } else {
+        filteredUsers = filteredUsers.filter((worker) => {
+          const filteredUser = worker.services.some((services) => {
+            return services.rate <= Number(rateFilter);
+          });
+          return filteredUser;
         });
-        return filteredUser;
-      });
+      }
     }
-  }
     return filteredUsers;
-  
   }, [
     users,
     debouncedsearch,
@@ -441,14 +425,12 @@ const HomePageUser = () => {
               filteredAndSortedUsers.map((worker, index) => (
                 <WorkerCard worker={worker} key={index} />
               ))
+            ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
+              filteredAndSortedUsers.map((worker, index) => (
+                <WorkerCard worker={worker} key={index} />
+              ))
             ) : (
-              (filteredAndSortedUsers && filteredAndSortedUsers?.length>0) ? (
-                filteredAndSortedUsers.map((worker, index) => (
-                  <WorkerCard worker={worker} key={index} />
-                ))
-              ) : 
-                <h3>No Workers found!</h3>
-              
+              <h3>No Workers found!</h3>
             )}
           </Col>
           <Col className="d-none d-md-block   mt-3" md={5}>

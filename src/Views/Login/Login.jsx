@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
@@ -9,15 +9,12 @@ import {
   Container,
   Row,
   Col,
-  Spinner
+  Spinner,
 } from "reactstrap";
-import {
-  LoginPage
-} from "../../Constants/Constants"; // Import constants
+import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
 import { failureToast, successToast, validateEmail } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync } from "../../Redux/Slices/AuthSlice";
-import { setSocket } from "../../Redux/Slices/SocketSlice";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -25,24 +22,21 @@ const Login = () => {
     [LoginPage.FORM_FIELDS.PASSWORD]: "",
   });
   const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState("");
+  const [errors, setErrors] = useState("");
+  const [loginDisabled, setLoginDisabled] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
- 
 
+  useEffect(() => {
+    const isFormValid = !errors.email && formData.email && formData.password;
+    setLoginDisabled(!isFormValid);
+  }, [formData]);
 
   const handleEmailChange = (e) => {
-    const email = e.target.value;
-
-    if (!validateEmail(email)) {
-      setEmailError(LoginPage.ERROR_MESSAGES.invalidEmail);
-    } else {
-      setEmailError("");
-    }
-
+    setErrors({ ...errors, email: "" });
     setFormData({
       ...formData,
-      email,
+      email: e.target.value,
     });
   };
 
@@ -54,29 +48,49 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true); // Start loading spinner
-
-      const result = await dispatch(loginAsync(formData));
-
-      if (result.type === "auth/login/fulfilled") {
-        setFormData({
-          [LoginPage.FORM_FIELDS.EMAIL]: "",
-          [LoginPage.FORM_FIELDS.PASSWORD]: "",
-        });
-        //const { user } = useSelector((state) => state.auth);
-        console.log(result)
-        await dispatch(setSocket(result.payload.user));
-        successToast("Login successful! Welcome back!")
-        navigate("/user/homepage");
-      } else {
-        failureToast("Login failed! Please try again.")
-      }
-    } finally {
-      setLoading(false); // Stop loading spinner
+  const FormValidation = (formData) => {
+    const errors = {};
+    if (!validateEmail(formData.email)) {
+      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
     }
+
+    return errors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = FormValidation(formData);
+    setErrors(validationErrors);
+
+    setTimeout(() => {
+      if (Object.keys(validationErrors).length === 0) {
+        try {
+          setLoading(true); // Start loading spinner
+          dispatch(loginAsync(formData))
+            .then((result) => {
+              if (result.type === "auth/login/fulfilled") {
+                if (result.payload) {
+                  setFormData({
+                    [LoginPage.FORM_FIELDS.EMAIL]: "",
+                    [LoginPage.FORM_FIELDS.PASSWORD]: "",
+                  });
+                  successToast("Login successful! Welcome back!");
+                  navigate("/user/homepage");
+                }
+              } else if (result.type === "auth/login/rejected") {
+                console.log(result.payload, "6the error");
+                failureToast(result.payload);
+              }
+            })
+            .catch((error) => {
+              console.log("Error login:", error);
+            });
+        } finally {
+          setLoading(false); // Stop loading spinner
+        }
+      }
+    }, 0);
+
   };
 
   return (
@@ -89,7 +103,10 @@ const Login = () => {
           <h2 className="text-center mt-5 mb-4">{LoginPage.LABELS.LOGIN}</h2>
           <Form onSubmit={handleSubmit}>
             <FormGroup>
-              <Label className="fw-semibold" for={LoginPage.FORM_FIELDS.USERNAME}>
+              <Label
+                className="fw-semibold"
+                for={LoginPage.FORM_FIELDS.USERNAME}
+              >
                 {LoginPage.LABELS.EMAIL}
               </Label>
               <Input
@@ -97,44 +114,71 @@ const Login = () => {
                 name={LoginPage.FORM_FIELDS.EMAIL}
                 id={LoginPage.FORM_FIELDS.EMAIL}
                 placeholder={LoginPage.PLACEHOLDERS.EMAIL}
+                maxLength={70}
                 value={formData[LoginPage.FORM_FIELDS.EMAIL]}
                 onChange={handleEmailChange}
                 required
               />
-              {emailError && <span className="text-danger">{emailError}</span>}
+              {errors.email && (
+                <span className="text-danger">{errors.email}</span>
+              )}
             </FormGroup>
             <FormGroup>
               <Col className="d-flex flex-row justify-content-between">
-              <Label className="fw-semibold" for={LoginPage.FORM_FIELDS.PASSWORD}>
-                {LoginPage.LABELS.PASSWORD}
-              </Label>
-              <Link to={LoginPage.ROUTES.FORGET_PASSWORD}  className="text-primary" >{LoginPage.LABELS.FORGET_PASSWORD}</Link>
+                <Label
+                  className="fw-semibold"
+                  for={LoginPage.FORM_FIELDS.PASSWORD}
+                >
+                  {LoginPage.LABELS.PASSWORD}
+                </Label>
+                <Link
+                  to={LoginPage.ROUTES.FORGET_PASSWORD}
+                  className="text-primary"
+                >
+                  {LoginPage.LABELS.FORGET_PASSWORD}
+                </Link>
               </Col>
               <Input
                 type="password"
                 name={LoginPage.FORM_FIELDS.PASSWORD}
                 id={LoginPage.FORM_FIELDS.PASSWORD}
                 placeholder={LoginPage.PLACEHOLDERS.PASSWORD}
+                maxLength={12}
                 value={formData[LoginPage.FORM_FIELDS.PASSWORD]}
                 onChange={handleChange}
                 autoComplete="on"
                 required
               />
             </FormGroup>
-            <Button color="primary" className="w-25" block disabled={loading}>
-            {loading ? <Spinner size="sm" color="light" /> : LoginPage.LABELS.LOGIN}
+            <Button
+              color="primary"
+              className="w-25"
+              block
+              disabled={loginDisabled || loading}
+            >
+              {loading ? (
+                <Spinner size="sm" color="light" />
+              ) : (
+                LoginPage.LABELS.LOGIN
+              )}
             </Button>
           </Form>
-          <Col className="mt-3 text-center">
+          <Col className="mt-3 text-center fw-medium">
             {LoginPage.LABELS.MEMBER}{" "}
-            <Link className="fw-bold" to={LoginPage.ROUTES.REGISTER}>
+            <Link
+              className="fw-bold links-hover"
+              to={LoginPage.ROUTES.REGISTER}
+            >
               {LoginPage.LABELS.ACCOUNT}
             </Link>
           </Col>
 
-          <Col className="mt-3 text-center">
+          <Col className="mt-3 text-center fw-medium">
             {LoginPage.LABELS.WORKER_DESCRIPTION}{" "}
-            <Link className="fw-bold" to={LoginPage.ROUTES.WORKER_REGISTER}>
+            <Link
+              className="fw-bold links-hover"
+              to={LoginPage.ROUTES.WORKER_REGISTER}
+            >
               {LoginPage.LABELS.WORKER_DESCRIPTION2}
             </Link>
           </Col>
