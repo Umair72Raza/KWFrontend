@@ -38,8 +38,9 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
         result: "true",
       };
       socket?.emit("finishjob-response", data);
-      setFinishOrderReq(false);
+      
       setFinishConfirmed(true);
+      //setFinishOrderReq(false);
     }
     //
     setModal(true);

@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 import Feedback from "../../Components/feedback/feedback";
 const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
-  let modal = "false";
+  const [feedback,setfeedback]=useState(false)
+  //let modal =false;
   if (confirmed === "true") {
     Swal.fire({
       title: "Finish Confirmed",
@@ -15,8 +16,9 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
       if (result.isConfirmed) {
         console.log("confirmed in worker");
         // SetConfirm('')
-        //setFinishJobVerified(false);
-        modal = true;
+        setfeedback(true);
+       setFinishJobVerified(false);
+       
       }
     });
   } else if (confirmed === "false") {
@@ -33,14 +35,14 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
   }
   return (
     <>
-      {modal && (
+      {feedback===true ? (
         <Feedback
-          flag={"true"}
+          flag={feedback}
           order={order}
           setFinishOrderReq={""}
           SetConfirm={SetConfirm}
         />
-      )}
+      ):{}}
     </>
   );
 };

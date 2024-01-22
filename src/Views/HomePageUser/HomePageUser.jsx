@@ -211,11 +211,13 @@ const HomePageUser = () => {
     return () => {
       socket?.off("finishjob-request");
     };
-  }, []);
+  });
 
   useEffect(() => {
     if (newOrder !== null) {
+      
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
+
       socket?.emit("new-order-created", data);
     }
     return () => {

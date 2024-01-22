@@ -422,7 +422,7 @@ const HomePageWorker = () => {
     return () => {
       socket?.off("new-order-result");
     };
-  }, []);
+  });
   return (
     <Container>
       <Row>
