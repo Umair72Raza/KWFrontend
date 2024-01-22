@@ -415,7 +415,7 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("new-order-result", (newOrderResult) => {
-      console.log(newOrderResult);
+      console.log(newOrderResult,"new order result");
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });
