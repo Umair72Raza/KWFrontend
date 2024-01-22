@@ -1,6 +1,6 @@
 
 // PersonDetails.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardBody, CardTitle, CardText, Col, Button, Container } from "reactstrap";
 import DetailsCard from "../DetailsCard/DetailsCard";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +12,11 @@ import {
 import FeedbacksComp from "../FeedbacksComp/FeedbacksComp";
 import Swal from "sweetalert2";
 import { capitalizeFirstLetter } from "../../utils";
+import { setSocket } from "../../Redux/Slices/SocketSlice";
 const PeopleDetails = ({ person, setNewFilPerson }) => {
+
+  
+  //console.log(socket,"socket");
   const [orders, setOrders] = useState();
   const [feedbacks, setFeedbacks] = useState([]);
   const [disableFeedbackButton,setDisableFeebackButton] = useState(false);
@@ -54,6 +58,7 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
     const result = await dispatch(togglePersonAccessAsync(data));
     if (result.type === "/admin/toggleAccess/fulfilled") {
       setNewFilPerson(person);
+      //socket.emit("blocking",(person));
     }
   };
   const getOrders = async (person) => {

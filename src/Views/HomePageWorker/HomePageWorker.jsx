@@ -481,7 +481,6 @@ const HomePageWorker = () => {
                       setScheduledOrders={setScheduledOrders}
                       cancelledOrders={cancelledOrders}
                       setCancelledOrders={setCancelledOrders}
-                      setLatestOrders={setLatestOrders}
                       latestOrder={latestOrder}
                       setUpdateScheduled={setUpdateScheduled}
                       updateScheduled={updateScheduled}
