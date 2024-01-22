@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import Feedback from "../../Components/feedback/feedback";
 const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
-  const [feedback,setfeedback]=useState(false)
+  const [feedback, setfeedback] = useState(false);
   //let modal =false;
   if (confirmed === "true") {
     Swal.fire({
@@ -17,8 +17,7 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
         console.log("confirmed in worker");
         // SetConfirm('')
         setfeedback(true);
-       setFinishJobVerified(false);
-       
+        setFinishJobVerified(false);
       }
     });
   } else if (confirmed === "false") {
@@ -33,16 +32,28 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
       }
     });
   }
+  const handleCloseFeedback = () => {
+    setfeedback(false);
+    SetConfirm("false"); // or any other state management you need to perform
+  };
   return (
     <>
-      {feedback===true ? (
+    {console.log(feedback)}
+      {/* {feedback && (
         <Feedback
           flag={feedback}
           order={order}
-          setFinishOrderReq={""}
+          setFinishOrderReq={handleCloseFeedback}
           SetConfirm={SetConfirm}
         />
-      ):{}}
+      )} */}
+       {feedback && (
+        <Feedback
+          flag={feedback}
+          order={order}
+          setFinishOrderReq={handleCloseFeedback}
+          SetConfirm={SetConfirm}
+        />)}
     </>
   );
 };

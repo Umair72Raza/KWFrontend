@@ -52,7 +52,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
         text: comment,
         rating: rateing,
       };
-      if (flag == true) {
+      if (flag === true) {
         dispatch(AddFeedBack({ params, token }));
         //SetConfirm("");
       }
