@@ -100,7 +100,7 @@ const AdminUsers = () => {
         </Row>
         <Row>
           <Navbar color="light" light expand="md" style={{paddingLeft:"2%"}}>
-            <Nav tabs>
+            <Nav tabs style={{cursor:"pointer"}}>
               <NavItem>
                 <Button
                   style={{

@@ -197,7 +197,11 @@ const HomePageWorker = () => {
                 <div>
                 <strong>Amount:</strong>
                  ${Corder.amount}
-              </div>`,
+              </div>
+              <div>
+              <strong>Cancel Reason:</strong>
+               ${Corder.cancelReason}
+            </div>`,
           icon: "error",
         });
 
