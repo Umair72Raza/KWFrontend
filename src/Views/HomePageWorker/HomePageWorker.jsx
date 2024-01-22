@@ -65,10 +65,8 @@ const HomePageWorker = () => {
   let {
     setOriginalChats,
     setCopyOfChats,
-    OriginalChats,
     offerNotification,
     SetONotification,
-    selectedChatCompare,
     chat,
     receiveMessage,
     setReceiveMessage,
@@ -249,7 +247,6 @@ const HomePageWorker = () => {
 
   //accept the offer
   const handleConfirm = async () => {
-
     setGotOffer(false);
     // send true to the event to socket
 
@@ -257,6 +254,7 @@ const HomePageWorker = () => {
       result: "accept",
       Uid: receiveMessage.users[0],
     });
+    document.body.style.overflow = 'auto';
   };
 
   //reject the offer
@@ -267,6 +265,7 @@ const HomePageWorker = () => {
       result: "cancel",
       Uid: receiveMessage.users[0],
     });
+    document.body.style.overflow = "auto";
   };
 
   useEffect(() => {
@@ -481,7 +480,6 @@ const HomePageWorker = () => {
                       setScheduledOrders={setScheduledOrders}
                       cancelledOrders={cancelledOrders}
                       setCancelledOrders={setCancelledOrders}
-                      setLatestOrders={setLatestOrders}
                       latestOrder={latestOrder}
                       setUpdateScheduled={setUpdateScheduled}
                       updateScheduled={updateScheduled}
