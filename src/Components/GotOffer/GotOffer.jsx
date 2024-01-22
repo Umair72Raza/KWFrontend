@@ -9,17 +9,19 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   const toggleFullDetailsModal = () => setFullDetailsModal(!fullDetailsModal);
 
   const handleConfirm = () => {
-    toggle();
+    
     if (onConfirm) {
       onConfirm();
     }
+    toggle();
   };
 
   const handleCancel = () => {
-    toggle();
+   
     if (onCancel) {
       onCancel();
     }
+    toggle();
   };
 
   const formattedDetails = formattedOfferDetails?.details || "";
