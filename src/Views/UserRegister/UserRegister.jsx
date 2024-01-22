@@ -445,7 +445,7 @@ const UserRegister = ({ ShowServices }) => {
           </Form>
 
           <Col className="mt-4 text-center fw-medium">
-            {RegisterPage.LABELS.MEMBER}
+            {RegisterPage.LABELS.MEMBER} 
             <Link className="fw-bold links-hover" to={RegisterPage.ROUTES.LOGIN}>
               {RegisterPage.LABELS.ACCOUNT}
             </Link>

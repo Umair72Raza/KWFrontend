@@ -174,7 +174,7 @@ const Login = () => {
           </Col>
 
           <Col className="mt-3 text-center fw-medium">
-            {LoginPage.LABELS.WORKER_DESCRIPTION}{" "}
+            {LoginPage.LABELS.WORKER_DESCRIPTION} {" "}
             <Link
               className="fw-bold links-hover"
               to={LoginPage.ROUTES.WORKER_REGISTER}

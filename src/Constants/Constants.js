@@ -57,7 +57,7 @@ export const RegisterPage = {
     ADDRESS: "Address",
     SERVICES: "Services",
     REGISTER: "Register",
-    MEMBER: "Already a member?",
+    MEMBER: "Already a member? ",
     ACCOUNT: "Login to your account",
     SIGNUP: "Sign up",
   },
@@ -72,12 +72,12 @@ export const RegisterPage = {
     SERVICES: "Select a service",
   },
   ERROR_MESSAGES: {
-    invalidEmail: "Invalid email address",
-    invalidPhoneNumber: "Please enter a valid phone number",
+    invalidEmail: "Invalid email address.",
+    invalidPhoneNumber: "Please enter a valid phone number.",
     invalidPassword:
       "Password must contain at least one special character, one uppercase letter, one number, and between 8 to 12 characters long.",
-    passwordsNotMatch: "Passwords do not match",
-    enterAllFields: "Enter all the fields to sign up",
+    passwordsNotMatch: "Passwords do not match.",
+    enterAllFields: "Enter all the fields to sign up.",
   },
   FORM_GROUPS: {
     PERSONAL_INFO: "Personal Information",
