@@ -14,7 +14,6 @@ const socketslice = createSlice({
   reducers: {
     setSocket: (state,action) => {
       const User = action.payload
-      console.log(User)
       if (User && User._id ) {
         console.log("this is console from socket")
         state.socket = io(ENDPOINT);

@@ -68,7 +68,7 @@ const Login = () => {
         });
         //const { user } = useSelector((state) => state.auth);
         console.log(result)
-        await dispatch(setSocket(result.payload.user));
+   //     await dispatch(setSocket(result.payload.user));
         successToast("Login successful! Welcome back!")
         navigate("/user/homepage");
       } else {

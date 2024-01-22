@@ -36,6 +36,7 @@ import {
   selectSpinnerVisibility,
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
+import { setSocket } from "../../Redux/Slices/SocketSlice";
 
 
 const HomePageWorker = () => {
@@ -59,7 +60,7 @@ const HomePageWorker = () => {
   const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
-  const socket=useSelector((state) => state?.socket?.socket);
+  const {socket}=useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   let {
     setOriginalChats,
@@ -77,6 +78,16 @@ const HomePageWorker = () => {
   } = ChatState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
+
+  useEffect(() => {
+    dispatch(setSocket(user));
+    return () => {
+      if (user) {
+        dispatch(setSocket(null)); // Disconnect socket on unmount
+      }
+    };
+  }, []);
+
   // useEffect(() => {
   // //  let socket=createSocket()
   //   if (user && user._id) {
