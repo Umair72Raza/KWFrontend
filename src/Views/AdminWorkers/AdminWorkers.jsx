@@ -99,7 +99,7 @@ const AdminWorkers = () => {
       <UserNavbar />
       <h1 style={{ textAlign: "center" }}>Workers</h1>
       <Navbar color="light" light expand="md" style={{marginLeft:"2%"}}>
-        <Nav tabs>
+        <Nav tabs style={{cursor:"pointer"}}>
           <NavItem>
             <Button
               style={{

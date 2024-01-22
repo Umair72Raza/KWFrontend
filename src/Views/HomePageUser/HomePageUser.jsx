@@ -54,19 +54,6 @@ const HomePageUser = () => {
   const [loading, setLoading] = useState(false);
   let removedUsers = [];
   removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-
-  // useEffect(() => {
-  //   if (user) {
-  //     dispatch(setSocket(user));
-  //   }
-  //   return () => {
-  //     if (user) {
-  //       dispatch(setSocket(null)); // Disconnect socket on unmount
-  //     }
-  //   };
-  // }, []);
-
-  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -138,14 +125,19 @@ const HomePageUser = () => {
   });
 
   useEffect(() => {
-    socket?.on("order-canceled", (Corder) => {
+    socket?.on("order-canceled", (data) => {
+      const Corder = data.order;
+      const reason = data.reason;
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
           html: `<div> <strong>Order Title:</strong> ${Corder.Title}</div>
                  <div> <strong>Order Details:</strong> ${Corder.details}</div>
                  <div> <strong>Service:</strong> ${Corder.service}</div>
-                 <div> <strong>Amount:</strong> ${Corder.amount}</div>`,
+                 <div> <strong>Amount:</strong> ${Corder.amount}</div>
+                 <div> <strong>Amount:</strong> ${reason}</div>`
+                 ,
+
           icon: "error",
         });
         setScheduledOrders((prevScheduledOrders) => {

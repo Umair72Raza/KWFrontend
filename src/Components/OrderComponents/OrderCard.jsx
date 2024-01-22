@@ -70,9 +70,14 @@ const OrderCard = ({
       Status: "Cancelled",
     };
 
+    const resonWithOrdertoCancel = {
+      reason: cancelReason,
+      order: order
+    }
+
     const cancelOrderSocketEvent = () => {
       if (!socket) return;
-      socket?.emit("cancel-order-user", order);
+      socket?.emit("cancel-order-user", resonWithOrdertoCancel);
       return () => {
         socket?.off("cancel-order-user");
       };

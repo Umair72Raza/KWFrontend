@@ -190,7 +190,7 @@ const UserNavbar = () => {
               <OffcanvasHeader toggle={orders}>New Order's</OffcanvasHeader>
               <OffcanvasBody>
                 {offerNotification.length === 0 ? (
-                  <DropdownItem>No new messages</DropdownItem>
+                  <DropdownItem>No new Orders</DropdownItem>
                 ) : (
                   offerNotification.map((item, index) => (
                     <DropdownItem

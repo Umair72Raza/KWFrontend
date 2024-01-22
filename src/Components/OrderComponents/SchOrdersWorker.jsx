@@ -76,10 +76,17 @@ const ScheduledOrdersCardWorker = ({
       cancelReason: cancelReason,
       Status: "Cancelled",
     };
+
+    const resonWithOrdertoCancel = {
+      reason: cancelReason,
+      order: order
+    }
+
+
     // there could be problem down here
     const cancelSocketEvent = () => {
       if (!socket) return;
-      socket?.emit("cancel-order", order);
+      socket?.emit("cancel-order", resonWithOrdertoCancel);
       return () => {
         socket?.off("cancel-order");
       };
