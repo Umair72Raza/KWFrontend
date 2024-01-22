@@ -55,30 +55,18 @@ const HomePageUser = () => {
   let removedUsers = [];
   removedUsers = useSelector((state) => state?.homepage?.removeWorker);
 
-  useEffect(() => {
-    if (user) {
-      dispatch(setSocket(user));
-    }
-    return () => {
-      if (user) {
-        dispatch(setSocket(null)); // Disconnect socket on unmount
-      }
-    };
-  }, []);
-
   // useEffect(() => {
-  //   console.log(user)
-  //  let socket = createSocket()
-  //   if (user && user._id ) {
-  //     socket?.emit("setup", user);
-  //     socket?.emit("new-user-add", user._id);
-  //     socket?.on("connection", "true");
-  //     console.log("user in connection")
-  //   } else {
-  //     socket?.disconnect();
+  //   if (user) {
+  //     dispatch(setSocket(user));
   //   }
+  //   return () => {
+  //     if (user) {
+  //       dispatch(setSocket(null)); // Disconnect socket on unmount
+  //     }
+  //   };
+  // }, []);
 
-  // },[]);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -150,8 +138,8 @@ const HomePageUser = () => {
   });
 
   useEffect(() => {
-    socket?.on("order-canceled", (order) => {
-      if (order) {
+    socket?.on("order-canceled", (Corder) => {
+      if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
           html: `<div> <strong>Order Title:</strong> ${Corder.Title}</div>
@@ -211,11 +199,13 @@ const HomePageUser = () => {
     return () => {
       socket?.off("finishjob-request");
     };
-  }, []);
+  });
 
   useEffect(() => {
     if (newOrder !== null) {
+      
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
+
       socket?.emit("new-order-created", data);
     }
     return () => {

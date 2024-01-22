@@ -35,7 +35,6 @@ const ScheduledOrdersCardWorker = ({
   setScheduledOrders,
   setCancelledOrders,
   cancelledOrders,
-  setLatestOrders,
   latestOrder,
   setUpdateScheduled,
   updateScheduled,

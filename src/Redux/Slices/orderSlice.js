@@ -84,6 +84,7 @@ export const activateOrderAsync = createAsyncThunk(
 export const changeStatusToPastAsync = createAsyncThunk(
   "orders/changeToPastOrders",
   async (data) => {
+    console.log(data);
     const { orderId } = data;
     const response = await changeToPast(data);
     return response;

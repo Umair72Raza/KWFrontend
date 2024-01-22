@@ -1,25 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 
 const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
-  const [modal, setModal] = useState(true);
+  const [showModal, setShowModal] = useState(true);
   const [fullDetailsModal, setFullDetailsModal] = useState(false);
 
-  const toggle = () => setModal(!modal);
-  const toggleFullDetailsModal = () => setFullDetailsModal(!fullDetailsModal);
+  useEffect(() => {
+    const openModal = () => {
+      setShowModal(true);
+      document.body.style.overflow = "hidden";
+    };
+    
+    const closeModal = () => {
+      setShowModal(false);
+      document.body.style.overflow = "";
+    };
+  
+    openModal();
+  
+    // Clean up function
+    return () => {
+      closeModal();
+    };
+  }, []);
+  const closeModal = () => {
+    setShowModal(false);
+    document.body.style.overflow = "auto";
+  };
+
+  const toggleFullDetailsModal = () => {
+    setFullDetailsModal(!fullDetailsModal);
+    document.body.style.overflow = "auto";
+  };
 
   const handleConfirm = () => {
-    toggle();
     if (onConfirm) {
       onConfirm();
     }
+    closeModal();
   };
 
   const handleCancel = () => {
-    toggle();
     if (onCancel) {
       onCancel();
     }
+    closeModal();
   };
 
   const formattedDetails = formattedOfferDetails?.details || "";
@@ -30,10 +55,9 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
 
   return (
     <div>
-      <Modal
+      {/* <Modal
         isOpen={modal}
         toggle={toggle}
-        backdrop="static"
         keyboard={false}
         centered
       >
@@ -66,6 +90,45 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
         <ModalFooter>
           <Button color="primary" onClick={handleConfirm}>
             Acept Offer
+          </Button>{" "}
+          <Button color="danger" onClick={handleCancel}>
+            Reject Offer
+          </Button>{" "}
+          <Button color="info" onClick={toggleFullDetailsModal}>
+            See Full Details
+          </Button>
+        </ModalFooter>
+      </Modal> */}
+      <Modal isOpen={showModal} keyboard={false} centered>
+        <ModalHeader toggle={closeModal}>
+          Do you want to Accept the Offer?
+        </ModalHeader>
+        <ModalBody>
+          <p>
+            <strong>Title:</strong> {formattedOfferDetails?.Title}
+          </p>
+          <p>
+            <strong>Date:</strong> {formattedOfferDetails?.date}
+          </p>
+          <p>
+            <strong>Time:</strong> {formattedOfferDetails?.time}
+          </p>
+          <p>
+            <strong>Amount:</strong> {formattedOfferDetails?.amount}
+          </p>
+          <p>
+            <strong>Service:</strong> {formattedOfferDetails?.service}
+          </p>
+          <p>
+            <strong>Details:</strong>{" "}
+            <div style={{ whiteSpace: "pre-wrap" }}>
+              {truncatedDetails.replace(/<br\s*\/?>/gi, "\n")}
+            </div>
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={handleConfirm}>
+            Accept Offer
           </Button>{" "}
           <Button color="danger" onClick={handleCancel}>
             Reject Offer

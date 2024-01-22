@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Modal, ModalHeader, ModalBody, Button } from "reactstrap";
 import { changeStatusToPastAsync } from "../../Redux/Slices/OrderSlice";
 
@@ -10,45 +10,7 @@ import { truncateText } from "../../utils";
 
 const FinishJobReq = ({ order, setFinishOrderReq }) => {
   const socket=useSelector((state) => state?.socket?.socket);
-  //let modal = "false";
-  //const dispatch = useDispatch();
-  // Swal.fire({
-  //   title: "Worker want to Finish?",
-  //   html: `<div>
-  //       <strong>Order Title:</strong> ${order.Title}
-  //     </div>
-  //     <div>
-  //       <strong>Order Details:</strong> ${order.details}
-  //     </div>
-  //     <div>
-  //       <strong>Service:</strong> ${order.service}
-  //     </div>
-  //     <div>
-  //       <strong>Amount:</strong> ${order.amount}
-  //     </div>`,
-  //   icon: "warning",
-  //   showCancelButton: true,
-  //   confirmButtonColor: "#3085d6",
-  //   cancelButtonColor: "#d33",
-  //   confirmButtonText: "Yes, Finish it!",
-  //   allowOutsideClick: false,
-  // }).then(async (result) => {
-  //   if (result.isConfirmed) {
-  //     const result = await dispatch(
-  //       changeStatusToPastAsync({ orderId: order._id })
-  //     );
-  //     console.log(result);
-  //     if (result.type === "orders/changeToPastOrders/fulfilled") {
-  //       if (result.payload.Status === "Past") {
-  //         const data = {
-  //           order: result.payload,
-  //           result: "true",
-  //         };
-  //         socket?.emit("finishjob-response", data);
-  //       }
-  //     }
-  //   }
-  const dispatch = useDispatch();
+   const dispatch = useDispatch();
   const [modal, setModal] = useState(true);
   const [showMoreDetails, setShowMoreDetails] = useState(false);
   const [finishConfirmed, setFinishConfirmed] = useState(false);
@@ -70,16 +32,18 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
       result.type === "orders/changeToPastOrders/fulfilled" &&
       result.payload.Status === "Past"
     ) {
+      console.log(result.payload)
       const data = {
         order: result.payload,
         result: "true",
       };
       socket?.emit("finishjob-response", data);
-      setFinishOrderReq(false);
+      
+      setFinishConfirmed(true);
+      // setFinishOrderReq(false);
     }
-
-    setFinishConfirmed(true);
-    setModal(false);
+    //
+    setModal(true);
   };
 
   const handleCancel = () => {
@@ -136,9 +100,9 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
           </Button>
         </ModalBody>
       </Modal>
-      {finishConfirmed && (
+      {finishConfirmed === true && (
         <Feedback
-          flag={modal}
+          flag={finishConfirmed}
           order={order}
           setFinishOrderReq={setFinishOrderReq}
           SetConfirm={""}
