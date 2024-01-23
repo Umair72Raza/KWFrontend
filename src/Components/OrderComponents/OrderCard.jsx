@@ -111,14 +111,14 @@ const OrderCard = ({
             <Col
               key={order._id}
               sm="6"
-              md="5"
-              lg="5"
-              xl="5"
+              md="4"
+              lg="4"
+              xl="4"
               style={{ marginTop: "10px" }}
             >
               <Card
                 className="shadow"
-                style={{ backgroundColor: "#f6f8fc", color: "#0d6efd" }}
+                style={{ backgroundColor: "#f6f8fc", color: "",height:"100%" }}
               >
                 <CardBody>
                   <CardTitle>
@@ -135,7 +135,14 @@ const OrderCard = ({
                           alt="schTask"
                           style={{ marginRight: "10px" }}
                         />
-                        <h5 style={{ textAlign: "center" }}>{order.Title}</h5>
+                        <h5 style={{
+                          marginTop: "4%",
+                          textAlign: "center",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                          maxWidth: "100%",
+                        }}>{order.Title}</h5>
                       </div>
                     </Col>{" "}
                   </CardTitle>
@@ -169,28 +176,34 @@ const OrderCard = ({
                   <CardText>Date: {order.date}</CardText>
                   <CardText>
                     Details:{" "}
-                    {showFullDetailsMap[order._id]
-                      ? (
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: order.details,
-                            }}
-                          />
-                        )
-                      : transformOrderDetails(order)}
-                    {order.details.length > 25 && (
-                      <Button
-                      style={{marginTop:"-5px"}}
-                        color="link"
-                        onClick={() => toggleDetails(order._id)}
-                      >
-                        {showFullDetailsMap[order._id]
-                          ? "Show Less"
-                          : "Show More"}
-                      </Button>
-                    )}
+                    <div
+                      style={{
+                        maxHeight: "100px",
+                        overflowY: "auto",
+                      }}
+                    >
+                      
+                      {showFullDetailsMap[order._id]
+                        ? (
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: order.details,
+                              }}
+                            />
+                          )
+                        : transformOrderDetails(order)}
+                      {order.details.length > 5 && (
+                        <Button
+                          style={{ marginTop: "-5px" }}
+                          color="link"
+                          onClick={() => toggleDetails(order._id)}
+                        >
+                          {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
+                        </Button>
+                      )}
+                    </div>
                   </CardText>
-                  <CardText>OrderId: {order._id}</CardText>
+                  {/* <CardText>OrderId: {order._id}</CardText> */}
                   <CardText>
                     Worker: {order.users.length > 0 && order.users[1].firstName}
                   </CardText>

@@ -12,13 +12,13 @@ const AuthRoutes = [
       layout: "/auth",
     },
     {
-      path: "/register",
+      path: "/createAccount",
       name: "User Register",
       component: <UserRegister ShowServices={false} />,
       layout: "/auth",
     },
     {
-      path: "/WorkerRegister",
+      path: "/workerRegister",
       name: "Worker Register",
       component: <UserRegister ShowServices={true} />,
       layout: "/auth",

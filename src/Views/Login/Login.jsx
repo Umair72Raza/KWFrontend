@@ -10,11 +10,14 @@ import {
   Row,
   Col,
   Spinner,
+  Tooltip,
 } from "reactstrap";
 import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
 import { failureToast, successToast, validateEmail } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync } from "../../Redux/Slices/AuthSlice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -24,8 +27,12 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState("");
   const [loginDisabled, setLoginDisabled] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const toggle = () => setTooltipOpen(!tooltipOpen);
 
   useEffect(() => {
     const isFormValid = !errors.email && formData.email && formData.password;
@@ -90,7 +97,6 @@ const Login = () => {
         }
       }
     }, 0);
-
   };
 
   return (
@@ -101,7 +107,7 @@ const Login = () => {
       <Row className="w-100 d-flex justify-content-center">
         <Col md={6} lg={4} xl={3}>
           <h2 className="text-center mt-5 mb-4">{LoginPage.LABELS.LOGIN}</h2>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} autoComplete="off" style={{ userSelect: "none" }}>
             <FormGroup>
               <Label
                 className="fw-semibold"
@@ -117,7 +123,12 @@ const Login = () => {
                 maxLength={70}
                 value={formData[LoginPage.FORM_FIELDS.EMAIL]}
                 onChange={handleEmailChange}
-                required
+                onKeyDown={ (event) => {
+                  if (event.key === ' ') {
+                    event.preventDefault();
+                  }
+                }}
+                
               />
               {errors.email && (
                 <span className="text-danger">{errors.email}</span>
@@ -138,22 +149,34 @@ const Login = () => {
                   {LoginPage.LABELS.FORGET_PASSWORD}
                 </Link>
               </Col>
-              <Input
-                type="password"
-                name={LoginPage.FORM_FIELDS.PASSWORD}
-                id={LoginPage.FORM_FIELDS.PASSWORD}
-                placeholder={LoginPage.PLACEHOLDERS.PASSWORD}
-                maxLength={12}
-                value={formData[LoginPage.FORM_FIELDS.PASSWORD]}
-                onChange={handleChange}
-                autoComplete="on"
-                required
-              />
+              <div className="password-input-wrapper">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name={LoginPage.FORM_FIELDS.PASSWORD}
+                  id={LoginPage.FORM_FIELDS.PASSWORD}
+                  placeholder={LoginPage.PLACEHOLDERS.PASSWORD}
+                  maxLength={12}
+                  value={formData[LoginPage.FORM_FIELDS.PASSWORD]}
+                  onChange={handleChange}
+                  required
+                />
+                <div
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <FontAwesomeIcon
+                    icon={showPassword ? faEye : faEyeSlash}
+                    className="password-icon"
+                  />
+                </div>
+              </div>
             </FormGroup>
+            <Link id="Login">
             <Button
               color="primary"
               className="w-25"
               block
+              onClick={handleSubmit}
               disabled={loginDisabled || loading}
             >
               {loading ? (
@@ -162,6 +185,16 @@ const Login = () => {
                 LoginPage.LABELS.LOGIN
               )}
             </Button>
+            </Link>
+            <Tooltip
+              placement="right"
+              autohide={false}
+              isOpen={tooltipOpen && loginDisabled}
+              target="Login"
+              toggle={toggle}
+            >
+              Enter all fields to login!
+            </Tooltip>
           </Form>
           <Col className="mt-3 text-center fw-medium">
             {LoginPage.LABELS.MEMBER}{" "}

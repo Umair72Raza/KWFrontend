@@ -27,6 +27,21 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
     person = "Was Assigned By";
   }
 
+  const [showFullReasonMap, setShowFullReasonMap] = useState({});
+  
+  const transformCancelReason = (reason, orderId) => {
+    return showFullReasonMap[orderId]
+      ? reason
+      : truncateText(reason, 100);
+  };
+
+  const toggleCancelReason = (orderId) => {
+    setShowFullReasonMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  }
+
   const transformOrderDetails = (order) => {
     let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
 
@@ -69,7 +84,14 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
                         alt="schTask"
                         style={{ height: "27px", marginRight: "10px" }}
                       />
-                      <h5 style={{ marginTop: "4%", textAlign: "center" }}>
+                      <h5 style={{
+                          marginTop: "4%",
+                          textAlign: "center",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                          maxWidth: "100%",
+                        }}>
                         {order.Title}
                       </h5>
                     </span>
@@ -79,33 +101,61 @@ const CancelledOrders = ({ scheduledOrdersObject }) => {
                 <CardText>Date and Time: {order.date}</CardText>
                 <CardText>
                     Details:{" "}
-                    {showFullDetailsMap[order._id]
-                      ? (
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: order.details,
-                            }}
-                          />
-                        )
-                      : transformOrderDetails(order)}
-                    {order.details.length > 5 && (
-                     <Button
-                     style={{ marginTop: "-5px" }}
-                     color="link"
-                     onClick={() => toggleDetails(order._id)}
-                   >
-                     {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
-                   </Button>
-                    )}
+                    <div
+                      style={{
+                        maxHeight: "100px",
+                        overflowY: "auto",
+                      }}
+                    >
+                      
+                      {showFullDetailsMap[order._id]
+                        ? (
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: order.details,
+                              }}
+                            />
+                          )
+                        : transformOrderDetails(order)}
+                      {order.details.length > 5 && (
+                        <Button
+                          style={{ marginTop: "-5px" }}
+                          color="link"
+                          onClick={() => toggleDetails(order._id)}
+                        >
+                          {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
+                        </Button>
+                      )}
+                    </div>
                   </CardText>
+                  <hr></hr>
                 {order.cancelReason ? (
                   <>
-                    <CardText>
-                      Cancelled By: {order.cancelReason?.c_id?.firstName}
-                    </CardText>
-                    <CardText>
-                      Cancelation Reason: {order.cancelReason.reason}
-                    </CardText>
+                     <CardText>
+                    Cancelation Reason:{" "}
+                    <div
+                      style={{
+                        maxHeight: "100px",
+                        overflowY: "auto",
+                      }}
+                    >
+                      <div>
+                        {transformCancelReason(
+                          order.cancelReason.reason,
+                          order._id
+                        )}
+                      </div>
+                      {order.cancelReason.reason.length > 50 && (
+                        <Button
+                          style={{ marginTop: "-5px" }}
+                          color="link"
+                          onClick={() => toggleCancelReason(order._id)}
+                        >
+                          {showFullReasonMap[order._id] ? "Show Less" : "Show More"}
+                        </Button>
+                      )}
+                    </div>
+                  </CardText>
                   </>
                 ) : (
                   <>

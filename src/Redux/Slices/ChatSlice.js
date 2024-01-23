@@ -1,12 +1,16 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { GetChats, GetMessages, SendMessage } from "../../APIs/chat";
-
+import {
+  GetChats,
+  GetMessages,
+  SendMessage,
+  ToggleSeen,
+} from "../../APIs/chat";
 
 export const fetchChatsAsync = createAsyncThunk(
   "Chats/WithWorkers",
-  async ({user,token}) => {
+  async ({ user, token }) => {
     const userId = user._id;
-    const response = await GetChats(userId,token);
+    const response = await GetChats(userId, token);
     return response.data;
   }
 );
@@ -14,8 +18,10 @@ export const fetchChatsAsync = createAsyncThunk(
 export const fetchMessages = createAsyncThunk(
   "Chat/messages",
   async (credentials) => {
-    const {chatId,token} = credentials;
-    const response = await GetMessages(chatId,token);
+    const { chatId, token } = credentials;
+    const response = await GetMessages(chatId, token);
+
+    console.log(response.data);
 
     return response.data;
   }
@@ -24,9 +30,22 @@ export const fetchMessages = createAsyncThunk(
 export const SendMessageAsync = createAsyncThunk(
   "Chat/SendMessage",
   async (credentials) => {
-    const { receiverId, text, initiatorId,token } = credentials;
-    const response = await SendMessage(receiverId, text, initiatorId,token);
+    const { receiverId, text, initiatorId, token } = credentials;
+    const response = await SendMessage(receiverId, text, initiatorId, token);
     return response.data;
+  }
+);
+
+export const ToggleChatSeen = createAsyncThunk(
+  "Chat/ToggleSeen",
+  async (credentials) => {
+    try {
+      const { chatId, token, seen } = credentials;
+      const response = await ToggleSeen(chatId, token, seen);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   }
 );
 
@@ -38,6 +57,11 @@ const ChatSlice = createSlice({
     error: null,
     status: null,
     messageStatus: null,
+  },
+  reducers: {
+    updateChatsWithWorkers: (state, action) => {
+      state.ChatsWithWorkers = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -59,7 +83,6 @@ const ChatSlice = createSlice({
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.messageStatus = "succeeded";
-
         state.messages = action.payload;
       })
       .addCase(fetchMessages.rejected, (state) => {
@@ -71,12 +94,23 @@ const ChatSlice = createSlice({
       .addCase(SendMessageAsync.fulfilled, (state) => {
         state.status = "succeeded";
       })
-      .addCase(SendMessageAsync.rejected, (state,action) => {
+      .addCase(SendMessageAsync.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message; // Capture the error message for debugging
-        console.log(action.error.message); 
+      })
+      .addCase(ToggleChatSeen.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(ToggleChatSeen.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(ToggleChatSeen.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message; 
       });
   },
 });
+
+export const { updateChatsWithWorkers } = ChatSlice.actions;  
 
 export default ChatSlice.reducer;

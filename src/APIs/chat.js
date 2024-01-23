@@ -45,3 +45,19 @@ export const SendMessage = async (receiverId, text, initiatorId,token) => {
     throw error.response.data;
   }
 };
+
+
+export const ToggleSeen = async (chatId,token,seen) => {
+  try {
+    const response = await API.put(`/chats/chat/${chatId}`, {
+      seen
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}

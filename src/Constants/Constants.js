@@ -1,7 +1,7 @@
 export const LoginPage = {
   ROUTES: {
     LOGIN: "/auth/login",
-    REGISTER: "/auth/register",
+    REGISTER: "/auth/createAccount",
     WORKER_REGISTER: "/auth/workerRegister",
     FORGET_PASSWORD: "/auth/forgetPassword",
   },
@@ -31,8 +31,8 @@ export const LoginPage = {
 export const RegisterPage = {
   ROUTES: {
     LOGIN: "/auth/login",
-    REGISTER: "/auth/register",
-    WORKER_REGISTER: "/auth/workerregister",
+    REGISTER: "/auth/createAccount",
+    WORKER_REGISTER: "/auth/workerRegister",
     // Add more routes as needed
   },
   FORM_FIELDS: {
@@ -57,7 +57,7 @@ export const RegisterPage = {
     ADDRESS: "Address",
     SERVICES: "Services",
     REGISTER: "Register",
-    MEMBER: "Already a member?",
+    MEMBER: "Already a member? ",
     ACCOUNT: "Login to your account",
     SIGNUP: "Sign up",
   },
@@ -72,12 +72,12 @@ export const RegisterPage = {
     SERVICES: "Select a service",
   },
   ERROR_MESSAGES: {
-    invalidEmail: "Invalid email address",
-    invalidPhoneNumber: "Please enter a valid phone number",
+    invalidEmail: "Invalid email address.",
+    invalidPhoneNumber: "Please enter a valid phone number.",
     invalidPassword:
       "Password must contain at least one special character, one uppercase letter, one number, and between 8 to 12 characters long.",
-    passwordsNotMatch: "Passwords do not match",
-    enterAllFields: "Enter all the fields to sign up",
+    passwordsNotMatch: "Passwords do not match.",
+    enterAllFields: "Enter all the fields to sign up.",
   },
   FORM_GROUPS: {
     PERSONAL_INFO: "Personal Information",
@@ -147,3 +147,39 @@ export const ChatPopUpPage = {
   SEND_BUTTON_COLOR: "primary",
   SELECT_CHAT_LABEL: "Select a chat to start messaging",
 };
+
+export const HomePageWorkerConsts = {
+  REASON_NOT_MENTIONED : "Reason not mentioned",
+
+}
+
+export const TABS = {
+  SCHEDULED : "Scheduled",
+  PAST: "Past",
+  CANCELLED : "Cancelled",
+  ACTIVE: "Active",
+  SCH_ORDERS: "Scheduled Orders",
+  NO_SCH_ORDERS: "No Scheduled Orders!",
+  PAST_ORDERS: "Past Orders",
+  NO_PAST_ORDERS: "No Past Orders!",
+  CANCELLED_ORDERS: "Cancelled Orders",
+  NO_CANC_ORDERS: "No Cancelled Orders",
+  ACTIVE_ORDERS: "Active Orders",
+  NO_ACTIVE_ORDERS: "No Active Orders!",
+}
+
+export const GOTOFFER = {
+  OFFER_HEADER: "Do you want to Accept the Offer?",
+  OFFER_TITLE: "Title: ",
+  OFFER_DATE: "DATE: ",
+  OFFER_TIME: "TIME: ",
+  OFFER_AMOUNT: "Amount: ",
+  OFFER_DETAILS: "Details: ",
+  OFFER_SERVICE: "Service: ",
+  ACCEPT_BUTTON: "Accept Offer!",
+  REJECT_BUTTON: "Reject Offer!",
+  SEE_DETAILS_BUTTON: "See Full Details",
+  FULL_DETAILS:"Full Details",
+  FULL_DETAILS_HEADING: "Full Details: ",
+  CLOSE_BUTTON: "Close"
+}

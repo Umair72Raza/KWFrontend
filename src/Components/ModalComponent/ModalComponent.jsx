@@ -30,6 +30,10 @@ const ModalComponent = (props) => {
     order,
   } = props;
 
+   const truncatedDetails = order?.details
+    ? order.details.replace(/<br\s*\/?>/g, "\n").substring(0, 100)
+    : "";
+
   return (
     <Modal
       isOpen={isModalOpen}
@@ -37,17 +41,15 @@ const ModalComponent = (props) => {
       centered
       backdrop="static"
       keyboard={false}
+      
     >
       <ModalHeader toggle={toggleModal}>{modalHeader}</ModalHeader>
-      <ModalBody>
+      <ModalBody style={{maxHeight: "200px", overflowY: "auto" }}>
+        
         {order && (
           <>
             <div>
               <strong>Order Title:</strong> {order.Title}
-            </div>
-            <div>
-              <strong>Order Details:</strong>{" "}
-              {order.details.replace(/<br\s*\/?>/g, "\n")}
             </div>
             <div>
               <strong>Service:</strong> {order.service}
@@ -55,6 +57,11 @@ const ModalComponent = (props) => {
             <div>
               <strong>Amount:</strong> {order.amount}
             </div>
+            <div>
+              <strong>Order Details:</strong>{" "}
+              {order.details.replace(/<br\s*\/?>/g, "\n")}
+            </div>
+
           </>
         )}
 
