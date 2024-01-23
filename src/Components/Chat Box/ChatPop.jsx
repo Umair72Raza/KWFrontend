@@ -1,14 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { useDispatch } from "react-redux";
-import { Button, Modal, ModalHeader, ModalBody } from "reactstrap";
-import { SendMessageAsync, fetchMessages } from "../../Redux/Slices/ChatSlice";
+import { Button, Modal, ModalHeader, ModalBody, Spinner } from "reactstrap";
+import {
+  SendMessageAsync,
+  ToggleChatSeen,
+  fetchMessages,
+  updateChatsWithWorkers,
+} from "../../Redux/Slices/ChatSlice";
 import { ChatState } from "../../Context/ChatProvider";
-
+import { FaDotCircle } from "react-icons/fa";
 import { SelectChat } from "../../utils";
 import { useSelector } from "react-redux";
 import Booking from "../booking popup/booking";
 import { ChatPopUpPage } from "../../Constants/Constants";
+import { set } from "lodash";
 
 const ChatPopup = () => {
   let {
@@ -41,21 +47,55 @@ const ChatPopup = () => {
   const [modal, setModal] = useState(false);
   const [worker, SetWorker] = useState({});
   const [sendButtonDisabled, setSendButtonDisabled] = useState(false);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     const getMessages = async () => {
+      setLoading(true);
       if (selectedChat && chat) {
         const result = await dispatch(
           fetchMessages({ chatId: chat._id, token })
         );
         if (result.type === "Chat/messages/fulfilled") {
-          setMessages(result.payload || []);
+          if (chat && chat.seen === false) {
+            dispatch(ToggleChatSeen({ chatId: chat._id, token, seen: true }))
+              .then((result) => {
+                if (result.type === "Chat/ToggleSeen/fulfilled") {
+                  if (notification.length > 0) {
+                    setNotification(
+                      notification.filter(
+                        (n) => n.chat._id !== result.payload._id
+                      )
+                    );
+                  }
+                  // Find the index of the chat to be updated
+                  const index = copyOfChats.findIndex(
+                    (c) => c._id === result.payload._id
+                  );
+
+                  // If the chat is found, create a new array with the updated chat
+                  if (index !== -1) {
+                    const updatedChats = [...copyOfChats];
+                    updatedChats.splice(index, 1, result.payload);
+                    dispatch(updateChatsWithWorkers(updatedChats));
+                    setCopyOfChats(updatedChats); // Trigger a re-render with the new array
+                  }
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+          setMessages(result.payload.messages || []);
           socket?.emit("join chat", chat._id);
+          setLoading(false);
         } else {
           setMessages([]);
+          setLoading(false);
         }
       } else {
         setMessages([]);
+        setLoading(false);
       }
     };
     getMessages();
@@ -86,7 +126,31 @@ const ChatPopup = () => {
             newMessageReceived.newMessage.chatId
         );
         if (!alreadyInNotifications) {
-          setNotification([newMessageReceived, ...notification]);
+          console.log("i run");
+          dispatch(
+            ToggleChatSeen({
+              chatId: newMessageReceived.newMessage.chatId,
+              token,
+              seen: false,
+            })
+          ).then((result) => {
+            if (result.type === "Chat/ToggleSeen/fulfilled") {
+              // Find the index of the chat to be updated
+              const index = copyOfChats.findIndex(
+                (c) => c._id === result.payload._id
+              );
+
+              // If the chat is found, create a new array with the updated chat
+              if (index !== -1) {
+                const updatedChats = [...copyOfChats];
+                updatedChats.splice(index, 1, result.payload);
+                dispatch(updateChatsWithWorkers(updatedChats));
+                setCopyOfChats(updatedChats); // Trigger a re-render with the new array
+                newMessageReceived.chat.seen = false;
+                setNotification([newMessageReceived, ...notification]);
+              }
+            }
+          });
         }
       } else {
         if (messages) {
@@ -206,6 +270,17 @@ const ChatPopup = () => {
   const renderMessages = () => {
     let lastMessageDate = null;
 
+    if (isLoading) {
+      return (
+        <div className=" vh-100 d-flex flex-column justify-content-center align-items-center">
+          {" "}
+          <Spinner
+            style={{ width: "3rem", height: "3rem", marginTop: "25px" }}
+          />
+        </div>
+      );
+    }
+
     return Array.isArray(messages) && messages.length > 0 ? (
       messages.map((message) => {
         const messageDate = new Date(message.createdAt);
@@ -262,7 +337,11 @@ const ChatPopup = () => {
         );
       })
     ) : (
-      <div className="no-messages">{ChatPopUpPage.START_CONVERSATION}</div>
+      <div className="no-messages">
+        {messages.length === 0 && !isLoading
+          ? ChatPopUpPage.START_CONVERSATION
+          : null}
+      </div>
     );
   };
 
@@ -270,14 +349,14 @@ const ChatPopup = () => {
     <div>
       <>
         {showModal && copyOfChats && (
-          <Modal isOpen={showModal} toggle={() => Toggler()} size="lg" centered>
+          <Modal isOpen={showModal} toggle={() => Toggler()} size="xl" centered>
             <ModalHeader
               toggle={() => Toggler()}
               className="d-flex flex-row justify-content-between align-items-center hover-pointer"
             >
               <h5 className="ms-3 fw-bold">{ChatPopUpPage.CHAT_TITLE}</h5>
             </ModalHeader>
-            <ModalBody className="Modal-Height" style={{ overflowY: "auto" }}>
+            <ModalBody className="" style={{ overflowY: "auto" }}>
               {window.innerWidth <= 768 ? (
                 // For mobile devices, display only chats initially
                 <div className="container-fluid">
@@ -360,12 +439,19 @@ const ChatPopup = () => {
                                       return (
                                         <div
                                           key={chatUser._id}
-                                          className="mt-2"
+                                          className="mt-2 d-flex flex-row justify-content-between"
                                         >
                                           <h5>
                                             {chatUser.firstName}{" "}
                                             {chatUser.lastName}
                                           </h5>
+                                          {!chat.seen &&
+                                            chat.latestMessage.sender !==
+                                              user._id && (
+                                              <span>
+                                                <FaDotCircle className="text-primary me-3" />
+                                              </span>
+                                            )}
                                         </div>
                                       );
                                     }
@@ -394,7 +480,7 @@ const ChatPopup = () => {
                               key={chat._id}
                               onClick={() => handleChatSlection(chat)}
                             >
-                              <div className="d-flex flex-column w-75">
+                              <div className="d-flex flex-column w-100">
                                 {chat.users.map((chatUser) => {
                                   if (
                                     chatUser &&
@@ -402,11 +488,21 @@ const ChatPopup = () => {
                                     String(chatUser._id) !== String(user._id)
                                   ) {
                                     return (
-                                      <div key={chatUser._id} className="mt-2">
+                                      <div
+                                        key={chatUser._id}
+                                        className="mt-2 d-flex flex-row justify-content-between"
+                                      >
                                         <h5>
                                           {chatUser.firstName}{" "}
                                           {chatUser.lastName}
                                         </h5>
+                                        {!chat.seen &&
+                                          chat.latestMessage.sender !==
+                                            user._id && (
+                                            <span>
+                                              <FaDotCircle className="text-primary me-3" />
+                                            </span>
+                                          )}
                                       </div>
                                     );
                                   }
