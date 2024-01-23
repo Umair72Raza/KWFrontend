@@ -159,15 +159,9 @@ const HomePageWorker = () => {
       let reason = data.reason;
 
       // Check if reason is empty and set a default message
-      if (!reason || !reason.length) {
+      if (!reason || !reason?.length) {
         reason = HomePageWorkerConsts.REASON_NOT_MENTIONED;
       }
-      const formattedDetails = Corder?.details || "";
-      const truncatedDetails =
-        formattedDetails.length > 5
-          ? formattedDetails.slice(0, 5) + "..."
-          : formattedDetails;
-
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
@@ -192,7 +186,13 @@ const HomePageWorker = () => {
           icon: "error",
           customClass: {
             content: 'swal-content-custom' // You can add a custom class for the content
-          }
+          },didOpen: () => {
+            document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
+          },
+          willClose: () => {
+            document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
+          },
+          allowOutsideClick: false 
         });
 
         setScheduledOrders((prevScheduledOrders) => {
