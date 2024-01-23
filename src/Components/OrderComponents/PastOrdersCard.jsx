@@ -126,7 +126,7 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
                     </Button>
                   )}
                 </CardText>
-                <CardText>OrderId: {order._id}</CardText>
+                {/* <CardText>OrderId: {order._id}</CardText> */}
                 <CardText>
                   {person}{" "}
                   {isUser

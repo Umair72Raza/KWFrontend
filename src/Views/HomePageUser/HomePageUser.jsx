@@ -127,7 +127,12 @@ const HomePageUser = () => {
   useEffect(() => {
     socket?.on("order-canceled", (data) => {
       const Corder = data.order;
-      const reason = data.reason;
+      let reason = data.reason;
+
+      // Check if reason is empty and set a default message
+      if (!reason || !reason.length) {
+        reason = "Reason not mentioned";
+      }
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
@@ -135,9 +140,7 @@ const HomePageUser = () => {
                  <div> <strong>Order Details:</strong> ${Corder.details}</div>
                  <div> <strong>Service:</strong> ${Corder.service}</div>
                  <div> <strong>Amount:</strong> ${Corder.amount}</div>
-                 <div> <strong>Amount:</strong> ${reason}</div>`
-                 ,
-
+                 <div> <strong>Reason:</strong> ${reason}</div>`,
           icon: "error",
         });
         setScheduledOrders((prevScheduledOrders) => {
@@ -195,7 +198,6 @@ const HomePageUser = () => {
 
   useEffect(() => {
     if (newOrder !== null) {
-      
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
 
       socket?.emit("new-order-created", data);

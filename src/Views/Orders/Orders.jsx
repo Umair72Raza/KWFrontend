@@ -29,6 +29,7 @@ import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { useNavigate } from "react-router-dom";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 import { hideSpinner, selectSpinnerVisibility, showSpinner } from "../../Redux/Slices/LoaderSlice";
+import { TABS } from "../../Constants/Constants";
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -211,7 +212,7 @@ const Orders = () => {
                 className={classnames({ active: activeTab === "1" })}
                 onClick={scheduleClick}
               >
-                Scheduled
+                {TABS.SCHEDULED}
               </NavLink>
             </NavItem>
             <NavItem>
@@ -219,7 +220,7 @@ const Orders = () => {
                 className={classnames({ active: activeTab === "2" })}
                 onClick={pastClick}
               >
-                Past
+                {TABS.PAST}
               </NavLink>
             </NavItem>
             <NavItem>
@@ -227,7 +228,7 @@ const Orders = () => {
                 className={classnames({ active: activeTab === "3" })}
                 onClick={cancelOrders}
               >
-                Cancelled
+                {TABS.CANCELLED}
               </NavLink>
             </NavItem>
             <NavItem>
@@ -235,7 +236,7 @@ const Orders = () => {
                 className={classnames({ active: activeTab === "4" })}
                 onClick={activeOrders}
               >
-                Active
+                {TABS.ACTIVE}
               </NavLink>
             </NavItem>
           </Nav>
@@ -245,7 +246,7 @@ const Orders = () => {
             <TabPane tabId="1">
               <Row>
                 <Col>
-                <h2 style={{textAlign:"center"}}>Scheduled Orders</h2>
+                <h2 style={{textAlign:"center"}}>{TABS.SCH_ORDERS}</h2>
 
                   <div style={{ marginTop: "10px !important" }}>
                     {scheduledOrders.length> 0 ? (
@@ -257,7 +258,7 @@ const Orders = () => {
                         setCancelledOrders={setCancelledOrders}
                       />
                     ) : (
-                      <>No Orders Scheduled</>
+                      <>{TABS.NO_SCH_ORDERS}</>
                     )}
                   </div>
                 </Col>
@@ -265,19 +266,19 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="2">
               <Row>
-              <h2 style={{textAlign:"center"}}>Past Orders</h2>
+              <h2 style={{textAlign:"center"}}>{TABS.PAST_ORDERS}</h2>
                 <Col>
                   {pastOrders ? (
                     <PastOrdersCard scheduledOrdersObject={pastOrders} />
                   ) : (
-                    <h1>No Past Orders</h1>
+                    <h1>{TABS.NO_PAST_ORDERS}</h1>
                   )}
                 </Col>
               </Row>
             </TabPane>
             <TabPane tabId="3">
               <Row>
-              <h2 style={{textAlign:"center"}}>Cancelled Orders</h2>
+              <h2 style={{textAlign:"center"}}>{TABS.CANCELLED_ORDERS}</h2>
                 <Col>
                   {cancelledOrders ? (
                     <>
@@ -286,14 +287,14 @@ const Orders = () => {
                       />
                     </>
                   ) : (
-                    <h1>No Cancelled Orders</h1>
+                    <h1>{TABS.NO_CANC_ORDERS}</h1>
                   )}
                 </Col>
               </Row>
             </TabPane>
             <TabPane tabId="4">
               <Row>
-              <h2 style={{textAlign:"center"}}>Active Orders</h2>
+              <h2 style={{textAlign:"center"}}>{TABS.ACTIVE_ORDERS}</h2>
                 <Col>
                   {activeOrder ? (
                     <>
@@ -304,7 +305,7 @@ const Orders = () => {
                       />
                     </>
                   ) : (
-                    <span>No Active Orders</span>
+                    <span>{TABS.NO_ACTIVE_ORDERS}</span>
                   )}
                 </Col>
               </Row>
@@ -314,7 +315,6 @@ const Orders = () => {
         <ChatPopup />
       </Container>
       {spinnerVisible && <Spinner />}
-      {/* Will be use to activate the order when user start the order working */}
     </>
   );
 };

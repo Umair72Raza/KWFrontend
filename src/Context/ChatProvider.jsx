@@ -18,7 +18,7 @@ const ChatProvider = ({ children }) => {
   const [selectedChatCompare,setSelectedChatCompare] =useState(null);
   const [receiveMessage, setReceiveMessage] = useState(null);
   const [gotOffer, setGotOffer] = useState(false);
-  const [userOffering,setUserOffering]=useState();
+  const [userOffering,setUserOffering]=useState([]);
   return (
     <ChatContext.Provider
       value={{

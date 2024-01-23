@@ -1,23 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
+import { ChatState } from "../../Context/ChatProvider";
+import { GOTOFFER } from "../../Constants/Constants";
 
 const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   const [showModal, setShowModal] = useState(true);
   const [fullDetailsModal, setFullDetailsModal] = useState(false);
-
+  let {setGotOffer,} = ChatState();
   useEffect(() => {
     const openModal = () => {
       setShowModal(true);
       document.body.style.overflow = "hidden";
     };
-    
+
     const closeModal = () => {
       setShowModal(false);
       document.body.style.overflow = "";
     };
-  
+
     openModal();
-  
+
     // Clean up function
     return () => {
       closeModal();
@@ -37,14 +39,18 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     if (onConfirm) {
       onConfirm();
     }
+    setGotOffer(false)
     closeModal();
+    
   };
 
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
     }
+    setGotOffer(false)
     closeModal();
+   
   };
 
   const formattedDetails = formattedOfferDetails?.details || "";
@@ -55,57 +61,13 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
 
   return (
     <div>
-      {/* <Modal
-        isOpen={modal}
-        toggle={toggle}
-        keyboard={false}
-        centered
-      >
-        <ModalHeader toggle={toggle}>
-          Do you want to Accept the Offer?
-        </ModalHeader>
-        <ModalBody>
-          <p>
-            <strong>Title:</strong> {formattedOfferDetails?.Title}
-          </p>
-          <p>
-            <strong>Date:</strong> {formattedOfferDetails?.date}
-          </p>
-          <p>
-            <strong>Time:</strong> {formattedOfferDetails?.time}
-          </p>
-          <p>
-            <strong>Amount:</strong> {formattedOfferDetails?.amount}
-          </p>
-          <p>
-            <strong>Service:</strong> {formattedOfferDetails?.service}
-          </p>
-          <p>
-            <strong>Details:</strong>{" "}
-            <div style={{ whiteSpace: "pre-wrap" }}>
-              {truncatedDetails.replace(/<br\s*\/?>/gi, "\n")}
-            </div>
-          </p>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={handleConfirm}>
-            Acept Offer
-          </Button>{" "}
-          <Button color="danger" onClick={handleCancel}>
-            Reject Offer
-          </Button>{" "}
-          <Button color="info" onClick={toggleFullDetailsModal}>
-            See Full Details
-          </Button>
-        </ModalFooter>
-      </Modal> */}
       <Modal isOpen={showModal} keyboard={false} centered>
-        <ModalHeader toggle={closeModal}>
-          Do you want to Accept the Offer?
+        <ModalHeader >
+         {GOTOFFER.OFFER_HEADER}
         </ModalHeader>
         <ModalBody>
           <p>
-            <strong>Title:</strong> {formattedOfferDetails?.Title}
+            <strong>{GOTOFFER.OFFER_TITLE}</strong> {formattedOfferDetails?.Title}
           </p>
           <p>
             <strong>Date:</strong> {formattedOfferDetails?.date}
