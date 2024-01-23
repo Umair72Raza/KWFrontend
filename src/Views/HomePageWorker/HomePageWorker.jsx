@@ -159,15 +159,9 @@ const HomePageWorker = () => {
       let reason = data.reason;
 
       // Check if reason is empty and set a default message
-      if (!reason || !reason.length) {
+      if (!reason || !reason?.length) {
         reason = HomePageWorkerConsts.REASON_NOT_MENTIONED;
       }
-      const formattedDetails = Corder?.details || "";
-      const truncatedDetails =
-        formattedDetails.length > 5
-          ? formattedDetails.slice(0, 5) + "..."
-          : formattedDetails;
-
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",

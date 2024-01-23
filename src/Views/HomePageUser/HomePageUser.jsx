@@ -129,7 +129,7 @@ const HomePageUser = () => {
       let reason = data.reason;
 
       // Check if reason is empty and set a default message
-      if (!reason || !reason.length) {
+      if (!reason || !reason?.length) {
         reason = "Reason not mentioned";
       }
 
