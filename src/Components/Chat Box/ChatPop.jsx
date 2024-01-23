@@ -77,7 +77,8 @@ const ChatPopup = () => {
                   if (index !== -1) {
                     const updatedChats = [...copyOfChats];
                     updatedChats.splice(index, 1, result.payload);
-                    dispatch(updateChatsWithWorkers(updatedChats));
+                    // dispatch(updateChatsWithWorkers(updatedChats));
+                    setOriginalChats(updatedChats);
                     setCopyOfChats(updatedChats); // Trigger a re-render with the new array
                   }
                 }
@@ -144,7 +145,8 @@ const ChatPopup = () => {
               if (index !== -1) {
                 const updatedChats = [...copyOfChats];
                 updatedChats.splice(index, 1, result.payload);
-                dispatch(updateChatsWithWorkers(updatedChats));
+                // dispatch(updateChatsWithWorkers(updatedChats));
+                setOriginalChats(updatedChats);
                 setCopyOfChats(updatedChats); // Trigger a re-render with the new array
                 newMessageReceived.chat.seen = false;
                 setNotification([newMessageReceived, ...notification]);
