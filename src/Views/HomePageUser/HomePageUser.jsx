@@ -160,7 +160,13 @@ const HomePageUser = () => {
           icon: "error",
           customClass: {
             content: 'swal-content-custom' // You can add a custom class for the content
-          }
+          },didOpen: () => {
+            document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
+          },
+          willClose: () => {
+            document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
+          },
+          allowOutsideClick: false 
         });
         
         
