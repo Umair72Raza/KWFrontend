@@ -1,0 +1,14 @@
+.custom-swal-content {
+    max-height: 400px; /* Adjust the height as needed */
+  }
+  
+  .scrollable-content {
+    max-height: 200px; /* Adjust the height as needed */
+    overflow-y: auto;
+  }
+
+
+  .custom-swal-container {
+    max-height: 300px; /* Set your desired max-height value */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
+  }

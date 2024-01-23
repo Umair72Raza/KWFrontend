@@ -11,6 +11,7 @@ import {
   Container,
   Button,
 } from "reactstrap";
+import "./styles.css";
 import classnames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -30,6 +31,7 @@ import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { ChatState } from "../../Context/ChatProvider";
 import { Spinner } from "reactstrap";
 import Swal from "sweetalert2";
+import "./styles.css";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 import {
   hideSpinner,
@@ -60,7 +62,7 @@ const HomePageWorker = () => {
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   const { socket } = useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
-  const [oId,setOid] = useState();
+  const [oId, setOid] = useState();
   let {
     setOriginalChats,
     setCopyOfChats,
@@ -80,9 +82,9 @@ const HomePageWorker = () => {
     if (!socket) return;
     socket?.on("gotNewOffer", (data) => {
       if (!chat || !data.chat || chat._id !== data.chat._id) {
-        const alreadyPresent = offerNotification.some(obj => {
-          return obj.params.users[0] === data.params.users[0]
-        })
+        const alreadyPresent = offerNotification.some((obj) => {
+          return obj.params.users[0] === data.params.users[0];
+        });
         if (!alreadyPresent) {
           SetONotification([data, ...offerNotification]);
           //setUserOffering(data.user);
@@ -105,7 +107,7 @@ const HomePageWorker = () => {
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
-        setOid(data.order.Title)
+        setOid(data?.order?.Title);
 
         // Use the functional form of setScheduledOrders to access the previous state
         setScheduledOrders((prevScheduledOrders) => {
@@ -152,7 +154,6 @@ const HomePageWorker = () => {
     };
   });
   useEffect(() => {
-
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
       let reason = data.reason;
@@ -170,27 +171,29 @@ const HomePageWorker = () => {
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
-          html: `<div>
-                <strong>Order Title:</strong>
-                 ${Corder.Title}
-                </div>
-                  <div>
-                    <strong>Order Details:</strong>
-                     ${truncatedDetails}
-                  </div>
-                <div>
-                  <strong>Service:</strong>
-                   ${Corder.service}
-                </div>
-                <div>
-                <strong>Amount:</strong>
-                 ${Corder.amount}
-              </div>
-              <div>
-              <strong>Cancel Reason:</strong>
-               ${reason}
-            </div>`,
+          html: `
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
+            </div>
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
+            </div>
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Service:</strong> ${Corder.service}
+            </div>
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
+            </div>
+           
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Reason:</strong>
+              <div class="custom-height custom-align-left swal-text-content text-wrap">${reason}</div>
+            </div>
+          `,
           icon: "error",
+          customClass: {
+            content: 'swal-content-custom' // You can add a custom class for the content
+          }
         });
 
         setScheduledOrders((prevScheduledOrders) => {
@@ -227,9 +230,6 @@ const HomePageWorker = () => {
 
           return prevScheduledOrders;
         });
-
-
-
       }
     });
     return () => {
@@ -246,7 +246,7 @@ const HomePageWorker = () => {
       result: "accept",
       Uid: receiveMessage.users[0],
     });
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = "auto";
   };
 
   //reject the offer
@@ -553,7 +553,10 @@ const HomePageWorker = () => {
         <></>
       )}
       <ChatPopup />
+      <div style={{textAlign:"center"}}>
       {spinnerVisible && <Spinner />}
+      </div>
+      
     </Container>
   );
 };
