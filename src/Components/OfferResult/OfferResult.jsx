@@ -39,7 +39,7 @@ const OfferResult = ({ result, params, setOfferResult }) => {
         <Col>
           {" "}
           <Card>
-            <CardBody>
+            <CardBody className="custom-align-left">
               <CardTitle>
                 <Col>
                   <img
