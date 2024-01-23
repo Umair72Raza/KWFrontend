@@ -136,7 +136,7 @@ li {
 }
 
 .chat-width{
-  width: 60% !important;
+  width: 70% !important;
   height: 550px !important;
 }
 
@@ -150,9 +150,9 @@ li {
     .max-height-message{
   height: 250px !important;
 }
-.modal-height{
+/* .Modal-height{
   height: 80vh !important;
-}
+} */
 .max-height-chat-users{
   height: 470px !important;
 }
@@ -162,9 +162,9 @@ li {
   .chat-width{
     width: 90% !important;
   }
-  .Modal-Height{
+  /* .Modal-Height{
     height: 50vh !important;
-  }
+  } */
 }
 
 .icon-width{

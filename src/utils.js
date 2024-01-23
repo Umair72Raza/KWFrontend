@@ -96,7 +96,7 @@ export const handleNameChange = (formData, setFormData, setErrors,errors, fieldN
 
 export const validateEmail = (email) => {
   const trimmedEmail = email.trim(); // Remove leading and trailing spaces
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@0-9]{2,}$/;
   return trimmedEmail.match(emailPattern);
 };
 

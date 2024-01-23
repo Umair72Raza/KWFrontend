@@ -272,6 +272,8 @@ const EditProfilePage = ({ ShowServices }) => {
                           handleNameChange(
                             formData,
                             setFormData,
+                            setErrors,
+                            errors,
                             "firstName",
                             e
                           )
@@ -295,7 +297,8 @@ const EditProfilePage = ({ ShowServices }) => {
                         required
                         value={formData.lastName}
                         onChange={(e) =>
-                          handleNameChange(formData, setFormData, "lastName", e)
+                          handleNameChange(formData, setFormData, setErrors,
+                            errors, "lastName", e)
                         }
                       />{" "}
                     </FormGroup>
@@ -317,6 +320,11 @@ const EditProfilePage = ({ ShowServices }) => {
                         maxLength={70}
                         value={formData.email}
                         onChange={handleEmailChange}
+                        onKeyDown={ (event) => {
+                          if (event.key === ' ') {
+                            event.preventDefault();
+                          }
+                        }}
                       />
                       {errors.email && (
                         <span className="text-danger">{errors.email}</span>
@@ -381,6 +389,8 @@ const EditProfilePage = ({ ShowServices }) => {
                           setFormData={setFormData}
                           formData={formData}
                           editMode={editMode}
+                          setErrors={setErrors}
+                          errors={errors}
                         />
                       )}
                     </FormGroup>
