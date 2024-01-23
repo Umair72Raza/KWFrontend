@@ -26,18 +26,18 @@ const ActiveOrders = ({
   if (user.role === "user") {
     isUser = true;
   }
-  
+
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [finishJobVerified, setFinishJobVerified] = useState(false);
   const [confirmed, SetConfirm] = useState("");
-  const socket=useSelector((state) => state?.socket?.socket);
+  const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
-           console.log(data,"in confirm true")
+        console.log(data, "in confirm true");
         // Assuming scheduledOrdersObject is an array of orders
         const updatedOrders = scheduledOrdersObject.filter(
           (o) => o._id !== data.order._id
@@ -55,13 +55,11 @@ const ActiveOrders = ({
     };
 
     socket?.on("finishjob-result", handleFinishJobResult);
-    
+
     return () => {
       socket?.off("finishjob-result", handleFinishJobResult);
     };
   }, [scheduledOrdersObject, setPastOrders]);
-
-
 
   const sendFinishRequest = (order, UserId) => {
     //send event to finish the job
@@ -92,99 +90,122 @@ const ActiveOrders = ({
   };
   return (
     <Container>
-      {scheduledOrdersObject.length > 0  ? <>
-        <Row>
-        {scheduledOrdersObject?.map((order) => (
-          <Col
-            key={order._id}
-            sm="6"
-            md="4"
-            lg="3"
-            style={{ marginTop: "10px" }}
-          >
-            <Card className="shadow" style={{ backgroundColor: "#f6f8fc",height:"100%" }}>
-              <CardBody>
-                <Col
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+      {scheduledOrdersObject.length > 0 ? (
+        <>
+          <Row>
+            {scheduledOrdersObject?.map((order) => (
+              <Col
+                key={order._id}
+                sm="6"
+                md="4"
+                lg="3"
+                style={{ marginTop: "10px" }}
+              >
+                <Card
+                  className="shadow"
+                  style={{ backgroundColor: "#f6f8fc", height: "100%" }}
                 >
-                  <h5 style={{ marginTop: "4%", textAlign: "center" }}>
-                    {order.Title}
-                  </h5>
-                </Col>{" "}
-                <CardText
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {" "}
-                  <span style={{ marginTop: "10px" }}>
-                    Status: {order.Status}
-                  </span>
-                </CardText>
-                <CardText>Time: {order.Time}</CardText>
-                <CardText>Date: {order.date}</CardText>
-                <CardText>
-                    Details:{" "}
-                    {showFullDetailsMap[order._id]
-                      ? (
+                  <CardBody>
+                    <Col
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h5
+                        style={{
+                          marginTop: "4%",
+                          textAlign: "center",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                          maxWidth: "100%",
+                        }}
+                      >
+                        {order.Title}
+                      </h5>
+                    </Col>{" "}
+                    <CardText
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {" "}
+                      <span style={{ marginTop: "10px" }}>Status: Active</span>
+                    </CardText>
+                    <CardText>Time: {order.Time}</CardText>
+                    <CardText>Date: {order.date}</CardText>
+                    <CardText>
+                      Details:{" "}
+                      <div
+                        style={{
+                          maxHeight: "100px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {showFullDetailsMap[order._id] ? (
                           <div
                             dangerouslySetInnerHTML={{
                               __html: order.details,
                             }}
                           />
-                        )
-                      : transformOrderDetails(order)}
-                    {order.details.length > 5 && (
-                     <Button
-                     style={{ marginTop: "-5px" }}
-                     color="link"
-                     onClick={() => toggleDetails(order._id)}
-                   >
-                     {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
-                   </Button>
-                    )}
-                  </CardText>
-                <CardText>OrderId: {order._id}</CardText>
-                <CardText>
-                  {" "}
-                  {isUser ? `Worker: ${order.users[1].firstName}`:`User: ${order.users[0].firstName}`}
-                  
-                </CardText>
-                <Col style={{ margin: "2%" }} xs="12" md="3">
-                  {" "}
-                  <CardText>
-                    {!isUser ? (
-                      <>
-                        <Button
-                          style={{
-                            backgroundColor: "#48c8ef",
-                            border: "2px solid #24aed8",
-                          }}
-                          onClick={() =>
-                            sendFinishRequest(order, order.users[0])
-                          }
-                        >
-                          Finish Job
-                        </Button>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </CardText>
-                </Col>
-              </CardBody>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-      </>:<>No Active Orders</>}
-     
+                        ) : (
+                          transformOrderDetails(order)
+                        )}
+                        {order.details.length > 5 && (
+                          <Button
+                            style={{ marginTop: "-5px" }}
+                            color="link"
+                            onClick={() => toggleDetails(order._id)}
+                          >
+                            {showFullDetailsMap[order._id]
+                              ? "Show Less"
+                              : "Show More"}
+                          </Button>
+                        )}
+                      </div>
+                    </CardText>
+                    <CardText>
+                      {" "}
+                      {isUser
+                        ? `Worker: ${order.users[1].firstName}`
+                        : `User: ${order.users[0].firstName}`}
+                    </CardText>
+                    <Col style={{ margin: "2%" }} xs="12" md="3">
+                      {" "}
+                      <CardText>
+                        {!isUser ? (
+                          <>
+                            <Button
+                              style={{
+                                backgroundColor: "#48c8ef",
+                                border: "2px solid #24aed8",
+                              }}
+                              onClick={() =>
+                                sendFinishRequest(order, order.users[0])
+                              }
+                            >
+                              Finish Job
+                            </Button>
+                          </>
+                        ) : (
+                          <></>
+                        )}
+                      </CardText>
+                    </Col>
+                  </CardBody>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </>
+      ) : (
+        <>No Active Orders</>
+      )}
+
       {finishJobVerified && !isUser ? (
         <>
           <FinishJob

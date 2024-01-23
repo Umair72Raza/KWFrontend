@@ -33,7 +33,6 @@ import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
-import { setSocket } from "../../Redux/Slices/SocketSlice.js";
 
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
@@ -133,16 +132,38 @@ const HomePageUser = () => {
       if (!reason || !reason.length) {
         reason = "Reason not mentioned";
       }
+
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
-          html: `<div> <strong>Order Title:</strong> ${Corder.Title}</div>
-                 <div> <strong>Order Details:</strong> ${Corder.details}</div>
-                 <div> <strong>Service:</strong> ${Corder.service}</div>
-                 <div> <strong>Amount:</strong> ${Corder.amount}</div>
-                 <div> <strong>Reason:</strong> ${reason}</div>`,
+          html: `
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
+            </div>
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
+            </div>
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Service:</strong> ${Corder.service}
+            </div>
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
+            </div>
+           
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Reason:</strong>
+              <div class="custom-height custom-align-left swal-text-content text-wrap">${reason}</div>
+            </div>
+          `,
           icon: "error",
+          customClass: {
+            content: 'swal-content-custom' // You can add a custom class for the content
+          }
         });
+        
+        
+
+        //this is not available in user. fix!!!
         setScheduledOrders((prevScheduledOrders) => {
           // Check if the order exists in scheduledOrders
           const scheduledOrderIndex = prevScheduledOrders.findIndex(
@@ -450,14 +471,12 @@ const HomePageUser = () => {
             ></Filter>
           </Col>
         </Row>
-        {/* chat popup is here */}
         <ChatPopup />
       </Container>
       <ModalComponent
         modalHeader={"Order Activation"}
         isFinalize={true}
         isModalOpen={isModalOpen}
-        toggleModal={toggleModal}
         finalizeFunction={activatingOrder}
         cancel={cancel}
         cancelButtonLabel={"Cancel Order Start"}
