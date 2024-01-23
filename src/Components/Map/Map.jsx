@@ -228,7 +228,6 @@ const Map = React.memo(
             const latitude = UsersData?.latitude;
             const longitude = UsersData?.longitude;
             const userCurrentCountry = UsersData?.country;
-            console.log("i ran");
             setTimeout(() => {
               setMapLoaded(true);
               setInputEnabled(true);
@@ -293,7 +292,7 @@ const Map = React.memo(
           onDoubleClick={(e) => e.target.select()}
           disabled={!isInputEnabled}
         />
-        {errors?.address && (
+        {errors.address && (
           <span className="text-danger">{errors.address}</span>
         )}
         <LoadScript
@@ -303,9 +302,12 @@ const Map = React.memo(
           onLoad={handleLoadScript}
         >
           {isLoading ? (
-            <Spinner
-              style={{ width: "3rem", height: "3rem", marginTop: "25px" }}
-            />
+            <div className=" d-flex flex-column justify-content-center align-items-center" style={{height:"25vh"}} >
+              {" "}
+              <Spinner
+                style={{ width: "3rem", height: "3rem", marginTop: "25px" }}
+              />
+            </div>
           ) : isMapLoaded ? (
             <GoogleMapContainer
               currentLocation={currentLocation}

@@ -44,7 +44,7 @@ const UserNavbar = () => {
     userOffering,
     setSelectedChatCompare,
   } = ChatState();
-  const socket=useSelector((state) => state?.socket?.socket);
+  const socket = useSelector((state) => state?.socket?.socket);
 
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
@@ -52,13 +52,13 @@ const UserNavbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-  
+
   const Logout = async () => {
     Swal.fire({
       title: "Are You Sure You want to Logout?",
       showCancelButton: true,
       confirmButtonText: "LogOut",
-    }).then(async(result) => {
+    }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         await socket?.disconnect();
@@ -68,18 +68,17 @@ const UserNavbar = () => {
         }
       }
     });
-
   };
 
   const orders = () => {
     SetShowOffer(!offer);
   };
 
-  const HandleNotificationSelection = (notify) => {
-    setSelectedChat(() => SelectChat(notify.chat));
-    setSelectedChatCompare(notify.chat);
-    setChat(notify.chat);
-    setNotification(notification.filter((n) => n !== notify));
+  const HandleNotificationSelection = (item) => {
+    setChat(item.chat);
+    setSelectedChatCompare(item.chat);
+     setSelectedChat(() => SelectChat(item.chat));
+    setNotification(notification.filter((n) => n !== item));
     setShowModal(true);
   };
 
@@ -112,10 +111,21 @@ const UserNavbar = () => {
           >
             {user.role !== "admin" ? (
               <>
-                <NavItem className="fs-3 text-white hover-pointer " title="Edit Profile">
-                  <CgProfile className="hover-text-3d rounded-5"  onClick={HandleEditProfile} />
+                <NavItem
+                  className="fs-3 text-white hover-pointer "
+                  title="Edit Profile"
+                >
+                  <CgProfile
+                    className="hover-text-3d rounded-5"
+                    onClick={HandleEditProfile}
+                  />
                 </NavItem>
-                <UncontrolledDropdown className=" fs-3" nav inNavbar title="View Notifications">
+                <UncontrolledDropdown
+                  className=" fs-3"
+                  nav
+                  inNavbar
+                  title="View Notifications"
+                >
                   <DropdownToggle nav className="d-flex">
                     <div>
                       <IoIosNotifications className=" text-white hover-pointer hover-text-3d rounded-5 " />
@@ -135,9 +145,9 @@ const UserNavbar = () => {
                     {notification.length === 0 ? (
                       <DropdownItem>No new messages</DropdownItem>
                     ) : (
-                      notification.map((item, index) => (
+                      notification.map((item) => (
                         <DropdownItem
-                          key={index}
+                          key={item.chat._id}
                           onClick={() => HandleNotificationSelection(item)}
                           className="fw-bold"
                         >
@@ -150,9 +160,15 @@ const UserNavbar = () => {
                 </UncontrolledDropdown>
 
                 {user.role == "worker" ? (
-                  <NavItem className="text-white fs-3  d-flex hover-pointer " title="View New Offers">
+                  <NavItem
+                    className="text-white fs-3  d-flex hover-pointer "
+                    title="View New Offers"
+                  >
                     <div>
-                      <RiInboxArchiveLine className="hover-text-3d rounded-5" onClick={orders} />
+                      <RiInboxArchiveLine
+                        className="hover-text-3d rounded-5"
+                        onClick={orders}
+                      />
                     </div>
                     {offerNotification.length > 0 && (
                       <h6>
@@ -168,8 +184,12 @@ const UserNavbar = () => {
                 ) : (
                   []
                 )}
-                <NavItem className="text-white fs-3 hover-pointer " title="Chats">
-                  <FiMessageCircle className="hover-text-3d rounded-5"
+                <NavItem
+                  className="text-white fs-3 hover-pointer "
+                  title="Chats"
+                >
+                  <FiMessageCircle
+                    className="hover-text-3d rounded-5"
                     onClick={() => {
                       setShowModal(true);
                       setCopyOfChats(OriginalChats);
