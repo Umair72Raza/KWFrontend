@@ -186,9 +186,8 @@ const HomePageWorker = () => {
             </div>
            
             <div class="custom-align-left swal-text-content">
-              <strong class="custom-align-left">Reason:</strong>
-              <div class="custom-height custom-align-left swal-text-content text-wrap">${reason}</div>
-            </div>
+            <strong class="custom-align-left">Reasons:</strong> ${reason}
+          </div>
           `,
           icon: "error",
           customClass: {
