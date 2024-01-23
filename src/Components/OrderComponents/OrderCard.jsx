@@ -118,7 +118,7 @@ const OrderCard = ({
             >
               <Card
                 className="shadow"
-                style={{ backgroundColor: "#f6f8fc", color: "#0d6efd" }}
+                style={{ backgroundColor: "#f6f8fc", color: "#0d6efd",height:"100%" }}
               >
                 <CardBody>
                   <CardTitle>
@@ -190,7 +190,7 @@ const OrderCard = ({
                       </Button>
                     )}
                   </CardText>
-                  <CardText>OrderId: {order._id}</CardText>
+                  {/* <CardText>OrderId: {order._id}</CardText> */}
                   <CardText>
                     Worker: {order.users.length > 0 && order.users[1].firstName}
                   </CardText>

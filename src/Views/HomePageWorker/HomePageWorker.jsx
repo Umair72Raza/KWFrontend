@@ -62,6 +62,7 @@ const HomePageWorker = () => {
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   const {socket}=useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
+  const [oId,setOid] = useState();
   let {
     setOriginalChats,
     setCopyOfChats,
@@ -77,16 +78,6 @@ const HomePageWorker = () => {
 
   const [startJobStatus, setStartJobStatus] = useState("");
 
-  // useEffect(() => {
-  //   dispatch(setSocket(user));
-  //   return () => {
-  //     if (user) {
-  //       dispatch(setSocket(null)); // Disconnect socket on unmount
-  //     }
-  //   };
-  // }, []);
-
-  
   useEffect(() => {
     if (!socket) return;
     socket?.on("gotNewOffer", (data) => {
@@ -112,6 +103,7 @@ const HomePageWorker = () => {
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
+        setOid(data.order.Title)
 
         // Use the functional form of setScheduledOrders to access the previous state
         setScheduledOrders((prevScheduledOrders) => {
@@ -161,8 +153,12 @@ const HomePageWorker = () => {
 
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
-      const reason = data.reason;
-      console.log("cancelled order: ",Corder)
+      let reason = data.reason;
+
+      // Check if reason is empty and set a default message
+      if (!reason || !reason.length) {
+        reason = "Reason not mentioned";
+      }
       const formattedDetails = Corder?.details || "";
       const truncatedDetails =
         formattedDetails.length > 5
@@ -548,7 +544,7 @@ const HomePageWorker = () => {
         <>
           <StartJob
             confirmed={startJobStatus}
-            orderId={"OrderId"}
+            orderId={oId}
             setStartJobVerified={setStartJobVerified}
           />
         </>
