@@ -118,6 +118,11 @@ const Login = () => {
                 value={formData[LoginPage.FORM_FIELDS.EMAIL]}
                 onChange={handleEmailChange}
                 required
+                onKeyDown={ (event) => {
+                  if (event.key === ' ') {
+                    event.preventDefault();
+                  }
+                }}
               />
               {errors.email && (
                 <span className="text-danger">{errors.email}</span>
