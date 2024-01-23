@@ -60,7 +60,7 @@ const HomePageWorker = () => {
   const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
-  const {socket}=useSelector((state) => state?.socket);
+  const { socket } = useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   const [oId,setOid] = useState();
   let {
@@ -82,9 +82,13 @@ const HomePageWorker = () => {
     if (!socket) return;
     socket?.on("gotNewOffer", (data) => {
       if (!chat || !data.chat || chat._id !== data.chat._id) {
-        if (!offerNotification.includes(data.params)) {
-          SetONotification([data.params, ...offerNotification]);
-          setUserOffering(data.user);
+        const alreadyPresent = offerNotification.some(obj => {
+          return obj.params.users[0] === data.params.users[0]
+        })
+        if (!alreadyPresent) {
+          SetONotification([data, ...offerNotification]);
+          //setUserOffering(data.user);
+          //setUserOffering([data.user,...userOffering]);
         }
       } else {
         setGotOffer(true);
@@ -164,7 +168,7 @@ const HomePageWorker = () => {
         formattedDetails.length > 5
           ? formattedDetails.slice(0, 5) + "..."
           : formattedDetails;
-    
+
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
@@ -404,7 +408,7 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("new-order-result", (newOrderResult) => {
-      console.log(newOrderResult,"new order result");
+      console.log(newOrderResult, "new order result");
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });
@@ -418,7 +422,7 @@ const HomePageWorker = () => {
         <UserNavbar />
       </Row>
       <Row>
-        <Nav tabs style={{cursor:"pointer"}}>
+        <Nav tabs style={{ cursor: "pointer" }}>
           <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "1" })}
@@ -459,33 +463,33 @@ const HomePageWorker = () => {
           <TabPane tabId="1">
             <Row>
               <Col>
-                <h2 style={{textAlign:"center"}}>Scheduled Orders</h2>
+                <h2 style={{ textAlign: "center" }}>Scheduled Orders</h2>
                 <Row>
-                <div style={{ marginTop: "10px !important" }}>
-                  {isScheduledOrdersFetched && scheduledOrders ? (
-                    <ScheduledOrdersCardWorker
-                      scheduledOrdersObject={scheduledOrders}
-                      toggleCancel={toggleCancel}
-                      setToggleCancel={setToggleCancel}
-                      setScheduledOrders={setScheduledOrders}
-                      cancelledOrders={cancelledOrders}
-                      setCancelledOrders={setCancelledOrders}
-                      latestOrder={latestOrder}
-                      setUpdateScheduled={setUpdateScheduled}
-                      updateScheduled={updateScheduled}
-                      activeOrder={activeOrder}
-                    />
-                  ) : (
-                    <>No Orders Scheduled</>
-                  )}
-                </div>
+                  <div style={{ marginTop: "10px !important" }}>
+                    {isScheduledOrdersFetched && scheduledOrders ? (
+                      <ScheduledOrdersCardWorker
+                        scheduledOrdersObject={scheduledOrders}
+                        toggleCancel={toggleCancel}
+                        setToggleCancel={setToggleCancel}
+                        setScheduledOrders={setScheduledOrders}
+                        cancelledOrders={cancelledOrders}
+                        setCancelledOrders={setCancelledOrders}
+                        latestOrder={latestOrder}
+                        setUpdateScheduled={setUpdateScheduled}
+                        updateScheduled={updateScheduled}
+                        activeOrder={activeOrder}
+                      />
+                    ) : (
+                      <>No Orders Scheduled</>
+                    )}
+                  </div>
                 </Row>
               </Col>
             </Row>
           </TabPane>
           <TabPane tabId="2">
             <Row>
-              <h2 style={{textAlign:"center"}}>Past Orders</h2>
+              <h2 style={{ textAlign: "center" }}>Past Orders</h2>
               <Col>
                 {pastOrders ? (
                   <PastOrdersCard scheduledOrdersObject={pastOrders} />
@@ -497,7 +501,7 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="3">
             <Row>
-            <h2 style={{textAlign:"center"}}>Cancelled Orders</h2>
+              <h2 style={{ textAlign: "center" }}>Cancelled Orders</h2>
               <Col>
                 {cancelledOrders ? (
                   <>
@@ -511,7 +515,7 @@ const HomePageWorker = () => {
           </TabPane>
           <TabPane tabId="4">
             <Row>
-            <h2 style={{textAlign:"center"}}>Active Orders</h2>
+              <h2 style={{ textAlign: "center" }}>Active Orders</h2>
               <Col>
                 {activeOrder ? (
                   <>

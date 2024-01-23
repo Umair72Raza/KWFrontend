@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
+import { ChatState } from "../../Context/ChatProvider";
 
 const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   const [showModal, setShowModal] = useState(true);
   const [fullDetailsModal, setFullDetailsModal] = useState(false);
-
+  let {setGotOffer,} = ChatState();
   useEffect(() => {
     const openModal = () => {
       setShowModal(true);
@@ -37,14 +38,18 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     if (onConfirm) {
       onConfirm();
     }
+    setGotOffer(false)
     closeModal();
+    
   };
 
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
     }
+    setGotOffer(false)
     closeModal();
+   
   };
 
   const formattedDetails = formattedOfferDetails?.details || "";
@@ -56,7 +61,9 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   return (
     <div>
       <Modal isOpen={showModal} keyboard={false} centered>
-        <ModalHeader>Do you want to Accept the Offer?</ModalHeader>
+        <ModalHeader >
+          Do you want to Accept the Offer?
+        </ModalHeader>
         <ModalBody>
           <p>
             <strong>Title:</strong> {formattedOfferDetails?.Title}

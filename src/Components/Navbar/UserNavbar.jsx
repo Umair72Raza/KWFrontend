@@ -43,6 +43,7 @@ const UserNavbar = () => {
     setGotOffer,
     userOffering,
     setSelectedChatCompare,
+    setUserOffering
   } = ChatState();
   const socket=useSelector((state) => state?.socket?.socket);
 
@@ -85,8 +86,9 @@ const UserNavbar = () => {
 
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
+    //setUserOffering(userOffering.filter(()=>))
     setGotOffer(true);
-    setReceiveMessage(notify);
+    setReceiveMessage(notify.params);
     SetShowOffer(!offer);
   };
 
@@ -198,8 +200,8 @@ const UserNavbar = () => {
                       onClick={() => HandleOrderSelection(item)}
                       className="fw-bold"
                     >
-                      New Offer By : {userOffering.firstName}{" "}
-                      {userOffering.lastName}
+                      New Offer By : {item.user.firstName}{" "}
+                      {item.user.lastName}
                     </DropdownItem>
                   ))
                 )}
