@@ -7,7 +7,7 @@ const StartJob = ({confirmed, orderId, setStartJobVerified}) => {
   if (confirmed === "true")
     Swal.fire({
       title: "Start Confirmed",
-      text: `You can start working on ${orderId}`,
+      text: `You can start working on requested order`,
       icon: "success",
     }).then((result) => {
         if (result.isConfirmed) {
@@ -18,7 +18,7 @@ const StartJob = ({confirmed, orderId, setStartJobVerified}) => {
   else  if (confirmed === "false")  {
     Swal.fire({
       title: "Start was not Confirmed!",
-      text: `You cannot start working on ${orderId} yet`,
+      text: `You cannot start working on requested order yet`,
       icon: "error",
     }).then((result) => {
         if (result.isConfirmed) {

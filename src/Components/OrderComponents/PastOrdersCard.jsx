@@ -76,7 +76,14 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
                     alt="schTask"
                     style={{ height: "27px", marginRight: "10px" }}
                   />
-                  <h5 style={{ marginTop: "4%", textAlign: "center" }}>
+                  <h5 style={{
+                          marginTop: "4%",
+                          textAlign: "center",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                          maxWidth: "100%",
+                        }}>
                     {order.Title}
                   </h5>
                 </Col>{" "}
@@ -104,29 +111,34 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
                 <CardText>Time: {order.time}</CardText>
                 <CardText>Date: {order.date}</CardText>
                 <CardText>
-                  Details:{" "}
-                  {showFullDetailsMap[order._id] ? (
+                    Details:{" "}
                     <div
-                      dangerouslySetInnerHTML={{
-                        __html: order.details,
+                      style={{
+                        maxHeight: "100px",
+                        overflowY: "auto",
                       }}
-                    />
-                  ) : (
-                    transformOrderDetails(order)
-                  )}
-                  {order.details.length > 5 && (
-                    <Button
-                      style={{ marginTop: "-5px" }}
-                      color="link"
-                      onClick={() => toggleDetails(order._id)}
                     >
+                      
                       {showFullDetailsMap[order._id]
-                        ? "Show Less"
-                        : "Show More"}
-                    </Button>
-                  )}
-                </CardText>
-                <CardText>OrderId: {order._id}</CardText>
+                        ? (
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: order.details,
+                              }}
+                            />
+                          )
+                        : transformOrderDetails(order)}
+                      {order.details.length > 5 && (
+                        <Button
+                          style={{ marginTop: "-5px" }}
+                          color="link"
+                          onClick={() => toggleDetails(order._id)}
+                        >
+                          {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
+                        </Button>
+                      )}
+                    </div>
+                  </CardText>
                 <CardText>
                   {person}{" "}
                   {isUser
