@@ -46,7 +46,6 @@ const UserNavbar = () => {
     setUserOffering
   } = ChatState();
   const socket = useSelector((state) => state?.socket?.socket);
-  const socket = useSelector((state) => state?.socket?.socket);
 
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
@@ -54,7 +53,6 @@ const UserNavbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-
 
   const Logout = async () => {
     Swal.fire({
@@ -126,8 +124,6 @@ const UserNavbar = () => {
                     className="hover-text-3d rounded-5"
                     onClick={HandleEditProfile}
                   />
-                <NavItem className="fs-3 text-white hover-pointer " title="Edit Profile">
-                  <CgProfile className="hover-text-3d rounded-5" onClick={HandleEditProfile} />
                 </NavItem>
                 <UncontrolledDropdown
                   className=" fs-3"
