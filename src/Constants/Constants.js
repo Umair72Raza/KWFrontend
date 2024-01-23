@@ -1,7 +1,7 @@
 export const LoginPage = {
   ROUTES: {
     LOGIN: "/auth/login",
-    REGISTER: "/auth/register",
+    REGISTER: "/auth/createAccount",
     WORKER_REGISTER: "/auth/workerRegister",
     FORGET_PASSWORD: "/auth/forgetPassword",
   },
@@ -31,8 +31,8 @@ export const LoginPage = {
 export const RegisterPage = {
   ROUTES: {
     LOGIN: "/auth/login",
-    REGISTER: "/auth/register",
-    WORKER_REGISTER: "/auth/workerregister",
+    REGISTER: "/auth/createAccount",
+    WORKER_REGISTER: "/auth/workerRegister",
     // Add more routes as needed
   },
   FORM_FIELDS: {

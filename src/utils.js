@@ -57,22 +57,24 @@ export const checkToken = () => {
 };
 
 export const validatePassword = (password) => {
-  const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
+  // Password pattern with disallowance of spaces
+  const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;;
 
   return password.match(passwordPattern);
 };
 
+
 export const hasOnlyWhiteSpace = (str) => {
-  return !str.trim();
+  return !str?.trim();
 };
 
 export const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const handleNameChange = (formData, setFormData, setError, fieldName, e) => {
+export const handleNameChange = (formData, setFormData, setErrors,errors, fieldName, e) => {
   const { value } = e.target;
-  setError("");
+  setErrors({ ...errors, [fieldName]: "" });
   // Check if the entered value is a valid string (only letters and spaces)
   const isValidString = /^[a-zA-Z\s]*$/.test(value);
 
@@ -92,10 +94,10 @@ export const handleNameChange = (formData, setFormData, setError, fieldName, e) 
 };
 
 
-
 export const validateEmail = (email) => {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return email.match(emailPattern);
+  const trimmedEmail = email.trim(); // Remove leading and trailing spaces
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  return trimmedEmail.match(emailPattern);
 };
 
 export const validatePhoneNumber = (phoneNumber) => {

@@ -80,7 +80,12 @@ const ChatPopup = () => {
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.newMessage.chatId
       ) {
-        if (!notification.includes(newMessageReceived)) {
+        const alreadyInNotifications = notification.some(
+          (notification) =>
+            notification.newMessage.chatId ===
+            newMessageReceived.newMessage.chatId
+        );
+        if (!alreadyInNotifications) {
           setNotification([newMessageReceived, ...notification]);
         }
       } else {
@@ -97,7 +102,7 @@ const ChatPopup = () => {
   });
 
   const book = (selectedChat) => {
-    console.log(selectedChat,"on clicking the book in chat ");
+    console.log(selectedChat, "on clicking the book in chat ");
     SetWorker(selectedChat);
     toggleModal();
   };

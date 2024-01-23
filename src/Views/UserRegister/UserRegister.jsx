@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Form,
@@ -9,6 +9,7 @@ import {
   Row,
   Col,
   Spinner,
+  Tooltip,
 } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom"; // Assuming React Router is properly set up
 import {
@@ -28,6 +29,9 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import Map from "../../Components/Map/Map";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { has } from "lodash";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -50,37 +54,44 @@ const UserRegister = ({ ShowServices }) => {
   const [isSignupDisabled, setIsSignupDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const toggle = () => setTooltipOpen(!tooltipOpen);
 
-  // useEffect(() => {
-  //   const isFormValid =
-  //     !passwordError &&
-  //     !confirmPasswordError &&
-  //     !emailError &&
-  //     !phoneError &&
-  //     formData.password &&
-  //     formData.confirmPassword &&
-  //     formData.password === formData.confirmPassword &&
-  //     formData.address.trim() !== "" &&
-  //     formData.firstName.trim() !== "" &&
-  //     formData.lastName.trim() !== "" &&
-  //     (ShowServices ? formData.services.length > 0 : true);
-  //   setIsSignupDisabled(!isFormValid);
-  // }, [formData, passwordError, confirmPasswordError, emailError, phoneError]);
+  const isFormValid = useMemo(() => {
+    const errorFields = [
+      "email",
+      "phone",
+      "password",
+      "confirmPassword",
+      "allField",
+      "address",
+      "firstName",
+      "lastName",
+      "services",
+    ];
+    const formDataFields = [
+      "firstName",
+      "lastName",
+      "address",
+      "email",
+      "password",
+      "confirmPassword",
+      "phoneNumber",
+    ];
+
+    const isErrorsEmpty = errorFields.every((field) => !errors[field]);
+    const isFormDataValid = formDataFields.every(
+      (field) => !hasOnlyWhiteSpace(formData[field])
+    );
+    const isServicesValid = ShowServices ? formData.services.length > 0 : true;
+
+    return isErrorsEmpty && isFormDataValid && isServicesValid;
+  }, [errors, formData, ShowServices]);
 
   useEffect(() => {
-    const isFormValid =
-      !errors.email &&
-      !errors.phone &&
-      !hasOnlyWhiteSpace(formData?.address) &&
-      !hasOnlyWhiteSpace(formData?.firstName) &&
-      !hasOnlyWhiteSpace(formData?.lastName) &&
-      !errors.password &&
-      !errors.confirmPassword &&
-      !errors.allField &&
-      (ShowServices ? formData.services.length > 0 : true);
-
     setIsSignupDisabled(!isFormValid);
-  }, [formData, errors.email, errors.phone]);
+  }, [isFormValid]);
 
   useEffect(() => {
     if (ShowServices) {
@@ -89,8 +100,8 @@ const UserRegister = ({ ShowServices }) => {
   }, [dispatch]);
 
   const handlePasswordChange = (e) => {
-    const password = e.target.value;
-
+    let password = e.target.value;
+password = password.replace(/\s/g, '');
     setErrors({ ...errors, password: "" });
 
     setFormData({
@@ -100,8 +111,8 @@ const UserRegister = ({ ShowServices }) => {
   };
 
   const handleConfirmPasswordChange = (e) => {
-    const confirmPassword = e.target.value;
-
+    let confirmPassword = e.target.value;
+confirmPassword = confirmPassword.replace(/\s/g, '');
     setErrors({ ...errors, confirmPassword: "" });
 
     setFormData({
@@ -112,11 +123,14 @@ const UserRegister = ({ ShowServices }) => {
 
   const handleEmailChange = (e) => {
     setErrors({ ...errors, email: "" });
-    setFormData({
-      ...formData,
-      email: e.target.value,
-    });
+    let email = e.target.value;
+    email = email.replace(/\s/g, '');
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      email,
+    }));
   };
+  
 
   const handlePhoneChange = (value) => {
     setErrors({ ...errors, phone: "" });
@@ -186,19 +200,26 @@ const UserRegister = ({ ShowServices }) => {
       errors.services = "Please select at least one service.";
     }
 
- 
-  if (!validatePassword(formData.password)) {
-    errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
-  }
+    if (!validatePassword(formData.password)) {
+      errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
+    }
 
-  if (formData.confirmPassword !== formData.password) {
-    errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
-  }
+    if (formData.confirmPassword !== formData.password) {
+      errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
+    }
 
     if (!isFormDataFilled(formData)) {
       errors.allField = RegisterPage.ERROR_MESSAGES.enterAllFields;
     }
-
+    if (hasOnlyWhiteSpace(formData.firstName)) {
+      errors.firstName = "First Name cannot be empty";
+    }
+    if (hasOnlyWhiteSpace(formData.lastName)) {
+      errors.lastName = "Last Name cannot be empty";
+    }
+    if (hasOnlyWhiteSpace(formData.address)) {
+      errors.address = "Address cannot be empty";
+    }
 
     return errors;
   };
@@ -251,8 +272,12 @@ const UserRegister = ({ ShowServices }) => {
     >
       <Row className="w-100 d-flex justify-content-center">
         <Col md={10} lg={8} xl={6}>
-          <h2 className="text-center mt-5 mb-4">{ShowServices? RegisterPage.LABELS.WORKER_TITLE :RegisterPage.LABELS.USER_TITLE}</h2>
-          <Form onSubmit={handleSubmit}>
+          <h2 className="text-center mt-5 mb-4">
+            {ShowServices
+              ? RegisterPage.LABELS.WORKER_TITLE
+              : RegisterPage.LABELS.USER_TITLE}
+          </h2>
+          <Form onSubmit={handleSubmit} style={{ userSelect: "none" }}>
             <Row>
               <Col md={6}>
                 <FormGroup>
@@ -273,11 +298,15 @@ const UserRegister = ({ ShowServices }) => {
                         formData,
                         setFormData,
                         setErrors,
+                        errors,
                         "firstName",
                         e
                       )
                     }
                   />{" "}
+                  {errors.lastName && (
+                    <span className="text-danger">{errors.lastName}</span>
+                  )}
                 </FormGroup>
               </Col>
               <Col md={6}>
@@ -299,11 +328,15 @@ const UserRegister = ({ ShowServices }) => {
                         formData,
                         setFormData,
                         setErrors,
+                        errors,
                         "lastName",
                         e
                       )
                     }
                   />{" "}
+                  {errors.firstName && (
+                    <span className="text-danger">{errors.firstName}</span>
+                  )}
                 </FormGroup>
               </Col>
             </Row>
@@ -321,6 +354,12 @@ const UserRegister = ({ ShowServices }) => {
                     value={formData.email || ""}
                     maxLength={70}
                     onChange={handleEmailChange}
+                    autoComplete="new-email"
+                    onKeyDown={ (event) => {
+                      if (event.key === ' ') {
+                        event.preventDefault();
+                      }
+                    }}
                   />
                   {errors.email && (
                     <span className="text-danger">{errors.email}</span>
@@ -354,16 +393,29 @@ const UserRegister = ({ ShowServices }) => {
                   <Label className="fw-semibold" for="password">
                     {RegisterPage.LABELS.PASSWORD}
                   </Label>
-                  <Input
-                    type={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                    name={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                    id={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                    placeholder={RegisterPage.INPUT_FIELDS.PASSWORD.placeholder}
-                    value={formData.password || ""}
-                    maxLength={12}
-                    onChange={handlePasswordChange}
-                    autoComplete="on"
-                  />
+                  <div className="password-input-wrapper">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      id="password"
+                      placeholder={
+                        RegisterPage.INPUT_FIELDS.PASSWORD.placeholder
+                      }
+                      maxLength={12}
+                      value={formData.password}
+                      onChange={handlePasswordChange}
+                      autoComplete="new-password"
+                    />
+                    <div
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <FontAwesomeIcon
+                        icon={showPassword ? faEye : faEyeSlash}
+                        className="password-icon"
+                      />
+                    </div>
+                  </div>
                   {errors.password && (
                     <span className="text-danger">{errors.password}</span>
                   )}
@@ -374,17 +426,29 @@ const UserRegister = ({ ShowServices }) => {
                   <Label className="fw-semibold" for="confirmPassword">
                     {RegisterPage.LABELS.CONFIRM_PASSWORD}
                   </Label>
-                  <Input
-                    type={RegisterPage.INPUT_FIELDS.PASSWORD.name}
-                    name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
-                    id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
-                    placeholder={
-                      RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
-                    }
-                    value={formData.confirmPassword || ""}
-                    maxLength={12}
-                    onChange={handleConfirmPasswordChange}
-                  />
+                  <div className="password-input-wrapper">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
+                      id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
+                      placeholder={
+                        RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
+                      }
+                      value={formData.confirmPassword || ""}
+                      maxLength={12}
+                      onChange={handleConfirmPasswordChange}
+                      autoComplete="new-password"
+                    />
+                    <div
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <FontAwesomeIcon
+                        icon={showPassword ? faEye : faEyeSlash}
+                        className="password-icon"
+                      />
+                    </div>
+                  </div>
                   {errors.confirmPassword && (
                     <span className="text-danger">
                       {errors.confirmPassword}
@@ -421,7 +485,11 @@ const UserRegister = ({ ShowServices }) => {
                   <Label className="fw-semibold" for="address">
                     {RegisterPage.LABELS.ADDRESS}
                   </Label>
-                  <Map setFormData={setFormData} />
+                  <Map
+                    setFormData={setFormData}
+                    errors={errors}
+                    setErrors={setErrors}
+                  />
                 </FormGroup>
               </Col>
             </Row>
@@ -431,22 +499,37 @@ const UserRegister = ({ ShowServices }) => {
                 <span className="text-danger">{errors.allField}</span>
               )}
             </div>
-            <Button
-              color="primary"
-              disabled={isSignupDisabled || loading}
-              block
+            <Link id="Signup">
+              <Button
+                color="primary"
+                disabled={isSignupDisabled || loading}
+                block
+                onClick={handleSubmit}
+              >
+                {loading ? (
+                  <Spinner size="sm" color="light" />
+                ) : (
+                  RegisterPage.LABELS.SIGNUP
+                )}
+              </Button>
+            </Link>
+            <Tooltip
+              placement="top"
+              autohide={false}
+              isOpen={tooltipOpen && isSignupDisabled}
+              target="Signup"
+              toggle={toggle}
             >
-              {loading ? (
-                <Spinner size="sm" color="light" />
-              ) : (
-                RegisterPage.LABELS.SIGNUP
-              )}
-            </Button>
+              Enter all fields to sign up!
+            </Tooltip>
           </Form>
 
           <Col className="mt-4 text-center fw-medium">
-            {RegisterPage.LABELS.MEMBER} 
-            <Link className="fw-bold links-hover" to={RegisterPage.ROUTES.LOGIN}>
+            {RegisterPage.LABELS.MEMBER}
+            <Link
+              className="fw-bold links-hover"
+              to={RegisterPage.ROUTES.LOGIN}
+            >
               {RegisterPage.LABELS.ACCOUNT}
             </Link>
           </Col>
