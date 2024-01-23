@@ -129,6 +129,11 @@ const Login = () => {
                   }
                 }}
                 required
+                onKeyDown={ (event) => {
+                  if (event.key === ' ') {
+                    event.preventDefault();
+                  }
+                }}
               />
               {errors.email && (
                 <span className="text-danger">{errors.email}</span>

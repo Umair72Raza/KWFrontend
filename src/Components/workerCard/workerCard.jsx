@@ -53,7 +53,7 @@ const WorkerCard = ({ worker }) => {
         latestMessage: null,
       };
       // Add the fake chat to the chats array
-      if (copyOfChats.length > 0) {
+      if(copyOfChats?.length>0){
         setCopyOfChats([fakeChat, ...copyOfChats]);
         setChat(fakeChat);
       setSelectedChatCompare(fakeChat);
