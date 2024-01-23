@@ -45,7 +45,7 @@ const UserNavbar = () => {
     setSelectedChatCompare,
     setUserOffering
   } = ChatState();
-  const socket=useSelector((state) => state?.socket?.socket);
+  const socket = useSelector((state) => state?.socket?.socket);
 
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
@@ -53,13 +53,13 @@ const UserNavbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-  
+
   const Logout = async () => {
     Swal.fire({
       title: "Are You Sure You want to Logout?",
       showCancelButton: true,
       confirmButtonText: "LogOut",
-    }).then(async(result) => {
+    }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         await socket?.disconnect();
@@ -99,6 +99,9 @@ const UserNavbar = () => {
       navigate("/worker/editprofile");
     }
   };
+  const toggleOffcanvas = () => {
+    SetShowOffer(!offer);
+  };
 
   return (
     <>
@@ -115,7 +118,7 @@ const UserNavbar = () => {
             {user.role !== "admin" ? (
               <>
                 <NavItem className="fs-3 text-white hover-pointer " title="Edit Profile">
-                  <CgProfile className="hover-text-3d rounded-5"  onClick={HandleEditProfile} />
+                  <CgProfile className="hover-text-3d rounded-5" onClick={HandleEditProfile} />
                 </NavItem>
                 <UncontrolledDropdown className=" fs-3" nav inNavbar title="View Notifications">
                   <DropdownToggle nav className="d-flex">
@@ -192,17 +195,20 @@ const UserNavbar = () => {
               <OffcanvasHeader toggle={orders}>New Order's</OffcanvasHeader>
               <OffcanvasBody>
                 {offerNotification.length === 0 ? (
-                  <DropdownItem>No new Orders</DropdownItem>
+                  <div>No new Orders</div>
                 ) : (
                   offerNotification.map((item, index) => (
-                    <DropdownItem
+                    <Button
                       key={index}
-                      onClick={() => HandleOrderSelection(item)}
+                      onClick={() => {
+                        HandleOrderSelection(item);
+                        toggleOffcanvas(); // Use the correct toggle function for Offcanvas
+                      }}
                       className="fw-bold"
+                      style={{ backgroundColor: 'white', color: 'black', border: 'none' }}
                     >
-                      New Offer By : {item.user.firstName}{" "}
-                      {item.user.lastName}
-                    </DropdownItem>
+                      New Offer By : {item.user.firstName} {item.user.lastName}
+                    </Button>
                   ))
                 )}
               </OffcanvasBody>
