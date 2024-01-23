@@ -147,3 +147,31 @@ export const ChatPopUpPage = {
   SEND_BUTTON_COLOR: "primary",
   SELECT_CHAT_LABEL: "Select a chat to start messaging",
 };
+
+export const HomePageWorkerConsts = {
+  REASON_NOT_MENTIONED : "Reason not mentioned",
+
+}
+
+export const TABS = {
+  SCHEDULED : "Scheduled",
+  PAST: "Past",
+  CANCELLED : "Cancelled",
+  ACTIVE: "Active",
+  SCH_ORDERS: "Scheduled Orders",
+  NO_SCH_ORDERS: "No Scheduled Orders!",
+  PAST_ORDERS: "Past Orders",
+  NO_PAST_ORDERS: "No Past Orders!",
+  CANCELLED_ORDERS: "Cancelled Orders",
+  NO_CANC_ORDERS: "No Cancelled Orders",
+  ACTIVE_ORDERS: "Active Orders",
+  NO_ACTIVE_ORDERS: "No Active Orders!",
+}
+
+export const GOTOFFER = {
+  OFFER_HEADER: "Do you want to Accept the Offer?",
+  OFFER_TITLE: "Title: ",
+  OFFER_DATE: "DATE: ",
+  OFFER_TIME: "TIME: ",
+  
+}

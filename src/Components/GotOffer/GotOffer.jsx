@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 import { ChatState } from "../../Context/ChatProvider";
+import { GOTOFFER } from "../../Constants/Constants";
 
 const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   const [showModal, setShowModal] = useState(true);
@@ -62,11 +63,11 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     <div>
       <Modal isOpen={showModal} keyboard={false} centered>
         <ModalHeader >
-          Do you want to Accept the Offer?
+         {GOTOFFER.OFFER_HEADER}
         </ModalHeader>
         <ModalBody>
           <p>
-            <strong>Title:</strong> {formattedOfferDetails?.Title}
+            <strong>{GOTOFFER.OFFER_TITLE}</strong> {formattedOfferDetails?.Title}
           </p>
           <p>
             <strong>Date:</strong> {formattedOfferDetails?.date}
