@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
-import './style.css'
 
 const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   const [showModal, setShowModal] = useState(true);
@@ -57,7 +56,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   return (
     <div>
       <Modal isOpen={showModal} keyboard={false} centered>
-        <ModalHeader toggle={closeModal}>
+        <ModalHeader>
           Do you want to Accept the Offer?
         </ModalHeader>
         <ModalBody>
