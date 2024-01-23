@@ -168,7 +168,7 @@ const ChatPopup = () => {
   });
 
   const book = (selectedChat) => {
-    console.log(selectedChat, "on clicking the book in chat ");
+
     SetWorker(selectedChat);
     toggleModal();
   };
@@ -447,8 +447,8 @@ const ChatPopup = () => {
                                             {chatUser.firstName}{" "}
                                             {chatUser.lastName}
                                           </h5>
-                                          {!chat.seen &&
-                                            chat.latestMessage.sender !==
+                                          {!chat?.seen &&
+                                            chat.latestMessage?.sender !==
                                               user._id && (
                                               <span>
                                                 <FaDotCircle className="text-primary me-3" />
@@ -498,8 +498,8 @@ const ChatPopup = () => {
                                           {chatUser.firstName}{" "}
                                           {chatUser.lastName}
                                         </h5>
-                                        {!chat.seen &&
-                                          chat.latestMessage.sender !==
+                                        {!chat?.seen &&
+                                          chat.latestMessage?.sender !==
                                             user._id && (
                                             <span>
                                               <FaDotCircle className="text-primary me-3" />
