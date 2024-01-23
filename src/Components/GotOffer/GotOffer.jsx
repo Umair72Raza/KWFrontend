@@ -10,14 +10,14 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
       setShowModal(true);
       document.body.style.overflow = "hidden";
     };
-    
+
     const closeModal = () => {
       setShowModal(false);
       document.body.style.overflow = "";
     };
-  
+
     openModal();
-  
+
     // Clean up function
     return () => {
       closeModal();
@@ -56,9 +56,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   return (
     <div>
       <Modal isOpen={showModal} keyboard={false} centered>
-        <ModalHeader>
-          Do you want to Accept the Offer?
-        </ModalHeader>
+        <ModalHeader>Do you want to Accept the Offer?</ModalHeader>
         <ModalBody>
           <p>
             <strong>Title:</strong> {formattedOfferDetails?.Title}
