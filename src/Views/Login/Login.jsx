@@ -127,7 +127,7 @@ const Login = () => {
                     event.preventDefault();
                   }
                 }}
-                
+                autoComplete="new-email"
               />
               {errors.email && (
                 <span className="text-danger">{errors.email}</span>
@@ -158,6 +158,7 @@ const Login = () => {
                   value={formData[LoginPage.FORM_FIELDS.PASSWORD]}
                   onChange={handleChange}
                   required
+                  autoComplete="new-password"
                 />
                 <div
                   className="password-toggle"
