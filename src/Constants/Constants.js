@@ -173,5 +173,13 @@ export const GOTOFFER = {
   OFFER_TITLE: "Title: ",
   OFFER_DATE: "DATE: ",
   OFFER_TIME: "TIME: ",
-  
+  OFFER_AMOUNT: "Amount: ",
+  OFFER_DETAILS: "Details: ",
+  OFFER_SERVICE: "Service: ",
+  ACCEPT_BUTTON: "Accept Offer!",
+  REJECT_BUTTON: "Reject Offer!",
+  SEE_DETAILS_BUTTON: "See Full Details",
+  FULL_DETAILS:"Full Details",
+  FULL_DETAILS_HEADING: "Full Details: ",
+  CLOSE_BUTTON: "Close"
 }

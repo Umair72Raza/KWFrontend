@@ -77,7 +77,8 @@ const ChatPopup = () => {
                   if (index !== -1) {
                     const updatedChats = [...copyOfChats];
                     updatedChats.splice(index, 1, result.payload);
-                    dispatch(updateChatsWithWorkers(updatedChats));
+                    // dispatch(updateChatsWithWorkers(updatedChats));
+                    setOriginalChats(updatedChats);
                     setCopyOfChats(updatedChats); // Trigger a re-render with the new array
                   }
                 }
@@ -144,7 +145,8 @@ const ChatPopup = () => {
               if (index !== -1) {
                 const updatedChats = [...copyOfChats];
                 updatedChats.splice(index, 1, result.payload);
-                dispatch(updateChatsWithWorkers(updatedChats));
+                // dispatch(updateChatsWithWorkers(updatedChats));
+                setOriginalChats(updatedChats);
                 setCopyOfChats(updatedChats); // Trigger a re-render with the new array
                 newMessageReceived.chat.seen = false;
                 setNotification([newMessageReceived, ...notification]);
@@ -166,7 +168,7 @@ const ChatPopup = () => {
   });
 
   const book = (selectedChat) => {
-    console.log(selectedChat, "on clicking the book in chat ");
+
     SetWorker(selectedChat);
     toggleModal();
   };
@@ -445,8 +447,8 @@ const ChatPopup = () => {
                                             {chatUser.firstName}{" "}
                                             {chatUser.lastName}
                                           </h5>
-                                          {!chat.seen &&
-                                            chat.latestMessage.sender !==
+                                          {!chat?.seen &&
+                                            chat.latestMessage?.sender !==
                                               user._id && (
                                               <span>
                                                 <FaDotCircle className="text-primary me-3" />
@@ -496,8 +498,8 @@ const ChatPopup = () => {
                                           {chatUser.firstName}{" "}
                                           {chatUser.lastName}
                                         </h5>
-                                        {!chat.seen &&
-                                          chat.latestMessage.sender !==
+                                        {!chat?.seen &&
+                                          chat.latestMessage?.sender !==
                                             user._id && (
                                             <span>
                                               <FaDotCircle className="text-primary me-3" />

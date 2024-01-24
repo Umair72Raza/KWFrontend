@@ -10,6 +10,7 @@ import {
   Container,
   Row,
   Col,
+  ModalFooter,
 } from "reactstrap";
 import { changeStatusToPastAsync } from "../../Redux/Slices/OrderSlice";
 
@@ -75,7 +76,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
         <ModalHeader toggle={toggleModal} className="text-center">
           Worker wants to Finish the job!
         </ModalHeader>
-        <ModalBody className="text-center">
+        <ModalBody style={{maxHeight: "200px", overflowY: "auto" }}>
           <Container>
             <Row>
               <Col>
@@ -83,30 +84,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
                 {order.Title}
               </Col>
             </Row>
-              <Row>
-                <Col>
-                  <b>Order Details: </b>
-
-                  {showMoreDetails
-                    ? order.details.replace(/<br\s*\/?>/gi, "\n")
-                    : truncateText(
-                        order.details.replace(/<br\s*\/?>/gi, "\n"),
-                        15
-                      )}
-                </Col>
-              </Row>
-              <Row>
-              {order.details.trim().length > 25 && (
-                <Button
-                  color="link"
-                  onClick={toggleDetails}
-                  style={{ marginTop: "10px" }}
-                >
-                  {showMoreDetails ? "Show Less" : "Show More"}
-                </Button>
-              )}
-            </Row>
-          <Row>
+            <Row>
             <Col>
             <b>Service:</b> {order.service}
             </Col>
@@ -116,8 +94,36 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
             <Col><b>Amount:</b> {order.amount}</Col>
             
           </Row>
+              <Row>
+                <Col>
+                  <b>Order Details: </b>
+
+                  {showMoreDetails
+                    ? order.details.replace(/<br\s*\/?>/gi, "\n")
+                    : truncateText(
+                        order.details.replace(/<br\s*\/?>/gi, "\n"),
+                        55
+                      )}
+                </Col>
+              </Row>
+              <Row>
+              {order.details.trim().length > 55 && (
+                <Button
+                  color="link"
+                  onClick={toggleDetails}
+                  style={{ marginTop: "10px" }}
+                >
+                  {showMoreDetails ? "Show Less" : "Show More"}
+                </Button>
+              )}
+            </Row>
+          
           </Container>
-          <Container style={{marginTop:"2%"}}>
+          
+        </ModalBody>
+
+        <ModalFooter style={{textAlign:"center"}}>
+        <Container style={{marginTop:"2%"}}>
           <Button color="success" onClick={handleConfirm}>
             Yes, Finish it!
           </Button>{" "}
@@ -126,7 +132,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
           </Button>
           
           </Container>
-        </ModalBody>
+        </ModalFooter>
       </Modal>
       {finishConfirmed === true && (
         <Feedback

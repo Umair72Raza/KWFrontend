@@ -1,10 +1,25 @@
-.greenButton{
-    background-color: #33cc33; /* Green */
-    color: #ffffff; /* White */
-    border: 1px solid #008000; 
+.greenButton {
+  background-color: #33cc33; /* Green */
+  color: #ffffff; /* White */
+  border: 1px solid #008000;
 }
-.redButton{
-    background-color: #ff4444; /* Red */
-    color: #ffffff; /* White */
-    border: 1px solid #cc0000; /* Darker shade of red or a complementary color */
+.redButton {
+  background-color: #ff4444; /* Red */
+  color: #ffffff; /* White */
+  border: 1px solid #cc0000; /* Darker shade of red or a complementary color */
 }
+.swal-content {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.swal-text-content {
+    max-height: 150px; 
+    overflow-y: auto; 
+    margin-bottom: 10px;
+}
+.custom-align-left {
+    text-align: left !important;
+    margin-left: 0px;
+  }
+  

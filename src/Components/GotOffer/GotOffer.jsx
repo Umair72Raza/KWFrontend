@@ -70,19 +70,19 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
             <strong>{GOTOFFER.OFFER_TITLE}</strong> {formattedOfferDetails?.Title}
           </p>
           <p>
-            <strong>Date:</strong> {formattedOfferDetails?.date}
+            <strong>{GOTOFFER.OFFER_DATE}</strong> {formattedOfferDetails?.date}
           </p>
           <p>
-            <strong>Time:</strong> {formattedOfferDetails?.time}
+            <strong>{GOTOFFER.OFFER_TIME}</strong> {formattedOfferDetails?.time}
           </p>
           <p>
-            <strong>Amount:</strong> {formattedOfferDetails?.amount}
+            <strong>{GOTOFFER.OFFER_AMOUNT}</strong> {formattedOfferDetails?.amount}
           </p>
           <p>
-            <strong>Service:</strong> {formattedOfferDetails?.service}
+            <strong>{GOTOFFER.OFFER_SERVICE}</strong> {formattedOfferDetails?.service}
           </p>
           <p>
-            <strong>Details:</strong>{" "}
+            <strong>{GOTOFFER.OFFER_DETAILS}</strong>{" "}
             <div style={{ whiteSpace: "pre-wrap" }}>
               {truncatedDetails.replace(/<br\s*\/?>/gi, "\n")}
             </div>
@@ -90,22 +90,22 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={handleConfirm}>
-            Accept Offer
+            {GOTOFFER.ACCEPT_BUTTON}  
           </Button>{" "}
           <Button color="danger" onClick={handleCancel}>
-            Reject Offer
+            {GOTOFFER.REJECT_BUTTON}
           </Button>{" "}
           <Button color="info" onClick={toggleFullDetailsModal}>
-            See Full Details
+            {GOTOFFER.SEE_DETAILS_BUTTON}
           </Button>
         </ModalFooter>
       </Modal>
 
       <Modal isOpen={fullDetailsModal} toggle={toggleFullDetailsModal}>
-        <ModalHeader toggle={toggleFullDetailsModal}>Full Details</ModalHeader>
-        <ModalBody>
+        <ModalHeader toggle={toggleFullDetailsModal}>{GOTOFFER.FULL_DETAILS}</ModalHeader>
+        <ModalBody style={{ maxHeight: '20vh', overflowY: 'auto' }}>
           <p>
-            <strong>Full Details:</strong>{" "}
+            <strong>{GOTOFFER.FULL_DETAILS_HEADING}</strong>{" "}
             <div style={{ whiteSpace: "pre-wrap" }}>
               {formattedDetails.replace(/<br\s*\/?>/gi, "\n")}
             </div>
@@ -113,7 +113,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={toggleFullDetailsModal}>
-            Close
+            {GOTOFFER.CLOSE_BUTTON}
           </Button>
         </ModalFooter>
       </Modal>

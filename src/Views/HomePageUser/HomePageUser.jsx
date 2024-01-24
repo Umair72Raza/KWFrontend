@@ -33,7 +33,6 @@ import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
-import { setSocket } from "../../Redux/Slices/SocketSlice.js";
 
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
@@ -130,53 +129,83 @@ const HomePageUser = () => {
       let reason = data.reason;
 
       // Check if reason is empty and set a default message
-      if (!reason || !reason.length) {
+      if (!reason || !reason?.length) {
         reason = "Reason not mentioned";
       }
+
       if (Corder) {
         Swal.fire({
           title: "Order Cancelled",
-          html: `<div> <strong>Order Title:</strong> ${Corder.Title}</div>
-                 <div> <strong>Order Details:</strong> ${Corder.details}</div>
-                 <div> <strong>Service:</strong> ${Corder.service}</div>
-                 <div> <strong>Amount:</strong> ${Corder.amount}</div>
-                 <div> <strong>Reason:</strong> ${reason}</div>`,
+          html: `
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
+            </div>
+
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
+            </div>
+
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Service:</strong> ${Corder.service}
+            </div>
+
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
+            </div>
+           
+            <div class="custom-align-left swal-text-content">
+            <strong class="custom-align-left">Reasons:</strong> ${reason}
+          </div>
+          `,
           icon: "error",
+          customClass: {
+            content: 'swal-content-custom' // You can add a custom class for the content
+          },didOpen: () => {
+            document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
+          },
+          willClose: () => {
+            document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
+          },
+          allowOutsideClick: false 
         });
-        setScheduledOrders((prevScheduledOrders) => {
-          // Check if the order exists in scheduledOrders
-          const scheduledOrderIndex = prevScheduledOrders.findIndex(
-            (order) => order.id === Corder.id
-          );
+        
+        
 
-          if (scheduledOrderIndex !== -1) {
-            // Remove from scheduledOrders
-            const updatedScheduledOrders = [...prevScheduledOrders];
-            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+        // //this is not available in user. fix!!!
+        // setScheduledOrders((prevScheduledOrders) => {
+        //   // Check if the order exists in scheduledOrders
+        //   const scheduledOrderIndex = prevScheduledOrders.findIndex(
+        //     (order) => order.id === Corder.id
+        //   );
 
-            // Set the updated scheduled orders to the local state
-            setScheduledOrders(updatedScheduledOrders);
+        //   // if (scheduledOrderIndex !== -1) {
+        //   //   // Remove from scheduledOrders
+        //   //   const updatedScheduledOrders = [...prevScheduledOrders];
+        //   //   updatedScheduledOrders.splice(scheduledOrderIndex, 1);
 
-            setCancelledOrders((prevCancelledOrders) => {
-              // Check if the order is already present in active orders
-              const isOrderAlreadyPresent = prevCancelledOrders.some(
-                (order) => order._id === Corder._id
-              );
+        //   //   // Set the updated scheduled orders to the local state
+        //   //   setScheduledOrders(updatedScheduledOrders);
 
-              if (!isOrderAlreadyPresent) {
-                // Add the order to active orders if it's not present
-                return [...prevCancelledOrders, Corder];
-              }
+        //   //   setCancelledOrders((prevCancelledOrders) => {
+        //   //     // Check if the order is already present in active orders
+        //   //     const isOrderAlreadyPresent = prevCancelledOrders.some(
+        //   //       (order) => order._id === Corder._id
+        //   //     );
 
-              // If the order is already present, return the current state
-              return prevCancelledOrders;
-            });
+        //   //     if (!isOrderAlreadyPresent) {
+        //   //       // Add the order to active orders if it's not present
+        //   //       return [...prevCancelledOrders, Corder];
+        //   //     }
 
-            return updatedScheduledOrders;
-          }
+        //   //     // If the order is already present, return the current state
+        //   //     return prevCancelledOrders;
+        //   //   });
 
-          return prevScheduledOrders;
-        });
+        //   //   return updatedScheduledOrders;
+        //   // }
+
+        //   // return prevScheduledOrders;
+        // });
       }
     });
     return () => {
@@ -423,10 +452,6 @@ const HomePageUser = () => {
                   width: "3rem",
                 }}
               />
-            ) : filteredAndSortedUsers ? (
-              filteredAndSortedUsers.map((worker, index) => (
-                <WorkerCard worker={worker} key={index} />
-              ))
             ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
               filteredAndSortedUsers.map((worker, index) => (
                 <WorkerCard worker={worker} key={index} />
@@ -450,14 +475,12 @@ const HomePageUser = () => {
             ></Filter>
           </Col>
         </Row>
-        {/* chat popup is here */}
         <ChatPopup />
       </Container>
       <ModalComponent
         modalHeader={"Order Activation"}
         isFinalize={true}
         isModalOpen={isModalOpen}
-        toggleModal={toggleModal}
         finalizeFunction={activatingOrder}
         cancel={cancel}
         cancelButtonLabel={"Cancel Order Start"}

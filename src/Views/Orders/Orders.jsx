@@ -313,8 +313,11 @@ const Orders = () => {
           </TabContent>
         </Row>
         <ChatPopup />
-      </Container>
+        <div style={{textAlign:"center"}}>
       {spinnerVisible && <Spinner />}
+      </div>
+      </Container>
+      
     </>
   );
 };
