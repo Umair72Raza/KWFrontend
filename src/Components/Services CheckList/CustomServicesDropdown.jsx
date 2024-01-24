@@ -7,21 +7,20 @@ const CustomServiceDropdown = ({
   handleServiceChange,
   handleRateChange,
 }) => {
- 
-const handleInputKeyDown = (e) => {
+  const handleInputKeyDown = (e) => {
     const keyCode = e.which || e.keyCode;
-  
+
     // Allow only numeric values and backspace/delete
     if ((keyCode < 48 || keyCode > 57) && keyCode !== 8 && keyCode !== 46) {
       e.preventDefault();
     }
   };
-  
+
   return (
     <div>
-      {list?.length > 0 &&
-        list?.map((service) => (
-          <FormGroup  key={service?._id} check>
+      {list?.length > 0 ? (
+        list.map((service) => (
+          <FormGroup key={service?._id} check>
             <Row className="align-items-center">
               <Col xs="auto">
                 <Input
@@ -38,7 +37,6 @@ const handleInputKeyDown = (e) => {
               </Col>
               {selectedServices?.some((s) => s?.name === service?.name) && (
                 <Col xs="auto" className="ml-2 d-flex flex-row">
-                
                   <Input
                     type="number"
                     min="10"
@@ -51,12 +49,15 @@ const handleInputKeyDown = (e) => {
                     onKeyDown={handleInputKeyDown}
                     style={{ height: "25px" }}
                   />
-                    <span className="align-self-center fw-bold" >($/hr)</span>
+                  <span className="align-self-center fw-bold">($/hr)</span>
                 </Col>
               )}
             </Row>
           </FormGroup>
-        ))}
+        ))
+      ) : (
+        <div>No services listed by admin yet.</div>
+      )}
     </div>
   );
 };

@@ -310,6 +310,7 @@ const Map = React.memo(
               <Spinner
                 style={{ width: "3rem", height: "3rem", marginTop: "25px" }}
               />
+                <p>Loading Maps...</p>
             </div>
           ) : isMapLoaded ? (
             <GoogleMapContainer
