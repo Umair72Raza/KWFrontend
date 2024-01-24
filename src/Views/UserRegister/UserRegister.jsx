@@ -56,6 +56,7 @@ const UserRegister = ({ ShowServices }) => {
   const [errors, setErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [listLoading, setListLoading] = useState(true); // Set loading to true when the component mounts and to false when the data is fetched or if there's an error
   const toggle = () => setTooltipOpen(!tooltipOpen);
 
   const isFormValid = useMemo(() => {
@@ -94,10 +95,20 @@ const UserRegister = ({ ShowServices }) => {
   }, [isFormValid]);
 
   useEffect(() => {
-    if (ShowServices) {
-      dispatch(allServicesAsync());
-    }
-  }, [dispatch]);
+    const fetchData = async () => {
+      try {
+        if (ShowServices) {
+          await dispatch(allServicesAsync());
+        }
+      } catch (error) {
+        console.error("Error fetching services", error);
+      } finally {
+        setListLoading(false); // Set loading to false when the data is fetched or if there's an error
+      }
+    };
+
+    fetchData();
+  }, [dispatch, ShowServices]);
 
   const handlePasswordChange = (e) => {
     let password = e.target.value;
@@ -474,13 +485,20 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
                     md={12}
                     className="d-flex flex-row Service-overflow-y-scroll"
                   >
-                    <FormGroup>
-                      <CustomServiceDropdown
-                        list={list}
-                        selectedServices={formData?.services}
-                        handleServiceChange={handleServiceChange}
-                        handleRateChange={handleRateChange}
-                      />
+                    <FormGroup className="d-flex w-100">
+                    {listLoading && ShowServices ? (
+                       <div className="text-center w-100">
+                       <Spinner />
+                       <p>Loading Services...</p>
+                     </div>
+                  ) : (
+                    <CustomServiceDropdown
+                      list={list}
+                      selectedServices={formData?.services}
+                      handleServiceChange={handleServiceChange}
+                      handleRateChange={handleRateChange}
+                    />
+                  )}
                     </FormGroup>
                   </Col>
                 </Row>
