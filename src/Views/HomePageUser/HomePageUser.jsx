@@ -474,7 +474,6 @@ const HomePageUser = () => {
             ></Filter>
           </Col>
         </Row>
-        <ChatPopup />
       </Container>
       <ModalComponent
         modalHeader={"Order Activation"}

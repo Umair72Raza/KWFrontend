@@ -20,7 +20,7 @@ import {
   fetchUsersDataAsync,
   updateProfileAsync,
 } from "../../Redux/Slices/EditProfileSlice";
-import { RegisterPage } from "../../Constants/Constants";
+import { EDITPROFILE_PAGE, RegisterPage } from "../../Constants/Constants";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import Map from "../../Components/Map/Map";
 import {
@@ -246,7 +246,9 @@ const EditProfilePage = ({ ShowServices }) => {
                 </Button>
               </Col>
             )}
-            <Col className="fw-bold fs-3">Your Profile</Col>
+            <Col className="fw-bold fs-3">
+              {EDITPROFILE_PAGE.LABELS.TITLE}
+            </Col>
           </Row>
           <Row>
             {editMode ? (
@@ -341,7 +343,7 @@ const EditProfilePage = ({ ShowServices }) => {
                         placeholder={
                           RegisterPage.INPUT_FIELDS.PHONE.placeholder
                         }
-                        maxLength={16}
+                        maxLength={20}
                         required
                         value={formData.phoneNumber}
                         onChange={handlePhoneChange}
@@ -401,14 +403,14 @@ const EditProfilePage = ({ ShowServices }) => {
                   disabled={isSaveDisabled || loading}
                   className="me-2"
                 >
-                  {loading ? <Spinner size="sm" color="light" /> : <>Save</>}
+                  {loading ? <Spinner size="sm" color="light" /> : <>{EDITPROFILE_PAGE.BUTTONS.SAVE}</>}
                 </Button>
                 <Button
                   color="danger"
                   onClick={handleCancelEdit}
                   disabled={loading}
                 >
-                  <FontAwesomeIcon icon={faTimes} /> Cancel
+                  <FontAwesomeIcon icon={faTimes} /> {EDITPROFILE_PAGE.BUTTONS.CANCEL}
                 </Button>
               </Form>
             ) : (
@@ -419,31 +421,44 @@ const EditProfilePage = ({ ShowServices }) => {
                 <CardBody>
                   <Row>
                     <Col xs={6}>
-                      <p className="fw-semibold">First Name:</p>
+                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.FIRST_NAME}</p>
                       <p className="w-100">{UsersData?.firstName}</p>
                     </Col>
                     <Col xs={6}>
-                      <p className="fw-semibold">Last Name:</p>
+                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.LAST_NAME}</p>
                       <p className="w-100">{UsersData?.lastName}</p>
                     </Col>
                   </Row>
                   <Row>
                     <Col xs={6}>
-                      <p className="fw-semibold">Email:</p>
+                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.EMAIL}</p>
                       <p className="w-100">{UsersData?.email}</p>
                     </Col>
                     <Col xs={6}>
-                      <p className="fw-semibold">Phone:</p>
+                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.PHONE}</p>
                       <p className="w-100">{UsersData?.phoneNumber}</p>
                     </Col>
                   </Row>
                   <Row>
+                  {ShowServices && (
                     <Col>
-                      <p className="fw-semibold">Address:</p>
+                  <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.SERVICES}</p>
+                  <ol >
+                    {UsersData?.services?.map((service) => (
+                      <li className="pb-2" key={service.name}>
+                        {service.name} - {service.rate} {EDITPROFILE_PAGE.CARD_LABELS.RATE}
+                      </li>
+                    ))}
+                    </ol>
+                  </Col>
+                    )}
+                    <Col>
+                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}</p>
                       <p className="w-100">{UsersData?.address}</p>
                     </Col>
+                  
                   </Row>
-                  <Button onClick={handleEditModeToggle}>Edit Profile</Button>
+                  <Button color="primary" onClick={handleEditModeToggle}>{EDITPROFILE_PAGE.BUTTONS.EDIT}</Button>
                 </CardBody>
               </Card>
             )}
