@@ -168,44 +168,6 @@ const HomePageUser = () => {
           },
           allowOutsideClick: false 
         });
-        
-        
-
-        // //this is not available in user. fix!!!
-        // setScheduledOrders((prevScheduledOrders) => {
-        //   // Check if the order exists in scheduledOrders
-        //   const scheduledOrderIndex = prevScheduledOrders.findIndex(
-        //     (order) => order.id === Corder.id
-        //   );
-
-        //   // if (scheduledOrderIndex !== -1) {
-        //   //   // Remove from scheduledOrders
-        //   //   const updatedScheduledOrders = [...prevScheduledOrders];
-        //   //   updatedScheduledOrders.splice(scheduledOrderIndex, 1);
-
-        //   //   // Set the updated scheduled orders to the local state
-        //   //   setScheduledOrders(updatedScheduledOrders);
-
-        //   //   setCancelledOrders((prevCancelledOrders) => {
-        //   //     // Check if the order is already present in active orders
-        //   //     const isOrderAlreadyPresent = prevCancelledOrders.some(
-        //   //       (order) => order._id === Corder._id
-        //   //     );
-
-        //   //     if (!isOrderAlreadyPresent) {
-        //   //       // Add the order to active orders if it's not present
-        //   //       return [...prevCancelledOrders, Corder];
-        //   //     }
-
-        //   //     // If the order is already present, return the current state
-        //   //     return prevCancelledOrders;
-        //   //   });
-
-        //   //   return updatedScheduledOrders;
-        //   // }
-
-        //   // return prevScheduledOrders;
-        // });
       }
     });
     return () => {
@@ -445,12 +407,14 @@ const HomePageUser = () => {
         <Row>
           <Col className="mt-3" md={7}>
             {loading ? (
+              <div className="d-flex justify-content-center">
               <Spinner
                 style={{
                   height: "3rem",
                   width: "3rem",
                 }}
-                              />
+              />
+              </div>
             ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
               filteredAndSortedUsers.map((worker, index) => (
                 <WorkerCard worker={worker} key={index} />

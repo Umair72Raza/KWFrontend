@@ -179,6 +179,9 @@ const Map = React.memo(
                     setFormData((prev) => ({
                       ...prev,
                       address: results[0].formatted_address,
+                      country:countryComponent ? countryComponent.short_name : "Unknown",
+                      latitude,
+                      longitude,
                     }));
                     setCurrentLocation({
                       lat: latitude,
