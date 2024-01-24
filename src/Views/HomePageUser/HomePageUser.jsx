@@ -450,7 +450,7 @@ const HomePageUser = () => {
                   height: "3rem",
                   width: "3rem",
                 }}
-              />
+                              />
             ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
               filteredAndSortedUsers.map((worker, index) => (
                 <WorkerCard worker={worker} key={index} />
