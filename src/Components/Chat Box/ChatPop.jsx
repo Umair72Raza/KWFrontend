@@ -432,9 +432,10 @@ const ChatPopup = () => {
                                   setSendButtonDisabled(false);
                                   setNewMessageText(e.target.value);
                                 }}
+                                disabled={isLoading}
                               />
                               <Button
-                                disabled={sendButtonDisabled}
+                                disabled={sendButtonDisabled || isLoading}
                                 color={ChatPopUpPage.SEND_BUTTON_COLOR}
                                 outline
                               >
@@ -619,9 +620,10 @@ const ChatPopup = () => {
                                 setSendButtonDisabled(false);
                                 setNewMessageText(e.target.value);
                               }}
+                              disabled={isLoading}
                             />
                             <Button
-                              disabled={sendButtonDisabled}
+                              disabled={sendButtonDisabled || isLoading}
                               color={ChatPopUpPage.SEND_BUTTON_COLOR}
                               outline
                             >
