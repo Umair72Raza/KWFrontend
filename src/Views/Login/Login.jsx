@@ -64,39 +64,37 @@ const Login = () => {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+  
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-
-    setTimeout(() => {
+  
+    try {
       if (Object.keys(validationErrors).length === 0) {
-        try {
-          dispatch(loginAsync(formData))
-            .then((result) => {
-              if (result.type === "auth/login/fulfilled") {
-                if (result.payload) {
-                  setFormData({
-                    [LoginPage.FORM_FIELDS.EMAIL]: "",
-                    [LoginPage.FORM_FIELDS.PASSWORD]: "",
-                  });
-                  successToast("Login successful! Welcome back!");
-                  navigate("/user/homepage");
-                }
-              } else if (result.type === "auth/login/rejected") {
-                failureToast(result.payload);
-              }
-            })
-            .catch((error) => {
-              console.log("Error login:", error);
+        const result = await dispatch(loginAsync(formData));
+  
+        if (result.type === "auth/login/fulfilled") {
+          if (result.payload) {
+            setFormData({
+              [LoginPage.FORM_FIELDS.EMAIL]: "",
+              [LoginPage.FORM_FIELDS.PASSWORD]: "",
             });
-        } finally {
-          setLoading(false); // Stop loading spinner
+            successToast("Login successful! Welcome back!");
+            navigate("/user/homepage");
+          }
+        } else if (result.type === "auth/login/rejected") {
+          failureToast(result.payload);
         }
       }
-    }, 0);
+    } catch (error) {
+      console.log("Error login:", error);
+    } finally {
+      setLoading(false); // Stop loading spinner after API response
+    }
   };
+  
 
   return (
     <Container
