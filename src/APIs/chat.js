@@ -3,7 +3,7 @@ const API = axios.create({ baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT 
 
 export const GetChats = async (UserId, token) => {
   try {
-    const response = await API.get(`chats/chat/${UserId}`, {
+    const response = await API.get(`chats/chatWithWorkers/${UserId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -50,7 +50,7 @@ export const SendMessage = async (receiverId, text, initiatorId,token) => {
 
 export const ToggleSeen = async (chatId,token,seen) => {
   try {
-    const response = await API.put(`chats/chat/${chatId}`, {
+    const response = await API.put(`chats/chatSeenToggle/${chatId}`, {
       seen
     }, {
       headers: {
