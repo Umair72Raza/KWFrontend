@@ -62,6 +62,7 @@ export const signUpUserAsync = createAsyncThunk(
         country,
         services
       );
+      console.log(response)
   return response.data;
     } catch(error) {
       if (
@@ -82,7 +83,7 @@ export const signUpUserAsync = createAsyncThunk(
         return rejectWithValue(
           "Phone Number is already in use. Please choose a different phone number."
         );
-      } 
+      }
     }
    
   }

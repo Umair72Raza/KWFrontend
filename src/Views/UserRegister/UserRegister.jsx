@@ -168,15 +168,15 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
     });
   };
 
-  const isFormDataFilled = (formData) => {
-    for (const field in formData) {
-      if (!formData[field]) {
-        // Field is empty
-        return false;
-      }
-    }
-    return true;
-  };
+  // const isFormDataFilled = (formData) => {
+  //   for (const field in formData) {
+  //     if (!formData[field]) {
+  //       // Field is empty
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // };
 
   const FormValidation = (formData) => {
     const errors = {};
@@ -207,9 +207,9 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
       errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
     }
 
-    if (!isFormDataFilled(formData)) {
-      errors.allField = RegisterPage.ERROR_MESSAGES.enterAllFields;
-    }
+    // if (!isFormDataFilled(formData)) {
+    //   errors.allField = RegisterPage.ERROR_MESSAGES.enterAllFields;
+    // }
     if (hasOnlyWhiteSpace(formData.firstName)) {
       errors.firstName = "First Name cannot be empty";
     }
@@ -223,46 +223,54 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Start loading spinner
+    setLoading(true);
+  
+    // Perform form validation
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-    setTimeout(() => {
-      if (Object.keys(validationErrors).length === 0) {
-        try {
-          setLoading(true); // Start loading spinner
-          dispatch(signUpUserAsync(formData))
-            .then((result) => {
-              if (result.type === "auth/signup/fulfilled") {
-                setFormData({
-                  firstName: "",
-                  lastName: "",
-                  email: "",
-                  phoneNumber: "",
-                  password: "",
-                  confirmPassword: "",
-                  latitude: "",
-                  longitude: "",
-                  address: "",
-                  country: "",
-                  services: [],
-                });
-                successToast("SignUP Successful!");
-                navigate("/auth/login");
-              } else if (result.type === "auth/signup/rejected") {
-                failureToast(result.payload);
-              }
-            })
-            .catch((error) => {
-              console.log("Error updating profile:", error);
-            });
-        } finally {
-          setLoading(false); // Stop loading spinner
+  
+    // Check if there are validation errors
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        // Dispatch the signup action
+        const result = await dispatch(signUpUserAsync(formData));
+  
+        if (result.type === "auth/signup/fulfilled") {
+          // Reset form data on successful signup
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            phoneNumber: "",
+            password: "",
+            confirmPassword: "",
+            latitude: "",
+            longitude: "",
+            address: "",
+            country: "",
+            services: [],
+          });
+          successToast("SignUP Successful!");
+          navigate("/auth/login");
+        } else if (result.type === "auth/signup/rejected") {
+          failureToast(result.payload);
         }
+      } catch (error) {
+        console.log("Error in sign up!", error);
+      } finally {
+        // Stop loading spinner
+        setLoading(false);
       }
-    }, 0);
+    } else {
+      // Stop loading spinner if there are validation errors
+      setLoading(false);
+    }
   };
+  
 
   return (
     <Container

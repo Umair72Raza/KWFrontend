@@ -66,13 +66,13 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
 
     setTimeout(() => {
       if (Object.keys(validationErrors).length === 0) {
         try {
-          setLoading(true); // Start loading spinner
           dispatch(loginAsync(formData))
             .then((result) => {
               if (result.type === "auth/login/fulfilled") {
