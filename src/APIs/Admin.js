@@ -98,7 +98,7 @@ export const editNewService = async(token,name,id) =>{
         },
       }
     );
-    console.log(response.data,"resposne of edit in api")
+   
     return response.data;
   } catch (error) {
     throw error.response.data;

@@ -103,7 +103,6 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("startjob-result", (data) => {
-      //console.log(data);
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
@@ -404,7 +403,6 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("new-order-result", (newOrderResult) => {
-      console.log(newOrderResult, "new order result");
       setLatestOrders(newOrderResult);
       setUpdateScheduled(true);
     });

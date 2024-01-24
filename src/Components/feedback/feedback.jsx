@@ -31,7 +31,6 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
   };
   const send = () => {
     if (user.role == "user") {
-      console.log("I reached in user for feedback");
       const params = {
         orderId: order._id,
         feedbackGiver: user._id,
@@ -44,7 +43,6 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
       }
       setFinishOrderReq(false);
     } else if (user.role == "worker") {
-      console.log("feedback in worker");
       const params = {
         orderId: order._id,
         feedbackGiver: user._id,

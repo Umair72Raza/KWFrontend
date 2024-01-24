@@ -145,7 +145,6 @@ const EditProfilePage = ({ ShowServices }) => {
     }
 
     if (ShowServices && formData.services.length === 0) {
-      console.error("Please select at least one service.");
       errors.services = "Please select at least one service.";
     }
 

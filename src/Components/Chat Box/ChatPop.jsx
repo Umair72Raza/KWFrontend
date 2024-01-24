@@ -127,7 +127,6 @@ const ChatPopup = () => {
             newMessageReceived.newMessage.chatId
         );
         if (!alreadyInNotifications) {
-          console.log("i run");
           dispatch(
             ToggleChatSeen({
               chatId: newMessageReceived.newMessage.chatId,

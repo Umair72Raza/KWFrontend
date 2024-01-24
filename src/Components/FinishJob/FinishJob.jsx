@@ -20,7 +20,6 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
         allowOutsideClick: false,
       }).then((result) => {
         if (result.isConfirmed) {
-          console.log("Confirmed in worker");
           setFeedback(true);
           //setFinishJobVerified(false);
         }

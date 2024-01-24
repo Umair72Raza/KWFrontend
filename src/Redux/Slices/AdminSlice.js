@@ -17,7 +17,6 @@ export const fetchUsersAsync = createAsyncThunk(
     try {
       //get users
       const response = await getAllTheUsers(token);
-      //console.log(response,"response in the thunk");
       return response;
     } catch (error) {
       console.log(error, "error getting users");
@@ -31,7 +30,6 @@ export const fetchWorkersAsync = createAsyncThunk(
     try {
       //get workers
       const response = await getAllTheWorkers(token);
-      //console.log(response, "response in the thunk");
       return response;
     } catch (error) {
       console.log(error, "error getting workers");
@@ -45,7 +43,6 @@ export const togglePersonAccessAsync = createAsyncThunk(
     try {
       const { token, id, access } = data;
       const response = await togglePersonAccess(token, id, access);
-      //console.log(response, "response toggle access in the thunk");
       return response;
     } catch (error) {
       console.log(error, "error getting workers");
@@ -70,7 +67,6 @@ export const addServiceAsync = createAsyncThunk(
     try {
       const { token, name, id } = data;
       const response = await createNewService(token, name, id);
-      //console.log(response, "response add services in the thunk");
       return response;
     } catch (error) {
       console.log(error, "error adding service");
@@ -86,7 +82,6 @@ export const deleteServiceAsync = createAsyncThunk(
     try {
       const { token, id } = data;
       const response = await deleteAService(token, id);
-      //console.log(response, "response delete services in the thunk");
       return response;
     } catch (error) {
       console.log(error, "error deleting service");
@@ -115,7 +110,6 @@ export const ordersOfUserByUid = createAsyncThunk(
     try {
       const { token, id } = data;
       const response = await getAllUserOrders(token, id);
-      //console.log(response, "response get orders in the thunk");
       return response;
     } catch (error) {
       console.log(error, "error getting orders");
@@ -128,7 +122,6 @@ export const fetchFeedbacksAsync = createAsyncThunk(
   async (data) => {
     try {
       const response = await fetchFeedbacksofUser(data);
-      //console.log(response, "response get feedbacks in the thunk");
       return response;
     } catch (error) {
       console.log(error, "error getting feedbacks");

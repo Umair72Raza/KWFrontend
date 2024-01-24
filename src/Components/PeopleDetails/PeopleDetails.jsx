@@ -16,7 +16,7 @@ import { setSocket } from "../../Redux/Slices/SocketSlice";
 const PeopleDetails = ({ person, setNewFilPerson }) => {
 
   
-  //console.log(socket,"socket");
+
   const [orders, setOrders] = useState();
   const [feedbacks, setFeedbacks] = useState([]);
   const [disableFeedbackButton,setDisableFeebackButton] = useState(false);

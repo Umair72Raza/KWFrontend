@@ -58,8 +58,7 @@ const ForgetPassword = () => {
     }
   };
 
-  console.log(stateotp);
-  console.log(otpStatus);
+
   return (
     <Container>
       <Row style={{ marginTop: "50px !important" }}>

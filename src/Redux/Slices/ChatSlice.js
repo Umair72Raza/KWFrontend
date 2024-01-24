@@ -20,9 +20,6 @@ export const fetchMessages = createAsyncThunk(
   async (credentials) => {
     const { chatId, token } = credentials;
     const response = await GetMessages(chatId, token);
-
-    console.log(response.data);
-
     return response.data;
   }
 );
@@ -44,7 +41,6 @@ export const ToggleChatSeen = createAsyncThunk(
       const response = await ToggleSeen(chatId, token, seen);
       return response;
     } catch (error) {
-      console.log(error);
     }
   }
 );

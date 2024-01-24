@@ -60,7 +60,7 @@ function App() {
       </>
     );
   } else if (authenticated && role === "admin") {
-    console.log("In Admin condition");
+   
     routes = (
       <>
         <Route path="/admin/*" element={<AdminLayout />} />
@@ -68,7 +68,7 @@ function App() {
       </>
     );
   } else {
-    console.log("In Auth condition", authenticated);
+   
     routes = (
       <>
         <Route path="/auth/*" element={<AuthLayout />} />

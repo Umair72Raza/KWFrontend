@@ -28,7 +28,6 @@ const bookingSlice = createSlice({
       .addCase(CreateOrder.fulfilled, (state, action) => {
         state.Status = "succeeded";
         state.newOrder = action.payload
-        console.log(action.payload)
       })
       .addCase(CreateOrder.rejected, (state, action) => {
         state.Status = "failed";
