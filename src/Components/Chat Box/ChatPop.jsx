@@ -48,6 +48,7 @@ const ChatPopup = () => {
   const [worker, SetWorker] = useState({});
   const [sendButtonDisabled, setSendButtonDisabled] = useState(false);
   const [isLoading, setLoading] = useState(true);
+  const [loadingSendMessage, setLoadingSendMessage] = useState(false);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -175,10 +176,13 @@ const ChatPopup = () => {
     setModal(!modal);
   };
 
-  const sendMessage = (e) => {
+  const sendMessage = async (e) => {
     e.preventDefault();
     setSendButtonDisabled(true);
-    const sendingMessage = async () => {
+     // Add loading state until the message is sent
+     setLoadingSendMessage(true);
+
+    try {
       if (newMessageText) {
         const messageData = {
           receiverId: selectedChat._id,
@@ -186,7 +190,11 @@ const ChatPopup = () => {
           initiatorId: user._id,
           token,
         };
+
+       
+
         const result = await dispatch(SendMessageAsync(messageData));
+
         if (result.type === "Chat/SendMessage/fulfilled") {
           setNewMessageText("");
           if (!chat._id) {
@@ -206,12 +214,15 @@ const ChatPopup = () => {
           } else {
             setMessages([result.payload.message]);
           }
-          setSendButtonDisabled(false);
         }
       }
-    };
-
-    sendingMessage();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // Reset loading state and enable the send button
+      setLoadingSendMessage(false);
+      setSendButtonDisabled(false);
+    }
   };
 
   const handleChatSelection = (chat) => {
@@ -428,7 +439,11 @@ const ChatPopup = () => {
                                 color={ChatPopUpPage.SEND_BUTTON_COLOR}
                                 outline
                               >
-                                {ChatPopUpPage.SEND_BUTTON_LABEL}
+                                {loadingSendMessage ? (
+                                  <Spinner size="sm" className="p-2"  />
+                                ) : (
+                                  ChatPopUpPage.SEND_BUTTON_LABEL
+                                )}
                               </Button>
                             </form>
                           </div>
@@ -446,14 +461,22 @@ const ChatPopup = () => {
                                       chatUser._id &&
                                       String(chatUser._id) !== String(user._id)
                                     ) {
-                                      const isBlockedByAdmin = chatUser.access === "denied" ? true : false;
+                                      const isBlockedByAdmin =
+                                        chatUser.access === "denied"
+                                          ? true
+                                          : false;
                                       return (
                                         <div
                                           key={chatUser._id}
                                           className={`mt-2 d-flex flex-row justify-content-between ${
-                                            isBlockedByAdmin ? "blocked-user" : ""
+                                            isBlockedByAdmin
+                                              ? "blocked-user"
+                                              : ""
                                           }`}
-                                          onClick={() => !isBlockedByAdmin &&  handleChatSelection(chat)}
+                                          onClick={() =>
+                                            !isBlockedByAdmin &&
+                                            handleChatSelection(chat)
+                                          }
                                         >
                                           <h5>
                                             {chatUser.firstName}{" "}
@@ -466,11 +489,11 @@ const ChatPopup = () => {
                                                 <FaDotCircle className="text-primary me-3" />
                                               </span>
                                             )}
-                                             {isBlockedByAdmin && (
-                                          <span className="text-danger">
-                                            {ChatPopUpPage.BLOCKED_BY_ADMIN}
-                                          </span>
-                                        )}
+                                          {isBlockedByAdmin && (
+                                            <span className="text-danger">
+                                              {ChatPopUpPage.BLOCKED_BY_ADMIN}
+                                            </span>
+                                          )}
                                         </div>
                                       );
                                     }
@@ -497,7 +520,6 @@ const ChatPopup = () => {
                             <div
                               className={`d-flex flex-row align-items-center my-2`}
                               key={chat._id}
-                              
                             >
                               <div className="d-flex flex-column w-100">
                                 {chat.users.map((chatUser) => {
@@ -506,14 +528,20 @@ const ChatPopup = () => {
                                     chatUser._id &&
                                     String(chatUser._id) !== String(user._id)
                                   ) {
-                                    const isBlockedByAdmin = chatUser.access === "denied" ? true : false;
+                                    const isBlockedByAdmin =
+                                      chatUser.access === "denied"
+                                        ? true
+                                        : false;
                                     return (
                                       <div
                                         key={chatUser._id}
                                         className={`mt-2 d-flex flex-row justify-content-between ${
                                           isBlockedByAdmin ? "blocked-user" : ""
                                         }`}
-                                        onClick={() => !isBlockedByAdmin &&  handleChatSelection(chat)}
+                                        onClick={() =>
+                                          !isBlockedByAdmin &&
+                                          handleChatSelection(chat)
+                                        }
                                       >
                                         <h5>
                                           {chatUser.firstName}{" "}
@@ -598,7 +626,11 @@ const ChatPopup = () => {
                               color={ChatPopUpPage.SEND_BUTTON_COLOR}
                               outline
                             >
-                              {ChatPopUpPage.SEND_BUTTON_LABEL}
+                              {loadingSendMessage ? (
+                                <Spinner size="sm" className="p-2" />
+                              ) : (
+                                ChatPopUpPage.SEND_BUTTON_LABEL
+                              )}
                             </Button>
                           </form>
                         </div>
