@@ -477,7 +477,7 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
                     <FormGroup>
                       <CustomServiceDropdown
                         list={list}
-                        selectedServices={formData.services}
+                        selectedServices={formData?.services}
                         handleServiceChange={handleServiceChange}
                         handleRateChange={handleRateChange}
                       />

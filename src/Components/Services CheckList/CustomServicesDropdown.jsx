@@ -20,23 +20,23 @@ const handleInputKeyDown = (e) => {
   return (
     <div>
       {list?.length > 0 &&
-        list.map((service) => (
-          <FormGroup  key={service._id} check>
+        list?.map((service) => (
+          <FormGroup  key={service?._id} check>
             <Row className="align-items-center">
               <Col xs="auto">
                 <Input
                   type="checkbox"
-                  value={service.name}
-                  checked={selectedServices.some((s) => s.name === service.name)}
+                  value={service?.name}
+                  checked={selectedServices?.some((s) => s?.name === service?.name)}
                   onChange={handleServiceChange}
                 />
               </Col>
               <Col>
                 <Label check className="ml-2 my-1">
-                  {service.name}
+                  {service?.name}
                 </Label>
               </Col>
-              {selectedServices.some((s) => s.name === service.name) && (
+              {selectedServices?.some((s) => s?.name === service?.name) && (
                 <Col xs="auto" className="ml-2 d-flex flex-row">
                 
                   <Input
@@ -45,9 +45,9 @@ const handleInputKeyDown = (e) => {
                     required
                     placeholder={`Rate ($/hr)`}
                     value={
-                      selectedServices.find((s) => s.name === service.name)?.rate || ""
+                      selectedServices?.find((s) => s?.name === service?.name)?.rate || ""
                     }
-                    onChange={(e) => handleRateChange(e, service.name)}
+                    onChange={(e) => handleRateChange(e, service?.name)}
                     onKeyDown={handleInputKeyDown}
                     style={{ height: "25px" }}
                   />
