@@ -168,7 +168,6 @@ const ChatPopup = () => {
   });
 
   const book = (selectedChat) => {
-
     SetWorker(selectedChat);
     toggleModal();
   };
@@ -215,13 +214,18 @@ const ChatPopup = () => {
     sendingMessage();
   };
 
-  const handleChatSlection = (chat) => {
+  const handleChatSelection = (chat) => {
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
   };
 
   const handleBack = () => {
+    const updatedChats = copyOfChats.filter(
+      (chat) => chat.chatName !== "fakeChat"
+    );
+    setCopyOfChats(updatedChats);
+    setOriginalChats(updatedChats);
     setSelectedChatCompare(null);
     setSelectedChat(null);
     setChat(null);
@@ -231,6 +235,11 @@ const ChatPopup = () => {
   const Toggler = () => {
     setShowModal(!showModal);
     document.body.style.overflow = showModal ? "hidden" : "auto";
+    const updatedChats = copyOfChats.filter(
+      (chat) => chat.chatName !== "fakeChat"
+    );
+    setCopyOfChats(updatedChats);
+    setOriginalChats(updatedChats);
     setSelectedChatCompare(null);
     setSelectedChat(null);
     setChat(null);
@@ -429,19 +438,22 @@ const ChatPopup = () => {
                             <React.Fragment key={chat._id}>
                               <div
                                 className={`d-flex flex-row align-items-center my-2`}
-                                onClick={() => handleChatSlection(chat)}
                               >
-                                <div className="d-flex flex-column w-75">
+                                <div className="d-flex flex-column w-100">
                                   {chat.users.map((chatUser) => {
                                     if (
                                       chatUser &&
                                       chatUser._id &&
                                       String(chatUser._id) !== String(user._id)
                                     ) {
+                                      const isBlockedByAdmin = chatUser.access === "denied" ? true : false;
                                       return (
                                         <div
                                           key={chatUser._id}
-                                          className="mt-2 d-flex flex-row justify-content-between"
+                                          className={`mt-2 d-flex flex-row justify-content-between ${
+                                            isBlockedByAdmin ? "blocked-user" : ""
+                                          }`}
+                                          onClick={() => !isBlockedByAdmin &&  handleChatSelection(chat)}
                                         >
                                           <h5>
                                             {chatUser.firstName}{" "}
@@ -454,6 +466,11 @@ const ChatPopup = () => {
                                                 <FaDotCircle className="text-primary me-3" />
                                               </span>
                                             )}
+                                             {isBlockedByAdmin && (
+                                          <span className="text-danger">
+                                            Blocked by Admin
+                                          </span>
+                                        )}
                                         </div>
                                       );
                                     }
@@ -480,7 +497,7 @@ const ChatPopup = () => {
                             <div
                               className={`d-flex flex-row align-items-center my-2`}
                               key={chat._id}
-                              onClick={() => handleChatSlection(chat)}
+                              
                             >
                               <div className="d-flex flex-column w-100">
                                 {chat.users.map((chatUser) => {
@@ -489,10 +506,14 @@ const ChatPopup = () => {
                                     chatUser._id &&
                                     String(chatUser._id) !== String(user._id)
                                   ) {
+                                    const isBlockedByAdmin = chatUser.access === "denied" ? true : false;
                                     return (
                                       <div
                                         key={chatUser._id}
-                                        className="mt-2 d-flex flex-row justify-content-between"
+                                        className={`mt-2 d-flex flex-row justify-content-between ${
+                                          isBlockedByAdmin ? "blocked-user" : ""
+                                        }`}
+                                        onClick={() => !isBlockedByAdmin &&  handleChatSelection(chat)}
                                       >
                                         <h5>
                                           {chatUser.firstName}{" "}
@@ -505,6 +526,11 @@ const ChatPopup = () => {
                                               <FaDotCircle className="text-primary me-3" />
                                             </span>
                                           )}
+                                        {isBlockedByAdmin && (
+                                          <span className="text-danger">
+                                            Blocked by Admin
+                                          </span>
+                                        )}
                                       </div>
                                     );
                                   }

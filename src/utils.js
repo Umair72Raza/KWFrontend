@@ -45,14 +45,36 @@ export const toggleDetails = (prevMap, orderId) => {
 
 export const checkToken = () => {
   const token = localStorage.getItem("token");
+  
   if (token) {
     try {
       const decodedToken = jwtDecode(token);
-      return decodedToken; // Return decoded token if valid
+    
+      if (decodedToken.exp) {
+        const currentTime = Math.floor(Date.now() / 1000);
+    
+        if (decodedToken.exp > currentTime) {
+          return decodedToken;
+        } else {
+          console.warn("Token has expired. Removing user from localStorage.");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          failureToast("Your session has expired. Please log in again.");
+          return null;
+        }
+      } else {
+        console.warn("Token does not have an expiration time. Consider using an exp claim in your token.");
+        return decodedToken;
+      }
     } catch (error) {
       console.error("Error decoding token:", error);
+      failureToast("Please log in again.");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      return null;
     }
   }
+
   return null; // No token found
 };
 

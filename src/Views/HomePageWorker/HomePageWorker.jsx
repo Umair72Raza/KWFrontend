@@ -551,7 +551,6 @@ const HomePageWorker = () => {
       ) : (
         <></>
       )}
-      <ChatPopup />
       <div style={{textAlign:"center"}}>
       {spinnerVisible && <Spinner />}
       </div>

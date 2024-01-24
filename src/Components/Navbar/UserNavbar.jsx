@@ -28,6 +28,7 @@ import { CgProfile } from "react-icons/cg";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
 import Swal from "sweetalert2";
+import ChatPopup from "../Chat Box/ChatPop";
 const UserNavbar = () => {
   const {
     setShowModal,
@@ -251,6 +252,7 @@ const UserNavbar = () => {
           </Nav>
         </Collapse>
       </Navbar>
+      <ChatPopup />
     </>
   );
 };

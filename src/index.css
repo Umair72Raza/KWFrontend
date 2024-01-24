@@ -8,12 +8,13 @@
 ul {
     
   list-style: none !important;
+ 
   padding: 0 !important;
 }
 
 li {
-  
   text-decoration: none !important;
+  
 }
 .password-input-wrapper {
   position: relative;
@@ -61,7 +62,11 @@ li {
   }
   
 
-
+  .blocked-user {
+    opacity: 0.5; /* or any other style to indicate the blocked state */
+    pointer-events: none; /* disable click events */
+  }
+  
 .chat-list {
   border-right: 1px solid #ccc !important;
 }
