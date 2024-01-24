@@ -3,7 +3,7 @@ const API = axios.create({ baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT 
 
 export const GetChats = async (UserId, token) => {
   try {
-    const response = await API.get(`/chats/chat/${UserId}`, {
+    const response = await API.get(`chats/chat/${UserId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -17,7 +17,7 @@ export const GetChats = async (UserId, token) => {
 
 export const GetMessages = async (chatId,token) => {
   try {
-    const response = await API.get(`/messages/allMessages/${chatId}`, {
+    const response = await API.get(`messages/allMessages/${chatId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -32,7 +32,7 @@ export const GetMessages = async (chatId,token) => {
 
 export const SendMessage = async (receiverId, text, initiatorId,token) => {
   try {
-    const response = await API.post(`/messages/sendMessage`, {
+    const response = await API.post(`messages/sendMessage`, {
       receiverId,
       text,
       initiatorId,
@@ -50,7 +50,7 @@ export const SendMessage = async (receiverId, text, initiatorId,token) => {
 
 export const ToggleSeen = async (chatId,token,seen) => {
   try {
-    const response = await API.put(`/chats/chat/${chatId}`, {
+    const response = await API.put(`chats/chat/${chatId}`, {
       seen
     }, {
       headers: {
