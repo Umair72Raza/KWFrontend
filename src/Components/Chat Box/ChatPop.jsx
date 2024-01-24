@@ -468,7 +468,7 @@ const ChatPopup = () => {
                                       return (
                                         <div
                                           key={chatUser._id}
-                                          className={`mt-2 d-flex flex-row justify-content-between ${
+                                          className={`pt-2 d-flex flex-row justify-content-between ${
                                             isBlockedByAdmin
                                               ? "blocked-user"
                                               : ""
@@ -535,7 +535,7 @@ const ChatPopup = () => {
                                     return (
                                       <div
                                         key={chatUser._id}
-                                        className={`mt-2 d-flex flex-row justify-content-between ${
+                                        className={`pt-2 d-flex flex-row justify-content-between ${
                                           isBlockedByAdmin ? "blocked-user" : ""
                                         }`}
                                         onClick={() =>
