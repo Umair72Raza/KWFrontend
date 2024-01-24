@@ -56,6 +56,7 @@ const EditProfilePage = ({ ShowServices }) => {
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userDataLoading, setUserDataLoading] = useState(true);
 
   useEffect(() => {
     if (UsersData) {
@@ -71,9 +72,16 @@ const EditProfilePage = ({ ShowServices }) => {
     }
   }, [formData, errors.email, errors.phone]);
 
+
   useEffect(() => {
     if (user && user._id) {
-      dispatch(fetchUsersDataAsync({ id: user._id, token }));
+      setUserDataLoading(true);
+      dispatch(fetchUsersDataAsync({ id: user._id, token }))
+        .then(() => setUserDataLoading(false))
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+          setUserDataLoading(false);
+        });
     }
   }, [dispatch, user, token]);
 
@@ -161,42 +169,38 @@ const EditProfilePage = ({ ShowServices }) => {
     e.preventDefault();
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-
-    // Wait for the state to be updated
-    setTimeout(() => {
+  
+    try {
       if (Object.keys(validationErrors).length === 0) {
-        try {
-          setLoading(true);
-          const data = { id: UsersData?._id, token, formData };
-          dispatch(updateProfileAsync(data))
-            .then((result) => {
-              if (result.type === "/UpdateProfile/fulfilled") {
-                successToast("Profile Updated Successfully!");
-                setFormData({
-                  firstName: UsersData?.firstName,
-                  lastName: result.payload?.lastName,
-                  email: result.payload?.email,
-                  phoneNumber: result.payload?.phoneNumber,
-                  latitude: result.payload?.latitude,
-                  longitude: result.payload?.longitude,
-                  country: result.payload?.country,
-                  address: result.payload?.address,
-                  services: result.payload?.services || [],
-                });
-                setEditMode(false);
-              } else if (result.type === "/UpdateProfile/rejected") {
-                failureToast(result.payload);
-              }
-            })
-            .catch((err) => {
-              console.log("Error updating profile:", err);
-            });
-        } finally {
-          setLoading(false);
+        setLoading(true);
+        const data = { id: UsersData?._id, token, formData };
+        const result = await dispatch(updateProfileAsync(data));
+  
+        if (result.type === "/UpdateProfile/fulfilled") {
+          successToast("Profile Updated Successfully!");
+          setFormData({
+            firstName: UsersData?.firstName,
+            lastName: result.payload?.lastName,
+            email: result.payload?.email,
+            phoneNumber: result.payload?.phoneNumber,
+            latitude: result.payload?.latitude,
+            longitude: result.payload?.longitude,
+            country: result.payload?.country,
+            address: result.payload?.address,
+            services: result.payload?.services || [],
+          });
+          setEditMode(false);
+        } else if (result.type === "/UpdateProfile/rejected") {
+          failureToast(result.payload);
         }
       }
-    }, 0);
+    } catch (err) {
+      console.log("Error updating profile:", err);
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const handleEditModeToggle = () => {
     setFormData({
@@ -250,6 +254,10 @@ const EditProfilePage = ({ ShowServices }) => {
               {EDITPROFILE_PAGE.LABELS.TITLE}
             </Col>
           </Row>
+          {userDataLoading ? (
+            <div className="d-flex justify-content-center">
+              <Spinner color="primary" />
+            </div> ):(
           <Row>
             {editMode ? (
               <Form className="mt-5" onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
@@ -463,6 +471,7 @@ const EditProfilePage = ({ ShowServices }) => {
               </Card>
             )}
           </Row>
+            )}
         </Container>
       </Container>
     </>
