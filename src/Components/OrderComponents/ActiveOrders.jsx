@@ -37,7 +37,6 @@ const ActiveOrders = ({
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
-        console.log(data, "in confirm true");
         // Assuming scheduledOrdersObject is an array of orders
         const updatedOrders = scheduledOrdersObject.filter(
           (o) => o._id !== data.order._id

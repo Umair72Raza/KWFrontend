@@ -93,7 +93,6 @@ export const cancelOrder = async (dataWithToken) => {
 
 export const activateOrder = async (data) => {
   try {
-    console.log(data);
     const response = await API.put("order/activateStatus", data);
     if (response.status === 200) {
       return response.data;
@@ -104,7 +103,6 @@ export const activateOrder = async (data) => {
 };
 export const changeToPast = async (data) => {
   try {
-    console.log(data);
     const response = await API.put("order/changeToPast", data);
     if (response.status === 200) {
       return response.data;

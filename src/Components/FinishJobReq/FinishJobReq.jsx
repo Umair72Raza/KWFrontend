@@ -41,7 +41,6 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
       result.type === "orders/changeToPastOrders/fulfilled" &&
       result.payload.Status === "Past"
     ) {
-      console.log(result.payload);
       const data = {
         order: result.payload,
         result: "true",
@@ -49,7 +48,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
       socket?.emit("finishjob-response", data);
 
       setFinishConfirmed(true);
-      // setFinishOrderReq(false);
+      //setFinishOrderReq(false);
     }
     //
     setModal(true);

@@ -216,7 +216,6 @@ const HomePageUser = () => {
   useEffect(() => {
     if (!socket) return;
     socket?.on("finishjob-request", (order) => {
-      console.log(order);
       setFinishOrderReq(true);
       setFOrder(order);
     });
@@ -475,7 +474,6 @@ const HomePageUser = () => {
             ></Filter>
           </Col>
         </Row>
-        <ChatPopup />
       </Container>
       <ModalComponent
         modalHeader={"Order Activation"}

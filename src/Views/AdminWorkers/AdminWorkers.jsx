@@ -33,7 +33,6 @@ const AdminWorkers = () => {
         setLoading(true); // Set loading to true when fetching starts
         const result = await dispatch(fetchWorkersAsync(token));
         if (result.type === "/admin/getWorkers/fulfilled") {
-          console.log(result.payload, "ALL Workers");
           setApiWorkers(result.payload);
         }
       } catch (error) {

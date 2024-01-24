@@ -93,12 +93,9 @@ export const requestOTPAsync = createAsyncThunk(
   "auth/requestOTP",
   async (email) => {
     try {
-      console.log(email);
       const response = await sendOTP(email);
-      console.log(response.status, "response from request OTP");
       return response.data;
     } catch (error) {
-      console.log(error);
       failureToast("Couldn't send OTP");
     }
   }
@@ -108,12 +105,9 @@ export const requestOTPverification = createAsyncThunk(
   "auth/otpverify",
   async (otp) => {
     try {
-      console.log(otp);
       const response = await OTPverify(otp);
-      console.log(response.status);
       return response.status;
     } catch (error) {
-      console.log(error);
       failureToast("Inavlid OTP");
     }
   }
@@ -126,7 +120,6 @@ export const setNewPassAsync = createAsyncThunk(
       const { email, newPassword } = data;
       const password = newPassword;
       const response = await newPasswordSetter(email, password);
-      console.log(response.status, "response of newpassword set");
       if (response.status === 200) {
         return response.status;
       } else {
@@ -143,9 +136,7 @@ export const toggleStatusAsync = createAsyncThunk(
   "/auth/toggleStatus",
   async (data, { rejectWithValue }) => {
     try {
-      console.log(data)
       const response = await toggleStatus(data);
-      console.log(response.updatedStatus,'resp.datat in the slice')
       const user = JSON.parse(localStorage.getItem('user'));
       user.status = response.updatedStatus.status;
       localStorage.setItem('user', JSON.stringify(user));

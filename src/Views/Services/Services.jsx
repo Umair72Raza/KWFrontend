@@ -30,9 +30,7 @@ const Services = () => {
       try {
         const result = await dispatch(allServicesAsync(token));
         if (result.type === "/admin/getallservices/fulfilled") {
-          console.log(result.payload);
           setServices(result.payload);
-          console.log(services);
         }
       } catch (error) {
         console.error("Error fetching services:", error);

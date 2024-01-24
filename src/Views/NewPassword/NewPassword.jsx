@@ -25,7 +25,6 @@ const NewPassword = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const email = location.state.email;
-  // console.log(email);
   const [OTP, setOTP] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -36,8 +35,6 @@ const NewPassword = () => {
 
   const resetOTP = useSelector((state)=>state.auth.resetOtp)
   const newpass = useSelector((state)=>state.auth.newpass)
-  //console.log(resetOTP);
-  console.log(newpass)
     
   useEffect(()=>{
     if(newpass===200){

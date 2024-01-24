@@ -196,7 +196,6 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
     }
 
     if (ShowServices && formData.services.length === 0) {
-      console.error("Please select at least one service.");
       errors.services = "Please select at least one service.";
     }
 
@@ -376,7 +375,7 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
                     id={RegisterPage.INPUT_FIELDS.PHONE.name}
                     placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
                     value={formData.phoneNumber || ""}
-                    maxLength={16}
+                    maxLength={20}
                     onChange={handlePhoneChange}
                     international
                     countryCallingCodeEditable={false}

@@ -49,8 +49,10 @@ const WorkerCard = ({ worker }) => {
       // Create a fake chat
       const fakeChat = {
         _id: "",
+        chatName:"fakeChat",
         users: [worker, user],
         latestMessage: null,
+        seen:true,
       };
       // Add the fake chat to the chats array
       if(copyOfChats?.length>0){

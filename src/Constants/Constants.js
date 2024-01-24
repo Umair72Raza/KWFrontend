@@ -146,6 +146,7 @@ export const ChatPopUpPage = {
   SEND_BUTTON_LABEL: "Send",
   SEND_BUTTON_COLOR: "primary",
   SELECT_CHAT_LABEL: "Select a chat to start messaging",
+  BLOCKED_BY_ADMIN:"Blocked by Admin"
 };
 
 export const HomePageWorkerConsts = {
@@ -183,3 +184,23 @@ export const GOTOFFER = {
   FULL_DETAILS_HEADING: "Full Details: ",
   CLOSE_BUTTON: "Close"
 }
+
+export const EDITPROFILE_PAGE = {
+  LABELS:{
+    TITLE:"Your Profile",
+  },
+  BUTTONS:{
+    EDIT:"Edit Profile",
+    SAVE:"Save",
+    CANCEL:"Cancel",
+  },
+  CARD_LABELS:{
+   FIRST_NAME:"First Name:",
+   LAST_NAME:"Last Name:",
+    EMAIL:"Email:",
+    PHONE:"Phone Number:",
+    ADDRESS:"Address:",
+    SERVICES:"Services:",
+    RATE:"$/hr",
+  },
+  }

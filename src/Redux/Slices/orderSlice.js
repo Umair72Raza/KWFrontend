@@ -55,7 +55,7 @@ export const fetchCancelledOrdersAsync = createAsyncThunk(
 export const fetchActiveOrdersAsync = createAsyncThunk(
   "orders/fetchActiveOrders",
   async (token) => {
-    console.log("Active orders ran ");
+
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user._id;
     const data = { token: token, users: userId, status: "Active" };
@@ -84,7 +84,6 @@ export const activateOrderAsync = createAsyncThunk(
 export const changeStatusToPastAsync = createAsyncThunk(
   "orders/changeToPastOrders",
   async (data) => {
-    console.log(data);
     const { orderId } = data;
     const response = await changeToPast(data);
     return response;

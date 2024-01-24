@@ -85,7 +85,6 @@ const Login = () => {
                   navigate("/user/homepage");
                 }
               } else if (result.type === "auth/login/rejected") {
-                console.log(result.payload, "6the error");
                 failureToast(result.payload);
               }
             })
