@@ -468,7 +468,7 @@ const ChatPopup = () => {
                                             )}
                                              {isBlockedByAdmin && (
                                           <span className="text-danger">
-                                            Blocked by Admin
+                                            {ChatPopUpPage.BLOCKED_BY_ADMIN}
                                           </span>
                                         )}
                                         </div>
@@ -528,7 +528,7 @@ const ChatPopup = () => {
                                           )}
                                         {isBlockedByAdmin && (
                                           <span className="text-danger">
-                                            Blocked by Admin
+                                            {ChatPopUpPage.BLOCKED_BY_ADMIN}
                                           </span>
                                         )}
                                       </div>
