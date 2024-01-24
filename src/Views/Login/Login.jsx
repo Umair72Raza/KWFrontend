@@ -128,7 +128,7 @@ const Login = () => {
                     event.preventDefault();
                   }
                 }}
-                required
+                
               />
               {errors.email && (
                 <span className="text-danger">{errors.email}</span>

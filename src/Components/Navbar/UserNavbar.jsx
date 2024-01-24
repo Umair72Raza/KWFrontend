@@ -98,6 +98,9 @@ const UserNavbar = () => {
       navigate("/worker/editprofile");
     }
   };
+  const toggleOffcanvas = () => {
+    SetShowOffer(!offer);
+  };
 
   return (
     <>
@@ -212,17 +215,20 @@ const UserNavbar = () => {
               <OffcanvasHeader toggle={orders}>New Order's</OffcanvasHeader>
               <OffcanvasBody>
                 {offerNotification.length === 0 ? (
-                  <DropdownItem>No new Orders</DropdownItem>
+                  <div>No new Orders</div>
                 ) : (
                   offerNotification.map((item, index) => (
-                    <DropdownItem
+                    <Button
                       key={index}
-                      onClick={() => HandleOrderSelection(item)}
+                      onClick={() => {
+                        HandleOrderSelection(item);
+                        toggleOffcanvas(); // Use the correct toggle function for Offcanvas
+                      }}
                       className="fw-bold"
+                      style={{ backgroundColor: 'white', color: 'black', border: 'none' }}
                     >
-                      New Offer By : {item.user.firstName}{" "}
-                      {item.user.lastName}
-                    </DropdownItem>
+                      New Offer By : {item.user.firstName} {item.user.lastName}
+                    </Button>
                   ))
                 )}
               </OffcanvasBody>

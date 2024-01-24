@@ -129,7 +129,7 @@ const HomePageUser = () => {
       let reason = data.reason;
 
       // Check if reason is empty and set a default message
-      if (!reason || !reason.length) {
+      if (!reason || !reason?.length) {
         reason = "Reason not mentioned";
       }
 
@@ -140,64 +140,72 @@ const HomePageUser = () => {
             <div class="custom-align-left swal-text-content">
               <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
             </div>
+
             <div class="custom-align-left swal-text-content">
               <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
             </div>
+
             <div class="custom-align-left swal-text-content">
               <strong class="custom-align-left">Service:</strong> ${Corder.service}
             </div>
+
             <div class="custom-align-left swal-text-content">
               <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
             </div>
            
             <div class="custom-align-left swal-text-content">
-              <strong class="custom-align-left">Reason:</strong>
-              <div class="custom-height custom-align-left swal-text-content text-wrap">${reason}</div>
-            </div>
+            <strong class="custom-align-left">Reasons:</strong> ${reason}
+          </div>
           `,
           icon: "error",
           customClass: {
             content: 'swal-content-custom' // You can add a custom class for the content
-          }
+          },didOpen: () => {
+            document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
+          },
+          willClose: () => {
+            document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
+          },
+          allowOutsideClick: false 
         });
         
         
 
-        //this is not available in user. fix!!!
-        setScheduledOrders((prevScheduledOrders) => {
-          // Check if the order exists in scheduledOrders
-          const scheduledOrderIndex = prevScheduledOrders.findIndex(
-            (order) => order.id === Corder.id
-          );
+        // //this is not available in user. fix!!!
+        // setScheduledOrders((prevScheduledOrders) => {
+        //   // Check if the order exists in scheduledOrders
+        //   const scheduledOrderIndex = prevScheduledOrders.findIndex(
+        //     (order) => order.id === Corder.id
+        //   );
 
-          if (scheduledOrderIndex !== -1) {
-            // Remove from scheduledOrders
-            const updatedScheduledOrders = [...prevScheduledOrders];
-            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+        //   // if (scheduledOrderIndex !== -1) {
+        //   //   // Remove from scheduledOrders
+        //   //   const updatedScheduledOrders = [...prevScheduledOrders];
+        //   //   updatedScheduledOrders.splice(scheduledOrderIndex, 1);
 
-            // Set the updated scheduled orders to the local state
-            setScheduledOrders(updatedScheduledOrders);
+        //   //   // Set the updated scheduled orders to the local state
+        //   //   setScheduledOrders(updatedScheduledOrders);
 
-            setCancelledOrders((prevCancelledOrders) => {
-              // Check if the order is already present in active orders
-              const isOrderAlreadyPresent = prevCancelledOrders.some(
-                (order) => order._id === Corder._id
-              );
+        //   //   setCancelledOrders((prevCancelledOrders) => {
+        //   //     // Check if the order is already present in active orders
+        //   //     const isOrderAlreadyPresent = prevCancelledOrders.some(
+        //   //       (order) => order._id === Corder._id
+        //   //     );
 
-              if (!isOrderAlreadyPresent) {
-                // Add the order to active orders if it's not present
-                return [...prevCancelledOrders, Corder];
-              }
+        //   //     if (!isOrderAlreadyPresent) {
+        //   //       // Add the order to active orders if it's not present
+        //   //       return [...prevCancelledOrders, Corder];
+        //   //     }
 
-              // If the order is already present, return the current state
-              return prevCancelledOrders;
-            });
+        //   //     // If the order is already present, return the current state
+        //   //     return prevCancelledOrders;
+        //   //   });
 
-            return updatedScheduledOrders;
-          }
+        //   //   return updatedScheduledOrders;
+        //   // }
 
-          return prevScheduledOrders;
-        });
+        //   // return prevScheduledOrders;
+        // });
       }
     });
     return () => {
@@ -444,10 +452,6 @@ const HomePageUser = () => {
                   width: "3rem",
                 }}
               />
-            ) : filteredAndSortedUsers ? (
-              filteredAndSortedUsers.map((worker, index) => (
-                <WorkerCard worker={worker} key={index} />
-              ))
             ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
               filteredAndSortedUsers.map((worker, index) => (
                 <WorkerCard worker={worker} key={index} />
