@@ -79,9 +79,9 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   };
 
   const handleSend = () => {
-    const currentDate = new Date();
-    const selectedDate = new Date(timePart);
-    if(selectedDate < currentDate){
+    const currentDate   = new Date();
+    const selectedDate = new Date(dateTime);
+    if(selectedDate > currentDate  ){
     const data = {
       Title: taskTitle,
       Status: "Scheduled",
