@@ -22,6 +22,7 @@ import {
   FormGroup,
   Label,
   Input,
+  Spinner,
 } from "reactstrap";
 
 import completedtask from "../../assets/completedtask.png";
@@ -39,14 +40,12 @@ const ScheduledOrdersCardWorker = ({
   setUpdateScheduled,
   updateScheduled,
   activeOrder,
+  spinnerVisible
 }) => {
   const { user } = useSelector((state) => state.auth);
   const { token } = useSelector((state) => state.auth);
   const userId = user._id;
-
   const socket=useSelector((state) => state?.socket?.socket);
-
- 
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
@@ -145,8 +144,14 @@ const ScheduledOrdersCardWorker = ({
   return (
     <>
       <Container>
-        {scheduledOrdersObject.length > 0 ? <>
-          <Row>
+      {spinnerVisible ? (
+    <div style={{ textAlign: "center" }}>
+      <Spinner />
+    </div>
+  ) : (
+    scheduledOrdersObject.length > 0 ? (
+      <>
+        <Row>
           {scheduledOrdersObject?.map((order) => (
             <Col
               key={order._id}
@@ -284,7 +289,11 @@ const ScheduledOrdersCardWorker = ({
             </Col>
           ))}
         </Row>
-        </>:<>No Scheduled Orders</>}
+      </>
+    ) : (
+      <div>No Scheduled Orders</div>
+    )
+  )}
   
       </Container>
 
@@ -313,6 +322,7 @@ const ScheduledOrdersCardWorker = ({
           </Button>
         </ModalFooter>
       </Modal>
+
     </>
   );
 };
