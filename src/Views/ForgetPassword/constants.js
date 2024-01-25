@@ -1,6 +1,3 @@
-export const FORGET_ROUTES = {
-  NEW_PASSWORD: "/auth/newpassword",
-};
 
 export const FP_FIELDS = {
   EMAIL: "Please Provide the Email Address.",

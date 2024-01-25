@@ -35,5 +35,6 @@ const AuthRoutes = [
       component: <NewPassword />,
       layout: "/auth",
     },
+    
 ]
 export default AuthRoutes;

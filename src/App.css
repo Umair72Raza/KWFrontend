@@ -26,3 +26,13 @@
 .pointerCursor {
   cursor: pointer;
 }
+
+.custom-margin-service{
+  margin-left: 1% !important;
+  border-radius: 3px;
+}
+
+.custom-padding-navbar-admin{
+  padding-left:50px !important
+
+}

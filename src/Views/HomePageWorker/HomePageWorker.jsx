@@ -39,6 +39,7 @@ import {
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
 import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
+import { useStartJob } from "../../Context/StartJobContext";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
@@ -63,6 +64,7 @@ const HomePageWorker = () => {
   const { socket } = useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   const [oId, setOid] = useState();
+  // const { startJobResult, hideStartJobResult, showStartJobResult  } = useStartJob();
   let {
     setOriginalChats,
     setCopyOfChats,
@@ -105,8 +107,11 @@ const HomePageWorker = () => {
     socket?.on("startjob-result", (data) => {
       if (data.result === "true") {
         setStartJobStatus("true");
-        setStartJobVerified(true);
+       setStartJobVerified(true);
+
+
         setOid(data?.order?.Title);
+        //showStartJobResult("true", data.order.Title);
 
         // Use the functional form of setScheduledOrders to access the previous state
         setScheduledOrders((prevScheduledOrders) => {
@@ -145,13 +150,18 @@ const HomePageWorker = () => {
         });
       } else if (data.result == "false") {
         setStartJobStatus("false");
-        setStartJobVerified(true);
+         setStartJobVerified(true);
+        //showStartJobResult("false");
       }
     });
     return () => {
       socket?.off("startjob-result");
     };
   });
+
+
+
+  
   useEffect(() => {
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
@@ -328,11 +338,11 @@ const HomePageWorker = () => {
 
     fetchData();
   }, [
-    activeOrder.length,
+    activeOrder?.length,
     activeTab,
-    cancelledOrders.length,
+    cancelledOrders?.length,
     dispatch,
-    pastOrders.length,
+    pastOrders?.length,
     scheduledOrders,
   ]);
 
@@ -352,7 +362,7 @@ const HomePageWorker = () => {
       setPastClicked(true);
       let result = await dispatch(fetchPastOrdersAsync(token));
       if (result.type === "orders/fetchPastOrders/fulfilled") {
-        if (pastOrders.length === 0) {
+        if (pastOrders?.length === 0) {
           setPastOrders(result.payload.orders);
         } else {
           const uniqueOrders = result.payload.orders.filter(
@@ -378,7 +388,7 @@ const HomePageWorker = () => {
       setCancelledClicked(true);
       let result = await dispatch(fetchCancelledOrdersAsync(token));
       if (result.type === "orders/fetchCancelledOrders/fulfilled") {
-        if (cancelledOrders.length === 0) {
+        if (cancelledOrders?.length === 0) {
           setCancelledOrders(result.payload.orders);
         } else {
           const uniqueOrders = result.payload.orders.filter(
