@@ -185,6 +185,10 @@ export const GOTOFFER = {
   CLOSE_BUTTON: "Close"
 }
 
+export const FORGET_PASSWORD = {
+  SEND_OTP_BUTTON : "Send OTP"
+}
+
 export const EDITPROFILE_PAGE = {
   LABELS: {
     TITLE: "Your Profile",
@@ -315,3 +319,16 @@ export const newpasswordConstants={
   }
   
 }
+  
+
+  export const SERVICE_CONSTS = {
+    SERVICES_HEADING: "Services",
+    ADD_A_SERVICE: "Add a Service",
+    ADD_NEW_SERVICE: "Add new service",
+    NO_SERVICES:"No services available.",
+    REMOVE: "Remove",
+    UPDATE: "Update",
+    CANCEL: "Cancel",
+    EDIT: "Edit",
+    BACK:"Back"
+  }
