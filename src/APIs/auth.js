@@ -25,7 +25,7 @@ export const newPasswordSetter = async (email, newPass) => {
 export const OTPverify = async (otp) => {
   try {
     const response = await API.put(`user/reset-password/${otp}`);
-
+    console.log("OTP verify resp", response)
     return response;
   } catch (error) {
     throw error.response.data;

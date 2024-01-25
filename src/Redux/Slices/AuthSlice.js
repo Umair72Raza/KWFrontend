@@ -91,11 +91,21 @@ export const signUpUserAsync = createAsyncThunk(
 
 
 export const requestOTPAsync = createAsyncThunk(
-  "auth/requestOTP",
+  "auth/requestOTPAsync",
   async (email) => {
     try {
+      console.log(email, "email in async")
       const response = await sendOTP(email);
-      return response.data;
+      // console.log(response,"send otp resp")
+      // return response;
+
+
+      const serializableResponse = {
+        data: response.data,
+        status: response.status,
+        // other serializable properties
+      };
+      return serializableResponse;
     } catch (error) {
       failureToast("Couldn't send OTP");
     }
@@ -107,6 +117,7 @@ export const requestOTPverification = createAsyncThunk(
   async (otp) => {
     try {
       const response = await OTPverify(otp);
+      console.log("otp cerify response", response)
       return response.status;
     } catch (error) {
       failureToast("Inavlid OTP");
@@ -121,6 +132,7 @@ export const setNewPassAsync = createAsyncThunk(
       const { email, newPassword } = data;
       const password = newPassword;
       const response = await newPasswordSetter(email, password);
+      console.log(response,"response in async")
       if (response.status === 200) {
         return response.status;
       } else {
@@ -209,7 +221,7 @@ const authSlice = createSlice({
         state.otpError = action.error.message;
       })
       .addCase(requestOTPAsync.fulfilled, (state, action) => {
-        state.otpStatus = "suceeded";
+        state.otpStatus = "succeeded";
         state.otp = action.payload;
       })
       .addCase(requestOTPverification.fulfilled, (state, action) => {

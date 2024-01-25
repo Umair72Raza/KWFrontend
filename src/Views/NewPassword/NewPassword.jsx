@@ -18,7 +18,11 @@ import confirmpassword from "../../assets/images/NewPasswordpngs/confirmpassword
 import otppng from "../../assets/images/NewPasswordpngs/securedata.png";
 import { failureToast, successToast } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
-import { requestOTPverification, setNewPassAsync } from "../../Redux/Slices/AuthSlice";
+import {
+  requestOTPverification,
+  setNewPassAsync,
+} from "../../Redux/Slices/AuthSlice";
+
 const NewPassword = () => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -32,12 +36,15 @@ const NewPassword = () => {
   const [otpVerified, setOtpVerified] = useState(false);
   const newpass = useSelector((state) => state.auth.newpass)
 
+  const resetOTP = useSelector((state) => state.auth.resetOtp);
+  const newpass = useSelector((state) => state.auth.newpass);
+
   useEffect(() => {
     if (newpass === 200) {
-      successToast("Password Changed Successfully!")
+      successToast("Password Changed Successfully!");
       navigate("/auth/login");
     }
-  }, [newpass])
+  }, [newpass]);
 
   useEffect(() => {
     if (newPassword !== confirmNewPassword) {
@@ -71,21 +78,31 @@ const NewPassword = () => {
 
     e.preventDefault();
     try {
-      dispatch(requestOTPverification(OTP))
-      successToast("OTP verified, Enter new Password")
-      setOtpVerified(true)
+      const resp = await dispatch(requestOTPverification(OTP));
+      console.log(resp, "response in new password of verification");
+      // 
+      if(resp.payload === 200)
+      {
+        successToast("OTP verified, Enter new Password");
+        setOtpVerified(true);
+      }
+      else{
+        failureToast("Invalid OTP");
+      }
+     
     } catch (error) {
-      failureToast("Inavlid OTP");
+      failureToast("Invalid OTP");
     }
   };
 
   const saveNewPassword = async (e) => {
     e.preventDefault();
-    const data = { email, newPassword }
+    const data = { email, newPassword };
 
     try {
-      dispatch(setNewPassAsync(data));
-
+      const resp = dispatch(setNewPassAsync(data));
+      
+      console.log(resp,"response of dispatch new pass")
     } catch (error) {
       failureToast("OTP expired");
     }
@@ -100,7 +117,7 @@ const NewPassword = () => {
         borderRadius: "10px",
       }}
     >
-      <h3>{newpasswordConstants.NP_CONSTANTS.NP_HEADING}</h3>
+      <h3>{NP_CONSTANTS.NP_HEADING}</h3>
 
       <>
         <Row>
@@ -123,7 +140,7 @@ const NewPassword = () => {
                       >
                         {" "}
                         <Label for="otp">
-                          {newpasswordConstants.NP_CONSTANTS.PROVIDE_OTP_LABEL}
+                          {NP_CONSTANTS.PROVIDE_OTP_LABEL}
                         </Label>
                         <InputGroup>
                           <InputGroupText>
@@ -135,13 +152,13 @@ const NewPassword = () => {
                             name="otp"
                             placeholder="****"
                             type="text"
+                            value={OTP}
                             onChange={(e) => setOTP(e.target.value)}
                           />
                         </InputGroup>
                       </Col>
                     </Row>
-                  </FormGroup>
-                  <Row style={{ textAlign: "center" }}>
+                    <Row style={{ textAlign: "center" }}>
                     <Col
                       md={{
                         offset: 3,
@@ -152,12 +169,13 @@ const NewPassword = () => {
                       <Button
                         onClick={verifyOTPSENT}
                         color="success"
-                        disabled={notEqualError}
+                        disabled={!OTP || OTP.trim() === ''}
                       >
-                        {newpasswordConstants.NP_CONSTANTS.VERIFYOTP}
+                        {NP_CONSTANTS.VERIFYOTP}
                       </Button>
                     </Col>
                   </Row>
+                  </FormGroup>
                 </>
               ) : (
                 <>
@@ -181,21 +199,18 @@ const NewPassword = () => {
                             >
                               {" "}
                               <Label className="fw-semibold" for="password">
-                                {newpasswordConstants.NP_CONSTANTS.NEWPASSWORD}
+                                {NP_CONSTANTS.NEWPASSWORD}
                               </Label>
                               <InputGroup>
                                 <InputGroupText addonType="prepend">
-                                  <img
-                                    src={resetpasswordpng}
-                                    alt="newpswrd"
-                                  />
+                                  <img src={resetpasswordpng} alt="newpswrd" />
                                 </InputGroupText>
                                 <Input
                                   style={{ textAlign: "center" }}
                                   type="password"
                                   name="password"
                                   id="password"
-                                  placeholder={newpasswordConstants.NP_CONSTANTS.PASSWORD_PH}
+                                  placeholder={NP_CONSTANTS.PASSWORD_PH}
                                   value={newPassword}
                                   onChange={handlePasswordChange}
                                 />
@@ -210,7 +225,7 @@ const NewPassword = () => {
                                 className="fw-semibold"
                                 for="confirmNewPassword"
                               >
-                                {newpasswordConstants.NP_CONSTANTS.CONFIRMPASSWORD}
+                                {NP_CONSTANTS.CONFIRMPASSWORD}
                               </Label>
                               <InputGroup>
                                 <InputGroupText>
@@ -224,9 +239,7 @@ const NewPassword = () => {
                                   type="password"
                                   id="confirmNewPassword"
                                   name="confirmNewPassword"
-                                  placeholder={
-                                    newpasswordConstants.NP_CONSTANTS.CONFIRMPASSWORD_PH
-                                  }
+                                  placeholder={NP_CONSTANTS.CONFIRMPASSWORD_PH}
                                   value={confirmNewPassword}
                                   onChange={handleConfirmNewPassword}
                                 />
@@ -244,7 +257,7 @@ const NewPassword = () => {
                           color="success"
                           disabled={notEqualError}
                         >
-                          {newpasswordConstants.NP_CONSTANTS.SAVEBUTTON}
+                          {NP_CONSTANTS.SAVEBUTTON}
                         </Button>
                       </Form>
                     </Col>

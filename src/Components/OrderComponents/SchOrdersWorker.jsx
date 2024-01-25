@@ -35,7 +35,7 @@ const ScheduledOrdersCardWorker = ({
   setUpdateScheduled,
   updateScheduled,
   activeOrder,
-  spinnerVisible
+  spinnerVisible,
 }) => {
   const { user } = useSelector((state) => state.auth);
   const { token } = useSelector((state) => state.auth);
@@ -45,7 +45,6 @@ const ScheduledOrdersCardWorker = ({
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -73,9 +72,8 @@ const ScheduledOrdersCardWorker = ({
 
     const resonWithOrdertoCancel = {
       reason: cancelReason,
-      order: order
-    }
-
+      order: order,
+    };
 
     // there could be problem down here
     const cancelSocketEvent = () => {
@@ -126,7 +124,6 @@ const ScheduledOrdersCardWorker = ({
     setUpdateScheduled(false);
   }, [updateScheduled]);
 
-
   const transformOrderDetails = (order) => {
     let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
 
@@ -142,153 +139,161 @@ const ScheduledOrdersCardWorker = ({
           <div style={{ textAlign: "center" }}>
             <Spinner />
           </div>
-        ) : (
-          scheduledOrdersObject.length > 0 ? (
-            <>
-              <Row>
-                {scheduledOrdersObject?.map((order) => (
-                  <Col
-                    key={order._id}
-                    sm="6"
-                    md="4"
-                    lg="4"
-                    xl="4"
-                    style={{ marginTop: "10px" }}
+        ) : scheduledOrdersObject.length > 0 ? (
+          <>
+            <Row>
+              {scheduledOrdersObject?.map((order) => (
+                <Col
+                  key={order._id}
+                  sm="6"
+                  md="4"
+                  lg="4"
+                  xl="4"
+                  style={{ marginTop: "10px" }}
+                >
+                  <Card
+                    className="shadow"
+                    style={{ backgroundColor: "#f6f8fc", height: "100%" }}
                   >
-                    <Card
-                      className="shadow"
-                      style={{ backgroundColor: "#f6f8fc", height: "100%" }}
-                    >
-                      <CardBody>
-                        <CardTitle>
-                          <Col>
-                            <div
+                    <CardBody>
+                      <CardTitle>
+                        <Col>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <img
+                              src={completedtask}
+                              alt="schTask"
+                              style={{ marginRight: "10px" }}
+                            />
+                            <h5
                               style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              <img
-                                src={completedtask}
-                                alt="schTask"
-                                style={{ marginRight: "10px" }}
-                              />
-                              <h5 style={{
                                 marginTop: "4%",
                                 textAlign: "center",
                                 overflow: "hidden",
                                 whiteSpace: "nowrap",
                                 textOverflow: "ellipsis",
                                 maxWidth: "100%",
-                              }}>{order.Title}</h5>
-                            </div>
-                          </Col>{" "}
-                        </CardTitle>
-                        <CardText>
-                          <Col>
+                              }}
+                            >
+                              {order.Title}
+                            </h5>
+                          </div>
+                        </Col>{" "}
+                      </CardTitle>
+                      <CardText>
+                        <Col>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <span
+                              style={{ marginTop: "10px", marginRight: "1%" }}
+                            >
+                              Status: {order.Status}
+                            </span>
+                            <img
+                              src={activeOrderspng}
+                              alt="schTask"
+                              style={{
+                                height: "12px",
+                                marginLeft: "-1%",
+                                zIndex: "0",
+                                marginTop: "3.75%",
+                                opacity: "90%",
+                              }}
+                            />
+                          </div>
+                        </Col>
+                      </CardText>
+                      <CardText>Time: {order.time}</CardText>
+                      <CardText>Date: {order.date}</CardText>
+                      <CardText>
+                        Details:{" "}
+                        <div
+                          style={{
+                            maxHeight: "100px",
+                            overflowY: "auto",
+                          }}
+                        >
+                          {showFullDetailsMap[order._id] ? (
                             <div
                               style={{
                                 display: "flex",
                                 justifyContent: "center",
                                 alignItems: "center",
                               }}
+                            />
+                          ) : (
+                            transformOrderDetails(order)
+                          )}
+                          {order.details.length > 5 && (
+                            <Button
+                              style={{ marginTop: "-5px" }}
+                              color="link"
+                              onClick={() => toggleDetails(order._id)}
                             >
-                              <span style={{ marginTop: "10px", marginRight: "1%" }}>
-                                Status: {order.Status}
-                              </span>
-                              <img
-                                src={activeOrderspng}
-                                alt="schTask"
-                                style={{
-                                  height: "12px",
-                                  marginLeft: "-1%",
-                                  zIndex: "0",
-                                  marginTop: "3.75%",
-                                  opacity: "90%",
-                                }}
-                              />
-                            </div>
-                          </Col>
-                        </CardText>
-                        <CardText>Time: {order.time}</CardText>
-                        <CardText>Date: {order.date}</CardText>
-                        <CardText>
-                          Details:{" "}
-                          <div
-                            style={{
-                              maxHeight: "100px",
-                              overflowY: "auto",
-                            }}
-                          >
+                              {showFullDetailsMap[order._id]
+                                ? "Show Less"
+                                : "Show More"}
+                            </Button>
+                          )}
+                        </div>
+                      </CardText>
+                      <CardText>
+                        Order By:{" "}
+                        {order.users.length > 0 && order.users[0].firstName}
+                      </CardText>
+                      <Row>
+                        <Col style={{ margin: "2%" }} xs="12" md="5">
+                          {" "}
+                          {/* Full width on small screens, half width on medium and larger screens */}
+                          <CardText>
+                            <Button
+                              onClick={() => toggleModal(order)}
+                              color="danger"
+                            >
+                              Cancel Job
+                            </Button>
+                          </CardText>
+                        </Col>
 
-                            {showFullDetailsMap[order._id]
-                              ? (
-                                <div
-                                  dangerouslySetInnerHTML={{
-                                    __html: order.details,
-                                  }}
-                                />
-                              )
-                              : transformOrderDetails(order)}
-                            {order.details.length > 5 && (
-                              <Button
-                                style={{ marginTop: "-5px" }}
-                                color="link"
-                                onClick={() => toggleDetails(order._id)}
-                              >
-                                {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
-                              </Button>
-                            )}
-                          </div>
-                        </CardText>
-                        <CardText>
-                          Order By:{" "}
-                          {order.users.length > 0 && order.users[0].firstName}
-                        </CardText>
-                        <Row>
+                        <>
                           <Col style={{ margin: "2%" }} xs="12" md="5">
                             {" "}
-                            {/* Full width on small screens, half width on medium and larger screens */}
+                            {/* Half width on small screens, one-third width on medium and larger screens */}
                             <CardText>
                               <Button
-                                onClick={() => toggleModal(order)}
-                                color="danger"
+                                onClick={() =>
+                                  sendStartRequest(order, order.users[0]._id)
+                                }
+                                color="success"
+                                className={
+                                  activeOrder.length > 0 ? "disabled" : ""
+                                }
                               >
-                                Cancel Job
+                                Start Job
                               </Button>
                             </CardText>
                           </Col>
-
-                          <>
-                            <Col style={{ margin: "2%" }} xs="12" md="5">
-                              {" "}
-                              {/* Half width on small screens, one-third width on medium and larger screens */}
-                              <CardText>
-                                <Button
-                                  onClick={() =>
-                                    sendStartRequest(order, order.users[0]._id)
-                                  }
-                                  color="success"
-                                  className={activeOrder.length > 0 ? "disabled" : ""}
-                                >
-                                  Start Job
-                                </Button>
-                              </CardText>
-                            </Col>
-                          </>
-                        </Row>
-                      </CardBody>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            </>
-          ) : (
-            <div>No Scheduled Orders</div>
-          )
+                        </>
+                      </Row>
+                    </CardBody>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </>
+        ) : (
+          <div>No Scheduled Orders</div>
         )}
-
       </Container>
 
       <Modal isOpen={isModalOpen} toggle={toggleModal} centered>
@@ -316,7 +321,6 @@ const ScheduledOrdersCardWorker = ({
           </Button>
         </ModalFooter>
       </Modal>
-
     </>
   );
 };

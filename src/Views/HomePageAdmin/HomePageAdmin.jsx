@@ -1,9 +1,6 @@
 import React from "react";
-import {
-  Col,
-  Container,
-  Row,
-} from "reactstrap";
+import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
+import { Col, Container, Row } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import CustomAdminCard from "../../Components/CustomAdminCard/CustomAdminCard";
 import man from "../../assets/images/AdminPngs/man.png";
@@ -26,8 +23,9 @@ const HomePageAdmin = () => {
   };
   return (
     <>
-      {/* <AdminNavbar /> */}
-      <UserNavbar />
+      <div>
+        <UserNavbar />
+      </div>
       <div>
         <Container>
           <Row className="justify-content-center mt-5">

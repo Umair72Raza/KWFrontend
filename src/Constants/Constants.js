@@ -333,3 +333,22 @@ export const SERVICE_CONSTS = {
   EDIT: "Edit",
   BACK: "Back"
 }
+
+
+  export const ADMIN_WORKERS = {
+    WORKERS_HEADING : "Workers",
+    BACK: "Back",
+    ACTIVE_WORKERS: "Active Workers",
+    INACTIVE_WORKERS: "Inactive Workers",
+    NO_ACTIVE_WORKERS: "No Active Workers found",
+    NO_INACTIVE_WORKERS: "No Inactive Workers found"
+  }
+
+  export const ADMIN_USERS = {
+    USERS_HEADING: "Users",
+    BACK: "Back",
+    ACTIVE_USERS: "Active Users",
+    INACTIVE_USERS: "Inactive Users",
+    NO_ACTIVE_USERS: "No Active Users found",
+    NO_INACTIVE_USERS: "No Inactive Users found"
+  }
