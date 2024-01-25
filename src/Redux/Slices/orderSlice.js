@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   activateOrder,
@@ -55,7 +54,6 @@ export const fetchCancelledOrdersAsync = createAsyncThunk(
 export const fetchActiveOrdersAsync = createAsyncThunk(
   "orders/fetchActiveOrders",
   async (token) => {
-
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user._id;
     const data = { token: token, users: userId, status: "Active" };
@@ -75,7 +73,6 @@ export const cancelOrderAsync = createAsyncThunk(
 export const activateOrderAsync = createAsyncThunk(
   "orders/activateOrders",
   async (data) => {
-    const { orderId } = data;
     const response = await activateOrder(data);
     return response;
   }
@@ -84,7 +81,6 @@ export const activateOrderAsync = createAsyncThunk(
 export const changeStatusToPastAsync = createAsyncThunk(
   "orders/changeToPastOrders",
   async (data) => {
-    const { orderId } = data;
     const response = await changeToPast(data);
     return response;
   }
@@ -104,63 +100,63 @@ const orderSlice = createSlice({
     status: null,
   },
   extraReducers: (builder) => {
-    builder //the thunk that is called when the  sch are fetched
+    builder
       .addCase(fetchScheduledOrdersAsync.pending, (state) => {
         state.scheduledOrders = { data: null, status: "loading" };
-      }) //the thunk that is called when the  sch are fetched
+      })
       .addCase(fetchScheduledOrdersAsync.fulfilled, (state, action) => {
         state.scheduledOrders = action.payload;
         state.status = "succeeded";
-      }) //the thunk that is called when the  sch are fetched
+      })
       .addCase(fetchScheduledOrdersAsync.rejected, (state, action) => {
         state.scheduledOrders = {
           data: null,
           status: "failed",
           error: action.error.message,
         };
-      }) //the thunk that is called when the  past are fetched
+      })
       .addCase(fetchPastOrdersAsync.pending, (state) => {
         state.pastOrders = { data: null, status: "loading" };
-      }) //the thunk that is called when the  past are fetched
+      })
       .addCase(fetchPastOrdersAsync.fulfilled, (state, action) => {
         state.pastOrders = action.payload;
         state.status = "succeeded";
-      }) //the thunk that is called when the  past are fetched
+      })
       .addCase(fetchPastOrdersAsync.rejected, (state, action) => {
         state.pastOrders = {
           data: null,
           status: "failed",
           error: action.error.message,
         };
-      }) //the thunk that is called when the  cancelled are fetched
+      })
       .addCase(fetchCancelledOrdersAsync.pending, (state) => {
         state.cancelledOrders = { data: null, status: "loading" };
-      }) //the thunk that is called when the  cancelled are fetched
+      })
       .addCase(fetchCancelledOrdersAsync.fulfilled, (state, action) => {
         state.cancelledOrders = action.payload;
         state.status = "succeeded";
-      }) //the thunk that is called when the cancelled are fetched
+      })
       .addCase(fetchCancelledOrdersAsync.rejected, (state, action) => {
         state.cancelledOrders = {
           data: null,
           status: "failed",
           error: action.error.message,
         };
-      }) //the thunk that is called when the status of the order is changed to cancel
+      })
       .addCase(cancelOrderAsync.pending, (state) => {
         state.orderCancelledBool = { data: null, status: "loading" };
-      }) //the thunk that is called when the status of the order is changed to cancel
+      })
       .addCase(cancelOrderAsync.rejected, (state, action) => {
         state.orderCancelledBool = {
           data: null,
           status: "rejected",
           error: action.error.message,
         };
-      }) //the thunk that is called when the status of the order is changed to cancel
+      })
       .addCase(cancelOrderAsync.fulfilled, (state, action) => {
         state.status = "success";
         state.orderCancelledBool = action.payload;
-      }) //the thunk that is called when the active orders are fetched
+      })
       .addCase(fetchActiveOrdersAsync.pending, (state) => {
         state.activeOrders = { data: null, status: "loading" };
       })

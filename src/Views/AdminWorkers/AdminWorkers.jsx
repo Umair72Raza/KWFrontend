@@ -79,16 +79,16 @@ const AdminWorkers = () => {
         updatedWorker.access === "denied"
           ? [...prevInactiveWorkers, updatedWorker]
           : prevInactiveWorkers.filter(
-              (person) => person._id !== updatedWorker._id
-            )
+            (person) => person._id !== updatedWorker._id
+          )
       );
 
       setActiveWorkers((prevActiveWorkers) =>
         updatedWorker.access === "accepted"
           ? [...prevActiveWorkers, updatedWorker]
           : prevActiveWorkers.filter(
-              (person) => person._id !== updatedWorker._id
-            )
+            (person) => person._id !== updatedWorker._id
+          )
       );
     }
   }, [newfilWorkers]);
@@ -97,8 +97,8 @@ const AdminWorkers = () => {
     <>
       <UserNavbar />
       <h1 style={{ textAlign: "center" }}>Workers</h1>
-      <Navbar color="light" light expand="md" style={{marginLeft:"2%"}}>
-        <Nav tabs style={{cursor:"pointer"}}>
+      <Navbar color="light" light expand="md" style={{ marginLeft: "2%" }}>
+        <Nav tabs style={{ cursor: "pointer" }}>
           <NavItem>
             <Button
               style={{
@@ -143,7 +143,7 @@ const AdminWorkers = () => {
               style={{ width: "3rem", height: "3rem" }}
             />
           </div>
-        ): activeTab === "workers" && activeWorkers.length === 0 ? (
+        ) : activeTab === "workers" && activeWorkers.length === 0 ? (
           <p style={{ textAlign: "center", marginTop: "20px" }}>
             No Active Workers found
           </p>
@@ -151,27 +151,27 @@ const AdminWorkers = () => {
           <p style={{ textAlign: "center", marginTop: "20px" }}>
             No Inactive Workers found
           </p>
-        )  : (
+        ) : (
           <Row xs="1" md="2" lg="3">
             {activeTab === "workers"
               ? activeWorkers.map((person, index) => (
-                  <Col key={index}>
-                    <PeopleDetails
-                      key={index}
-                      person={person}
-                      setNewFilPerson={setNewFilWorkers}
-                    />
-                  </Col>
-                ))
+                <Col key={index}>
+                  <PeopleDetails
+                    key={index}
+                    person={person}
+                    setNewFilPerson={setNewFilWorkers}
+                  />
+                </Col>
+              ))
               : inactiveWorkers.map((person, index) => (
-                  <Col key={index}>
-                    <PeopleDetails
-                      key={index}
-                      person={person}
-                      setNewFilPerson={setNewFilWorkers}
-                    />
-                  </Col>
-                ))}
+                <Col key={index}>
+                  <PeopleDetails
+                    key={index}
+                    person={person}
+                    setNewFilPerson={setNewFilWorkers}
+                  />
+                </Col>
+              ))}
           </Row>
         )}
       </Row>

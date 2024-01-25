@@ -186,7 +186,7 @@ export const GOTOFFER = {
 }
 
 export const FORGET_PASSWORD = {
-  SEND_OTP_BUTTON : "Send OTP"
+  SEND_OTP_BUTTON: "Send OTP"
 }
 
 export const EDITPROFILE_PAGE = {
@@ -279,26 +279,26 @@ export const filterConstants = {
   }
 }
 export const navbarConstants = {
-  NavBar : {
+  NavBar: {
     brandName: "KaamWala"
   }
 }
-export const workerCardConstants ={
-  WorkerCardText:{
-    Services:"Services:"
+export const workerCardConstants = {
+  WorkerCardText: {
+    Services: "Services:"
+  }
+  ,
+  WorkerCardButtons: {
+    chat: "Chat",
+    book: "Book"
+  }
 }
-,
-WorkerCardButtons:{
-    chat:"Chat",
-    book:"Book"
-}
-}
-export const forgetPasswordConstants={
-  FORGET_ROUTES : {
+export const forgetPasswordConstants = {
+  FORGET_ROUTES: {
     NEW_PASSWORD: "/auth/newpassword",
   },
-  
-  FP_FIELDS : {
+
+  FP_FIELDS: {
     EMAIL: "Please Provide the Email Address.",
     MSG: "An OTP will be sent to your Email",
     EG_MAIL: "example@gmail.com",
@@ -306,8 +306,8 @@ export const forgetPasswordConstants={
   }
 }
 
-export const newpasswordConstants={
- NP_CONSTANTS : {
+export const newpasswordConstants = {
+  NP_CONSTANTS: {
     NP_HEADING: "Confirm your OTP and Add a new Password",
     PROVIDE_OTP_LABEL: " Please Provide the OTP sent to you via Email",
     NEWPASSWORD: "New Password",
@@ -315,20 +315,20 @@ export const newpasswordConstants={
     CONFIRMPASSWORD: "Confirm Password",
     CONFIRMPASSWORD_PH: "Confirm new password",
     SAVEBUTTON: "Save New Password",
-    VERIFYOTP:"VERIFY OTP"
+    VERIFYOTP: "VERIFY OTP"
   }
-  
-}
-  
 
-  export const SERVICE_CONSTS = {
-    SERVICES_HEADING: "Services",
-    ADD_A_SERVICE: "Add a Service",
-    ADD_NEW_SERVICE: "Add new service",
-    NO_SERVICES:"No services available.",
-    REMOVE: "Remove",
-    UPDATE: "Update",
-    CANCEL: "Cancel",
-    EDIT: "Edit",
-    BACK:"Back"
-  }
+}
+
+
+export const SERVICE_CONSTS = {
+  SERVICES_HEADING: "Services",
+  ADD_A_SERVICE: "Add a Service",
+  ADD_NEW_SERVICE: "Add new service",
+  NO_SERVICES: "No services available.",
+  REMOVE: "Remove",
+  UPDATE: "Update",
+  CANCEL: "Cancel",
+  EDIT: "Edit",
+  BACK: "Back"
+}

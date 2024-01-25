@@ -1,22 +1,18 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import {
   Form,
   FormGroup,
   Input,
   Button,
-  Label,
-  FormText,
   Container,
   Row,
   Col,
 } from "reactstrap";
 import forgotpng from "../../assets/images/ForgetPasswordpng/forgot.png";
-import {forgetPasswordConstants } from "../../Constants/Constants.js";
+import { forgetPasswordConstants } from "../../Constants/Constants.js";
 import { failureToast, successToast } from "../../utils";
-import { requestOTPAsync,updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
+import { requestOTPAsync, updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { FORGET_PASSWORD } from "../../Constants/Constants.js";
 

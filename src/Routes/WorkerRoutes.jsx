@@ -9,7 +9,7 @@ const WorkerRoutes = [
     layout: "/worker",
   },
   {
-    path:"/editprofile",
+    path: "/editprofile",
     name: "editprofile",
     component: <EditProfilePage ShowServices={true} />,
     layout: "/worker",

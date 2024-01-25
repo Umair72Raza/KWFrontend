@@ -1,5 +1,4 @@
 import { createContext, useContext, useState } from "react";
-import { useSelector } from "react-redux";
 
 const ChatContext = createContext();
 
@@ -13,12 +12,12 @@ const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState();
   const [socketConnected, setSocketConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [notification,setNotification] = useState([]);
-  const [offerNotification,SetONotification]=useState([])
-  const [selectedChatCompare,setSelectedChatCompare] =useState(null);
+  const [notification, setNotification] = useState([]);
+  const [offerNotification, SetONotification] = useState([])
+  const [selectedChatCompare, setSelectedChatCompare] = useState(null);
   const [receiveMessage, setReceiveMessage] = useState(null);
   const [gotOffer, setGotOffer] = useState(false);
-  const [userOffering,setUserOffering]=useState([]);
+  const [userOffering, setUserOffering] = useState([]);
   return (
     <ChatContext.Provider
       value={{
@@ -47,9 +46,9 @@ const ChatProvider = ({ children }) => {
         selectedChatCompare,
         setSelectedChatCompare,
         receiveMessage,
-         setReceiveMessage,
-         gotOffer, setGotOffer,
-         userOffering,setUserOffering
+        setReceiveMessage,
+        gotOffer, setGotOffer,
+        userOffering, setUserOffering
       }}
     >
       {children}

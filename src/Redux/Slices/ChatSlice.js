@@ -102,11 +102,11 @@ const ChatSlice = createSlice({
       })
       .addCase(ToggleChatSeen.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message; 
+        state.error = action.error.message;
       });
   },
 });
 
-export const { updateChatsWithWorkers } = ChatSlice.actions;  
+export const { updateChatsWithWorkers } = ChatSlice.actions;
 
 export default ChatSlice.reducer;

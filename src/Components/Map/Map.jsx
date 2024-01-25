@@ -5,7 +5,6 @@ import { useDebounce } from "../../Hooks/Debounce";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { set } from "lodash";
 
 const libraries = [import.meta.env.VITE_GOOGLE_API_LIBARARY];
 
@@ -59,7 +58,6 @@ const Map = React.memo(
     const [newInput, setNewInput] = useState(formData?.address);
     const [country, setCountry] = useState(formData?.country);
     const autocompleteRef = useRef(null);
-    const debouncedAddress = useDebounce(newInput);
     const location = useLocation();
     const [loadScriptKey, setLoadScriptKey] = useState(0);
     const [isMapLoaded, setMapLoaded] = useState(false);
@@ -179,7 +177,7 @@ const Map = React.memo(
                     setFormData((prev) => ({
                       ...prev,
                       address: results[0].formatted_address,
-                      country:countryComponent ? countryComponent.short_name : "Unknown",
+                      country: countryComponent ? countryComponent.short_name : "Unknown",
                       latitude,
                       longitude,
                     }));
@@ -305,12 +303,12 @@ const Map = React.memo(
           onLoad={handleLoadScript}
         >
           {isLoading ? (
-            <div className=" d-flex flex-column justify-content-center align-items-center" style={{height:"25vh"}} >
+            <div className=" d-flex flex-column justify-content-center align-items-center" style={{ height: "25vh" }} >
               {" "}
               <Spinner
                 style={{ width: "3rem", height: "3rem", marginTop: "25px" }}
               />
-                <p>Loading Maps...</p>
+              <p>Loading Maps...</p>
             </div>
           ) : isMapLoaded ? (
             <GoogleMapContainer

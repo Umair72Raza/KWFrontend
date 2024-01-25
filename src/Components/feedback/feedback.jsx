@@ -25,7 +25,6 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
       setModal(false);
     } else if (user.role == "worker") {
       SetConfirm("");
-      //flag="false";
       setModal(false);
     }
   };
@@ -52,7 +51,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
       };
       if (flag === true) {
         dispatch(AddFeedBack({ params, token }));
-        //SetConfirm("");
+
       }
       SetConfirm("");
     }

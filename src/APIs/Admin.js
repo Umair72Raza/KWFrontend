@@ -29,7 +29,7 @@ export const getAllTheWorkers = async (token) => {
 
 export const togglePersonAccess = async (token, id, access) => {
   try {
-    
+
     const response = await API.put(
       `admin/users/${id}`,
       { access },
@@ -72,7 +72,7 @@ export const createNewService = async (token, name, id) => {
 };
 
 
-export const deleteAService = async(token, id) => {
+export const deleteAService = async (token, id) => {
   try {
     const response = await API.delete(
       `admin/services/${id}`,
@@ -88,24 +88,24 @@ export const deleteAService = async(token, id) => {
   }
 };
 
-export const editNewService = async(token,name,id) =>{
+export const editNewService = async (token, name, id) => {
   try {
     const response = await API.put(
-      `admin/updateService/${id}`, {name}, 
+      `admin/updateService/${id}`, { name },
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
-   
+
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 }
 
-///users/:id
+
 export const getAllUserOrders = async (token, id) => {
   try {
     const response = await API.get(`admin/orders/${id}`, {
@@ -120,18 +120,17 @@ export const getAllUserOrders = async (token, id) => {
 };
 
 export const fetchFeedbacksofUser = async (data) => {
-    try {
-      const {_id,token} = data
-      const response = await API.get(`admin/feedbacks/${_id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response.data;
-    }
-  };
+  try {
+    const { _id, token } = data
+    const response = await API.get(`admin/feedbacks/${_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
 
 
-  

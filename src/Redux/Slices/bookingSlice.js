@@ -16,7 +16,7 @@ const bookingSlice = createSlice({
 
   },
   reducers: {
-    setnewOrderValue:(state,action)=>{
+    setnewOrderValue: (state, action) => {
       state.newOrder = action.payload;
     }
   },

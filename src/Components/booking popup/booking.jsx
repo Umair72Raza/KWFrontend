@@ -8,7 +8,6 @@ import {
   Input,
   Label,
   FormGroup,
-  Row,
 } from "reactstrap";
 import Swal from "sweetalert2";
 import { BookingConstants } from "../../Constants/Constants.js";
@@ -20,7 +19,7 @@ import { failureToast } from "../../utils.js";
 
 const Booking = ({ modal, toggle, worker, chat }) => {
   const { user, token } = useSelector((state) => state.auth);
-  const socket=useSelector((state) => state?.socket?.socket);
+  const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDetails, setTaskDetails] = useState(``);
@@ -208,8 +207,8 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               <div className="">
                 <b>{BookingConstants.div.rating}</b>
                 {worker?.rating > 0
-                      ? starRating(worker.rating)
-                      : "not rated yet"}
+                  ? starRating(worker.rating)
+                  : "not rated yet"}
               </div>
             </div>
           </FormGroup>
@@ -222,7 +221,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               id="taskDetails"
               value={taskDetails}
               onChange={(e) => setTaskDetails(e.target.value)}
-              maxLength={1000} 
+              maxLength={1000}
               style={{ minHeight: '100px' }}
             />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -278,7 +277,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               min={5}
               max={50}
             />
-           
+
           </FormGroup>
         </ModalBody>
         <ModalFooter>

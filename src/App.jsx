@@ -1,8 +1,8 @@
 import "./App.css";
-import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AuthLayout from "./Layouts/AuthLayout";
 import UserLayout from "./Layouts/UserLayout";
-import { checkRole, checkToken, failureToast } from "./utils";
+import { checkRole, checkToken } from "./utils";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Worker from "./Layouts/WorkerLayout";
@@ -13,14 +13,14 @@ function App() {
   const [authenticated, setAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState(null);
-  let { loginStatus, user } = useSelector((state) => state.auth);
- 
+  let { loginStatus, } = useSelector((state) => state.auth);
+
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchData = async () => {
-      
+
 
       if (isMounted) {
         const authenticated = checkToken();
@@ -46,7 +46,7 @@ function App() {
   let routes;
 
   if (authenticated && role === "user") {
-    
+
     routes = (
       <>
         <Route path="/user/*" element={<UserLayout />} />
@@ -61,7 +61,7 @@ function App() {
       </>
     );
   } else if (authenticated && role === "admin") {
-   
+
     routes = (
       <>
         <Route path="/admin/*" element={<AdminLayout />} />
@@ -69,7 +69,7 @@ function App() {
       </>
     );
   } else {
-   
+
     routes = (
       <>
         <Route path="/auth/*" element={<AuthLayout />} />

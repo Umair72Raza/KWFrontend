@@ -42,9 +42,7 @@ const UserNavbar = () => {
     SetONotification,
     setReceiveMessage,
     setGotOffer,
-    userOffering,
     setSelectedChatCompare,
-    setUserOffering
   } = ChatState();
   const socket = useSelector((state) => state?.socket?.socket);
 
@@ -79,14 +77,13 @@ const UserNavbar = () => {
   const HandleNotificationSelection = (item) => {
     setChat(item.chat);
     setSelectedChatCompare(item.chat);
-     setSelectedChat(() => SelectChat(item.chat));
+    setSelectedChat(() => SelectChat(item.chat));
     setNotification(notification.filter((n) => n !== item));
     setShowModal(true);
   };
 
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
-    //setUserOffering(userOffering.filter(()=>))
     setGotOffer(true);
     setReceiveMessage(notify.params);
     SetShowOffer(!offer);

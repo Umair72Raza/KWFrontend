@@ -6,7 +6,6 @@ import {
   SendMessageAsync,
   ToggleChatSeen,
   fetchMessages,
-  updateChatsWithWorkers,
 } from "../../Redux/Slices/ChatSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import { FaDotCircle } from "react-icons/fa";
@@ -14,7 +13,6 @@ import { SelectChat } from "../../utils";
 import { useSelector } from "react-redux";
 import Booking from "../booking popup/booking";
 import { ChatPopUpPage } from "../../Constants/Constants";
-import { set } from "lodash";
 
 const ChatPopup = () => {
   let {
@@ -178,8 +176,8 @@ const ChatPopup = () => {
   const sendMessage = async (e) => {
     e.preventDefault();
     setSendButtonDisabled(true);
-     // Add loading state until the message is sent
-     setLoadingSendMessage(true);
+    // Add loading state until the message is sent
+    setLoadingSendMessage(true);
 
     try {
       if (newMessageText) {
@@ -190,7 +188,7 @@ const ChatPopup = () => {
           token,
         };
 
-       
+
 
         const result = await dispatch(SendMessageAsync(messageData));
 
@@ -316,11 +314,11 @@ const ChatPopup = () => {
               {isSameDay(new Date(), messageDate)
                 ? ChatPopUpPage.MESSAGE_TODAY
                 : isSameDay(
-                    new Date(new Date().setDate(new Date().getDate() - 1)),
-                    messageDate
-                  )
-                ? ChatPopUpPage.MESSAGE_YESTERDAY
-                : messageDate.toLocaleDateString()}
+                  new Date(new Date().setDate(new Date().getDate() - 1)),
+                  messageDate
+                )
+                  ? ChatPopUpPage.MESSAGE_YESTERDAY
+                  : messageDate.toLocaleDateString()}
             </div>
           );
         }
@@ -331,11 +329,10 @@ const ChatPopup = () => {
           <React.Fragment key={message._id}>
             {separator}
             <div
-              className={`ps-3 ${
-                message.sender._id === user._id
+              className={`ps-3 ${message.sender._id === user._id
                   ? "sent-message justify-content-end w-50 mt-4 me-4"
                   : "received-message mt-4 w-50"
-              }`}
+                }`}
               style={{
                 wordWrap: "break-word",
                 maxWidth: "100%",
@@ -440,7 +437,7 @@ const ChatPopup = () => {
                                 outline
                               >
                                 {loadingSendMessage ? (
-                                  <Spinner size="sm" className="p-2"  />
+                                  <Spinner size="sm" className="p-2" />
                                 ) : (
                                   ChatPopUpPage.SEND_BUTTON_LABEL
                                 )}
@@ -468,11 +465,10 @@ const ChatPopup = () => {
                                       return (
                                         <div
                                           key={chatUser._id}
-                                          className={`pt-2 d-flex flex-row justify-content-between ${
-                                            isBlockedByAdmin
+                                          className={`pt-2 d-flex flex-row justify-content-between ${isBlockedByAdmin
                                               ? "blocked-user"
                                               : ""
-                                          }`}
+                                            }`}
                                           onClick={() =>
                                             !isBlockedByAdmin &&
                                             handleChatSelection(chat)
@@ -484,7 +480,7 @@ const ChatPopup = () => {
                                           </h5>
                                           {!chat?.seen &&
                                             chat.latestMessage?.sender !==
-                                              user._id && (
+                                            user._id && (
                                               <span>
                                                 <FaDotCircle className="text-primary me-3" />
                                               </span>
@@ -535,9 +531,8 @@ const ChatPopup = () => {
                                     return (
                                       <div
                                         key={chatUser._id}
-                                        className={`pt-2 d-flex flex-row justify-content-between ${
-                                          isBlockedByAdmin ? "blocked-user" : ""
-                                        }`}
+                                        className={`pt-2 d-flex flex-row justify-content-between ${isBlockedByAdmin ? "blocked-user" : ""
+                                          }`}
                                         onClick={() =>
                                           !isBlockedByAdmin &&
                                           handleChatSelection(chat)
@@ -549,7 +544,7 @@ const ChatPopup = () => {
                                         </h5>
                                         {!chat?.seen &&
                                           chat.latestMessage?.sender !==
-                                            user._id && (
+                                          user._id && (
                                             <span>
                                               <FaDotCircle className="text-primary me-3" />
                                             </span>

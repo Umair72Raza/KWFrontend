@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import {
   TabContent,
@@ -49,7 +48,6 @@ const Orders = () => {
   const spinnerVisible = useSelector(selectSpinnerVisibility);
 
 
-
   const navigate = useNavigate();
   const { newOrder } = useSelector((state) => state.booking);
   const toggleTab = (tab) => {
@@ -57,14 +55,14 @@ const Orders = () => {
       setActiveTab(tab);
     }
   };
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
       let result;
       switch (activeTab) {
         case "1":
-          
+
           // Check if scheduledOrders is already available locally
           if (!isScheduledOrdersFetched) {
             dispatch(showSpinner());
@@ -84,7 +82,7 @@ const Orders = () => {
               dispatch(hideSpinner());
             }
           }
-          
+
           break;
         case "2":
           dispatch(showSpinner());
@@ -197,7 +195,7 @@ const Orders = () => {
         </Row>
         <Row></Row>
         <Row style={{ marginTop: "0.5%" }}>
-          <Nav tabs style={{cursor:"pointer"}}>
+          <Nav tabs style={{ cursor: "pointer" }}>
             <NavItem>
               <Button
                 color="danger"
@@ -246,10 +244,10 @@ const Orders = () => {
             <TabPane tabId="1">
               <Row>
                 <Col>
-                <h2 style={{textAlign:"center"}}>{TABS.SCH_ORDERS}</h2>
+                  <h2 style={{ textAlign: "center" }}>{TABS.SCH_ORDERS}</h2>
 
                   <div style={{ marginTop: "10px !important" }}>
-                    {scheduledOrders.length> 0 ? (
+                    {scheduledOrders.length > 0 ? (
                       <OrderCard
                         scheduledOrdersObject={scheduledOrders}
                         toggleCancel={toggleCancel}
@@ -266,7 +264,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="2">
               <Row>
-              <h2 style={{textAlign:"center"}}>{TABS.PAST_ORDERS}</h2>
+                <h2 style={{ textAlign: "center" }}>{TABS.PAST_ORDERS}</h2>
                 <Col>
                   {pastOrders ? (
                     <PastOrdersCard scheduledOrdersObject={pastOrders} />
@@ -278,7 +276,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="3">
               <Row>
-              <h2 style={{textAlign:"center"}}>{TABS.CANCELLED_ORDERS}</h2>
+                <h2 style={{ textAlign: "center" }}>{TABS.CANCELLED_ORDERS}</h2>
                 <Col>
                   {cancelledOrders ? (
                     <>
@@ -294,7 +292,7 @@ const Orders = () => {
             </TabPane>
             <TabPane tabId="4">
               <Row>
-              <h2 style={{textAlign:"center"}}>{TABS.ACTIVE_ORDERS}</h2>
+                <h2 style={{ textAlign: "center" }}>{TABS.ACTIVE_ORDERS}</h2>
                 <Col>
                   {activeOrder ? (
                     <>
@@ -313,11 +311,11 @@ const Orders = () => {
           </TabContent>
         </Row>
         <ChatPopup />
-        <div style={{textAlign:"center"}}>
-      {spinnerVisible && <Spinner />}
-      </div>
+        <div style={{ textAlign: "center" }}>
+          {spinnerVisible && <Spinner />}
+        </div>
       </Container>
-      
+
     </>
   );
 };

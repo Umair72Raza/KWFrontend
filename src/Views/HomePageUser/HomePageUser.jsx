@@ -1,7 +1,7 @@
 import { FaSearch } from "react-icons/fa";
 import Filter from "../../Components/Filter/Filter.jsx";
 import WorkerCard from "../../Components/workerCard/workerCard";
-import  {HomePageUserConst}  from "../../Constants/Constants.js";
+import { HomePageUserConst } from "../../Constants/Constants.js";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice.js";
@@ -35,7 +35,7 @@ const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const { setOriginalChats, setCopyOfChats, OriginalChats } = ChatState();
+  const { setOriginalChats, setCopyOfChats } = ChatState();
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
   let users = useSelector((state) => state?.homepage?.workers);
@@ -157,13 +157,13 @@ const HomePageUser = () => {
           icon: "error",
           customClass: {
             content: 'swal-content-custom' // You can add a custom class for the content
-          },didOpen: () => {
+          }, didOpen: () => {
             document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
           },
           willClose: () => {
             document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
           },
-          allowOutsideClick: false 
+          allowOutsideClick: false
         });
       }
     });
@@ -405,12 +405,12 @@ const HomePageUser = () => {
           <Col className="mt-3" md={7}>
             {loading ? (
               <div className="d-flex justify-content-center">
-              <Spinner
-                style={{
-                  height: "3rem",
-                  width: "3rem",
-                }}
-              />
+                <Spinner
+                  style={{
+                    height: "3rem",
+                    width: "3rem",
+                  }}
+                />
               </div>
             ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
               filteredAndSortedUsers.map((worker, index) => (

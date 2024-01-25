@@ -92,7 +92,7 @@ const Filter = ({ sortOption, setSortOption, sortOption2,
         </FormGroup>
         <FormGroup>
           <Label>{filterConstants.Labels.filter1}</Label>
-         
+
           <FormGroup check>
             <Label check>
               <Input
