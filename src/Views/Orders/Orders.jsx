@@ -28,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 import { hideSpinner, selectSpinnerVisibility, showSpinner } from "../../Redux/Slices/LoaderSlice";
 import { TABS } from "../../Constants/Constants";
-import ChatPopup from "../../Components/Chat Box/ChatPop";
+
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
   const [toggleCancel, setToggleCancel] = useState(false);
