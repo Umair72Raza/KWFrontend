@@ -9,6 +9,7 @@ import {
   Col,
   Container,
   Row,
+  Spinner,
 } from "reactstrap";
 import FinishJob from "../FinishJob/FinishJob";
 import Swal from "sweetalert2";
@@ -19,6 +20,7 @@ const ActiveOrders = ({
   scheduledOrdersObject,
   setPastOrders,
   updateActiveOrders,
+  spinnerVisible,
 }) => {
   const { user } = useSelector((state) => state.auth);
   const [order, SetOrder] = useState(null);
@@ -89,7 +91,11 @@ const ActiveOrders = ({
   };
   return (
     <Container>
-      {scheduledOrdersObject.length > 0 ? (
+      {spinnerVisible ? (
+        <div style={{ textAlign: "center" }}>
+          <Spinner />
+        </div>
+      ) : scheduledOrdersObject.length > 0 ? (
         <>
           <Row>
             {scheduledOrdersObject?.map((order) => (

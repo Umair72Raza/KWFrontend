@@ -25,15 +25,12 @@ import {
   OffcanvasBody,
   Spinner,
 } from "reactstrap";
-import ChatPopup from "../../Components/Chat Box/ChatPop.jsx";
 import { ChatState } from "../../Context/ChatProvider.jsx";
 import ModalComponent from "../../Components/ModalComponent/ModalComponent.jsx";
 import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
-
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
-
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);

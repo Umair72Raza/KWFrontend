@@ -12,13 +12,14 @@ import {
   Row,
   Col,
   Button,
+  Spinner,
 } from "reactstrap";
 import pastpng from "../../assets/past.png";
 import checkpng from "../../assets/check.png";
 import { useSelector } from "react-redux";
 import { truncateText } from "../../utils";
 
-const PastOrdersCard = ({ scheduledOrdersObject }) => {
+const PastOrdersCard = ({ scheduledOrdersObject,spinnerVisible }) => {
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const { user } = useSelector((state) => state.auth);
   const userRole = user.role;
@@ -49,114 +50,123 @@ const PastOrdersCard = ({ scheduledOrdersObject }) => {
   };
   return (
     <Container>
-      {scheduledOrdersObject.length > 0 ? <>
-        <Row>
-        {scheduledOrdersObject?.map((order) => (
-          <Col
-            key={order._id}
-            sm="6"
-            md="4"
-            lg="3"
-            style={{ marginTop: "10px" }}
-          >
-            <Card
-              className="shadow"
-              style={{ backgroundColor: "#f6f8fc", height: "100%" }}
-            >
-              <CardBody>
-                <Col
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+    {spinnerVisible ? (
+      <div style={{ textAlign: "center" }}>
+        <Spinner />
+      </div>
+    ) : (
+      scheduledOrdersObject.length > 0 ? (
+        <>
+          <Row>
+            {scheduledOrdersObject?.map((order) => (
+              <Col
+                key={order._id}
+                sm="6"
+                md="4"
+                lg="3"
+                style={{ marginTop: "10px" }}
+              >
+                <Card
+                  className="shadow"
+                  style={{ backgroundColor: "#f6f8fc", height: "100%" }}
                 >
-                  <img
-                    src={pastpng}
-                    alt="schTask"
-                    style={{ height: "27px", marginRight: "10px" }}
-                  />
-                  <h5 style={{
+                  <CardBody>
+                    <Col
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <img
+                        src={pastpng}
+                        alt="schTask"
+                        style={{ height: "27px", marginRight: "10px" }}
+                      />
+                      <h5
+                        style={{
                           marginTop: "4%",
                           textAlign: "center",
                           overflow: "hidden",
                           whiteSpace: "nowrap",
                           textOverflow: "ellipsis",
                           maxWidth: "100%",
-                        }}>
-                    {order.Title}
-                  </h5>
-                </Col>{" "}
-                <CardText
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {" "}
-                  <span style={{ marginTop: "10px" }}>
-                    Status: {order.Status}
-                  </span>
-                  <img
-                    src={checkpng}
-                    alt="schTask"
-                    style={{
-                      height: "25px",
-                      marginLeft: "1%",
-                      marginTop: "-1%",
-                    }}
-                  />
-                </CardText>
-                <CardText>Time: {order.time}</CardText>
-                <CardText>Date: {order.date}</CardText>
-                <CardText>
-                    Details:{" "}
-                    <div
+                        }}
+                      >
+                        {order.Title}
+                      </h5>
+                    </Col>{" "}
+                    <CardText
                       style={{
-                        maxHeight: "100px",
-                        overflowY: "auto",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                       }}
                     >
-                      
-                      {showFullDetailsMap[order._id]
-                        ? (
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: order.details,
-                              }}
-                            />
-                          )
-                        : transformOrderDetails(order)}
-                      {order.details.length > 5 && (
-                        <Button
-                          style={{ marginTop: "-5px" }}
-                          color="link"
-                          onClick={() => toggleDetails(order._id)}
-                        >
-                          {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
-                        </Button>
-                      )}
-                    </div>
-                  </CardText>
-                <CardText>
-                  {person}{" "}
-                  {isUser
-                    ? `Worker: 
-                   ${order?.users[1]?.firstName}
-                  `
-                    : `User: 
-                   ${order?.users[0]?.firstName}
-                  `}
-                </CardText>
-              </CardBody>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-      </>:<>No Past Orders</>}
-
-    </Container>
+                      {" "}
+                      <span style={{ marginTop: "10px" }}>
+                        Status: {order.Status}
+                      </span>
+                      <img
+                        src={checkpng}
+                        alt="schTask"
+                        style={{
+                          height: "25px",
+                          marginLeft: "1%",
+                          marginTop: "-1%",
+                        }}
+                      />
+                    </CardText>
+                    <CardText>Time: {order.time}</CardText>
+                    <CardText>Date: {order.date}</CardText>
+                    <CardText>
+                      Details:{" "}
+                      <div
+                        style={{
+                          maxHeight: "100px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {showFullDetailsMap[order._id] ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order.details,
+                            }}
+                          />
+                        ) : (
+                          transformOrderDetails(order)
+                        )}
+                        {order.details.length > 5 && (
+                          <Button
+                            style={{ marginTop: "-5px" }}
+                            color="link"
+                            onClick={() => toggleDetails(order._id)}
+                          >
+                            {showFullDetailsMap[order._id]
+                              ? "Show Less"
+                              : "Show More"}
+                          </Button>
+                        )}
+                      </div>
+                    </CardText>
+                    <CardText>
+                      {person}{" "}
+                      {isUser
+                        ? `Worker: ${order?.users[1]?.firstName}`
+                        : `User: ${order?.users[0]?.firstName}`}
+                    </CardText>
+                  </CardBody>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </>
+      ) : (
+        <>No Past Orders</>
+      )
+    )}
+  </Container>
+  
   );
 };
 
