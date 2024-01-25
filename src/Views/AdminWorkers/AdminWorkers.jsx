@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchWorkersAsync } from "../../Redux/Slices/AdminSlice";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
+import { ADMIN_WORKERS } from "../../Constants/Constants";
 
 const AdminWorkers = () => {
   const navigate = useNavigate();
@@ -79,24 +80,26 @@ const AdminWorkers = () => {
         updatedWorker.access === "denied"
           ? [...prevInactiveWorkers, updatedWorker]
           : prevInactiveWorkers.filter(
-              (person) => person._id !== updatedWorker._id
-            )
+            (person) => person._id !== updatedWorker._id
+          )
       );
 
       setActiveWorkers((prevActiveWorkers) =>
         updatedWorker.access === "accepted"
           ? [...prevActiveWorkers, updatedWorker]
           : prevActiveWorkers.filter(
-              (person) => person._id !== updatedWorker._id
-            )
+            (person) => person._id !== updatedWorker._id
+          )
       );
     }
   }, [newfilWorkers]);
 
   return (
     <>
+    <div>
       <UserNavbar />
-      <h1 style={{ textAlign: "center" }}>Workers</h1>
+      </div>
+      <h1 style={{ textAlign: "center" }}>{ADMIN_WORKERS.WORKERS_HEADING}</h1>
       <Navbar color="light" light expand="md" style={{marginLeft:"2%"}}>
         <Nav tabs style={{cursor:"pointer"}}>
           <NavItem>
@@ -109,7 +112,7 @@ const AdminWorkers = () => {
               color="danger"
               onClick={() => navigate(-1)}
             >
-              Back
+              {ADMIN_WORKERS.BACK}
             </Button>
           </NavItem>
           <NavItem>
@@ -117,7 +120,7 @@ const AdminWorkers = () => {
               onClick={() => handleButtonClick("workers")}
               className={classnames({ active: activeTab === "workers" })}
             >
-              Active Workers
+             {ADMIN_WORKERS.ACTIVE_WORKERS}
             </NavLink>
           </NavItem>
           <NavItem>
@@ -127,7 +130,7 @@ const AdminWorkers = () => {
                 active: activeTab === "inactiveWorkers",
               })}
             >
-              Inactive Workers
+              {ADMIN_WORKERS.INACTIVE_WORKERS}
             </NavLink>
           </NavItem>
         </Nav>
@@ -143,35 +146,35 @@ const AdminWorkers = () => {
               style={{ width: "3rem", height: "3rem" }}
             />
           </div>
-        ): activeTab === "workers" && activeWorkers.length === 0 ? (
+        ) : activeTab === "workers" && activeWorkers.length === 0 ? (
           <p style={{ textAlign: "center", marginTop: "20px" }}>
-            No Active Workers found
+            {ADMIN_WORKERS.NO_ACTIVE_WORKERS}
           </p>
         ) : activeTab === "inactiveWorkers" && inactiveWorkers.length === 0 ? (
           <p style={{ textAlign: "center", marginTop: "20px" }}>
-            No Inactive Workers found
+            {ADMIN_WORKERS.NO_INACTIVE_WORKERS}
           </p>
-        )  : (
+        ) : (
           <Row xs="1" md="2" lg="3">
             {activeTab === "workers"
               ? activeWorkers.map((person, index) => (
-                  <Col key={index}>
-                    <PeopleDetails
-                      key={index}
-                      person={person}
-                      setNewFilPerson={setNewFilWorkers}
-                    />
-                  </Col>
-                ))
+                <Col key={index}>
+                  <PeopleDetails
+                    key={index}
+                    person={person}
+                    setNewFilPerson={setNewFilWorkers}
+                  />
+                </Col>
+              ))
               : inactiveWorkers.map((person, index) => (
-                  <Col key={index}>
-                    <PeopleDetails
-                      key={index}
-                      person={person}
-                      setNewFilPerson={setNewFilWorkers}
-                    />
-                  </Col>
-                ))}
+                <Col key={index}>
+                  <PeopleDetails
+                    key={index}
+                    person={person}
+                    setNewFilPerson={setNewFilWorkers}
+                  />
+                </Col>
+              ))}
           </Row>
         )}
       </Row>

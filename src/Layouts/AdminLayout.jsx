@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Row } from "reactstrap";
 import AdminRoutes from "../Routes/AdminRoutes";
 
@@ -21,10 +21,10 @@ const AdminLayout = () => {
         <Row className="justify-content-center">
           <Routes>
             {getRoutes(AdminRoutes)}
-            {/* <Route
+            <Route
               path="*"
-              element={<Navigate to="/admin/homepage" replace />}
-            /> */}
+              element={<Navigate to="/admin/homePageAdmin" replace />}
+            />
           </Routes>
         </Row>
       </div>

@@ -1,8 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { CgCollage } from 'react-icons/cg';
 
 import { io } from "socket.io-client";
-const user = JSON.parse(localStorage.getItem("user"));
 const ENDPOINT = `${import.meta.env.VITE_SOCKET_ENDPOINT}`;
 const initialState = {
   socket: null,
@@ -12,9 +10,9 @@ const socketslice = createSlice({
   name: 'socket',
   initialState,
   reducers: {
-    setSocket: (state,action) => {
+    setSocket: (state, action) => {
       const User = action.payload
-      if (User && User._id ) {
+      if (User && User._id) {
         state.socket = io(ENDPOINT);
         state.socket.emit("setup", User);
         state.socket.emit("new-user-add", User._id);
@@ -22,10 +20,9 @@ const socketslice = createSlice({
       } else {
         state.socket?.disconnect();
       }
-    }}
+    }
+  }
 });
 
 export const { setSocket } = socketslice.actions;
-
-
 export default socketslice.reducer;

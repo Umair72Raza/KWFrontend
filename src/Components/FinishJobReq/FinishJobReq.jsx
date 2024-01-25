@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -48,9 +46,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
       socket?.emit("finishjob-response", data);
 
       setFinishConfirmed(true);
-      //setFinishOrderReq(false);
     }
-    //
     setModal(true);
   };
 
@@ -75,7 +71,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
         <ModalHeader toggle={toggleModal} className="text-center">
           Worker wants to Finish the job!
         </ModalHeader>
-        <ModalBody style={{maxHeight: "200px", overflowY: "auto" }}>
+        <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
           <Container>
             <Row>
               <Col>
@@ -84,28 +80,28 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
               </Col>
             </Row>
             <Row>
-            <Col>
-            <b>Service:</b> {order.service}
-            </Col>
-            
-          </Row>
-          <Row>
-            <Col><b>Amount:</b> {order.amount}</Col>
-            
-          </Row>
-              <Row>
-                <Col>
-                  <b>Order Details: </b>
+              <Col>
+                <b>Service:</b> {order.service}
+              </Col>
 
-                  {showMoreDetails
-                    ? order.details.replace(/<br\s*\/?>/gi, "\n")
-                    : truncateText(
-                        order.details.replace(/<br\s*\/?>/gi, "\n"),
-                        55
-                      )}
-                </Col>
-              </Row>
-              <Row>
+            </Row>
+            <Row>
+              <Col><b>Amount:</b> {order.amount}</Col>
+
+            </Row>
+            <Row>
+              <Col>
+                <b>Order Details: </b>
+
+                {showMoreDetails
+                  ? order.details.replace(/<br\s*\/?>/gi, "\n")
+                  : truncateText(
+                    order.details.replace(/<br\s*\/?>/gi, "\n"),
+                    55
+                  )}
+              </Col>
+            </Row>
+            <Row>
               {order.details.trim().length > 55 && (
                 <Button
                   color="link"
@@ -116,20 +112,20 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
                 </Button>
               )}
             </Row>
-          
+
           </Container>
-          
+
         </ModalBody>
 
-        <ModalFooter style={{textAlign:"center"}}>
-        <Container style={{marginTop:"2%"}}>
-          <Button color="success" onClick={handleConfirm}>
-            Yes, Finish it!
-          </Button>{" "}
-          <Button color="danger" onClick={handleCancel}>
-            No, Cancel
-          </Button>
-          
+        <ModalFooter style={{ textAlign: "center" }}>
+          <Container style={{ marginTop: "2%" }}>
+            <Button color="success" onClick={handleConfirm}>
+              Yes, Finish it!
+            </Button>{" "}
+            <Button color="danger" onClick={handleCancel}>
+              No, Cancel
+            </Button>
+
           </Container>
         </ModalFooter>
       </Modal>

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import {
   Collapse,
@@ -8,20 +7,13 @@ import {
   Nav,
   NavItem,
   Button,
-  Badge,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownItem,
-  DropdownMenu,
+
   Container,
 } from "reactstrap";
-import { FiUser, FiMessageCircle } from "react-icons/fi";
+
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { logoutAsync } from "../../Redux/Slices/AuthSlice";
-import { ChatState } from "../../Context/ChatProvider";
-import { IoIosNotifications } from "react-icons/io";
-import { SelectChat } from "../../utils";
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);

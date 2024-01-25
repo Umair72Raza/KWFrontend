@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -13,14 +12,17 @@ import {
   Label,
   Row,
 } from "reactstrap";
-import { OTPverify, newPasswordSetter } from "../../APIs/auth";
-import { NP_CONSTANTS } from "./constants";
+import { newpasswordConstants } from "../../Constants/Constants";
 import resetpasswordpng from "../../assets/images/NewPasswordpngs/resetpassword.png";
 import confirmpassword from "../../assets/images/NewPasswordpngs/confirmpassword.png";
 import otppng from "../../assets/images/NewPasswordpngs/securedata.png";
 import { failureToast, successToast } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
-import { requestOTPverification, setNewPassAsync } from "../../Redux/Slices/AuthSlice";
+import {
+  requestOTPverification,
+  setNewPassAsync,
+} from "../../Redux/Slices/AuthSlice";
+
 const NewPassword = () => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -32,16 +34,17 @@ const NewPassword = () => {
   const [notEqualError, setNotEqualError] = useState(null);
   const navigate = useNavigate();
   const [otpVerified, setOtpVerified] = useState(false);
+  const newpass = useSelector((state) => state.auth.newpass)
 
-  const resetOTP = useSelector((state)=>state.auth.resetOtp)
-  const newpass = useSelector((state)=>state.auth.newpass)
-    
-  useEffect(()=>{
-    if(newpass===200){
-      successToast("Password Changed Successfully!")
+  const resetOTP = useSelector((state) => state.auth.resetOtp);
+  const newpass = useSelector((state) => state.auth.newpass);
+
+  useEffect(() => {
+    if (newpass === 200) {
+      successToast("Password Changed Successfully!");
       navigate("/auth/login");
     }
-  },[newpass])
+  }, [newpass]);
 
   useEffect(() => {
     if (newPassword !== confirmNewPassword) {
@@ -75,191 +78,197 @@ const NewPassword = () => {
 
     e.preventDefault();
     try {
-      dispatch(requestOTPverification(OTP))
-      successToast("OTP verified, Enter new Password")
-      setOtpVerified(true)
+      const resp = await dispatch(requestOTPverification(OTP));
+      console.log(resp, "response in new password of verification");
+      // 
+      if(resp.payload === 200)
+      {
+        successToast("OTP verified, Enter new Password");
+        setOtpVerified(true);
+      }
+      else{
+        failureToast("Invalid OTP");
+      }
+     
     } catch (error) {
-      failureToast("Inavlid OTP");
+      failureToast("Invalid OTP");
     }
   };
 
   const saveNewPassword = async (e) => {
     e.preventDefault();
-    const data = {email,newPassword}
+    const data = { email, newPassword };
 
     try {
-      dispatch(setNewPassAsync(data));
-
+      const resp = dispatch(setNewPassAsync(data));
+      
+      console.log(resp,"response of dispatch new pass")
     } catch (error) {
       failureToast("OTP expired");
     }
   };
 
   return (
-      <Container
-        style={{
-          backgroundColor: "#f0f0f0",
-          marginTop: "5%",
-          textAlign: "center",
-          borderRadius: "10px",
-        }}
-      >
-        <h3>{NP_CONSTANTS.NP_HEADING}</h3>
+    <Container
+      style={{
+        backgroundColor: "#f0f0f0",
+        marginTop: "5%",
+        textAlign: "center",
+        borderRadius: "10px",
+      }}
+    >
+      <h3>{NP_CONSTANTS.NP_HEADING}</h3>
 
-        <>
-          <Row>
-            <Col>
-              <Form
-                style={{
-                  marginTop: "3%",
-                }}
-              >
-                {!otpVerified ? (
-                  <>
-                    <FormGroup>
-                      <Row>
-                        <Col
-                          style={{ textAlign: "center" }}
-                          md={{
-                            offset: 3,
-                            size: 6,
-                          }}
-                        >
-                          {" "}
-                          <Label for="otp">
-                            {NP_CONSTANTS.PROVIDE_OTP_LABEL}
-                          </Label>
-                          <InputGroup>
-                            <InputGroupText>
-                              <img src={otppng} alt="otppng" />
-                            </InputGroupText>
-                            <Input
-                              style={{ textAlign: "center" }}
-                              id="otp"
-                              name="otp"
-                              placeholder="****"
-                              type="text"
-                              onChange={(e) => setOTP(e.target.value)}
-                            />
-                          </InputGroup>
-                        </Col>
-                      </Row>
-                    </FormGroup>
-                    <Row style={{ textAlign: "center" }}>
+      <>
+        <Row>
+          <Col>
+            <Form
+              style={{
+                marginTop: "3%",
+              }}
+            >
+              {!otpVerified ? (
+                <>
+                  <FormGroup>
+                    <Row>
                       <Col
+                        style={{ textAlign: "center" }}
                         md={{
                           offset: 3,
                           size: 6,
                         }}
                       >
                         {" "}
+                        <Label for="otp">
+                          {NP_CONSTANTS.PROVIDE_OTP_LABEL}
+                        </Label>
+                        <InputGroup>
+                          <InputGroupText>
+                            <img src={otppng} alt="otppng" />
+                          </InputGroupText>
+                          <Input
+                            style={{ textAlign: "center" }}
+                            id="otp"
+                            name="otp"
+                            placeholder="****"
+                            type="text"
+                            value={OTP}
+                            onChange={(e) => setOTP(e.target.value)}
+                          />
+                        </InputGroup>
+                      </Col>
+                    </Row>
+                    <Row style={{ textAlign: "center" }}>
+                    <Col
+                      md={{
+                        offset: 3,
+                        size: 6,
+                      }}
+                    >
+                      {" "}
+                      <Button
+                        onClick={verifyOTPSENT}
+                        color="success"
+                        disabled={!OTP || OTP.trim() === ''}
+                      >
+                        {NP_CONSTANTS.VERIFYOTP}
+                      </Button>
+                    </Col>
+                  </Row>
+                  </FormGroup>
+                </>
+              ) : (
+                <>
+                  {/* if the otp is not verified it will not be shown*/}
+                  <Row style={{ marginTop: "0px !important" }}>
+                    <Col>
+                      <Form
+                        style={{
+                          marginTop: "2%",
+                          padding: "2%",
+                        }}
+                      >
+                        <FormGroup>
+                          <Row>
+                            <Col
+                              style={{ textAlign: "center" }}
+                              md={{
+                                offset: 3,
+                                size: 6,
+                              }}
+                            >
+                              {" "}
+                              <Label className="fw-semibold" for="password">
+                                {NP_CONSTANTS.NEWPASSWORD}
+                              </Label>
+                              <InputGroup>
+                                <InputGroupText addonType="prepend">
+                                  <img src={resetpasswordpng} alt="newpswrd" />
+                                </InputGroupText>
+                                <Input
+                                  style={{ textAlign: "center" }}
+                                  type="password"
+                                  name="password"
+                                  id="password"
+                                  placeholder={NP_CONSTANTS.PASSWORD_PH}
+                                  value={newPassword}
+                                  onChange={handlePasswordChange}
+                                />
+                              </InputGroup>
+                              {passwordError && (
+                                <span className="text-danger">
+                                  {passwordError}
+                                </span>
+                              )}
+                              <br></br>
+                              <Label
+                                className="fw-semibold"
+                                for="confirmNewPassword"
+                              >
+                                {NP_CONSTANTS.CONFIRMPASSWORD}
+                              </Label>
+                              <InputGroup>
+                                <InputGroupText>
+                                  <img
+                                    src={confirmpassword}
+                                    alt="confirmpswrd"
+                                  />
+                                </InputGroupText>
+                                <Input
+                                  style={{ textAlign: "center" }}
+                                  type="password"
+                                  id="confirmNewPassword"
+                                  name="confirmNewPassword"
+                                  placeholder={NP_CONSTANTS.CONFIRMPASSWORD_PH}
+                                  value={confirmNewPassword}
+                                  onChange={handleConfirmNewPassword}
+                                />
+                              </InputGroup>
+                              {notEqualError && (
+                                <span className="text-danger">
+                                  {notEqualError}
+                                </span>
+                              )}
+                            </Col>
+                          </Row>
+                        </FormGroup>
                         <Button
-                          onClick={verifyOTPSENT}
+                          onClick={saveNewPassword}
                           color="success"
                           disabled={notEqualError}
                         >
-                          {NP_CONSTANTS.VERIFYOTP}
+                          {NP_CONSTANTS.SAVEBUTTON}
                         </Button>
-                      </Col>
-                    </Row>
-                  </>
-                ) : (
-                  <>
-                    {/* if the otp is not verified it will not be shown*/}
-                    <Row style={{ marginTop: "0px !important" }}>
-                      <Col>
-                        <Form
-                          style={{
-                            marginTop: "2%",
-                            padding: "2%",
-                          }}
-                        >
-                          <FormGroup>
-                            <Row>
-                              <Col
-                                style={{ textAlign: "center" }}
-                                md={{
-                                  offset: 3,
-                                  size: 6,
-                                }}
-                              >
-                                {" "}
-                                <Label className="fw-semibold" for="password">
-                                  {NP_CONSTANTS.NEWPASSWORD}
-                                </Label>
-                                <InputGroup>
-                                  <InputGroupText addonType="prepend">
-                                    <img
-                                      src={resetpasswordpng}
-                                      alt="newpswrd"
-                                    />
-                                  </InputGroupText>
-                                  <Input
-                                    style={{ textAlign: "center" }}
-                                    type="password"
-                                    name="password"
-                                    id="password"
-                                    placeholder={NP_CONSTANTS.PASSWORD_PH}
-                                    value={newPassword}
-                                    onChange={handlePasswordChange}
-                                  />
-                                </InputGroup>
-                                {passwordError && (
-                                  <span className="text-danger">
-                                    {passwordError}
-                                  </span>
-                                )}
-                                <br></br>
-                                <Label
-                                  className="fw-semibold"
-                                  for="confirmNewPassword"
-                                >
-                                  {NP_CONSTANTS.CONFIRMPASSWORD}
-                                </Label>
-                                <InputGroup>
-                                  <InputGroupText>
-                                    <img
-                                      src={confirmpassword}
-                                      alt="confirmpswrd"
-                                    />
-                                  </InputGroupText>
-                                  <Input
-                                    style={{ textAlign: "center" }}
-                                    type="password"
-                                    id="confirmNewPassword"
-                                    name="confirmNewPassword"
-                                    placeholder={
-                                      NP_CONSTANTS.CONFIRMPASSWORD_PH
-                                    }
-                                    value={confirmNewPassword}
-                                    onChange={handleConfirmNewPassword}
-                                  />
-                                </InputGroup>
-                                {notEqualError && (
-                                  <span className="text-danger">
-                                    {notEqualError}
-                                  </span>
-                                )}
-                              </Col>
-                            </Row>
-                          </FormGroup>
-                          <Button
-                            onClick={saveNewPassword}
-                            color="success"
-                            disabled={notEqualError}
-                          >
-                            {NP_CONSTANTS.SAVEBUTTON}
-                          </Button>
-                        </Form>
-                      </Col>
-                    </Row>
-                  </>
-                )}
-              </Form>
-            </Col>
-          </Row>
-        </>
-      </Container>
+                      </Form>
+                    </Col>
+                  </Row>
+                </>
+              )}
+            </Form>
+          </Col>
+        </Row>
+      </>
+    </Container>
   );
 };
 

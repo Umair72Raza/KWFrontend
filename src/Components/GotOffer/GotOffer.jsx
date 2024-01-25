@@ -6,7 +6,7 @@ import { GOTOFFER } from "../../Constants/Constants";
 const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   const [showModal, setShowModal] = useState(true);
   const [fullDetailsModal, setFullDetailsModal] = useState(false);
-  let {setGotOffer,} = ChatState();
+  let { setGotOffer, } = ChatState();
   useEffect(() => {
     const openModal = () => {
       setShowModal(true);
@@ -19,7 +19,6 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     };
 
     openModal();
-
     // Clean up function
     return () => {
       closeModal();
@@ -41,7 +40,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     }
     setGotOffer(false)
     closeModal();
-    
+
   };
 
   const handleCancel = () => {
@@ -50,7 +49,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     }
     setGotOffer(false)
     closeModal();
-   
+
   };
 
   const formattedDetails = formattedOfferDetails?.details || "";
@@ -63,7 +62,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     <div>
       <Modal isOpen={showModal} keyboard={false} centered>
         <ModalHeader >
-         {GOTOFFER.OFFER_HEADER}
+          {GOTOFFER.OFFER_HEADER}
         </ModalHeader>
         <ModalBody>
           <p>
@@ -90,7 +89,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={handleConfirm}>
-            {GOTOFFER.ACCEPT_BUTTON}  
+            {GOTOFFER.ACCEPT_BUTTON}
           </Button>{" "}
           <Button color="danger" onClick={handleCancel}>
             {GOTOFFER.REJECT_BUTTON}

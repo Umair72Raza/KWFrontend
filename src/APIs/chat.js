@@ -15,7 +15,7 @@ export const GetChats = async (UserId, token) => {
   }
 };
 
-export const GetMessages = async (chatId,token) => {
+export const GetMessages = async (chatId, token) => {
   try {
     const response = await API.get(`messages/allMessages/${chatId}`, {
       headers: {
@@ -25,12 +25,12 @@ export const GetMessages = async (chatId,token) => {
 
     return response;
   } catch (error) {
-    console.log(error.response,"getting messages")
+    console.log(error.response, "getting messages")
     throw error.response.data;
   }
 };
 
-export const SendMessage = async (receiverId, text, initiatorId,token) => {
+export const SendMessage = async (receiverId, text, initiatorId, token) => {
   try {
     const response = await API.post(`messages/sendMessage`, {
       receiverId,
@@ -48,7 +48,7 @@ export const SendMessage = async (receiverId, text, initiatorId,token) => {
 };
 
 
-export const ToggleSeen = async (chatId,token,seen) => {
+export const ToggleSeen = async (chatId, token, seen) => {
   try {
     const response = await API.put(`chats/chatSeenToggle/${chatId}`, {
       seen

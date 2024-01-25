@@ -4,7 +4,6 @@ import HomePageUser from "../Views/HomePageUser/HomePageUser";
 import Orders from "../Views/Orders/Orders";
 
 const UserRoutes = [
-  //umer code for user homepage
   {
     path: "/homepage",
     name: "homepage",
@@ -19,10 +18,10 @@ const UserRoutes = [
     layout: "/user",
   },
   {
-    path:"/editprofile",
-    name:"editprofile",
-    component:<EditProfilePage ShowServices={false} />,
-    layout:"/user"
+    path: "/editprofile",
+    name: "editprofile",
+    component: <EditProfilePage ShowServices={false} />,
+    layout: "/user"
   }
 ];
 export default UserRoutes;

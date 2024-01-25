@@ -79,7 +79,7 @@ const EditProfileSlice = createSlice({
       })
       .addCase(updateProfileAsync.rejected, (state, action) => {
         state.error = action.error.message;
-       
+
       });
   },
 });

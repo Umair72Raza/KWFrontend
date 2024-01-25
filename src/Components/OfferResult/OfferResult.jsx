@@ -3,10 +3,7 @@ import {
   Row,
   Col,
   Modal,
-  ModalHeader,
-  ModalBody,
   Button,
-  Container,
   CardBody,
   CardTitle,
   Card,
@@ -71,16 +68,16 @@ const OfferResult = ({ result, params, setOfferResult }) => {
                       <>
                         <b>Details: </b>
                         <div
-                              style={{
-                                maxHeight: showMoreDetails ? '200px' : '80px', // Set your desired height
-                                overflowY: 'auto',
-                              }}
-                              dangerouslySetInnerHTML={{
-                                __html: showMoreDetails
-                                  ? params.details
-                                  : truncateText(params.details, 25),
-                              }}
-                            />
+                          style={{
+                            maxHeight: showMoreDetails ? '200px' : '80px', // Set your desired height
+                            overflowY: 'auto',
+                          }}
+                          dangerouslySetInnerHTML={{
+                            __html: showMoreDetails
+                              ? params.details
+                              : truncateText(params.details, 25),
+                          }}
+                        />
                         <br />
                         <Button
                           color="primary"

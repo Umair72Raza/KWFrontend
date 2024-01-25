@@ -1,12 +1,12 @@
 .greenButton {
-  background-color: #33cc33; /* Green */
-  color: #ffffff; /* White */
+  background-color: #33cc33; 
+  color: #ffffff; 
   border: 1px solid #008000;
 }
 .redButton {
-  background-color: #ff4444; /* Red */
-  color: #ffffff; /* White */
-  border: 1px solid #cc0000; /* Darker shade of red or a complementary color */
+  background-color: #ff4444; 
+  color: #ffffff; 
+  border: 1px solid #cc0000; 
 }
 .swal-content {
   max-height: 300px;
@@ -25,4 +25,14 @@
 
 .pointerCursor {
   cursor: pointer;
+}
+
+.custom-margin-service{
+  margin-left: 1% !important;
+  border-radius: 3px;
+}
+
+.custom-padding-navbar-admin{
+  padding-left:50px !important
+
 }

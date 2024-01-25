@@ -18,7 +18,7 @@ import {
 } from "reactstrap";
 import { FiMessageCircle } from "react-icons/fi";
 import { RiInboxArchiveLine } from "react-icons/ri";
-import { NavBar } from "./constants";
+import { navbarConstants } from "../../Constants/Constants";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync } from "../../Redux/Slices/AuthSlice";
@@ -28,7 +28,7 @@ import { CgProfile } from "react-icons/cg";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
 import Swal from "sweetalert2";
-import ChatPopup from "../Chat Box/ChatPop";
+
 const UserNavbar = () => {
   const {
     setShowModal,
@@ -42,9 +42,9 @@ const UserNavbar = () => {
     SetONotification,
     setReceiveMessage,
     setGotOffer,
-    userOffering,
     setSelectedChatCompare,
-    setUserOffering
+    unreadMessages,
+    setUnreadMessages,
   } = ChatState();
   const socket = useSelector((state) => state?.socket?.socket);
 
@@ -57,9 +57,9 @@ const UserNavbar = () => {
 
   const Logout = async () => {
     Swal.fire({
-      title: "Are You Sure You want to Logout?",
+      title: "Are You Sure You Want To Log Out?",
       showCancelButton: true,
-      confirmButtonText: "LogOut",
+      confirmButtonText: "Log Out",
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
@@ -79,14 +79,17 @@ const UserNavbar = () => {
   const HandleNotificationSelection = (item) => {
     setChat(item.chat);
     setSelectedChatCompare(item.chat);
-     setSelectedChat(() => SelectChat(item.chat));
+    setUnreadMessages((prevCount) => ({
+      ...prevCount,
+      [item.chat._id]:0,
+    }));
+    setSelectedChat(() => SelectChat(item.chat));
     setNotification(notification.filter((n) => n !== item));
     setShowModal(true);
   };
 
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
-    //setUserOffering(userOffering.filter(()=>))
     setGotOffer(true);
     setReceiveMessage(notify.params);
     SetShowOffer(!offer);
@@ -103,11 +106,16 @@ const UserNavbar = () => {
     SetShowOffer(!offer);
   };
 
+  const handleMessageIconClick = () => {
+    setShowModal(true);
+    setCopyOfChats(OriginalChats);
+  };
+console.log(unreadMessages)
   return (
     <>
       <Navbar className="bg-primary w-full" expand="sm" dark container="fluid">
         <NavbarBrand href="/" className="fs-bold">
-          {NavBar.brandName}
+          {navbarConstants.NavBar.brandName}
         </NavbarBrand>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar className=" gap-3 justify-content-end">
@@ -155,10 +163,16 @@ const UserNavbar = () => {
                         <DropdownItem
                           key={item.chat._id}
                           onClick={() => HandleNotificationSelection(item)}
-                          className="fw-bold"
+                          className="fw-bold d-flex flex-row  gap-1 justify-content-between"
                         >
                           New Message: {item.newMessage.sender.firstName}{" "}
                           {item.newMessage.sender.lastName}
+                          {unreadMessages[item.chat._id] > 1 && (
+                            <div className=" rounded-4 bg-danger text-white px-2">
+                              {" "}
+                              {unreadMessages[item.chat._id]}
+                            </div>
+                          )}
                         </DropdownItem>
                       ))
                     )}
@@ -196,10 +210,7 @@ const UserNavbar = () => {
                 >
                   <FiMessageCircle
                     className="hover-text-3d rounded-5"
-                    onClick={() => {
-                      setShowModal(true);
-                      setCopyOfChats(OriginalChats);
-                    }}
+                    onClick={handleMessageIconClick}
                   />
                 </NavItem>
               </>
@@ -226,7 +237,11 @@ const UserNavbar = () => {
                         toggleOffcanvas(); // Use the correct toggle function for Offcanvas
                       }}
                       className="fw-bold"
-                      style={{ backgroundColor: 'white', color: 'black', border: 'none' }}
+                      style={{
+                        backgroundColor: "white",
+                        color: "black",
+                        border: "none",
+                      }}
                     >
                       New Offer By : {item.user.firstName} {item.user.lastName}
                     </Button>
@@ -234,7 +249,6 @@ const UserNavbar = () => {
                 )}
               </OffcanvasBody>
             </Offcanvas>
-
             <NavItem className="text-white ">
               <Button color="danger" className="p-1 " onClick={Logout}>
                 Logout
@@ -252,7 +266,6 @@ const UserNavbar = () => {
           </Nav>
         </Collapse>
       </Navbar>
-      <ChatPopup />
     </>
   );
 };

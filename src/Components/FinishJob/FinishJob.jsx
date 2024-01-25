@@ -5,13 +5,6 @@ import Feedback from "../../Components/feedback/feedback";
 const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
   const [feedback, setFeedback] = useState(false);
 
-  // useEffect(() => {
-  //   if (confirmed === "false") {
-  //     setFeedback(false);
-  //     setFinishJobVerified(false);
-  //   }
-  // }, [confirmed, setFinishJobVerified]);
-
   useEffect(() => {
     if (confirmed === "true") {
       Swal.fire({
@@ -21,7 +14,6 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
       }).then((result) => {
         if (result.isConfirmed) {
           setFeedback(true);
-          //setFinishJobVerified(false);
         }
       });
     } else if (confirmed === "false") {
@@ -39,11 +31,11 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
 
   return (
     <>
-      {confirmed =="true" && (
+      {confirmed == "true" && (
         <Feedback
           flag={feedback}
           order={order}
-          setFinishOrderReq={""} // Ensure you pass a function that can update the state
+          setFinishOrderReq={""}
           SetConfirm={SetConfirm}
         />
       )}

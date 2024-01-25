@@ -35,13 +35,13 @@ const FeedbacksComp = ({
     <Modal isOpen={showFeedbacksState} toggle={toggle}>
       <ModalHeader toggle={toggle}>Feedbacks</ModalHeader>
       <ModalBody>
-      {feedbacks && feedbacks.length > 0 ? (
-        <ul>
-          {feedbacks?.map((feedback) => (
-            <li style={{margin:"2%"}} key={feedback._id}>
-              <strong>{feedback.feedbackGiver.firstName}:</strong>{" "}
-              
-              {truncateText(feedback.text, 5)} (Rating:{" "}
+        {feedbacks && feedbacks.length > 0 ? (
+          <ul>
+            {feedbacks?.map((feedback) => (
+              <li style={{ margin: "2%" }} key={feedback._id}>
+                <strong>{feedback.feedbackGiver.firstName}:</strong>{" "}
+
+                {truncateText(feedback.text, 5)} (Rating:{" "}
                 {starRating(feedback.rating)})
                 <span>
                   {feedback.text.length > 5 && (
@@ -53,9 +53,9 @@ const FeedbacksComp = ({
                 {showFullTextMap[feedback._id] && (
                   <div style={{ whiteSpace: "pre-wrap" }}>{feedback.text}</div>
                 )}
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
         ) : (
           <p>No feedbacks available.</p>
         )}

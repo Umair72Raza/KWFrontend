@@ -14,7 +14,7 @@ import {
 } from "reactstrap";
 import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
 import { failureToast, successToast, validateEmail } from "../../utils";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { loginAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -67,14 +67,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-  
+
     try {
       if (Object.keys(validationErrors).length === 0) {
         const result = await dispatch(loginAsync(formData));
-  
+
         if (result.type === "auth/login/fulfilled") {
           if (result.payload) {
             setFormData({
@@ -94,7 +94,7 @@ const Login = () => {
       setLoading(false); // Stop loading spinner after API response
     }
   };
-  
+
 
   return (
     <Container
@@ -120,7 +120,7 @@ const Login = () => {
                 maxLength={70}
                 value={formData[LoginPage.FORM_FIELDS.EMAIL]}
                 onChange={handleEmailChange}
-                onKeyDown={ (event) => {
+                onKeyDown={(event) => {
                   if (event.key === ' ') {
                     event.preventDefault();
                   }
@@ -170,19 +170,19 @@ const Login = () => {
               </div>
             </FormGroup>
             <Link id="Login">
-            <Button
-              color="primary"
-              className="w-25"
-              block
-              onClick={handleSubmit}
-              disabled={loginDisabled || loading}
-            >
-              {loading ? (
-                <Spinner size="sm" color="light" />
-              ) : (
-                LoginPage.LABELS.LOGIN
-              )}
-            </Button>
+              <Button
+                color="primary"
+                className="w-25"
+                block
+                onClick={handleSubmit}
+                disabled={loginDisabled || loading}
+              >
+                {loading ? (
+                  <Spinner size="sm" color="light" />
+                ) : (
+                  LoginPage.LABELS.LOGIN
+                )}
+              </Button>
             </Link>
             <Tooltip
               placement="right"

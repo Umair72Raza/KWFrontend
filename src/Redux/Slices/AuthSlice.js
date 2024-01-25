@@ -13,19 +13,19 @@ import { Logout, failureToast } from "../../utils";
 export const loginAsync = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
-    try{
+    try {
       const { email, password } = credentials;
       const response = await loginUser(email, password);
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
       const result = response;
       return result;
-    } catch(error) {
-   if(error){
-    return rejectWithValue(error.error);
-   }
+    } catch (error) {
+      if (error) {
+        return rejectWithValue(error.error);
+      }
     }
- 
+
   }
 );
 
@@ -36,8 +36,8 @@ export const logoutAsync = createAsyncThunk("auth/logout", async () => {
 
 export const signUpUserAsync = createAsyncThunk(
   "auth/signup",
-  async (credentials,{ rejectWithValue }) => {
-    try{
+  async (credentials, { rejectWithValue }) => {
+    try {
       const {
         firstName,
         lastName,
@@ -63,8 +63,8 @@ export const signUpUserAsync = createAsyncThunk(
         services
       );
       console.log(response)
-  return response.data;
-    } catch(error) {
+      return response.data;
+    } catch (error) {
       if (
         error.error.code === 11000 &&
         error.error.keyPattern &&
@@ -85,17 +85,27 @@ export const signUpUserAsync = createAsyncThunk(
         );
       }
     }
-   
+
   }
 );
 
 
 export const requestOTPAsync = createAsyncThunk(
-  "auth/requestOTP",
+  "auth/requestOTPAsync",
   async (email) => {
     try {
+      console.log(email, "email in async")
       const response = await sendOTP(email);
-      return response.data;
+      // console.log(response,"send otp resp")
+      // return response;
+
+
+      const serializableResponse = {
+        data: response.data,
+        status: response.status,
+        // other serializable properties
+      };
+      return serializableResponse;
     } catch (error) {
       failureToast("Couldn't send OTP");
     }
@@ -107,6 +117,7 @@ export const requestOTPverification = createAsyncThunk(
   async (otp) => {
     try {
       const response = await OTPverify(otp);
+      console.log("otp cerify response", response)
       return response.status;
     } catch (error) {
       failureToast("Inavlid OTP");
@@ -121,6 +132,7 @@ export const setNewPassAsync = createAsyncThunk(
       const { email, newPassword } = data;
       const password = newPassword;
       const response = await newPasswordSetter(email, password);
+      console.log(response,"response in async")
       if (response.status === 200) {
         return response.status;
       } else {
@@ -172,7 +184,7 @@ const authSlice = createSlice({
     updateOtpStatus: (state, action) => {
       state.otpStatus = action.payload;
     },
-    
+
   },
   extraReducers: (builder) => {
     builder
@@ -181,15 +193,15 @@ const authSlice = createSlice({
       })
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.loginStatus = "succeeded";
-      if(action.payload){
-        state.token = action.payload.token;
-        state.user = action.payload.user;
-      }
+        if (action.payload) {
+          state.token = action.payload.token;
+          state.user = action.payload.user;
+        }
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.loginStatus = "failed";
         state.error = action.error.message;
-     
+
       })
       .addCase(signUpUserAsync.pending, (state) => {
         state.signupStatus = "loading";
@@ -209,7 +221,7 @@ const authSlice = createSlice({
         state.otpError = action.error.message;
       })
       .addCase(requestOTPAsync.fulfilled, (state, action) => {
-        state.otpStatus = "suceeded";
+        state.otpStatus = "succeeded";
         state.otp = action.payload;
       })
       .addCase(requestOTPverification.fulfilled, (state, action) => {
@@ -236,10 +248,10 @@ const authSlice = createSlice({
       })
       .addCase(logoutAsync.fulfilled, (state) => {
         state.loginStatus = "failed";
-       
+
       })
-      .addCase(toggleStatusAsync.fulfilled, (state,action) => {
-         state.user= action.payload.updatedStatus;
+      .addCase(toggleStatusAsync.fulfilled, (state, action) => {
+        state.user = action.payload.updatedStatus;
       });
   },
 });

@@ -1,10 +1,6 @@
 import React from "react";
 import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
-import {
-  Col,
-  Container,
-  Row,
-} from "reactstrap";
+import { Col, Container, Row } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import CustomAdminCard from "../../Components/CustomAdminCard/CustomAdminCard";
 import man from "../../assets/images/AdminPngs/man.png";
@@ -27,40 +23,41 @@ const HomePageAdmin = () => {
   };
   return (
     <>
-      {/* <AdminNavbar /> */}
-      <UserNavbar />
       <div>
-      <Container>
-        <Row className="justify-content-center mt-5">
-          <Col sm="12" md="6" lg="4">
-            <CustomAdminCard
-              logoSrc={man}
-              title="Users"
-              buttonText="Users"
-              buttonColor="primary"
-              onClickHandler={handleUsers}
-            />
-          </Col>
-          <Col sm="12" md="6" lg="4">
-            <CustomAdminCard
-              logoSrc={workerspng}
-              title="Workers"
-              buttonText="Workers"
-              buttonColor="primary"
-              onClickHandler={handleWorkers}
-            />
-          </Col>
-          <Col sm="12" md="6" lg="4">
-            <CustomAdminCard
-              logoSrc={servicepng}
-              title="Services"
-              buttonText="Services"
-              buttonColor="primary"
-              onClickHandler={goToServices}
-            />
-          </Col>
-        </Row>
-      </Container>
+        <UserNavbar />
+      </div>
+      <div>
+        <Container>
+          <Row className="justify-content-center mt-5">
+            <Col sm="12" md="6" lg="4">
+              <CustomAdminCard
+                logoSrc={man}
+                title="Users"
+                buttonText="Users"
+                buttonColor="primary"
+                onClickHandler={handleUsers}
+              />
+            </Col>
+            <Col sm="12" md="6" lg="4">
+              <CustomAdminCard
+                logoSrc={workerspng}
+                title="Workers"
+                buttonText="Workers"
+                buttonColor="primary"
+                onClickHandler={handleWorkers}
+              />
+            </Col>
+            <Col sm="12" md="6" lg="4">
+              <CustomAdminCard
+                logoSrc={servicepng}
+                title="Services"
+                buttonText="Services"
+                buttonColor="primary"
+                onClickHandler={goToServices}
+              />
+            </Col>
+          </Row>
+        </Container>
       </div>
     </>
   );

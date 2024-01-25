@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import React from "react";
 import {
   Button,
@@ -30,10 +28,6 @@ const ModalComponent = (props) => {
     order,
   } = props;
 
-   const truncatedDetails = order?.details
-    ? order.details.replace(/<br\s*\/?>/g, "\n").substring(0, 100)
-    : "";
-
   return (
     <Modal
       isOpen={isModalOpen}
@@ -41,11 +35,11 @@ const ModalComponent = (props) => {
       centered
       backdrop="static"
       keyboard={false}
-      
+
     >
       <ModalHeader toggle={toggleModal}>{modalHeader}</ModalHeader>
-      <ModalBody style={{maxHeight: "200px", overflowY: "auto" }}>
-        
+      <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
+
         {order && (
           <>
             <div>

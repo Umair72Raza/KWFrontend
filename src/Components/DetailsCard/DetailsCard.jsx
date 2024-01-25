@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal as RsModal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const DetailsCard = ({
   person,
@@ -57,42 +57,42 @@ const DetailsCard = ({
 
   return (
     <>
-    <RsModal isOpen={modalIsOpen} toggle={closeModal} centered>
-      <ModalHeader toggle={closeModal}>
-        <strong>{firstName}</strong>
-      </ModalHeader>
-      <ModalBody>
-        <p>
-          First Name: {firstName} <br />
-          Last Name: {lastName} <br />
-          Role: {role} <br />
-        </p>
-      </ModalBody>
-      <ModalFooter>
-        <Button color="primary" onClick={closeModal}>
-          Okay
-        </Button>
-        <Button style={{backgroundColor:"#5d12cf"}}  onClick={openSecondModal}>
-          Details
-        </Button>
-      </ModalFooter>
-    </RsModal>
+      <RsModal isOpen={modalIsOpen} toggle={closeModal} centered>
+        <ModalHeader toggle={closeModal}>
+          <strong>{firstName}</strong>
+        </ModalHeader>
+        <ModalBody>
+          <p>
+            First Name: {firstName} <br />
+            Last Name: {lastName} <br />
+            Role: {role} <br />
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={closeModal}>
+            Okay
+          </Button>
+          <Button style={{ backgroundColor: "#5d12cf" }} onClick={openSecondModal}>
+            Details
+          </Button>
+        </ModalFooter>
+      </RsModal>
 
-    <RsModal isOpen={secondModalIsOpen} toggle={closeSecondModal} centered>
-      <ModalHeader toggle={closeSecondModal}>Order Details</ModalHeader>
-      <ModalBody>
-        <p>Scheduled: {scheduledCount}</p>
-        <p>Active: {activeCount}</p>
-        <p>Past: {pastCount}</p>
-        <p>Cancelled: {cancelledCount}</p>
-      </ModalBody>
-      <ModalFooter>
-        <Button color="primary" onClick={closeSecondModal}>
-          Close
-        </Button>
-      </ModalFooter>
-    </RsModal>
-  </>
+      <RsModal isOpen={secondModalIsOpen} toggle={closeSecondModal} centered>
+        <ModalHeader toggle={closeSecondModal}>Order Details</ModalHeader>
+        <ModalBody>
+          <p>Scheduled: {scheduledCount}</p>
+          <p>Active: {activeCount}</p>
+          <p>Past: {pastCount}</p>
+          <p>Cancelled: {cancelledCount}</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={closeSecondModal}>
+            Close
+          </Button>
+        </ModalFooter>
+      </RsModal>
+    </>
   );
 };
 

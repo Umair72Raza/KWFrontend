@@ -16,10 +16,11 @@ import { useNavigate } from "react-router-dom";
 import classnames from "classnames";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
+import { ADMIN_USERS } from "../../Constants/Constants";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
-  const { user, token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
   const [apiUsers, setApiUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("users");
   const [newfilUsers, setNewFilUsers] = useState();
@@ -93,14 +94,16 @@ const AdminUsers = () => {
 
   return (
     <>
+    <div>
       <UserNavbar />
+      </div>
       <Container>
         <Row>
-          <h1 style={{ textAlign: "center" }}>Users</h1>
+          <h1 style={{ textAlign: "center" }}>{ADMIN_USERS.USERS_HEADING}</h1>
         </Row>
         <Row>
-          <Navbar color="light" light expand="md" style={{paddingLeft:"2%"}}>
-            <Nav tabs style={{cursor:"pointer"}}>
+          <Navbar color="light" light expand="md" style={{ paddingLeft: "2%" }}>
+            <Nav tabs style={{ cursor: "pointer" }}>
               <NavItem>
                 <Button
                   style={{
@@ -110,7 +113,7 @@ const AdminUsers = () => {
                   }}
                   onClick={() => navigate(-1)}
                 >
-                  Back
+                  {ADMIN_USERS.BACK}
                 </Button>
               </NavItem>
               <NavItem>
@@ -118,7 +121,7 @@ const AdminUsers = () => {
                   onClick={() => handleButtonClick("users")}
                   className={classnames({ active: activeTab === "users" })}
                 >
-                  Active Users
+                  {ADMIN_USERS.ACTIVE_USERS}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -128,7 +131,7 @@ const AdminUsers = () => {
                     active: activeTab === "inactiveUsers",
                   })}
                 >
-                  Inactive Users
+                  {ADMIN_USERS.INACTIVE_USERS}
                 </NavLink>
               </NavItem>
             </Nav>
@@ -147,33 +150,33 @@ const AdminUsers = () => {
             </div>
           ) : activeTab === "users" && activeUsers.length === 0 ? (
             <p style={{ textAlign: "center", marginTop: "20px" }}>
-              No Active Users found
+              {ADMIN_USERS.NO_ACTIVE_USERS}
             </p>
           ) : activeTab === "inactiveUsers" && inactiveUsers.length === 0 ? (
             <p style={{ textAlign: "center", marginTop: "20px" }}>
-              No Inactive Users found
+              {ADMIN_USERS.NO_INACTIVE_USERS}
             </p>
           ) : (
             <Row xs="1" md="2" lg="3">
               {activeTab === "users"
                 ? activeUsers.map((person, index) => (
-                    <Col key={index}>
-                      <PeopleDetails
-                        key={index}
-                        person={person}
-                        setNewFilPerson={setNewFilUsers}
-                      />
-                    </Col>
-                  ))
+                  <Col key={index}>
+                    <PeopleDetails
+                      key={index}
+                      person={person}
+                      setNewFilPerson={setNewFilUsers}
+                    />
+                  </Col>
+                ))
                 : inactiveUsers.map((person, index) => (
-                    <Col key={index}>
-                      <PeopleDetails
-                        key={index}
-                        person={person}
-                        setNewFilPerson={setNewFilUsers}
-                      />
-                    </Col>
-                  ))}
+                  <Col key={index}>
+                    <PeopleDetails
+                      key={index}
+                      person={person}
+                      setNewFilPerson={setNewFilUsers}
+                    />
+                  </Col>
+                ))}
             </Row>
           )}
         </Row>

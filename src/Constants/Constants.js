@@ -46,8 +46,8 @@ export const RegisterPage = {
     SERVICES: "services",
   },
   LABELS: {
-   USER_TITLE: "Create an account as a user",
-   WORKER_TITLE: "Create an account as a worker",
+    USER_TITLE: "Create an account as a user",
+    WORKER_TITLE: "Create an account as a worker",
     FIRST_NAME: "First Name",
     LAST_NAME: "Last Name",
     EMAIL: "Email",
@@ -146,18 +146,19 @@ export const ChatPopUpPage = {
   SEND_BUTTON_LABEL: "Send",
   SEND_BUTTON_COLOR: "primary",
   SELECT_CHAT_LABEL: "Select a chat to start messaging",
-  BLOCKED_BY_ADMIN:"Blocked by Admin"
+  BLOCKED_BY_ADMIN:"Blocked by Admin",
+  NO_CHATS:"No Chats!",
 };
 
 export const HomePageWorkerConsts = {
-  REASON_NOT_MENTIONED : "Reason not mentioned",
+  REASON_NOT_MENTIONED: "Reason not mentioned",
 
 }
 
 export const TABS = {
-  SCHEDULED : "Scheduled",
+  SCHEDULED: "Scheduled",
   PAST: "Past",
-  CANCELLED : "Cancelled",
+  CANCELLED: "Cancelled",
   ACTIVE: "Active",
   SCH_ORDERS: "Scheduled Orders",
   NO_SCH_ORDERS: "No Scheduled Orders!",
@@ -180,43 +181,174 @@ export const GOTOFFER = {
   ACCEPT_BUTTON: "Accept Offer!",
   REJECT_BUTTON: "Reject Offer!",
   SEE_DETAILS_BUTTON: "See Full Details",
-  FULL_DETAILS:"Full Details",
+  FULL_DETAILS: "Full Details",
   FULL_DETAILS_HEADING: "Full Details: ",
   CLOSE_BUTTON: "Close"
 }
 
 export const FORGET_PASSWORD = {
-  SEND_OTP_BUTTON : "Send OTP"
+  SEND_OTP_BUTTON: "Send OTP"
 }
 
 export const EDITPROFILE_PAGE = {
-  LABELS:{
-    TITLE:"Your Profile",
+  LABELS: {
+    TITLE: "Your Profile",
   },
-  BUTTONS:{
-    EDIT:"Edit Profile",
-    SAVE:"Save",
-    CANCEL:"Cancel",
+  BUTTONS: {
+    EDIT: "Edit Profile",
+    SAVE: "Save",
+    CANCEL: "Cancel",
   },
-  CARD_LABELS:{
-   FIRST_NAME:"First Name:",
-   LAST_NAME:"Last Name:",
-    EMAIL:"Email:",
-    PHONE:"Phone Number:",
-    ADDRESS:"Address:",
-    SERVICES:"Services:",
-    RATE:"$/hr",
+  CARD_LABELS: {
+    FIRST_NAME: "First Name:",
+    LAST_NAME: "Last Name:",
+    EMAIL: "Email:",
+    PHONE: "Phone Number:",
+    ADDRESS: "Address:",
+    SERVICES: "Services:",
+    RATE: "$/hr",
   },
+}
+
+export const HomePageUserConst = {
+  button: {
+    orders: "Orders",
+    filters: "Filters",
+  },
+  heading: {
+    filter: "Filters and Sort"
+  }
+}
+
+export const BookingConstants = {
+  button: {
+    send: "Send",
+    cancel: "Cancel"
   }
 
-  export const SERVICE_CONSTS = {
-    SERVICES_HEADING: "Services",
-    ADD_A_SERVICE: "Add a Service",
-    ADD_NEW_SERVICE: "Add new service",
-    NO_SERVICES:"No services available.",
-    REMOVE: "Remove",
-    UPDATE: "Update",
-    CANCEL: "Cancel",
-    EDIT: "Edit",
-    BACK:"Back"
+  , heading: {
+    book: "Book a Service"
+  }
+
+  , div: {
+    "name": "Name: ",
+    "status": "Status: ",
+    "rating": "Rating: "
+  }
+  , Labels: {
+    taskTitle: "Task Title",
+    worker: "Worker Details",
+    taskDetail: "Task Details",
+    service: "Service Type",
+    datetime: "Date and Time",
+    amount: "Amount Per Hour ($)",
+
+
+  }
+}
+export const feedbackConstants = {
+  heading: {
+    rateService: "Rate The Service",
+    rateUser: "Rate The User"
+  }
+}
+export const filterConstants = {
+  button: {
+
+    clear: "Clear Filters"
+  },
+  Labels: {
+    sort1: "Sort by Rating:",
+    sort2: "Sort by Distance:",
+    filter: "Filter by Distance:",
+    l5: "5 km",
+    l10: "10 km",
+    l15: "15 km",
+    l20: "20 km",
+    filter1: "Filter by Rate:",
+    l6to10: "Less then Equal $10",
+    l11to15: "Less then Equal $15",
+    l16to20: "Less then Equal $20",
+    g20: "Greater then    $20",
+  },
+  options: {
+    none: "None",
+    htlR: "High to Low Rating",
+    lthR: "Low to High Rating",
+    htld: "High to Low Distance",
+    lthd: "Low to High Distance"
+  }
+}
+export const navbarConstants = {
+  NavBar: {
+    brandName: "KaamWala"
+  }
+}
+export const workerCardConstants = {
+  WorkerCardText: {
+    Services: "Services:"
+  }
+  ,
+  WorkerCardButtons: {
+    chat: "Chat",
+    book: "Book"
+  }
+}
+export const forgetPasswordConstants = {
+  FORGET_ROUTES: {
+    NEW_PASSWORD: "/auth/newpassword",
+  },
+
+  FP_FIELDS: {
+    EMAIL: "Please Provide the Email Address.",
+    MSG: "An OTP will be sent to your Email",
+    EG_MAIL: "example@gmail.com",
+    FP_TOAST_MSG: "OTP Sent Successfully!",
+  }
+}
+
+export const newpasswordConstants = {
+  NP_CONSTANTS: {
+    NP_HEADING: "Confirm your OTP and Add a new Password",
+    PROVIDE_OTP_LABEL: " Please Provide the OTP sent to you via Email",
+    NEWPASSWORD: "New Password",
+    PASSWORD_PH: "Enter new password",
+    CONFIRMPASSWORD: "Confirm Password",
+    CONFIRMPASSWORD_PH: "Confirm new password",
+    SAVEBUTTON: "Save New Password",
+    VERIFYOTP: "VERIFY OTP"
+  }
+
+}
+
+
+export const SERVICE_CONSTS = {
+  SERVICES_HEADING: "Services",
+  ADD_A_SERVICE: "Add a Service",
+  ADD_NEW_SERVICE: "Add new service",
+  NO_SERVICES: "No services available.",
+  REMOVE: "Remove",
+  UPDATE: "Update",
+  CANCEL: "Cancel",
+  EDIT: "Edit",
+  BACK: "Back"
+}
+
+
+  export const ADMIN_WORKERS = {
+    WORKERS_HEADING : "Workers",
+    BACK: "Back",
+    ACTIVE_WORKERS: "Active Workers",
+    INACTIVE_WORKERS: "Inactive Workers",
+    NO_ACTIVE_WORKERS: "No Active Workers found",
+    NO_INACTIVE_WORKERS: "No Inactive Workers found"
+  }
+
+  export const ADMIN_USERS = {
+    USERS_HEADING: "Users",
+    BACK: "Back",
+    ACTIVE_USERS: "Active Users",
+    INACTIVE_USERS: "Inactive Users",
+    NO_ACTIVE_USERS: "No Active Users found",
+    NO_INACTIVE_USERS: "No Inactive Users found"
   }

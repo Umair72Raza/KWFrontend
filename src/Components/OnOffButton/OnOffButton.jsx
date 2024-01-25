@@ -1,20 +1,16 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "reactstrap";
 import { toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 
-
 const OnOffButton = ({ user }) => {
-
-  const {token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
   const [isOn, setIsOn] = useState(false);
   const dispatch = useDispatch();
-  const socket=useSelector((state) => state?.socket?.socket);
+  const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     user.status === "online" ? setIsOn(true) : setIsOn(false);
-    socket?.emit("online-offline",user);
+    socket?.emit("online-offline", user);
   }, [user]);
 
   const toggleSwitch = async () => {
@@ -29,36 +25,35 @@ const OnOffButton = ({ user }) => {
     const result = await dispatch(toggleStatusAsync(data));
     if (result.type === "/auth/toggleStatus/fulfilled") {
       setIsOn(!isOn);
-     
+
     }
-    
   };
 
   return (
     <>
-    <h6>{isOn ? "Online":"Offline"}</h6>
-    <Button
-      color={isOn ? "success" : "secondary"}
-      onClick={toggleSwitch}
-      style={{
-        width: "60px",
-        height: "30px",
-        borderRadius: "15px",
-        display: "flex",
-        justifyContent: isOn ? "flex-end" : "flex-start",
-        padding: "2px",
-      }}
-    >
-      <span
+      <h6>{isOn ? "Online" : "Offline"}</h6>
+      <Button
+        color={isOn ? "success" : "secondary"}
+        onClick={toggleSwitch}
         style={{
-          width: "26px",
-          height: "26px",
-          borderRadius: "50%",
-          backgroundColor: "white",
-          boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.5)",
+          width: "60px",
+          height: "30px",
+          borderRadius: "15px",
+          display: "flex",
+          justifyContent: isOn ? "flex-end" : "flex-start",
+          padding: "2px",
         }}
-      />
-    </Button>
+      >
+        <span
+          style={{
+            width: "26px",
+            height: "26px",
+            borderRadius: "50%",
+            backgroundColor: "white",
+            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.5)",
+          }}
+        />
+      </Button>
     </>
   );
 };
