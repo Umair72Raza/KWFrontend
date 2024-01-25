@@ -8,10 +8,9 @@ import {
   Input,
   Label,
   FormGroup,
-  Row,
 } from "reactstrap";
 import Swal from "sweetalert2";
-import { button, heading, Labels, div } from "./constants.js";
+import { BookingConstants } from "../../Constants/Constants.js";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 
@@ -20,7 +19,7 @@ import { failureToast } from "../../utils.js";
 
 const Booking = ({ modal, toggle, worker, chat }) => {
   const { user, token } = useSelector((state) => state.auth);
-  const socket=useSelector((state) => state?.socket?.socket);
+  const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDetails, setTaskDetails] = useState(``);
@@ -80,6 +79,9 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   };
 
   const handleSend = () => {
+    const currentDate = new Date();
+    const selectedDate = new Date(timePart);
+    if(selectedDate < currentDate){
     const data = {
       Title: taskTitle,
       Status: "Scheduled",
@@ -91,6 +93,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       service: serviceOption,
     };
     SetParams(data);
+    
 
     if (removedUsers) {
       const present = removedUsers?.findIndex((u) => u._id === worker._id);
@@ -131,6 +134,11 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         socket?.off("newOffer");
       };
     }
+  }
+  else{
+    failureToast("Time is in past! select the future time");
+      
+  }
   };
 
   const starRating = (numStars) => {
@@ -175,12 +183,12 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           toggle={toggle}
           className="justify-content-center fw-bold "
         >
-          {heading.book}
+          {BookingConstants.heading.book}
         </ModalHeader>
         <ModalBody>
           <FormGroup>
             <Label for="taskTitle" className="fw-bold">
-              {Labels.taskTitle}
+              {BookingConstants.Labels.taskTitle}
             </Label>
             <Input
               type="text"
@@ -194,36 +202,36 @@ const Booking = ({ modal, toggle, worker, chat }) => {
             )}
           </FormGroup>
           <FormGroup>
-            <Label className="fw-bold">{Labels.worker}</Label>
+            <Label className="fw-bold">{BookingConstants.Labels.worker}</Label>
             <div className="d-flex flex-column flex-md-row  gap-md-4">
               <div>
-                <b>{div.name}</b>
+                <b>{BookingConstants.div.name}</b>
                 {worker?.firstName + " " + worker?.lastName + "  "}
               </div>
               <div>
                 {" "}
-                <b>{div.status}</b>
+                <b>{BookingConstants.div.status}</b>
                 {worker?.status}
               </div>
               <div className="">
-                <b>{div.rating}</b>
+                <b>{BookingConstants.div.rating}</b>
                 {worker?.rating > 0
-                      ? starRating(worker.rating)
-                      : "not rated yet"}
+                  ? starRating(worker.rating)
+                  : "not rated yet"}
               </div>
             </div>
           </FormGroup>
           <FormGroup>
             <Label for="taskDetails" className="fw-bold ">
-              {Labels.taskDetail}
+              {BookingConstants.Labels.taskDetail}
             </Label>
             <Input
               type="textarea"
               id="taskDetails"
               value={taskDetails}
               onChange={(e) => setTaskDetails(e.target.value)}
-              maxLength={1000} 
-              style={{ minHeight: '100px' }}
+              maxLength={1000}
+              style={{ minHeight: '100px',maxHeight: '100px' }}
             />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               {taskDetails.length}/1000
@@ -234,7 +242,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </FormGroup>
           <FormGroup>
             <Label for="serviceOption " className="fw-bold">
-              {Labels.service}
+              {BookingConstants.Labels.service}
             </Label>
             <Input
               type="select"
@@ -254,7 +262,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </FormGroup>
           <FormGroup>
             <Label for="dateTime" className="fw-bold">
-              {Labels.datetime}
+              {BookingConstants.Labels.datetime}
             </Label>
             <Input
               type="datetime-local"
@@ -268,7 +276,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </FormGroup>
           <FormGroup>
             <Label for="amountPerHour" className="fw-bold">
-              {Labels.amount}
+              {BookingConstants.Labels.amount}
             </Label>
             <Input
               type="number"
@@ -278,15 +286,15 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               min={5}
               max={50}
             />
-           
+
           </FormGroup>
         </ModalBody>
         <ModalFooter>
           <Button color="primary" disabled={!formComplete} onClick={handleSend}>
-            {button.send}
+            {BookingConstants.button.send}
           </Button>{" "}
           <Button color="secondary" onClick={toggle}>
-            {button.cancel}
+            {BookingConstants.button.cancel}
           </Button>
         </ModalFooter>
       </Modal>

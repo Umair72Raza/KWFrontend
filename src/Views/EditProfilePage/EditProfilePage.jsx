@@ -33,7 +33,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
-import ChatPopup from "../../Components/Chat Box/ChatPop";
 
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -181,13 +180,13 @@ const EditProfilePage = ({ ShowServices }) => {
     e.preventDefault();
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-  
+
     try {
       if (Object.keys(validationErrors).length === 0) {
         setLoading(true);
         const data = { id: UsersData?._id, token, formData };
         const result = await dispatch(updateProfileAsync(data));
-  
+
         if (result.type === "/UpdateProfile/fulfilled") {
           successToast("Profile Updated Successfully!");
           setFormData({
@@ -212,7 +211,7 @@ const EditProfilePage = ({ ShowServices }) => {
       setLoading(false);
     }
   };
-  
+
 
   const handleEditModeToggle = () => {
     setFormData({
@@ -273,124 +272,124 @@ const EditProfilePage = ({ ShowServices }) => {
           {userDataLoading ? (
             <div className="d-flex justify-content-center">
               <Spinner color="primary" />
-            </div> ):(
-          <Row>
-            {editMode ? (
-              <Form className="mt-5" onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label className="fw-semibold" for="firstName">
-                        {RegisterPage.LABELS.FIRST_NAME}
-                      </Label>
-                      <Input
-                        type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
-                        name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
-                        id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
-                        placeholder={
-                          RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
-                        }
-                        maxLength={12}
-                        required
-                        value={formData.firstName}
-                        onChange={(e) =>
-                          handleNameChange(
-                            formData,
-                            setFormData,
-                            setErrors,
-                            errors,
-                            "firstName",
-                            e
-                          )
-                        }
-                      />{" "}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label className="fw-semibold" for="lastName">
-                        {RegisterPage.LABELS.LAST_NAME}
-                      </Label>
-                      <Input
-                        type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
-                        name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
-                        id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
-                        placeholder={
-                          RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
-                        }
-                        maxLength={12}
-                        required
-                        value={formData.lastName}
-                        onChange={(e) =>
-                          handleNameChange(formData, setFormData, setErrors,
-                            errors, "lastName", e)
-                        }
-                      />{" "}
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label className="fw-semibold" for="email">
-                        {RegisterPage.LABELS.EMAIL}
-                      </Label>
-                      <Input
-                        type={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                        name={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                        id={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                        placeholder={
-                          RegisterPage.INPUT_FIELDS.EMAIL.placeholder
-                        }
-                        maxLength={70}
-                        value={formData.email}
-                        onChange={handleEmailChange}
-                        onKeyDown={ (event) => {
-                          if (event.key === ' ') {
-                            event.preventDefault();
+            </div>) : (
+            <Row>
+              {editMode ? (
+                <Form className="mt-5" onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
+                  <Row>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label className="fw-semibold" for="firstName">
+                          {RegisterPage.LABELS.FIRST_NAME}
+                        </Label>
+                        <Input
+                          type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
+                          name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
+                          id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
+                          placeholder={
+                            RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
                           }
-                        }}
-                      />
-                      {errors.email && (
-                        <span className="text-danger">{errors.email}</span>
-                      )}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label className="fw-semibold" for="phoneNumber">
-                        {RegisterPage.LABELS.PHONE}
-                      </Label>
-                      <PhoneInput
-                        defaultCountry="PK"
-                        id={RegisterPage.INPUT_FIELDS.PHONE.name}
-                        placeholder={
-                          RegisterPage.INPUT_FIELDS.PHONE.placeholder
-                        }
-                        maxLength={20}
-                        required
-                        value={formData.phoneNumber}
-                        onChange={handlePhoneChange}
-                        international
-                        countryCallingCodeEditable={false}
-                      />
-                      {errors.phone && (
-                        <span className="text-danger">{errors.phone}</span>
-                      )}
-                    </FormGroup>
-                  </Col>
-                </Row>
-                {ShowServices && (
-                  <>
-                    <Row className="my-4">
-                      <Label className="fw-semibold">
-                        {RegisterPage.LABELS.SERVICES}
-                      </Label>
-                      <Col
-                        md={12}
-                        className="d-flex flex-row Service-overflow-y-scroll"
-                      >
-                        <FormGroup>
+                          maxLength={12}
+                          required
+                          value={formData.firstName}
+                          onChange={(e) =>
+                            handleNameChange(
+                              formData,
+                              setFormData,
+                              setErrors,
+                              errors,
+                              "firstName",
+                              e
+                            )
+                          }
+                        />{" "}
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label className="fw-semibold" for="lastName">
+                          {RegisterPage.LABELS.LAST_NAME}
+                        </Label>
+                        <Input
+                          type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
+                          name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
+                          id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
+                          placeholder={
+                            RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
+                          }
+                          maxLength={12}
+                          required
+                          value={formData.lastName}
+                          onChange={(e) =>
+                            handleNameChange(formData, setFormData, setErrors,
+                              errors, "lastName", e)
+                          }
+                        />{" "}
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label className="fw-semibold" for="email">
+                          {RegisterPage.LABELS.EMAIL}
+                        </Label>
+                        <Input
+                          type={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                          name={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                          id={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                          placeholder={
+                            RegisterPage.INPUT_FIELDS.EMAIL.placeholder
+                          }
+                          maxLength={70}
+                          value={formData.email}
+                          onChange={handleEmailChange}
+                          onKeyDown={(event) => {
+                            if (event.key === ' ') {
+                              event.preventDefault();
+                            }
+                          }}
+                        />
+                        {errors.email && (
+                          <span className="text-danger">{errors.email}</span>
+                        )}
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label className="fw-semibold" for="phoneNumber">
+                          {RegisterPage.LABELS.PHONE}
+                        </Label>
+                        <PhoneInput
+                          defaultCountry="PK"
+                          id={RegisterPage.INPUT_FIELDS.PHONE.name}
+                          placeholder={
+                            RegisterPage.INPUT_FIELDS.PHONE.placeholder
+                          }
+                          maxLength={20}
+                          required
+                          value={formData.phoneNumber}
+                          onChange={handlePhoneChange}
+                          international
+                          countryCallingCodeEditable={false}
+                        />
+                        {errors.phone && (
+                          <span className="text-danger">{errors.phone}</span>
+                        )}
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  {ShowServices && (
+                    <>
+                      <Row className="my-4">
+                        <Label className="fw-semibold">
+                          {RegisterPage.LABELS.SERVICES}
+                        </Label>
+                        <Col
+                          md={12}
+                          className="d-flex flex-row Service-overflow-y-scroll"
+                        >
+                               <FormGroup>
                         {listLoading && ShowServices ? (
                        <div className="text-center w-100">
                        <Spinner />
@@ -405,98 +404,97 @@ const EditProfilePage = ({ ShowServices }) => {
                     />
                   )}
                         </FormGroup>
+                        </Col>
+                      </Row>
+                    </>
+                  )}
+                  <Row>
+                    <Col>
+                      <FormGroup>
+                        <Label className="fw-semibold" for="address">
+                          {RegisterPage.LABELS.ADDRESS}
+                        </Label>
+                        {editMode && (
+                          // Render map only when in edit mode
+                          <Map
+                            setFormData={setFormData}
+                            formData={formData}
+                            editMode={editMode}
+                            setErrors={setErrors}
+                            errors={errors}
+                          />
+                        )}
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <Button
+                    type="submit"
+                    color="primary"
+                    disabled={isSaveDisabled || loading}
+                    className="me-2"
+                  >
+                    {loading ? <Spinner size="sm" color="light" /> : <>{EDITPROFILE_PAGE.BUTTONS.SAVE}</>}
+                  </Button>
+                  <Button
+                    color="danger"
+                    onClick={handleCancelEdit}
+                    disabled={loading}
+                  >
+                    <FontAwesomeIcon icon={faTimes} /> {EDITPROFILE_PAGE.BUTTONS.CANCEL}
+                  </Button>
+                </Form>
+              ) : (
+                <Card
+                  className="my-4"
+                  style={{ boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}
+                >
+                  <CardBody>
+                    <Row>
+                      <Col xs={6}>
+                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.FIRST_NAME}</p>
+                        <p className="w-100">{UsersData?.firstName}</p>
+                      </Col>
+                      <Col xs={6}>
+                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.LAST_NAME}</p>
+                        <p className="w-100">{UsersData?.lastName}</p>
                       </Col>
                     </Row>
-                  </>
-                )}
-                <Row>
-                  <Col>
-                    <FormGroup>
-                      <Label className="fw-semibold" for="address">
-                        {RegisterPage.LABELS.ADDRESS}
-                      </Label>
-                      {editMode && (
-                        // Render map only when in edit mode
-                        <Map
-                          setFormData={setFormData}
-                          formData={formData}
-                          editMode={editMode}
-                          setErrors={setErrors}
-                          errors={errors}
-                        />
+                    <Row>
+                      <Col xs={6}>
+                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.EMAIL}</p>
+                        <p className="w-100">{UsersData?.email}</p>
+                      </Col>
+                      <Col xs={6}>
+                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.PHONE}</p>
+                        <p className="w-100">{UsersData?.phoneNumber}</p>
+                      </Col>
+                    </Row>
+                    <Row>
+                      {ShowServices && (
+                        <Col>
+                          <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.SERVICES}</p>
+                          <ol >
+                            {UsersData?.services?.map((service) => (
+                              <li className="pb-2" key={service.name}>
+                                {service.name} - {service.rate} {EDITPROFILE_PAGE.CARD_LABELS.RATE}
+                              </li>
+                            ))}
+                          </ol>
+                        </Col>
                       )}
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <Button
-                  type="submit"
-                  color="primary"
-                  disabled={isSaveDisabled || loading}
-                  className="me-2"
-                >
-                  {loading ? <Spinner size="sm" color="light" /> : <>{EDITPROFILE_PAGE.BUTTONS.SAVE}</>}
-                </Button>
-                <Button
-                  color="danger"
-                  onClick={handleCancelEdit}
-                  disabled={loading}
-                >
-                  <FontAwesomeIcon icon={faTimes} /> {EDITPROFILE_PAGE.BUTTONS.CANCEL}
-                </Button>
-              </Form>
-            ) : (
-              <Card
-                className="my-4"
-                style={{ boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}
-              >
-                <CardBody>
-                  <Row>
-                    <Col xs={6}>
-                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.FIRST_NAME}</p>
-                      <p className="w-100">{UsersData?.firstName}</p>
-                    </Col>
-                    <Col xs={6}>
-                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.LAST_NAME}</p>
-                      <p className="w-100">{UsersData?.lastName}</p>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col xs={6}>
-                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.EMAIL}</p>
-                      <p className="w-100">{UsersData?.email}</p>
-                    </Col>
-                    <Col xs={6}>
-                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.PHONE}</p>
-                      <p className="w-100">{UsersData?.phoneNumber}</p>
-                    </Col>
-                  </Row>
-                  <Row>
-                  {ShowServices && (
-                    <Col>
-                  <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.SERVICES}</p>
-                  <ol >
-                    {UsersData?.services?.map((service) => (
-                      <li className="pb-2" key={service.name}>
-                        {service.name} - {service.rate} {EDITPROFILE_PAGE.CARD_LABELS.RATE}
-                      </li>
-                    ))}
-                    </ol>
-                  </Col>
-                    )}
-                    <Col>
-                      <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}</p>
-                      <p className="w-100">{UsersData?.address}</p>
-                    </Col>
-                  
-                  </Row>
-                  <Button color="primary" onClick={handleEditModeToggle}>{EDITPROFILE_PAGE.BUTTONS.EDIT}</Button>
-                </CardBody>
-              </Card>
-            )}
-          </Row>
-            )}
+                      <Col>
+                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}</p>
+                        <p className="w-100">{UsersData?.address}</p>
+                      </Col>
+
+                    </Row>
+                    <Button color="primary" onClick={handleEditModeToggle}>{EDITPROFILE_PAGE.BUTTONS.EDIT}</Button>
+                  </CardBody>
+                </Card>
+              )}
+            </Row>
+          )}
         </Container>
-        {/* <ChatPopup /> */}
       </Container>
     </>
   );

@@ -1,6 +1,4 @@
-
-// PersonDetails.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardBody, CardTitle, CardText, Col, Button, Container } from "reactstrap";
 import DetailsCard from "../DetailsCard/DetailsCard";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,14 +10,11 @@ import {
 import FeedbacksComp from "../FeedbacksComp/FeedbacksComp";
 import Swal from "sweetalert2";
 import { capitalizeFirstLetter } from "../../utils";
-import { setSocket } from "../../Redux/Slices/SocketSlice";
 const PeopleDetails = ({ person, setNewFilPerson }) => {
-
-  
 
   const [orders, setOrders] = useState();
   const [feedbacks, setFeedbacks] = useState([]);
-  const [disableFeedbackButton,setDisableFeebackButton] = useState(false);
+  const [disableFeedbackButton, setDisableFeebackButton] = useState(false);
   const [showFeedbacksState, setShowFeedbacksState] = useState(false);
   const dispatch = useDispatch();
   const [showDetailsCard, setShowDetailsCard] = useState(false);
@@ -42,7 +37,7 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
       if (result.isConfirmed) {
         toggleAccess();
         Swal.fire({
-          title:  `${newAccess}`,
+          title: `${newAccess}`,
           icon: "warning",
         });
       }
@@ -58,7 +53,6 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
     const result = await dispatch(togglePersonAccessAsync(data));
     if (result.type === "/admin/toggleAccess/fulfilled") {
       setNewFilPerson(person);
-      //socket.emit("blocking",(person));
     }
   };
   const getOrders = async (person) => {
@@ -113,28 +107,28 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
               {person.rating > 0 ? starRating(person.rating) : "Not Rated Yet!"}
             </CardText>
             <Col className="d-flex flex-column gap-2 flex-md-row ">
-            <Button
-              color={person.access === "accepted" ? "danger" : "success"}
-             
-              onClick={() => confirmationPopUp(person)}
-            >
-              {person.access === "accepted" ? "Block" : "Unblock"}
-            </Button>
+              <Button
+                color={person.access === "accepted" ? "danger" : "success"}
 
-            <Button
-              style={{ backgroundColor: "#5d12cf", border: "none" }}
-              onClick={() => getOrders(person)}
-            >
-              See More Details
-            </Button>
+                onClick={() => confirmationPopUp(person)}
+              >
+                {person.access === "accepted" ? "Block" : "Unblock"}
+              </Button>
 
-            <Button
-              color="warning"
-              onClick={() => feedbackfunction(person)}
-              disabled={disableFeedbackButton}
-            >
-              See Feedbacks
-            </Button>
+              <Button
+                style={{ backgroundColor: "#5d12cf", border: "none" }}
+                onClick={() => getOrders(person)}
+              >
+                See More Details
+              </Button>
+
+              <Button
+                color="warning"
+                onClick={() => feedbackfunction(person)}
+                disabled={disableFeedbackButton}
+              >
+                See Feedbacks
+              </Button>
             </Col>
           </CardBody>
         </Card>

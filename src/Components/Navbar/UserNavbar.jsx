@@ -18,7 +18,7 @@ import {
 } from "reactstrap";
 import { FiMessageCircle } from "react-icons/fi";
 import { RiInboxArchiveLine } from "react-icons/ri";
-import { NavBar } from "./constants";
+import { navbarConstants } from "../../Constants/Constants";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync } from "../../Redux/Slices/AuthSlice";
@@ -28,7 +28,7 @@ import { CgProfile } from "react-icons/cg";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
 import Swal from "sweetalert2";
-import ChatPopup from "../Chat Box/ChatPop";
+
 const UserNavbar = () => {
   const {
     setShowModal,
@@ -42,9 +42,7 @@ const UserNavbar = () => {
     SetONotification,
     setReceiveMessage,
     setGotOffer,
-    userOffering,
     setSelectedChatCompare,
-    setUserOffering,
     unreadMessages,
     setUnreadMessages,
   } = ChatState();
@@ -59,9 +57,9 @@ const UserNavbar = () => {
 
   const Logout = async () => {
     Swal.fire({
-      title: "Are You Sure You want to Logout?",
+      title: "Are You Sure You Want To Log Out?",
       showCancelButton: true,
-      confirmButtonText: "LogOut",
+      confirmButtonText: "Log Out",
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
@@ -92,7 +90,6 @@ const UserNavbar = () => {
 
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
-    //setUserOffering(userOffering.filter(()=>))
     setGotOffer(true);
     setReceiveMessage(notify.params);
     SetShowOffer(!offer);
@@ -118,7 +115,7 @@ console.log(unreadMessages)
     <>
       <Navbar className="bg-primary w-full" expand="sm" dark container="fluid">
         <NavbarBrand href="/" className="fs-bold">
-          {NavBar.brandName}
+          {navbarConstants.NavBar.brandName}
         </NavbarBrand>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar className=" gap-3 justify-content-end">

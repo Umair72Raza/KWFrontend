@@ -19,7 +19,7 @@ import UserNavbar from "../../Components/Navbar/UserNavbar";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
-  const { user, token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
   const [apiUsers, setApiUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("users");
   const [newfilUsers, setNewFilUsers] = useState();
@@ -99,8 +99,8 @@ const AdminUsers = () => {
           <h1 style={{ textAlign: "center" }}>Users</h1>
         </Row>
         <Row>
-          <Navbar color="light" light expand="md" style={{paddingLeft:"2%"}}>
-            <Nav tabs style={{cursor:"pointer"}}>
+          <Navbar color="light" light expand="md" style={{ paddingLeft: "2%" }}>
+            <Nav tabs style={{ cursor: "pointer" }}>
               <NavItem>
                 <Button
                   style={{
@@ -157,23 +157,23 @@ const AdminUsers = () => {
             <Row xs="1" md="2" lg="3">
               {activeTab === "users"
                 ? activeUsers.map((person, index) => (
-                    <Col key={index}>
-                      <PeopleDetails
-                        key={index}
-                        person={person}
-                        setNewFilPerson={setNewFilUsers}
-                      />
-                    </Col>
-                  ))
+                  <Col key={index}>
+                    <PeopleDetails
+                      key={index}
+                      person={person}
+                      setNewFilPerson={setNewFilUsers}
+                    />
+                  </Col>
+                ))
                 : inactiveUsers.map((person, index) => (
-                    <Col key={index}>
-                      <PeopleDetails
-                        key={index}
-                        person={person}
-                        setNewFilPerson={setNewFilUsers}
-                      />
-                    </Col>
-                  ))}
+                  <Col key={index}>
+                    <PeopleDetails
+                      key={index}
+                      person={person}
+                      setNewFilPerson={setNewFilUsers}
+                    />
+                  </Col>
+                ))}
             </Row>
           )}
         </Row>

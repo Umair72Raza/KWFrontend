@@ -9,18 +9,14 @@ import {
 } from "../../Redux/Slices/AdminSlice";
 import { Input, InputGroup, Button, Col, Row } from "reactstrap";
 import Swal from "sweetalert2";
-import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
 import cross from "../../assets/images/servicespngs/cross.png";
 import { useNavigate } from "react-router-dom";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import { SERVICE_CONSTS } from "../../Constants/Constants";
 const Services = () => {
   const [services, setServices] = useState([]);
-  const [addButtonDisabled, setAddButtonDisabled] = useState(false);
   const [showEditButtons, setShowEditButton] = useState(false);
-  const [showErrorPopUp, setShowErrorPopUp] = useState(false);
   const [editedService, setEditedService] = useState({ id: null, name: "" });
-  const [updateButtonDisabled, setUpdateButtonDisabled] = useState(false);
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const id = user._id;
@@ -239,88 +235,88 @@ const Services = () => {
               </Button>
             ) : (
               <>
-                <img  src={cross} alt="cross" onClick={toggleshowEdits} />
+                <img src={cross} alt="cross" onClick={toggleshowEdits} />
               </>
             )}
           </Col>
         </Row>
 
         {showEditButtons ? (
-        <InputGroup style={{padding:"1%"}}>
-          <Input
-            type="text"
-            placeholder="Add a new service"
-            value={newService}
-            onChange={handleInputChange}
-          />
-          <Button color="primary" onClick={handleAddService}>
-            {SERVICE_CONSTS.ADD_NEW_SERVICE}
-          </Button>
-        </InputGroup>
-      ) : (
-        <></>
-      )}
+          <InputGroup style={{ padding: "1%" }}>
+            <Input
+              type="text"
+              placeholder="Add a new service"
+              value={newService}
+              onChange={handleInputChange}
+            />
+            <Button color="primary" onClick={handleAddService}>
+              {SERVICE_CONSTS.ADD_NEW_SERVICE}
+            </Button>
+          </InputGroup>
+        ) : (
+          <></>
+        )}
 
         <ListGroup>
-        {services.length === 0 ? (
+          {services.length === 0 ? (
             <ListGroupItem style={{ textAlign: "center" }}>
               {SERVICE_CONSTS.NO_SERVICES}
             </ListGroupItem>
           ) : (
-          <ListGroup>
-            {services.map((service) => (
-              <ListGroupItem key={service._id}>
-                <Row style={{ textAlign: "center" }}>
-                  <Col>
-                    {editedService.id === service._id ? (
-                      <Input
-                        type="text"
-                        value={editedService.name}
-                        onChange={handleEditInputChange}
-                      />
-                    ) : (
-                      <span onClick={() => startEditingService(service)}>
-                        {service.name}
-                      </span>
-                    )}
-                  </Col>
-                  <Col>
-                    <Button
-                      color="danger"
-                      size="sm"
-                      className="ml-2"
-                      onClick={() => handleRemoveService(service)}
-                    >
-                      {SERVICE_CONSTS.REMOVE}
-                    </Button>
-                  </Col>
-                  <Col>
-                    {editedService.id === service._id ? (
-                      <>
+            <ListGroup>
+              {services.map((service) => (
+                <ListGroupItem key={service._id}>
+                  <Row style={{ textAlign: "center" }}>
+                    <Col>
+                      {editedService.id === service._id ? (
+                        <Input
+                          type="text"
+                          value={editedService.name}
+                          onChange={handleEditInputChange}
+                        />
+                      ) : (
+                        <span onClick={() => startEditingService(service)}>
+                          {service.name}
+                        </span>
+                      )}
+                    </Col>
+                    <Col>
+                      <Button
+                        color="danger"
+                        size="sm"
+                        className="ml-2"
+                        onClick={() => handleRemoveService(service)}
+                      >
+                        {SERVICE_CONSTS.REMOVE}
+                      </Button>
+                    </Col>
+                    <Col>
+                      {editedService.id === service._id ? (
+                        <>
+                          <Button
+                            style={{ marginRight: "2%", marginBottom: "1%" }}
+                            color="primary"
+                            onClick={() => handleEditService(service)}
+                          >
+                            {SERVICE_CONSTS.EDIT}
+                          </Button>
+                          <Button color="secondary" onClick={handleCancelEdit}>
+                            {SERVICE_CONSTS.CANCEL}
+                          </Button>
+                        </>
+                      ) : (
                         <Button
-                        style={{marginRight:"2%", marginBottom:"1%"}}
                           color="primary"
-                          onClick={() => handleEditService(service)}
+                          onClick={() => startEditingService(service)}
                         >
                           {SERVICE_CONSTS.EDIT}
                         </Button>
-                        <Button   color="secondary" onClick={handleCancelEdit}>
-                          {SERVICE_CONSTS.CANCEL}
-                        </Button>
-                      </>
-                    ) : (
-                      <Button
-                        color="primary"
-                        onClick={() => startEditingService(service)}
-                      >
-                        {SERVICE_CONSTS.EDIT}
-                      </Button>
-                    )}
-                  </Col>
-                </Row>
-              </ListGroupItem>
-            ))}
-          </ListGroup>
+                      )}
+                    </Col>
+                  </Row>
+                </ListGroupItem>
+              ))}
+            </ListGroup>
           )}
         </ListGroup>
       </Container>

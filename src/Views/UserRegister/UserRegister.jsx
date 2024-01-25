@@ -31,7 +31,6 @@ import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { has } from "lodash";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -56,7 +55,7 @@ const UserRegister = ({ ShowServices }) => {
   const [errors, setErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
-  const [listLoading, setListLoading] = useState(true); // Set loading to true when the component mounts and to false when the data is fetched or if there's an error
+  const [listLoading, setListLoading] = useState(true);
   const toggle = () => setTooltipOpen(!tooltipOpen);
 
   const isFormValid = useMemo(() => {
@@ -103,7 +102,7 @@ const UserRegister = ({ ShowServices }) => {
       } catch (error) {
         console.error("Error fetching services", error);
       } finally {
-        setListLoading(false); // Set loading to false when the data is fetched or if there's an error
+        setListLoading(false);
       }
     };
 
@@ -112,7 +111,7 @@ const UserRegister = ({ ShowServices }) => {
 
   const handlePasswordChange = (e) => {
     let password = e.target.value;
-password = password.replace(/\s/g, '');
+    password = password.replace(/\s/g, '');
     setErrors({ ...errors, password: "" });
 
     setFormData({
@@ -123,7 +122,7 @@ password = password.replace(/\s/g, '');
 
   const handleConfirmPasswordChange = (e) => {
     let confirmPassword = e.target.value;
-confirmPassword = confirmPassword.replace(/\s/g, '');
+    confirmPassword = confirmPassword.replace(/\s/g, '');
     setErrors({ ...errors, confirmPassword: "" });
 
     setFormData({
@@ -141,7 +140,7 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
       email,
     }));
   };
-  
+
 
   const handlePhoneChange = (value) => {
     setErrors({ ...errors, phone: "" });
@@ -178,17 +177,6 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
       services: updatedServices,
     });
   };
-
-  // const isFormDataFilled = (formData) => {
-  //   for (const field in formData) {
-  //     if (!formData[field]) {
-  //       // Field is empty
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // };
-
   const FormValidation = (formData) => {
     const errors = {};
     if (!validateEmail(formData.email)) {
@@ -218,9 +206,6 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
       errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
     }
 
-    // if (!isFormDataFilled(formData)) {
-    //   errors.allField = RegisterPage.ERROR_MESSAGES.enterAllFields;
-    // }
     if (hasOnlyWhiteSpace(formData.firstName)) {
       errors.firstName = "First Name cannot be empty";
     }
@@ -236,20 +221,20 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Start loading spinner
     setLoading(true);
-  
+
     // Perform form validation
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-  
+
     // Check if there are validation errors
     if (Object.keys(validationErrors).length === 0) {
       try {
         // Dispatch the signup action
         const result = await dispatch(signUpUserAsync(formData));
-  
+
         if (result.type === "auth/signup/fulfilled") {
           // Reset form data on successful signup
           setFormData({
@@ -281,7 +266,7 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
       setLoading(false);
     }
   };
-  
+
 
   return (
     <Container
@@ -373,7 +358,7 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
                     maxLength={70}
                     onChange={handleEmailChange}
                     autoComplete="new-email"
-                    onKeyDown={ (event) => {
+                    onKeyDown={(event) => {
                       if (event.key === ' ') {
                         event.preventDefault();
                       }
@@ -486,19 +471,19 @@ confirmPassword = confirmPassword.replace(/\s/g, '');
                     className="d-flex flex-row Service-overflow-y-scroll"
                   >
                     <FormGroup className="d-flex w-100">
-                    {listLoading && ShowServices ? (
-                       <div className="text-center w-100">
-                       <Spinner />
-                       <p>Loading Services...</p>
-                     </div>
-                  ) : (
-                    <CustomServiceDropdown
-                      list={list}
-                      selectedServices={formData?.services}
-                      handleServiceChange={handleServiceChange}
-                      handleRateChange={handleRateChange}
-                    />
-                  )}
+                      {listLoading && ShowServices ? (
+                        <div className="text-center w-100">
+                          <Spinner />
+                          <p>Loading Services...</p>
+                        </div>
+                      ) : (
+                        <CustomServiceDropdown
+                          list={list}
+                          selectedServices={formData?.services}
+                          handleServiceChange={handleServiceChange}
+                          handleRateChange={handleRateChange}
+                        />
+                      )}
                     </FormGroup>
                   </Col>
                 </Row>

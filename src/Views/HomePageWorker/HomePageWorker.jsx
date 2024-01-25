@@ -1,4 +1,3 @@
-// / eslint-disable no-unused-vars /;
 import React, { useEffect, useState } from "react";
 import {
   TabContent,
@@ -9,7 +8,6 @@ import {
   Row,
   Col,
   Container,
-  Button,
 } from "reactstrap";
 import "./styles.css";
 import classnames from "classnames";
@@ -28,7 +26,6 @@ import GotOffer from "../../Components/GotOffer/GotOffer";
 import StartJob from "../../Components/StartJob/StartJob";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice";
 import { ChatState } from "../../Context/ChatProvider";
-import { Spinner } from "reactstrap";
 import Swal from "sweetalert2";
 import "./styles.css";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
@@ -87,8 +84,6 @@ const HomePageWorker = () => {
         });
         if (!alreadyPresent) {
           SetONotification([data, ...offerNotification]);
-          //setUserOffering(data.user);
-          //setUserOffering([data.user,...userOffering]);
         }
       } else {
         setGotOffer(true);

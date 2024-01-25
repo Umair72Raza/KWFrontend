@@ -6,7 +6,7 @@ export const sendOTP = async (email) => {
     const response = await API.post(`user/forgot-password`, { email: email });
     return response;
   } catch (error) {
-    throw error.response.data; // Throw the response error data
+    throw error.response.data;
   }
 };
 
@@ -18,7 +18,7 @@ export const newPasswordSetter = async (email, newPass) => {
     });
     return response;
   } catch (error) {
-    throw error.response.data; // Throw the response error data
+    throw error.response.data;
   }
 };
 
@@ -76,7 +76,6 @@ export const signUpUser = async (
   }
 }
 
-// /updateOnlineStatus/:id
 export const toggleStatus = async (data) => {
   try {
     const { id, status } = data;

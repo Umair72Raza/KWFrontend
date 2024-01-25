@@ -1,7 +1,7 @@
 import { FaSearch } from "react-icons/fa";
 import Filter from "../../Components/Filter/Filter.jsx";
 import WorkerCard from "../../Components/workerCard/workerCard";
-import { button, heading } from "./constants.js";
+import { HomePageUserConst } from "../../Constants/Constants.js";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice.js";
@@ -36,7 +36,7 @@ const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const { setOriginalChats, setCopyOfChats, OriginalChats } = ChatState();
+  const { setOriginalChats, setCopyOfChats } = ChatState();
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
   let users = useSelector((state) => state?.homepage?.workers);
@@ -158,13 +158,13 @@ const HomePageUser = () => {
           icon: "error",
           customClass: {
             content: 'swal-content-custom' // You can add a custom class for the content
-          },didOpen: () => {
+          }, didOpen: () => {
             document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
           },
           willClose: () => {
             document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
           },
-          allowOutsideClick: false 
+          allowOutsideClick: false
         });
       }
     });
@@ -333,7 +333,7 @@ const HomePageUser = () => {
               color="primary"
               className="p-1"
             >
-              {button.orders}
+              {HomePageUserConst.button.orders}
             </Button>
           </Col>
           <Col className="   d-flex flex-column py-0" xs={6}>
@@ -375,7 +375,7 @@ const HomePageUser = () => {
               color="primary"
               onClick={handleFiltersToggle}
             >
-              {button.filters}
+              {HomePageUserConst.button.filters}
             </Button>
             <Offcanvas
               isOpen={showFilters}
@@ -384,7 +384,7 @@ const HomePageUser = () => {
               toggle={handleFiltersToggle}
             >
               <OffcanvasHeader toggle={handleFiltersToggle}>
-                {heading.filter}
+                {HomePageUserConst.heading.filter}
               </OffcanvasHeader>
               <OffcanvasBody>
                 <Filter
@@ -406,12 +406,12 @@ const HomePageUser = () => {
           <Col className="mt-3" md={7}>
             {loading ? (
               <div className="d-flex justify-content-center">
-              <Spinner
-                style={{
-                  height: "3rem",
-                  width: "3rem",
-                }}
-              />
+                <Spinner
+                  style={{
+                    height: "3rem",
+                    width: "3rem",
+                  }}
+                />
               </div>
             ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
               filteredAndSortedUsers.map((worker, index) => (
@@ -422,7 +422,7 @@ const HomePageUser = () => {
             )}
           </Col>
           <Col className="d-none d-md-block   mt-3" md={5}>
-            <h3>{heading.filter}</h3>
+            <h3>{HomePageUserConst.heading.filter}</h3>
             <Filter
               sortOption={sortOption}
               setSortOption={setSortOption}

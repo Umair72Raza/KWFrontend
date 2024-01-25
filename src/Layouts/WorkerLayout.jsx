@@ -5,7 +5,7 @@ import WorkerRoutes from '../Routes/WorkerRoutes';
 import { setSocket } from "../Redux/Slices/SocketSlice";
 import { useDispatch, useSelector } from "react-redux";
 const Worker = () => {
-  let {  user } = useSelector((state) => state.auth);
+  let { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const Worker = () => {
   };
   return (
     <>
-      <Container fluid  className="mt-8 pb-5">
+      <Container fluid className="mt-8 pb-5">
         <Row className="justify-content-center">
           <Routes>
             {getRoutes(WorkerRoutes)}

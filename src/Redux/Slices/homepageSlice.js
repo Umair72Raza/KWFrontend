@@ -17,7 +17,7 @@ const homepageSlice = createSlice({
     workers: null,
     Status: "idle",
     error: null,
-    removeWorker:null
+    removeWorker: null
   },
   reducers: {
     updateWorkers: (state, action) => {
@@ -26,7 +26,7 @@ const homepageSlice = createSlice({
     updateRemoveWorker: (state, action) => {
       state.removeWorker = action.payload;
     }
-    
+
   },
   extraReducers: (builder) => {
     builder
@@ -54,5 +54,5 @@ const homepageSlice = createSlice({
       })
   }
 });
-export const { updateWorkers ,updateRemoveWorker} = homepageSlice.actions;
+export const { updateWorkers, updateRemoveWorker } = homepageSlice.actions;
 export default homepageSlice.reducer;
