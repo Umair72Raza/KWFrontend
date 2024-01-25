@@ -18,7 +18,7 @@ import {
 } from "reactstrap";
 import { FiMessageCircle } from "react-icons/fi";
 import { RiInboxArchiveLine } from "react-icons/ri";
-import { NavBar } from "./constants";
+import { navbarConstants } from "../../Constants/Constants";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync } from "../../Redux/Slices/AuthSlice";
@@ -107,7 +107,7 @@ const UserNavbar = () => {
     <>
       <Navbar className="bg-primary w-full" expand="sm" dark container="fluid">
         <NavbarBrand href="/" className="fs-bold">
-          {NavBar.brandName}
+          {navbarConstants.NavBar.brandName}
         </NavbarBrand>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar className=" gap-3 justify-content-end">

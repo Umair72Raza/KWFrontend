@@ -14,7 +14,7 @@ import {
   Col,
 } from "reactstrap";
 import forgotpng from "../../assets/images/ForgetPasswordpng/forgot.png";
-import { FORGET_ROUTES, FP_FIELDS } from "./constants";
+import {forgetPasswordConstants } from "../../Constants/Constants.js";
 import { failureToast, successToast } from "../../utils";
 import { requestOTPAsync,updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,8 +29,8 @@ const ForgetPassword = () => {
     //as soon as email is sent, the user will b navigated to the newpassword page
     // where he/she can verify otp and add a new password
     if (otpStatus === "suceeded") {
-      successToast(FP_FIELDS.FP_TOAST_MSG);
-      navigate(FORGET_ROUTES.NEW_PASSWORD, { state: { email: email } });
+      successToast(forgetPasswordConstants.FP_FIELDS.FP_TOAST_MSG);
+      navigate(forgetPasswordConstants.FORGET_ROUTES.NEW_PASSWORD, { state: { email: email } });
     }
   }, [otpStatus, stateotp]);
 
@@ -51,7 +51,7 @@ const ForgetPassword = () => {
     try {
       dispatch(requestOTPAsync(email));
       if (otpStatus === "suceeded") {
-        navigate(FORGET_ROUTES.NEW_PASSWORD, { state: { email: email } });
+        navigate(forgetPasswordConstants.FORGET_ROUTES.NEW_PASSWORD, { state: { email: email } });
       }
     } catch (error) {
       failureToast("Error sending OTP");
@@ -86,14 +86,14 @@ const ForgetPassword = () => {
 
                     <Col style={{ marginTop: "5%" }}>
                       <h4 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-                        {FP_FIELDS.EMAIL}
+                        {forgetPasswordConstants.FP_FIELDS.EMAIL}
                         <br />
-                        {FP_FIELDS.MSG}
+                        {forgetPasswordConstants.FP_FIELDS.MSG}
                       </h4>
                       <Input
                         id="exampleEmail"
                         name="email"
-                        placeholder={FP_FIELDS.EG_MAIL}
+                        placeholder={forgetPasswordConstants.FP_FIELDS.EG_MAIL}
                         type="email"
                         onChange={handleChange}
                         style={{

@@ -14,7 +14,7 @@ import {
   Row,
 } from "reactstrap";
 import { OTPverify, newPasswordSetter } from "../../APIs/auth";
-import { NP_CONSTANTS } from "./constants";
+import { newpasswordConstants } from "../../Constants/Constants";
 import resetpasswordpng from "../../assets/images/NewPasswordpngs/resetpassword.png";
 import confirmpassword from "../../assets/images/NewPasswordpngs/confirmpassword.png";
 import otppng from "../../assets/images/NewPasswordpngs/securedata.png";
@@ -104,7 +104,7 @@ const NewPassword = () => {
           borderRadius: "10px",
         }}
       >
-        <h3>{NP_CONSTANTS.NP_HEADING}</h3>
+        <h3>{newpasswordConstants.NP_CONSTANTS.NP_HEADING}</h3>
 
         <>
           <Row>
@@ -127,7 +127,7 @@ const NewPassword = () => {
                         >
                           {" "}
                           <Label for="otp">
-                            {NP_CONSTANTS.PROVIDE_OTP_LABEL}
+                            {newpasswordConstants.NP_CONSTANTS.PROVIDE_OTP_LABEL}
                           </Label>
                           <InputGroup>
                             <InputGroupText>
@@ -158,7 +158,7 @@ const NewPassword = () => {
                           color="success"
                           disabled={notEqualError}
                         >
-                          {NP_CONSTANTS.VERIFYOTP}
+                          {newpasswordConstants.NP_CONSTANTS.VERIFYOTP}
                         </Button>
                       </Col>
                     </Row>
@@ -185,7 +185,7 @@ const NewPassword = () => {
                               >
                                 {" "}
                                 <Label className="fw-semibold" for="password">
-                                  {NP_CONSTANTS.NEWPASSWORD}
+                                  {newpasswordConstants.NP_CONSTANTS.NEWPASSWORD}
                                 </Label>
                                 <InputGroup>
                                   <InputGroupText addonType="prepend">
@@ -199,7 +199,7 @@ const NewPassword = () => {
                                     type="password"
                                     name="password"
                                     id="password"
-                                    placeholder={NP_CONSTANTS.PASSWORD_PH}
+                                    placeholder={newpasswordConstants.NP_CONSTANTS.PASSWORD_PH}
                                     value={newPassword}
                                     onChange={handlePasswordChange}
                                   />
@@ -214,7 +214,7 @@ const NewPassword = () => {
                                   className="fw-semibold"
                                   for="confirmNewPassword"
                                 >
-                                  {NP_CONSTANTS.CONFIRMPASSWORD}
+                                  {newpasswordConstants.NP_CONSTANTS.CONFIRMPASSWORD}
                                 </Label>
                                 <InputGroup>
                                   <InputGroupText>
@@ -229,7 +229,7 @@ const NewPassword = () => {
                                     id="confirmNewPassword"
                                     name="confirmNewPassword"
                                     placeholder={
-                                      NP_CONSTANTS.CONFIRMPASSWORD_PH
+                                      newpasswordConstants.NP_CONSTANTS.CONFIRMPASSWORD_PH
                                     }
                                     value={confirmNewPassword}
                                     onChange={handleConfirmNewPassword}
@@ -248,7 +248,7 @@ const NewPassword = () => {
                             color="success"
                             disabled={notEqualError}
                           >
-                            {NP_CONSTANTS.SAVEBUTTON}
+                            {newpasswordConstants.NP_CONSTANTS.SAVEBUTTON}
                           </Button>
                         </Form>
                       </Col>

@@ -9,7 +9,7 @@ import {
   Input,
 } from "reactstrap";
 import { FaStar } from "react-icons/fa";
-import { heading } from "./constants";
+import { feedbackConstants } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import { AddFeedBack } from "../../Redux/Slices/FeedBackSlice";
 const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
@@ -64,11 +64,11 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
       <Modal isOpen={modal2} centered>
         {user.role == "user" ? (
           <ModalHeader toggle={toggle} className="justify-content-center">
-            {heading.rateService}
+            {feedbackConstants.heading.rateService}
           </ModalHeader>
         ) : (
           <ModalHeader toggle={toggle} className="justify-content-center">
-            {heading.rateUser}
+            {feedbackConstants.heading.rateUser}
           </ModalHeader>
         )}
         <ModalBody>

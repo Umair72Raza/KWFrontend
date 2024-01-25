@@ -11,7 +11,7 @@ import {
   Row,
 } from "reactstrap";
 import Swal from "sweetalert2";
-import { button, heading, Labels, div } from "./constants.js";
+import { BookingConstants } from "../../Constants/Constants.js";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 
@@ -175,12 +175,12 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           toggle={toggle}
           className="justify-content-center fw-bold "
         >
-          {heading.book}
+          {BookingConstants.heading.book}
         </ModalHeader>
         <ModalBody>
           <FormGroup>
             <Label for="taskTitle" className="fw-bold">
-              {Labels.taskTitle}
+              {BookingConstants.Labels.taskTitle}
             </Label>
             <Input
               type="text"
@@ -194,19 +194,19 @@ const Booking = ({ modal, toggle, worker, chat }) => {
             )}
           </FormGroup>
           <FormGroup>
-            <Label className="fw-bold">{Labels.worker}</Label>
+            <Label className="fw-bold">{BookingConstants.Labels.worker}</Label>
             <div className="d-flex flex-column flex-md-row  gap-md-4">
               <div>
-                <b>{div.name}</b>
+                <b>{BookingConstants.div.name}</b>
                 {worker?.firstName + " " + worker?.lastName + "  "}
               </div>
               <div>
                 {" "}
-                <b>{div.status}</b>
+                <b>{BookingConstants.div.status}</b>
                 {worker?.status}
               </div>
               <div className="">
-                <b>{div.rating}</b>
+                <b>{BookingConstants.div.rating}</b>
                 {worker?.rating > 0
                       ? starRating(worker.rating)
                       : "not rated yet"}
@@ -215,7 +215,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </FormGroup>
           <FormGroup>
             <Label for="taskDetails" className="fw-bold ">
-              {Labels.taskDetail}
+              {BookingConstants.Labels.taskDetail}
             </Label>
             <Input
               type="textarea"
@@ -234,7 +234,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </FormGroup>
           <FormGroup>
             <Label for="serviceOption " className="fw-bold">
-              {Labels.service}
+              {BookingConstants.Labels.service}
             </Label>
             <Input
               type="select"
@@ -254,7 +254,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </FormGroup>
           <FormGroup>
             <Label for="dateTime" className="fw-bold">
-              {Labels.datetime}
+              {BookingConstants.Labels.datetime}
             </Label>
             <Input
               type="datetime-local"
@@ -268,7 +268,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </FormGroup>
           <FormGroup>
             <Label for="amountPerHour" className="fw-bold">
-              {Labels.amount}
+              {BookingConstants.Labels.amount}
             </Label>
             <Input
               type="number"
@@ -283,10 +283,10 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" disabled={!formComplete} onClick={handleSend}>
-            {button.send}
+            {BookingConstants.button.send}
           </Button>{" "}
           <Button color="secondary" onClick={toggle}>
-            {button.cancel}
+            {BookingConstants.button.cancel}
           </Button>
         </ModalFooter>
       </Modal>

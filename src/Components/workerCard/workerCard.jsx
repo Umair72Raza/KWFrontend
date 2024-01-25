@@ -9,7 +9,7 @@ import {
   CardTitle,
   Button,
 } from "reactstrap";
-import { WorkerCardText, WorkerCardButtons } from "./constants";
+import { workerCardConstants } from "../../Constants/Constants";
 import Booking from "../booking popup/booking";
 import { ChatState } from "../../Context/ChatProvider";
 import { useSelector } from "react-redux";
@@ -102,7 +102,7 @@ const WorkerCard = ({ worker }) => {
                     <div>Status:</div> <div>{worker.status}</div>
                   </CardSubtitle>
                   <CardSubtitle>
-                    <b>{WorkerCardText.Services}</b>
+                    <b>{workerCardConstants.WorkerCardText.Services}</b>
                     {worker?.services.map((service, key) => (
                       <div
                         key={key}
@@ -132,10 +132,10 @@ const WorkerCard = ({ worker }) => {
                   </CardSubtitle>
                   <div className="gap-3 d-flex flex-md-column pt-md-4">
                     <Button color="primary" onClick={HandleChat}>
-                      {WorkerCardButtons.chat}
+                      {workerCardConstants.WorkerCardButtons.chat}
                     </Button>
                     <Button color="primary" onClick={() => book(worker)}>
-                      {WorkerCardButtons.book}
+                      {workerCardConstants.WorkerCardButtons.book}
                     </Button>
                   </div>
                 </CardBody>
