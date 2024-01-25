@@ -205,7 +205,7 @@ const OrderCard = ({
                   </CardText>
                   {/* <CardText>OrderId: {order._id}</CardText> */}
                   <CardText>
-                    Worker: {order.users.length > 0 && order.users[1].firstName}
+                    Worker: {order?.users?.length > 0 && order?.users[1]?.firstName}
                   </CardText>
                   <Row>
                     <Col></Col>

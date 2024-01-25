@@ -25,11 +25,11 @@ import UserNavbar from "../../Components/Navbar/UserNavbar";
 import ActiveOrders from "../../Components/OrderComponents/ActiveOrders";
 import { setnewOrderValue } from "../../Redux/Slices/BookingSlice";
 import OrderCard from "../../Components/OrderComponents/OrderCard";
-import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { useNavigate } from "react-router-dom";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 import { hideSpinner, selectSpinnerVisibility, showSpinner } from "../../Redux/Slices/LoaderSlice";
 import { TABS } from "../../Constants/Constants";
+import ChatPopup from "../../Components/Chat Box/ChatPop";
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -312,12 +312,10 @@ const Orders = () => {
             </TabPane>
           </TabContent>
         </Row>
-        <ChatPopup />
         <div style={{textAlign:"center"}}>
       {spinnerVisible && <Spinner />}
       </div>
       </Container>
-      
     </>
   );
 };

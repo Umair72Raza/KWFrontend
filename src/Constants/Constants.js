@@ -146,7 +146,8 @@ export const ChatPopUpPage = {
   SEND_BUTTON_LABEL: "Send",
   SEND_BUTTON_COLOR: "primary",
   SELECT_CHAT_LABEL: "Select a chat to start messaging",
-  BLOCKED_BY_ADMIN:"Blocked by Admin"
+  BLOCKED_BY_ADMIN:"Blocked by Admin",
+  NO_CHATS:"No Chats!",
 };
 
 export const HomePageWorkerConsts = {

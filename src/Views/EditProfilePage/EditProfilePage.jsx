@@ -33,6 +33,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
+import ChatPopup from "../../Components/Chat Box/ChatPop";
 
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -244,7 +245,11 @@ const EditProfilePage = ({ ShowServices }) => {
   };
 
   const handleGoBack = () => {
-    navigate(-1);
+    if(user?.role === "user"){
+      navigate("/user/homepage");
+    } else if(user?.role === "worker"){
+      navigate("/worker/workerHomepage");
+    }
   };
 
   return (
@@ -491,6 +496,7 @@ const EditProfilePage = ({ ShowServices }) => {
           </Row>
             )}
         </Container>
+        {/* <ChatPopup /> */}
       </Container>
     </>
   );

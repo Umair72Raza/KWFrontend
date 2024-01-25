@@ -44,7 +44,9 @@ const UserNavbar = () => {
     setGotOffer,
     userOffering,
     setSelectedChatCompare,
-    setUserOffering
+    setUserOffering,
+    unreadMessages,
+    setUnreadMessages,
   } = ChatState();
   const socket = useSelector((state) => state?.socket?.socket);
 
@@ -79,7 +81,11 @@ const UserNavbar = () => {
   const HandleNotificationSelection = (item) => {
     setChat(item.chat);
     setSelectedChatCompare(item.chat);
-     setSelectedChat(() => SelectChat(item.chat));
+    setUnreadMessages((prevCount) => ({
+      ...prevCount,
+      [item.chat._id]:0,
+    }));
+    setSelectedChat(() => SelectChat(item.chat));
     setNotification(notification.filter((n) => n !== item));
     setShowModal(true);
   };
@@ -103,6 +109,11 @@ const UserNavbar = () => {
     SetShowOffer(!offer);
   };
 
+  const handleMessageIconClick = () => {
+    setShowModal(true);
+    setCopyOfChats(OriginalChats);
+  };
+console.log(unreadMessages)
   return (
     <>
       <Navbar className="bg-primary w-full" expand="sm" dark container="fluid">
@@ -155,10 +166,16 @@ const UserNavbar = () => {
                         <DropdownItem
                           key={item.chat._id}
                           onClick={() => HandleNotificationSelection(item)}
-                          className="fw-bold"
+                          className="fw-bold d-flex flex-row  gap-1 justify-content-between"
                         >
                           New Message: {item.newMessage.sender.firstName}{" "}
                           {item.newMessage.sender.lastName}
+                          {unreadMessages[item.chat._id] > 1 && (
+                            <div className=" rounded-4 bg-danger text-white px-2">
+                              {" "}
+                              {unreadMessages[item.chat._id]}
+                            </div>
+                          )}
                         </DropdownItem>
                       ))
                     )}
@@ -196,10 +213,7 @@ const UserNavbar = () => {
                 >
                   <FiMessageCircle
                     className="hover-text-3d rounded-5"
-                    onClick={() => {
-                      setShowModal(true);
-                      setCopyOfChats(OriginalChats);
-                    }}
+                    onClick={handleMessageIconClick}
                   />
                 </NavItem>
               </>
@@ -226,7 +240,11 @@ const UserNavbar = () => {
                         toggleOffcanvas(); // Use the correct toggle function for Offcanvas
                       }}
                       className="fw-bold"
-                      style={{ backgroundColor: 'white', color: 'black', border: 'none' }}
+                      style={{
+                        backgroundColor: "white",
+                        color: "black",
+                        border: "none",
+                      }}
                     >
                       New Offer By : {item.user.firstName} {item.user.lastName}
                     </Button>
@@ -234,7 +252,6 @@ const UserNavbar = () => {
                 )}
               </OffcanvasBody>
             </Offcanvas>
-
             <NavItem className="text-white ">
               <Button color="danger" className="p-1 " onClick={Logout}>
                 Logout
@@ -252,7 +269,6 @@ const UserNavbar = () => {
           </Nav>
         </Collapse>
       </Navbar>
-      <ChatPopup />
     </>
   );
 };

@@ -8,6 +8,8 @@ import { useSelector } from "react-redux";
 import Worker from "./Layouts/WorkerLayout";
 import AdminLayout from "./Layouts/AdminLayout";
 import { Spinner } from "reactstrap";
+import ChatPopup from "./Components/Chat Box/ChatPop";
+
 
 function App() {
   const [authenticated, setAuthenticated] = useState();
@@ -84,6 +86,7 @@ function App() {
         <Spinner />
       ) : (
         <BrowserRouter>
+        <ChatPopup />
           <Routes>{routes}</Routes>
         </BrowserRouter>
       )}

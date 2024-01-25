@@ -31,6 +31,7 @@ import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
 import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
+import ChatPopup from "../../Components/Chat Box/ChatPop.jsx";
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);
@@ -453,6 +454,7 @@ const HomePageUser = () => {
       ) : (
         <></>
       )}
+            {/* <ChatPopup /> */}
     </>
   );
 };

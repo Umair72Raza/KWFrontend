@@ -37,6 +37,8 @@ const ChatPopup = () => {
     setNotification,
     selectedChatCompare,
     setSelectedChatCompare,
+    setUnreadMessages,
+    unreadMessages,
   } = ChatState();
 
   const { user, token } = useSelector((state) => state.auth);
@@ -137,8 +139,8 @@ const ChatPopup = () => {
           ).then((result) => {
             if (result.type === "Chat/ToggleSeen/fulfilled") {
               // Find the index of the chat to be updated
-              const index = copyOfChats.findIndex(
-                (c) => c._id === result.payload._id
+              const index = copyOfChats?.findIndex(
+                (c) => c?._id === result.payload._id
               );
 
               // If the chat is found, create a new array with the updated chat
@@ -150,9 +152,20 @@ const ChatPopup = () => {
                 setCopyOfChats(updatedChats); // Trigger a re-render with the new array
                 newMessageReceived.chat.seen = false;
                 setNotification([newMessageReceived, ...notification]);
+              } else {
+                setCopyOfChats([newMessageReceived.chat, ...copyOfChats]);
+                setOriginalChats([newMessageReceived.chat, ...OriginalChats]);
+                setNotification([newMessageReceived, ...notification]);
               }
             }
           });
+        } else {
+          setUnreadMessages((prevUnreadMessages) => ({
+            ...prevUnreadMessages,
+            [newMessageReceived.newMessage.chatId]:
+              (prevUnreadMessages[newMessageReceived.newMessage.chatId] || 1) +
+              1,
+          }));
         }
       } else {
         if (messages) {
@@ -178,8 +191,8 @@ const ChatPopup = () => {
   const sendMessage = async (e) => {
     e.preventDefault();
     setSendButtonDisabled(true);
-     // Add loading state until the message is sent
-     setLoadingSendMessage(true);
+    // Add loading state until the message is sent
+    setLoadingSendMessage(true);
 
     try {
       if (newMessageText) {
@@ -190,8 +203,6 @@ const ChatPopup = () => {
           token,
         };
 
-       
-
         const result = await dispatch(SendMessageAsync(messageData));
 
         if (result.type === "Chat/SendMessage/fulfilled") {
@@ -200,12 +211,14 @@ const ChatPopup = () => {
             setOriginalChats((prev) => [result.payload.chat, ...prev]);
             let dummyChats = [result.payload.chat, ...OriginalChats];
             setCopyOfChats(dummyChats);
-            SelectChat(result.payload.chat);
+            setChat(result.payload.chat);
+            setSelectedChatCompare(result.payload.chat);
+            setSelectedChat(() => SelectChat(result.payload.chat));
           }
           setMessages([...messages, result.payload.message]);
           const NewMessageAndUserId = {
             newMessage: result.payload.message,
-            chat: chat,
+            chat: chat._id ? chat : result.payload.chat,
           };
           socket?.emit("new message", NewMessageAndUserId);
           if (messages) {
@@ -440,16 +453,15 @@ const ChatPopup = () => {
                                 outline
                               >
                                 {loadingSendMessage ? (
-                                  <Spinner size="sm" className="p-2"  />
+                                  <Spinner size="sm" className="p-2" />
                                 ) : (
                                   ChatPopUpPage.SEND_BUTTON_LABEL
                                 )}
                               </Button>
                             </form>
                           </div>
-                        ) : (
-                          // Show chat list if no chat is selected
-                          copyOfChats?.map((chat) => (
+                        ) : copyOfChats?.length > 0 ? (
+                          copyOfChats.map((chat) => (
                             <React.Fragment key={chat._id}>
                               <div
                                 className={`d-flex flex-row align-items-center my-2`}
@@ -504,6 +516,9 @@ const ChatPopup = () => {
                               <hr />
                             </React.Fragment>
                           ))
+                        ) : (
+                          // Render when no chats available
+                          <div>{ChatPopUpPage.NO_CHATS}</div>
                         )}
                       </div>
                     </div>
@@ -515,60 +530,66 @@ const ChatPopup = () => {
                   <div className="row">
                     <div className="col-3 chat-list">
                       <div className="chat-preview overflow-y-auto max-height-chat-users">
-                        {copyOfChats?.map((chat) => (
-                          <>
-                            <div
-                              className={`d-flex flex-row align-items-center my-2`}
-                              key={chat._id}
-                            >
-                              <div className="d-flex flex-column w-100">
-                                {chat.users.map((chatUser) => {
-                                  if (
-                                    chatUser &&
-                                    chatUser._id &&
-                                    String(chatUser._id) !== String(user._id)
-                                  ) {
-                                    const isBlockedByAdmin =
-                                      chatUser.access === "denied"
-                                        ? true
-                                        : false;
-                                    return (
-                                      <div
-                                        key={chatUser._id}
-                                        className={`pt-2 d-flex flex-row justify-content-between ${
-                                          isBlockedByAdmin ? "blocked-user" : ""
-                                        }`}
-                                        onClick={() =>
-                                          !isBlockedByAdmin &&
-                                          handleChatSelection(chat)
-                                        }
-                                      >
-                                        <h5>
-                                          {chatUser.firstName}{" "}
-                                          {chatUser.lastName}
-                                        </h5>
-                                        {!chat?.seen &&
-                                          chat.latestMessage?.sender !==
-                                            user._id && (
-                                            <span>
-                                              <FaDotCircle className="text-primary me-3" />
+                        {copyOfChats?.length === 0 ? (
+                          <div>{ChatPopUpPage.NO_CHATS}</div>
+                        ) : (
+                          copyOfChats?.map((chat) => (
+                            <>
+                              <div
+                                className={`d-flex flex-row align-items-center my-2`}
+                                key={chat._id}
+                              >
+                                <div className="d-flex flex-column w-100">
+                                  {chat.users.map((chatUser) => {
+                                    if (
+                                      chatUser &&
+                                      chatUser._id &&
+                                      String(chatUser._id) !== String(user._id)
+                                    ) {
+                                      const isBlockedByAdmin =
+                                        chatUser.access === "denied"
+                                          ? true
+                                          : false;
+                                      return (
+                                        <div
+                                          key={chatUser._id}
+                                          className={`pt-2 d-flex flex-row justify-content-between ${
+                                            isBlockedByAdmin
+                                              ? "blocked-user"
+                                              : ""
+                                          }`}
+                                          onClick={() =>
+                                            !isBlockedByAdmin &&
+                                            handleChatSelection(chat)
+                                          }
+                                        >
+                                          <h5>
+                                            {chatUser.firstName}{" "}
+                                            {chatUser.lastName}
+                                          </h5>
+                                          {!chat?.seen &&
+                                            chat.latestMessage?.sender !==
+                                              user._id && (
+                                              <span>
+                                                <FaDotCircle className="text-primary me-3" />
+                                              </span>
+                                            )}
+                                          {isBlockedByAdmin && (
+                                            <span className="text-danger">
+                                              {ChatPopUpPage.BLOCKED_BY_ADMIN}
                                             </span>
                                           )}
-                                        {isBlockedByAdmin && (
-                                          <span className="text-danger">
-                                            {ChatPopUpPage.BLOCKED_BY_ADMIN}
-                                          </span>
-                                        )}
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                })}
+                                        </div>
+                                      );
+                                    }
+                                    return null;
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                            <hr />
-                          </>
-                        ))}
+                              <hr />
+                            </>
+                          ))
+                        )}
                       </div>
                     </div>
                     <div className="col-9 chat-display">

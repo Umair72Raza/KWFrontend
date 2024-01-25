@@ -77,7 +77,6 @@ const WorkerCard = ({ worker }) => {
       }
     }
   };
-
   const toggleModal = () => {
     setModal(!modal);
   };

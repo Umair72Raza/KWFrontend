@@ -27,7 +27,6 @@ import ActiveOrders from "../../Components/OrderComponents/ActiveOrders";
 import GotOffer from "../../Components/GotOffer/GotOffer";
 import StartJob from "../../Components/StartJob/StartJob";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice";
-import ChatPopup from "../../Components/Chat Box/ChatPop";
 import { ChatState } from "../../Context/ChatProvider";
 import { Spinner } from "reactstrap";
 import Swal from "sweetalert2";
@@ -39,6 +38,7 @@ import {
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
 import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
+import ChatPopup from "../../Components/Chat Box/ChatPop";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
@@ -550,6 +550,7 @@ const HomePageWorker = () => {
       ) : (
         <></>
       )}
+      {/* <ChatPopup /> */}
     </Container>
   );
 };
