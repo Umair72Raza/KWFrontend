@@ -18,6 +18,7 @@ import {forgetPasswordConstants } from "../../Constants/Constants.js";
 import { failureToast, successToast } from "../../utils";
 import { requestOTPAsync,updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
 import { useDispatch, useSelector } from "react-redux";
+import { FORGET_PASSWORD } from "../../Constants/Constants.js";
 
 const ForgetPassword = () => {
   useEffect(() => {
@@ -118,7 +119,7 @@ const ForgetPassword = () => {
                   onClick={requestOTP}
                   color="primary"
                 >
-                  Send OTP
+                  {FORGET_PASSWORD.SEND_OTP_BUTTON}
                 </Button>
               </Col>
             </Row>

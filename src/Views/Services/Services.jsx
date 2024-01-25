@@ -13,6 +13,7 @@ import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
 import cross from "../../assets/images/servicespngs/cross.png";
 import { useNavigate } from "react-router-dom";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
+import { SERVICE_CONSTS } from "../../Constants/Constants";
 const Services = () => {
   const [services, setServices] = useState([]);
   const [addButtonDisabled, setAddButtonDisabled] = useState(false);
@@ -222,11 +223,11 @@ const Services = () => {
               }}
               onClick={() => navigate(-1)}
             >
-              Back
+              {SERVICE_CONSTS.BACK}
             </Button>
           </Col>
           <Col>
-            <h2>Services</h2>
+            <h2>{SERVICE_CONSTS.SERVICES_HEADING}</h2>
           </Col>
           <Col>
             {!showEditButtons ? (
@@ -234,11 +235,11 @@ const Services = () => {
                 color="success"
                 onClick={toggleshowEdits}
               >
-                Add a service
+                {SERVICE_CONSTS.ADD_A_SERVICE}
               </Button>
             ) : (
               <>
-                <img src={cross} alt="cross" onClick={toggleshowEdits} />
+                <img  src={cross} alt="cross" onClick={toggleshowEdits} />
               </>
             )}
           </Col>
@@ -253,7 +254,7 @@ const Services = () => {
             onChange={handleInputChange}
           />
           <Button color="primary" onClick={handleAddService}>
-            Add New Service
+            {SERVICE_CONSTS.ADD_NEW_SERVICE}
           </Button>
         </InputGroup>
       ) : (
@@ -263,7 +264,7 @@ const Services = () => {
         <ListGroup>
         {services.length === 0 ? (
             <ListGroupItem style={{ textAlign: "center" }}>
-              No services available.
+              {SERVICE_CONSTS.NO_SERVICES}
             </ListGroupItem>
           ) : (
           <ListGroup>
@@ -290,7 +291,7 @@ const Services = () => {
                       className="ml-2"
                       onClick={() => handleRemoveService(service)}
                     >
-                      Remove
+                      {SERVICE_CONSTS.REMOVE}
                     </Button>
                   </Col>
                   <Col>
@@ -301,10 +302,10 @@ const Services = () => {
                           color="primary"
                           onClick={() => handleEditService(service)}
                         >
-                          Update
+                          {SERVICE_CONSTS.EDIT}
                         </Button>
                         <Button   color="secondary" onClick={handleCancelEdit}>
-                          Cancel
+                          {SERVICE_CONSTS.CANCEL}
                         </Button>
                       </>
                     ) : (
@@ -312,7 +313,7 @@ const Services = () => {
                         color="primary"
                         onClick={() => startEditingService(service)}
                       >
-                        Edit
+                        {SERVICE_CONSTS.EDIT}
                       </Button>
                     )}
                   </Col>
@@ -323,10 +324,6 @@ const Services = () => {
           )}
         </ListGroup>
       </Container>
-
-      
-
-      {/* {showErrorPopUp ? <>{displayErrorMessage()}</> : <></>} */}
     </>
   );
 };
