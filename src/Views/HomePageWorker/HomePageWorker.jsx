@@ -184,14 +184,15 @@ const HomePageWorker = () => {
           `,
           icon: "error",
           customClass: {
-            content: 'swal-content-custom' // You can add a custom class for the content
-          },didOpen: () => {
-            document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
+            content: "swal-content-custom", // You can add a custom class for the content
+          },
+          didOpen: () => {
+            document.body.style.overflow = "hidden"; // Disable scroll when SweetAlert is open
           },
           willClose: () => {
-            document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
+            document.body.style.overflow = ""; // Re-enable scroll when SweetAlert is closing
           },
-          allowOutsideClick: false 
+          allowOutsideClick: false,
         });
 
         setScheduledOrders((prevScheduledOrders) => {
@@ -460,7 +461,7 @@ const HomePageWorker = () => {
                 <h2 style={{ textAlign: "center" }}>{TABS.SCH_ORDERS}</h2>
                 <Row>
                   <div style={{ marginTop: "10px !important" }}>
-                    {isScheduledOrdersFetched && scheduledOrders ? (
+                    {isScheduledOrdersFetched && scheduledOrders && (
                       <ScheduledOrdersCardWorker
                         scheduledOrdersObject={scheduledOrders}
                         toggleCancel={toggleCancel}
@@ -472,9 +473,8 @@ const HomePageWorker = () => {
                         setUpdateScheduled={setUpdateScheduled}
                         updateScheduled={updateScheduled}
                         activeOrder={activeOrder}
+                        spinnerVisible={spinnerVisible}
                       />
-                    ) : (
-                      <>{TABS.NO_SCH_ORDERS}</>
                     )}
                   </div>
                 </Row>
@@ -485,10 +485,11 @@ const HomePageWorker = () => {
             <Row>
               <h2 style={{ textAlign: "center" }}>{TABS.PAST_ORDERS}</h2>
               <Col>
-                {pastOrders ? (
-                  <PastOrdersCard scheduledOrdersObject={pastOrders} />
-                ) : (
-                  <h1>{TABS.NO_PAST_ORDERS}</h1>
+                {pastOrders && (
+                  <PastOrdersCard
+                    scheduledOrdersObject={pastOrders}
+                    spinnerVisible={spinnerVisible}
+                  />
                 )}
               </Col>
             </Row>
@@ -497,12 +498,13 @@ const HomePageWorker = () => {
             <Row>
               <h2 style={{ textAlign: "center" }}>{TABS.CANCELLED_ORDERS}</h2>
               <Col>
-                {cancelledOrders ? (
+                {cancelledOrders && (
                   <>
-                    <CancelledOrders scheduledOrdersObject={cancelledOrders} />
+                    <CancelledOrders
+                      scheduledOrdersObject={cancelledOrders}
+                      spinnerVisible={spinnerVisible}
+                    />
                   </>
-                ) : (
-                  <h1>{TABS.NO_CANC_ORDERS}</h1>
                 )}
               </Col>
             </Row>
@@ -511,16 +513,15 @@ const HomePageWorker = () => {
             <Row>
               <h2 style={{ textAlign: "center" }}>{TABS.ACTIVE_ORDERS}</h2>
               <Col>
-                {activeOrder ? (
+                {activeOrder && (
                   <>
                     <ActiveOrders
                       scheduledOrdersObject={activeOrder}
                       setPastOrders={setPastOrders}
                       updateActiveOrders={setActiveOrder}
+                      spinnerVisible={spinnerVisible}
                     />
                   </>
-                ) : (
-                  <span>{TABS.NO_ACTIVE_ORDERS}</span>
                 )}
               </Col>
             </Row>
@@ -549,10 +550,6 @@ const HomePageWorker = () => {
       ) : (
         <></>
       )}
-      <div style={{textAlign:"center"}}>
-      {spinnerVisible && <Spinner />}
-      </div>
-      
     </Container>
   );
 };

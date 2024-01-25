@@ -14,12 +14,15 @@
 }
 
 .swal-text-content {
-    max-height: 150px; 
-    overflow-y: auto; 
-    margin-bottom: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 10px;
 }
 .custom-align-left {
-    text-align: left !important;
-    margin-left: 0px;
-  }
-  
+  text-align: left !important;
+  margin-left: 0px;
+}
+
+.pointerCursor {
+  cursor: pointer;
+}
