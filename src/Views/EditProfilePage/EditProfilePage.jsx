@@ -56,6 +56,7 @@ const EditProfilePage = ({ ShowServices }) => {
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
+  const [listLoading, setListLoading] = useState(true); 
   const [userDataLoading, setUserDataLoading] = useState(true);
 
   useEffect(() => {
@@ -86,9 +87,19 @@ const EditProfilePage = ({ ShowServices }) => {
   }, [dispatch, user, token]);
 
   useEffect(() => {
-    if (ShowServices) {
-      dispatch(allServicesAsync());
-    }
+    const fetchData = async () => {
+      try {
+        if (ShowServices) {
+          await dispatch(allServicesAsync());
+        }
+      } catch (error) {
+        console.error("Error fetching services", error);
+      } finally {
+        setListLoading(false); // Set loading to false when the data is fetched or if there's an error
+      }
+    };
+
+    fetchData();
   }, [dispatch, ShowServices]);
 
   const handleEmailChange = (e) => {
@@ -375,12 +386,19 @@ const EditProfilePage = ({ ShowServices }) => {
                         className="d-flex flex-row Service-overflow-y-scroll"
                       >
                         <FormGroup>
-                          <CustomServiceDropdown
-                            list={list}
-                            selectedServices={formData.services}
-                            handleServiceChange={handleServiceChange}
-                            handleRateChange={handleRateChange}
-                          />
+                        {listLoading && ShowServices ? (
+                       <div className="text-center w-100">
+                       <Spinner />
+                       <p>Loading Services...</p>
+                     </div>
+                  ) : (
+                    <CustomServiceDropdown
+                      list={list}
+                      selectedServices={formData?.services}
+                      handleServiceChange={handleServiceChange}
+                      handleRateChange={handleRateChange}
+                    />
+                  )}
                         </FormGroup>
                       </Col>
                     </Row>
