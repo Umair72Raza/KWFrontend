@@ -79,6 +79,9 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   };
 
   const handleSend = () => {
+    const currentDate = new Date();
+    const selectedDate = new Date(timePart);
+    if(selectedDate < currentDate){
     const data = {
       Title: taskTitle,
       Status: "Scheduled",
@@ -90,6 +93,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       service: serviceOption,
     };
     SetParams(data);
+    
 
     if (removedUsers) {
       const present = removedUsers?.findIndex((u) => u._id === worker._id);
@@ -130,6 +134,11 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         socket?.off("newOffer");
       };
     }
+  }
+  else{
+    failureToast("Time is in past! select the future time");
+      
+  }
   };
 
   const starRating = (numStars) => {
@@ -222,7 +231,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               value={taskDetails}
               onChange={(e) => setTaskDetails(e.target.value)}
               maxLength={1000}
-              style={{ minHeight: '100px' }}
+              style={{ minHeight: '100px',maxHeight: '100px' }}
             />
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               {taskDetails.length}/1000

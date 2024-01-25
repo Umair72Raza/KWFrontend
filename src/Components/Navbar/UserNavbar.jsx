@@ -17,6 +17,7 @@ import {
   DropdownMenu,
 } from "reactstrap";
 import { FiMessageCircle } from "react-icons/fi";
+import { IoMdLogOut } from "react-icons/io";
 import { RiInboxArchiveLine } from "react-icons/ri";
 import { navbarConstants } from "../../Constants/Constants";
 import { useNavigate } from "react-router";
@@ -55,9 +56,9 @@ const UserNavbar = () => {
 
   const Logout = async () => {
     Swal.fire({
-      title: "Are You Sure You want to Logout?",
+      title: "Are You Sure You Want To Log Out?",
       showCancelButton: true,
-      confirmButtonText: "LogOut",
+      confirmButtonText: "Log Out",
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
