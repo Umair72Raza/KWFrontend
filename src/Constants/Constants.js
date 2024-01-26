@@ -187,7 +187,8 @@ export const GOTOFFER = {
 }
 
 export const FORGET_PASSWORD = {
-  SEND_OTP_BUTTON: "Send OTP"
+  SEND_OTP_BUTTON: "Send OTP",
+  EG_MAIL:""
 }
 
 export const EDITPROFILE_PAGE = {
@@ -295,10 +296,6 @@ export const workerCardConstants = {
   }
 }
 export const forgetPasswordConstants = {
-  FORGET_ROUTES: {
-    NEW_PASSWORD: "/auth/newpassword",
-  },
-
   FP_FIELDS: {
     EMAIL: "Please Provide the Email Address.",
     MSG: "An OTP will be sent to your Email",
