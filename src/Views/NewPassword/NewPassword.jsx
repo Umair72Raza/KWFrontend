@@ -34,9 +34,6 @@ const NewPassword = () => {
   const [notEqualError, setNotEqualError] = useState(null);
   const navigate = useNavigate();
   const [otpVerified, setOtpVerified] = useState(false);
-  const newpass = useSelector((state) => state.auth.newpass)
-
-  const resetOTP = useSelector((state) => state.auth.resetOtp);
   const newpass = useSelector((state) => state.auth.newpass);
 
   useEffect(() => {

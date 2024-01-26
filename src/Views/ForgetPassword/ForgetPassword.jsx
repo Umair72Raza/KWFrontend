@@ -10,7 +10,7 @@ import {
   Col,
 } from "reactstrap";
 import forgotpng from "../../assets/images/ForgetPasswordpng/forgot.png";
-import { FP_FIELDS } from "./constants";
+
 import { failureToast, successToast } from "../../utils";
 import {
   requestOTPAsync,
