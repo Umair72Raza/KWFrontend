@@ -37,7 +37,7 @@ const NewPassword = () => {
   const newpass = useSelector((state) => state.auth.newpass)
 
   const resetOTP = useSelector((state) => state.auth.resetOtp);
-  const newpass = useSelector((state) => state.auth.newpass);
+
 
   useEffect(() => {
     if (newpass === 200) {
