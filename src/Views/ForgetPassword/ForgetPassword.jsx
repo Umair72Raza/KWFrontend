@@ -8,52 +8,54 @@ import {
   Container,
   Row,
   Col,
+  Spinner,
 } from "reactstrap";
 import forgotpng from "../../assets/images/ForgetPasswordpng/forgot.png";
 import { failureToast, successToast } from "../../utils";
+import { requestOTPAsync, updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
+import { useDispatch } from "react-redux";
 import {
-  requestOTPAsync,
-  updateOtpStatus,
-} from "../../Redux/Slices/AuthSlice.js";
-import { useDispatch, useSelector } from "react-redux";
-import { FORGET_PASSWORD, forgetPasswordConstants } from "../../Constants/Constants.js";
+  FORGET_PASSWORD,
+  forgetPasswordConstants,
+} from "../../Constants/Constants.js";
+import { hideSpinner, showSpinner } from "../../Redux/Slices/LoaderSlice.js";
 
 const ForgetPassword = () => {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // State to store the email value
+
   const [email, setEmail] = useState("");
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [enableButton, setEnableButton] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const enteredEmail = e.target.value;
     setEmail(enteredEmail);
-
     // Email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     // Check if entered email matches the regex
     const isValid = emailRegex.test(enteredEmail);
     setIsValidEmail(isValid);
     setEnableButton(isValid);
   };
 
-
   const requestOTP = async () => {
     //dispatch the api to send the otp
+    setEnableButton(false);
+    setIsLoading(true);
     try {
-      console.log("I ran in send otp")
-      console.log("Data to requets otp", email)
+      dispatch(showSpinner());
       const otpResp = await dispatch(requestOTPAsync(email));
-      console.log(otpResp.type, "otp resp type")
-      if (otpResp.type === "auth/requestOTPAsync/fulfilled" ) {
-        console.log("I ran in disaptch success")
+      if (otpResp.type === "auth/requestOTPAsync/fulfilled") {
         navigate("/auth/newpassword", { state: { email: email } });
+        successToast("OTP sent successfully!");
       }
     } catch (error) {
       failureToast("Error sending OTP");
+    } finally {
+      setIsLoading(false);
+      dispatch(hideSpinner());
     }
   };
 
@@ -115,17 +117,28 @@ const ForgetPassword = () => {
               </Row>
             </FormGroup>
             <Row style={{ textAlign: "center" }}>
-              <Col style={{marginLeft:"30%"}}>
-              <Button style={{marginRight:"3%"}} color="danger" onClick={()=>navigate(-1)} >
-                Back
-              </Button>
+              <Col style={{ marginLeft: "30%" }}>
                 <Button
-                  disabled={!enableButton}
-                  onClick={requestOTP}
-                  color="primary"
+                  style={{ marginRight: "3%" }}
+                  color="danger"
+                  onClick={() => navigate(-1)}
                 >
-                  {FORGET_PASSWORD.SEND_OTP_BUTTON}
+                  Back
                 </Button>
+
+                  <Button
+                    disabled={!enableButton}
+                    onClick={requestOTP}
+                    color="primary"
+                  >
+                    {isLoading ? (
+                      <><Button color="primary" size="sm"><Spinner/></Button> </>
+                      ):(
+                      <>
+                      <div>{FORGET_PASSWORD.SEND_OTP_BUTTON}</div> 
+                      </>)
+                   }
+                  </Button>
               </Col>
             </Row>
           </Form>

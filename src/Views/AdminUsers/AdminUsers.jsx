@@ -94,28 +94,29 @@ const AdminUsers = () => {
 
   return (
     <>
-    <div>
-      <UserNavbar />
+      <div>
+        <UserNavbar />
       </div>
       <Container>
         <Row>
+          <Col>
+            <Button
+              style={{
+                margin: "10px 10px 0px 10px",
+                backgroundColor: "#48629b",
+                border: "none",
+              }}
+              onClick={() => navigate(-1)}
+            >
+              {ADMIN_USERS.BACK}
+            </Button>
+          </Col>
           <h1 style={{ textAlign: "center" }}>{ADMIN_USERS.USERS_HEADING}</h1>
         </Row>
         <Row>
           <Navbar color="light" light expand="md" style={{ paddingLeft: "2%" }}>
             <Nav tabs style={{ cursor: "pointer" }}>
-              <NavItem>
-                <Button
-                  style={{
-                    marginRight: "10px",
-                    backgroundColor: "#48629b",
-                    border: "none",
-                  }}
-                  onClick={() => navigate(-1)}
-                >
-                  {ADMIN_USERS.BACK}
-                </Button>
-              </NavItem>
+              <NavItem></NavItem>
               <NavItem>
                 <NavLink
                   onClick={() => handleButtonClick("users")}
@@ -137,6 +138,7 @@ const AdminUsers = () => {
             </Nav>
           </Navbar>
         </Row>
+
         <Row>
           {loading ? (
             <div
@@ -157,26 +159,26 @@ const AdminUsers = () => {
               {ADMIN_USERS.NO_INACTIVE_USERS}
             </p>
           ) : (
-            <Row xs="1" md="2" lg="3">
+            <Row xs="1" md="2" lg="2" xl="3" style={{marginLeft:"5%"}} className="justify-content-center">
               {activeTab === "users"
                 ? activeUsers.map((person, index) => (
-                  <Col key={index}>
-                    <PeopleDetails
-                      key={index}
-                      person={person}
-                      setNewFilPerson={setNewFilUsers}
-                    />
-                  </Col>
-                ))
+                    <Col key={index}>
+                      <PeopleDetails
+                        key={index}
+                        person={person}
+                        setNewFilPerson={setNewFilUsers}
+                      />
+                    </Col>
+                  ))
                 : inactiveUsers.map((person, index) => (
-                  <Col key={index}>
-                    <PeopleDetails
-                      key={index}
-                      person={person}
-                      setNewFilPerson={setNewFilUsers}
-                    />
-                  </Col>
-                ))}
+                    <Col key={index}>
+                      <PeopleDetails
+                        key={index}
+                        person={person}
+                        setNewFilPerson={setNewFilUsers}
+                      />
+                    </Col>
+                  ))}
             </Row>
           )}
         </Row>

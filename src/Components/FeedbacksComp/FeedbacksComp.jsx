@@ -32,7 +32,7 @@ const FeedbacksComp = ({
   };
 
   return (
-    <Modal isOpen={showFeedbacksState} toggle={toggle}>
+    <Modal isOpen={showFeedbacksState} toggle={toggle} backdrop="static">
       <ModalHeader toggle={toggle}>Feedbacks</ModalHeader>
       <ModalBody>
         {feedbacks && feedbacks.length > 0 ? (
@@ -41,7 +41,8 @@ const FeedbacksComp = ({
               <li style={{ margin: "2%" }} key={feedback._id}>
                 <strong>{feedback.feedbackGiver.firstName}:</strong>{" "}
 
-                {truncateText(feedback.text, 5)} (Rating:{" "}
+                {truncateText(feedback.text, 5)} (
+                  <b>Rating:{" "}</b>
                 {starRating(feedback.rating)})
                 <span>
                   {feedback.text.length > 5 && (
@@ -57,7 +58,7 @@ const FeedbacksComp = ({
             ))}
           </ul>
         ) : (
-          <p>No feedbacks available.</p>
+          <p>No Feedback is available.</p>
         )}
       </ModalBody>
       <ModalFooter>
