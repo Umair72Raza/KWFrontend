@@ -10,30 +10,15 @@ import {
   Col,
 } from "reactstrap";
 import forgotpng from "../../assets/images/ForgetPasswordpng/forgot.png";
-
 import { failureToast, successToast } from "../../utils";
 import {
   requestOTPAsync,
   updateOtpStatus,
 } from "../../Redux/Slices/AuthSlice.js";
 import { useDispatch, useSelector } from "react-redux";
-import { FORGET_PASSWORD } from "../../Constants/Constants.js";
+import { FORGET_PASSWORD, forgetPasswordConstants } from "../../Constants/Constants.js";
 
 const ForgetPassword = () => {
-  // useEffect(() => {
-  //   dispatch(updateOtpStatus("idle"));
-  // });
-  const stateotp = useSelector((state) => state.auth.otp);
-  const otpStatus = useSelector((state) => state.auth.otpStatus);
-  
-  // useEffect(() => {
-  //   //as soon as email is sent, the user will b navigated to the newpassword page
-  //   // where he/she can verify otp and add a new password
-  //   if (otpStatus === "suceeded") {
-  //     successToast(FP_FIELDS.FP_TOAST_MSG);
-  //     navigate(FORGET_ROUTES.NEW_PASSWORD, { state: { email: email } });
-  //   }
-  // }, [otpStatus, stateotp]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
