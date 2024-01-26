@@ -72,6 +72,7 @@ const HomePageUser = () => {
 
   useEffect(() => {
     if (chats && chats.length > 0) {
+      socket?.emit("notifications", { user,chats });
       setOriginalChats(chats);
       setCopyOfChats(chats);
     }

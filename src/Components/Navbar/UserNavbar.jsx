@@ -110,7 +110,7 @@ const UserNavbar = () => {
     setShowModal(true);
     setCopyOfChats(OriginalChats);
   };
-console.log(unreadMessages)
+
   return (
     <>
       <Navbar className="bg-primary w-full" expand="sm" dark container="fluid">

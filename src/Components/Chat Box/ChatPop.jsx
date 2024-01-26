@@ -51,6 +51,39 @@ const ChatPopup = () => {
   const [loadingSendMessage, setLoadingSendMessage] = useState(false);
 
   useEffect(() => {
+    socket?.on("chat-notifications", (data) => {
+      setUnreadMessages?.map((prevUnreadMessages) => {
+        // Check if the chat ID already exists in the unreadMessages state
+        prevUnreadMessages?.map((notify) => {
+          if (notify.chatId === data.chatId) {
+            return {
+              ...notify,
+              unreadCount: data.unreadCount,
+            };
+          } else {
+            // Add the new chat ID and its unread count to the unreadMessages state
+            setUnreadMessages((prevUnreadMessages) => [
+              ...prevUnreadMessages,
+              data,
+            ]);
+          }
+        });
+        //  else {
+        //   // Add the new chat ID and its unread count to the unreadMessages state
+        //   setUnreadMessages((prevUnreadMessages) => ([
+        //     ...prevUnreadMessages,
+        //     data,
+        //   ]));
+        // }
+      });
+    });
+
+    return () => {
+      socket?.off("chat-notifications");
+    };
+  }, [socket]); // Assuming socket is a dependency of useEffect
+
+  useEffect(() => {
     const getMessages = async () => {
       setLoading(true);
       if (selectedChat && chat) {
@@ -117,37 +150,38 @@ const ChatPopup = () => {
 
   useEffect(() => {
     if (!socket) return;
+
     socket?.on("message received", (newMessageReceived) => {
+      // Check if the new message belongs to the selected chat
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.newMessage.chatId
       ) {
-        const alreadyInNotifications = notification.some(
+        // Check if the new message is already in notifications
+        const alreadyInNotifications = notification?.some(
           (notification) =>
-            notification.newMessage.chatId ===
-            newMessageReceived.newMessage.chatId
+            notification?.newMessage?.chatId ===
+            newMessageReceived?.newMessage?.chatId
         );
+
         if (!alreadyInNotifications) {
           dispatch(
             ToggleChatSeen({
-              chatId: newMessageReceived.newMessage.chatId,
+              chatId: newMessageReceived?.newMessage?.chatId,
               token,
               seen: false,
             })
           ).then((result) => {
             if (result.type === "Chat/ToggleSeen/fulfilled") {
-              // Find the index of the chat to be updated
               const index = copyOfChats?.findIndex(
-                (c) => c?._id === result.payload._id
+                (c) => c?._id === result?.payload?._id
               );
 
-              // If the chat is found, create a new array with the updated chat
               if (index !== -1) {
                 const updatedChats = [...copyOfChats];
                 updatedChats.splice(index, 1, result.payload);
-                // dispatch(updateChatsWithWorkers(updatedChats));
                 setOriginalChats(updatedChats);
-                setCopyOfChats(updatedChats); // Trigger a re-render with the new array
+                setCopyOfChats(updatedChats);
                 newMessageReceived.chat.seen = false;
                 setNotification([newMessageReceived, ...notification]);
               } else {
@@ -157,13 +191,6 @@ const ChatPopup = () => {
               }
             }
           });
-        } else {
-          setUnreadMessages((prevUnreadMessages) => ({
-            ...prevUnreadMessages,
-            [newMessageReceived.newMessage.chatId]:
-              (prevUnreadMessages[newMessageReceived.newMessage.chatId] || 1) +
-              1,
-          }));
         }
       } else {
         if (messages) {
@@ -173,6 +200,74 @@ const ChatPopup = () => {
         }
       }
     });
+    // if (!socket) return;
+    // socket?.on("message received", (newMessageReceived) => {
+    //   if (
+    //     !selectedChatCompare ||
+    //     selectedChatCompare?._id !== newMessageReceived?.newMessage?.chatId
+    //   ) {
+    //     const alreadyInNotifications = notification?.some(
+    //       (notification) =>
+    //         notification?.newMessage?.chatId ===
+    //         newMessageReceived?.newMessage?.chatId
+    //     );
+    //     if (!alreadyInNotifications) {
+    //       dispatch(
+    //         ToggleChatSeen({
+    //           chatId: newMessageReceived?.newMessage?.chatId,
+    //           token,
+    //           seen: false,
+    //         })
+    //       ).then((result) => {
+    //         if (result.type === "Chat/ToggleSeen/fulfilled") {
+    //           // Find the index of the chat to be updated
+    //           const index = copyOfChats?.findIndex(
+    //             (c) => c?._id === result?.payload?._id
+    //           );
+
+    //           // If the chat is found, create a new array with the updated chat
+    //           if (index !== -1) {
+    //             const updatedChats = [...copyOfChats];
+    //             updatedChats.splice(index, 1, result.payload);
+    //             // dispatch(updateChatsWithWorkers(updatedChats));
+    //             setOriginalChats(updatedChats);
+    //             setCopyOfChats(updatedChats); // Trigger a re-render with the new array
+    //             newMessageReceived.chat.seen = false;
+    //             setNotification([newMessageReceived, ...notification]);
+    //           } else {
+    //             setCopyOfChats([newMessageReceived.chat, ...copyOfChats]);
+    //             setOriginalChats([newMessageReceived.chat, ...OriginalChats]);
+    //             setNotification([newMessageReceived, ...notification]);
+    //           }
+    //         }
+    //       });
+
+    //       socket?.on("chat-notifications", (data) =>{
+    //         console.log(data)
+    //         setUnreadMessages((prevUnreadMessages) => ({
+    //           ...prevUnreadMessages,
+    //           [data.chatId]:
+    //             (prevUnreadMessages[data.notifications.chatId] || 1) +
+    //             1,
+    //         }));
+    //       })
+
+    //     //  else {
+    //     //   setUnreadMessages((prevUnreadMessages) => ({
+    //     //     ...prevUnreadMessages,
+    //     //     [newMessageReceived.newMessage.chatId]:
+    //     //       (prevUnreadMessages[newMessageReceived.newMessage.chatId] || 1) +
+    //     //       1,
+    //     //   }));
+    //     // }
+    //   } else {
+    //     if (messages) {
+    //       setMessages([...messages, newMessageReceived.newMessage]);
+    //     } else {
+    //       setMessages([newMessageReceived.newMessage]);
+    //     }
+    //   }
+    // });
     return () => {
       socket?.off("message received");
     };
@@ -239,6 +334,11 @@ const ChatPopup = () => {
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
+    const data = {
+      userId: user._id,
+      chatId: chat._id,
+    };
+    socket?.emit("chat read", data);
   };
 
   const handleBack = () => {
@@ -327,11 +427,11 @@ const ChatPopup = () => {
               {isSameDay(new Date(), messageDate)
                 ? ChatPopUpPage.MESSAGE_TODAY
                 : isSameDay(
-                  new Date(new Date().setDate(new Date().getDate() - 1)),
-                  messageDate
-                )
-                  ? ChatPopUpPage.MESSAGE_YESTERDAY
-                  : messageDate.toLocaleDateString()}
+                    new Date(new Date().setDate(new Date().getDate() - 1)),
+                    messageDate
+                  )
+                ? ChatPopUpPage.MESSAGE_YESTERDAY
+                : messageDate.toLocaleDateString()}
             </div>
           );
         }
@@ -342,10 +442,11 @@ const ChatPopup = () => {
           <React.Fragment key={message._id}>
             {separator}
             <div
-              className={`ps-3 ${message.sender._id === user._id
+              className={`ps-3 ${
+                message.sender._id === user._id
                   ? "sent-message justify-content-end w-50 mt-4 me-4"
                   : "received-message mt-4 w-50"
-                }`}
+              }`}
               style={{
                 wordWrap: "break-word",
                 maxWidth: "100%",
@@ -477,10 +578,11 @@ const ChatPopup = () => {
                                       return (
                                         <div
                                           key={chatUser._id}
-                                          className={`pt-2 d-flex flex-row justify-content-between ${isBlockedByAdmin
+                                          className={`pt-2 d-flex flex-row justify-content-between ${
+                                            isBlockedByAdmin
                                               ? "blocked-user"
                                               : ""
-                                            }`}
+                                          }`}
                                           onClick={() =>
                                             !isBlockedByAdmin &&
                                             handleChatSelection(chat)
@@ -492,7 +594,7 @@ const ChatPopup = () => {
                                           </h5>
                                           {!chat?.seen &&
                                             chat.latestMessage?.sender !==
-                                            user._id && (
+                                              user._id && (
                                               <span>
                                                 <FaDotCircle className="text-primary me-3" />
                                               </span>
@@ -546,6 +648,17 @@ const ChatPopup = () => {
                                         chatUser.access === "denied"
                                           ? true
                                           : false;
+                                      const unreadMessage = Array.isArray(
+                                        unreadMessages
+                                      )
+                                        ? unreadMessages.find(
+                                            (unread) =>
+                                              unread.chatId === chat._id
+                                          )
+                                        : null;
+                                      const unreadCount = unreadMessage
+                                        ? unreadMessage.unreadCount
+                                        : 0;
                                       return (
                                         <div
                                           key={chatUser._id}
@@ -565,10 +678,15 @@ const ChatPopup = () => {
                                           </h5>
                                           {!chat?.seen &&
                                             chat.latestMessage?.sender !==
-                                              user._id && (
-                                              <span>
-                                                <FaDotCircle className="text-primary me-3" />
-                                              </span>
+                                              user?._id && (
+                                              <div className=" rounded-5 bg-danger text-white px-2 d-flex ">
+                                                <span className="align-self-center">
+                                                  {unreadCount}
+                                                </span>
+                                              </div>
+                                              // <span>
+                                              //   <FaDotCircle className="text-primary me-3" />
+                                              // </span>
                                             )}
                                           {isBlockedByAdmin && (
                                             <span className="text-danger">

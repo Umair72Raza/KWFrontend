@@ -72,6 +72,8 @@ const HomePageWorker = () => {
     gotOffer,
     setGotOffer,
     setUserOffering,
+    setUnreadMessages,
+    unreadMessages
   } = ChatState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
@@ -266,12 +268,32 @@ const HomePageWorker = () => {
     dispatch(fetchChatsAsync({ user, token }));
   }, []);
 
+  
   useEffect(() => {
-    if (chats) {
+    if (chats && chats.length > 0) {
+      // Emitting notifications to the server for all chats
+      socket?.emit("notifications", { user, chats });
+  
+      // Handling incoming chat notifications from the server
+      socket?.on("chat-notifications", (chatNotifications) => {
+        console.log(chatNotifications);
+        const newUnreadMessages = {};
+  
+        // Update the unread message count state for each chat
+        chatNotifications.forEach(({ chatId, unreadCount }) => {
+          newUnreadMessages[chatId] = unreadCount;
+        });
+  
+        // Update the state with all chat IDs and their unread message counts
+        setUnreadMessages(newUnreadMessages);
+      });
+  
+      // Set the original and copy of chats
       setOriginalChats(chats);
       setCopyOfChats(chats);
     }
   }, [chats]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
