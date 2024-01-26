@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Container,
@@ -10,15 +10,13 @@ import {
   CardText,
   Button,
 } from "reactstrap";
-
 import completedtask from "../../assets/completedtask.png";
 import activeOrder from "../../assets/activestatus.png";
 import {
   cancelOrderAsync,
 } from "../../Redux/Slices/OrderSlice";
-import ModalComponent from "../ModalComponent/ModalComponent";
-
 import { truncateText } from "../../utils";
+import { PopUpState } from "../../Context/PopUpProvider";
 const OrderCard = ({
   scheduledOrdersObject,
   toggleCancel,
@@ -31,15 +29,19 @@ const OrderCard = ({
   const { user, token } = useSelector((state) => state.auth);
   const userId = user._id;
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
-  const [cancelReason, setCancelReason] = useState("");
-  const [orderToCancel, setOrderToCancel] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+ 
+  let {
+    setModalHeader,
+    setIsModalOpen,
+    setInputLabel,
+    modalInputValue,
+    setModalInputValue,
+    setCancelButtonLabel,
+    setFinalizeButtonLabel,
+    setShowInput,
+    order,toggleModal,orderToCancel, setOrderToCancel,finalizeFunction,}=PopUpState()
 
-
-  const toggleModal = (order) => {
-    setOrderToCancel(order);
-    setIsModalOpen(!isModalOpen);
-  };
+  
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -57,19 +59,39 @@ const OrderCard = ({
   };
 
   const dispatch = useDispatch();
+
+
+  const CancelOrder=()=>{
+
+    setOrderToCancel(order)
+    setModalHeader("Order Cancellation")
+    setInputLabel("Reason for Cancellation")
+    setShowInput(true)
+    setFinalizeButtonLabel("Finalize Order Cancellation")
+    setCancelButtonLabel("Cancel Order Cancellation")
+    toggleModal()
+  }
+
+  useEffect(()=>{
+    if(finalizeFunction==true)
+    {
+      cancelingOrder();
+    }
+  },[finalizeFunction])
+  
   const cancelingOrder = () => {
     //dispatch cancel order
     const order = orderToCancel;
     const data = {
       userId: userId,
       orderId: order._id,
-      cancelReason: cancelReason,
+      cancelReason: modalInputValue,
       Status: "Cancelled",
     };
 
     const resonWithOrdertoCancel = {
-      reason: cancelReason,
-      order: order
+      reason: modalInputValue,
+      order: orderToCancel
     }
 
     const cancelOrderSocketEvent = () => {
@@ -83,7 +105,7 @@ const OrderCard = ({
     dispatch(cancelOrderAsync(dataWithToken));
     cancelOrderSocketEvent();
 
-    setCancelReason("");
+    setModalInputValue("");
     setIsModalOpen(false);
 
     setScheduledOrders((prevScheduledOrders) =>
@@ -211,7 +233,7 @@ const OrderCard = ({
                       {/* Full width on small screens, half width on medium and larger screens */}
                       <CardText>
                         <Button
-                          onClick={() => toggleModal(order)}
+                          onClick={CancelOrder}
                           color="danger"
                         >
                           Cancel Order
@@ -228,19 +250,9 @@ const OrderCard = ({
         </>:<>No Scheduled Orders</>}
 
       </Container>
-      <ModalComponent
-        modalHeader={"Order Cancellation"}
-        isModalOpen={isModalOpen}
-        toggleModal={toggleModal}
-        inputLabel={"Reason for Cancellation"}
-        modalInputValue={cancelReason}
-        modalInputSetter={setCancelReason}
-        finalizeFunction={cancelingOrder}
-        cancelButtonLabel={"Cancel Order Cancellation"}
-        finalizeButtonLabel={"Finalize Order Cancellation"}
-        cancel={toggleModal}
-        showInput={true}
-      />
+      {/* <ModalComponent
+       
+      /> */}
     </>
   );
 };

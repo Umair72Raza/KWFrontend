@@ -27,11 +27,7 @@ import {
 } from "reactstrap";
 import { ChatState } from "../../Context/ChatProvider.jsx";
 import ModalComponent from "../../Components/ModalComponent/ModalComponent.jsx";
-import FinishJobReq from "../../Components/FinishJobReq/FinishJobReq.jsx";
-import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
-import Swal from "sweetalert2";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
-import ChatPopup from "../../Components/Chat Box/ChatPop.jsx";
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);
@@ -76,12 +72,7 @@ const HomePageUser = () => {
       setCopyOfChats(chats);
     }
   }, [chats]);
-  //popup states
-  const [finishOrderReq, setFinishOrderReq] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [order, setOrder] = useState("");
-  const [fOrder, setFOrder] = useState("");
-
+  
   useEffect(() => {
     socket?.on("status-change", (User) => {
       if (users && User.status === "offline") {
@@ -110,80 +101,6 @@ const HomePageUser = () => {
       socket?.off("status-change");
     };
   });
-
-  useEffect(() => {
-    socket?.on("startjob-request", (order) => {
-      setOrder(order);
-      toggleModal();
-    });
-    return () => {
-      socket?.off("startjob-request");
-    };
-  });
-
-  useEffect(() => {
-    socket?.on("order-canceled", (data) => {
-      const Corder = data.order;
-      let reason = data.reason;
-
-      // Check if reason is empty and set a default message
-      if (!reason || !reason?.length) {
-        reason = "Reason not mentioned";
-      }
-
-      if (Corder) {
-        Swal.fire({
-          title: "Order Cancelled",
-          html: `
-            <div class="custom-align-left swal-text-content">
-              <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
-            </div>
-
-            <div class="custom-align-left swal-text-content">
-              <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
-            </div>
-
-            <div class="custom-align-left swal-text-content">
-              <strong class="custom-align-left">Service:</strong> ${Corder.service}
-            </div>
-
-            <div class="custom-align-left swal-text-content">
-              <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
-            </div>
-           
-            <div class="custom-align-left swal-text-content">
-            <strong class="custom-align-left">Reasons:</strong> ${reason}
-          </div>
-          `,
-          icon: "error",
-          customClass: {
-            content: 'swal-content-custom' // You can add a custom class for the content
-          }, didOpen: () => {
-            document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
-          },
-          willClose: () => {
-            document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
-          },
-          allowOutsideClick: false
-        });
-      }
-    });
-    return () => {
-      socket?.off("order-canceled");
-    };
-  });
-
-  useEffect(() => {
-    if (!socket) return;
-    socket?.on("finishjob-request", (order) => {
-      setFinishOrderReq(true);
-      setFOrder(order);
-    });
-    return () => {
-      socket?.off("finishjob-request");
-    };
-  });
-
   useEffect(() => {
     if (newOrder !== null) {
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
@@ -194,44 +111,6 @@ const HomePageUser = () => {
       socket?.off("new-order-created");
     };
   }, [newOrder]);
-
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
-  const activatingOrder = async () => {
-    const result = await dispatch(activateOrderAsync({ orderId: order._id }));
-    if (result.type === "orders/activateOrders/fulfilled") {
-      if (result.payload.Status === "Active") {
-        const data = {
-          order: order,
-          result: "true",
-        };
-        const startJobSocket = () => {
-          if (!socket) return;
-          socket?.emit("startjob-response", data);
-
-          setIsModalOpen(false);
-          return () => {
-            socket?.off("startjob-response");
-          };
-        };
-        startJobSocket();
-      }
-    }
-  };
-
-  const cancel = async () => {
-    const data = {
-      result: "false",
-      order: order,
-    };
-    socket?.emit("startjob-response", data);
-    setIsModalOpen(false);
-    return () => {
-      socket?.off("startjob-response");
-    };
-  };
 
   //search
   let debouncedsearch = useDebounce(searchInput);
@@ -437,24 +316,6 @@ const HomePageUser = () => {
           </Col>
         </Row>
       </Container>
-      <ModalComponent
-        modalHeader={"Order Activation"}
-        isFinalize={true}
-        isModalOpen={isModalOpen}
-        finalizeFunction={activatingOrder}
-        cancel={cancel}
-        cancelButtonLabel={"Cancel Order Start"}
-        finalizeButtonLabel={"Finalize Order Start"}
-        order={order}
-      />
-      {finishOrderReq ? (
-        <>
-          <FinishJobReq order={fOrder} setFinishOrderReq={setFinishOrderReq} />
-        </>
-      ) : (
-        <></>
-      )}
-            {/* <ChatPopup /> */}
     </>
   );
 };
