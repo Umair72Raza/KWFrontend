@@ -38,8 +38,7 @@ const OrderCard = ({
     setModalInputValue,
     setCancelButtonLabel,
     setFinalizeButtonLabel,
-    setShowInput,
-    order, toggleModal, orderToCancel, setOrderToCancel, finalizeFunction, } = PopUpState()
+    setShowInput, toggleModal, orderToCancel, setOrderToCancel, finalizeFunction,setFinalizeFunction } = PopUpState()
 
 
 
@@ -61,9 +60,9 @@ const OrderCard = ({
   const dispatch = useDispatch();
 
 
-  const CancelOrder = () => {
+  const CancelOrder = (Order) => {
 
-    //setOrderToCancel(order)
+    setOrderToCancel(Order)
     setModalHeader("Order Cancellation")
     setInputLabel("Reason for Cancellation")
     setShowInput(true)
@@ -74,7 +73,7 @@ const OrderCard = ({
 
   useEffect(() => {
     if (finalizeFunction == true) {
-      cancelingOrder();
+     cancelingOrder();
     }
   }, [finalizeFunction])
 
@@ -90,7 +89,7 @@ const OrderCard = ({
 
     const resonWithOrdertoCancel = {
       reason: modalInputValue,
-      order: orderToCancel
+      order: order
     }
     console.log(resonWithOrdertoCancel, "cancel order")
 
@@ -104,7 +103,7 @@ const OrderCard = ({
     const dataWithToken = { token: token, data: data };
     //dispatch(cancelOrderAsync(dataWithToken));
     cancelOrderSocketEvent();
-
+    setFinalizeFunction(false)
     setModalInputValue("");
     setIsModalOpen(false);
 
@@ -233,10 +232,9 @@ const OrderCard = ({
                         {/* Full width on small screens, half width on medium and larger screens */}
                         <CardText>
                           <Button
-                            onClick={async()=>{
-                              setOrderToCancel(order)
-                              CancelOrder()
-                                    }}
+                            onClick={()=>{
+                              //setOrderToCancel(order)
+                              CancelOrder(order)}}
                           color="danger"
                         >
                           Cancel Order
