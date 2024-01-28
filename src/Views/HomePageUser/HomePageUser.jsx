@@ -36,7 +36,7 @@ const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const { setOriginalChats, setCopyOfChats } = ChatState();
+  const { setOriginalChats, setCopyOfChats,setUnreadMessages } = ChatState();
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
   let users = useSelector((state) => state?.homepage?.workers);
@@ -72,10 +72,32 @@ const HomePageUser = () => {
 
   useEffect(() => {
     if (chats && chats.length > 0) {
-      socket?.emit("notifications", { user,chats });
+      // Emitting notifications to the server for all chats
+      socket?.emit("notifications", { user, chats });
+  
+      // Handling incoming chat notifications from the server
+      socket?.on("chat-notifications", (chatNotifications) => {
+        // console.log(chatNotifications);
+        const newUnreadMessages = {};
+  
+        // Update the unread message count state for each chat
+        chatNotifications.forEach(({ chatId, unreadCount }) => {
+          newUnreadMessages[chatId] = unreadCount;
+        });
+  
+        // Update the state with all chat IDs and their unread message counts
+        setUnreadMessages(newUnreadMessages);
+      });
+  
+      // Set the original and copy of chats
       setOriginalChats(chats);
       setCopyOfChats(chats);
     }
+
+    return () => {
+      socket?.off("chat-notification");
+      socket?.off("notifications")
+    };
   }, [chats]);
   //popup states
   const [finishOrderReq, setFinishOrderReq] = useState(false);

@@ -265,7 +265,10 @@ const HomePageWorker = () => {
   };
 
   useEffect(() => {
+    if(user && token){
+    
     dispatch(fetchChatsAsync({ user, token }));
+    }
   }, []);
 
   
@@ -276,7 +279,7 @@ const HomePageWorker = () => {
   
       // Handling incoming chat notifications from the server
       socket?.on("chat-notifications", (chatNotifications) => {
-        console.log(chatNotifications);
+        // console.log(chatNotifications);
         const newUnreadMessages = {};
   
         // Update the unread message count state for each chat
@@ -292,6 +295,11 @@ const HomePageWorker = () => {
       setOriginalChats(chats);
       setCopyOfChats(chats);
     }
+
+    return () => {
+      socket?.off("chat-notification");
+      socket?.off("notifications")
+    };
   }, [chats]);
   
 
