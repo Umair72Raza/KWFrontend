@@ -39,9 +39,9 @@ const OrderCard = ({
     setCancelButtonLabel,
     setFinalizeButtonLabel,
     setShowInput,
-    order,toggleModal,orderToCancel, setOrderToCancel,finalizeFunction,}=PopUpState()
+    order, toggleModal, orderToCancel, setOrderToCancel, finalizeFunction, } = PopUpState()
 
-  
+
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -61,9 +61,9 @@ const OrderCard = ({
   const dispatch = useDispatch();
 
 
-  const CancelOrder=()=>{
+  const CancelOrder = () => {
 
-    setOrderToCancel(order)
+    //setOrderToCancel(order)
     setModalHeader("Order Cancellation")
     setInputLabel("Reason for Cancellation")
     setShowInput(true)
@@ -72,13 +72,12 @@ const OrderCard = ({
     toggleModal()
   }
 
-  useEffect(()=>{
-    if(finalizeFunction==true)
-    {
+  useEffect(() => {
+    if (finalizeFunction == true) {
       cancelingOrder();
     }
-  },[finalizeFunction])
-  
+  }, [finalizeFunction])
+
   const cancelingOrder = () => {
     //dispatch cancel order
     const order = orderToCancel;
@@ -93,6 +92,7 @@ const OrderCard = ({
       reason: modalInputValue,
       order: orderToCancel
     }
+    console.log(resonWithOrdertoCancel, "cancel order")
 
     const cancelOrderSocketEvent = () => {
       if (!socket) return;
@@ -102,7 +102,7 @@ const OrderCard = ({
       };
     };
     const dataWithToken = { token: token, data: data };
-    dispatch(cancelOrderAsync(dataWithToken));
+    //dispatch(cancelOrderAsync(dataWithToken));
     cancelOrderSocketEvent();
 
     setModalInputValue("");
@@ -210,30 +210,33 @@ const OrderCard = ({
                               }}
                             />
                           )
-                        : transformOrderDetails(order)}
-                      {order.details.length > 5 && (
-                        <Button
-                          style={{ marginTop: "-5px" }}
-                          color="link"
-                          onClick={() => toggleDetails(order._id)}
-                        >
-                          {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
-                        </Button>
-                      )}
-                    </div>
-                  </CardText>
-                  {/* <CardText>OrderId: {order._id}</CardText> */}
-                  <CardText>
-                    Worker: {order?.users?.length > 0 && order?.users[1]?.firstName}
-                  </CardText>
-                  <Row>
-                    <Col></Col>
-                    <Col>
-                      {" "}
-                      {/* Full width on small screens, half width on medium and larger screens */}
-                      <CardText>
-                        <Button
-                          onClick={CancelOrder}
+                          : transformOrderDetails(order)}
+                        {order.details.length > 5 && (
+                          <Button
+                            style={{ marginTop: "-5px" }}
+                            color="link"
+                            onClick={() => toggleDetails(order._id)}
+                          >
+                            {showFullDetailsMap[order._id] ? "Show Less" : "Show More"}
+                          </Button>
+                        )}
+                      </div>
+                    </CardText>
+                    {/* <CardText>OrderId: {order._id}</CardText> */}
+                    <CardText>
+                      Worker: {order?.users?.length > 0 && order?.users[1]?.firstName}
+                    </CardText>
+                    <Row>
+                      <Col></Col>
+                      <Col>
+                        {" "}
+                        {/* Full width on small screens, half width on medium and larger screens */}
+                        <CardText>
+                          <Button
+                            onClick={async()=>{
+                              setOrderToCancel(order)
+                              CancelOrder()
+                                    }}
                           color="danger"
                         >
                           Cancel Order
@@ -247,10 +250,10 @@ const OrderCard = ({
             </Col>
           ))}
         </Row>
-        </>:<>No Scheduled Orders</>}
+      </>:<>No Scheduled Orders</>}
 
-      </Container>
-      {/* <ModalComponent
+    </Container >
+    {/* <ModalComponent
        
       /> */}
     </>
