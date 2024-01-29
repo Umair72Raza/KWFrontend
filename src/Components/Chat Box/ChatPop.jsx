@@ -8,11 +8,12 @@ import {
   fetchMessages,
 } from "../../Redux/Slices/ChatSlice";
 import { ChatState } from "../../Context/ChatProvider";
-import { FaDotCircle } from "react-icons/fa";
-import { SelectChat } from "../../utils";
+import { SelectChat, hasOnlyWhiteSpace } from "../../utils";
 import { useSelector } from "react-redux";
 import Booking from "../booking popup/booking";
 import { ChatPopUpPage } from "../../Constants/Constants";
+import { useTransition, animated } from "@react-spring/web";
+import { is } from "@react-spring/shared";
 
 const ChatPopup = () => {
   let {
@@ -49,7 +50,13 @@ const ChatPopup = () => {
   const [sendButtonDisabled, setSendButtonDisabled] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [loadingSendMessage, setLoadingSendMessage] = useState(false);
+  const [chatAndUserId, setChatAndUserId] = useState(null);
 
+  const chatTransitions = useTransition(copyOfChats, {
+    from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
+    enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
+    leave: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
+  });
   useEffect(() => {
     const getMessages = async () => {
       setLoading(true);
@@ -117,53 +124,59 @@ const ChatPopup = () => {
 
   useEffect(() => {
     if (!socket) return;
+    let chatIdAndUserId;
+
     socket?.on("message received", (newMessageReceived) => {
+      // Check if the new message belongs to the selected chat
       if (
         !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageReceived.newMessage.chatId
+        selectedChatCompare?._id !== newMessageReceived?.newMessage?.chatId
       ) {
-        const alreadyInNotifications = notification.some(
+        chatIdAndUserId = {
+          chat: newMessageReceived?.chat,
+          userId: user?._id,
+        };
+
+        // Save chatAndUserId to state
+        setChatAndUserId(chatIdAndUserId);
+        // Check if the new message is already in notifications
+        const alreadyInNotifications = notification?.some(
           (notification) =>
-            notification.newMessage.chatId ===
-            newMessageReceived.newMessage.chatId
+            notification?.newMessage?.chatId ===
+            newMessageReceived?.newMessage?.chatId
         );
+
         if (!alreadyInNotifications) {
           dispatch(
             ToggleChatSeen({
-              chatId: newMessageReceived.newMessage.chatId,
+              chatId: newMessageReceived?.newMessage?.chatId,
               token,
               seen: false,
             })
           ).then((result) => {
             if (result.type === "Chat/ToggleSeen/fulfilled") {
-              // Find the index of the chat to be updated
               const index = copyOfChats?.findIndex(
-                (c) => c?._id === result.payload._id
+                (c) => c?._id === result?.payload?._id
               );
 
-              // If the chat is found, create a new array with the updated chat
               if (index !== -1) {
-                const updatedChats = [...copyOfChats];
-                updatedChats.splice(index, 1, result.payload);
-                // dispatch(updateChatsWithWorkers(updatedChats));
-                setOriginalChats(updatedChats);
-                setCopyOfChats(updatedChats); // Trigger a re-render with the new array
-                newMessageReceived.chat.seen = false;
-                setNotification([newMessageReceived, ...notification]);
+                // If chat is not at the top of the array, move it to the top
+                if (index !== 0) {
+                  const updatedChats = [
+                    result?.payload,
+                    ...copyOfChats.slice(0, index),
+                    ...copyOfChats.slice(index + 1),
+                  ];
+                  setOriginalChats(updatedChats);
+                  setCopyOfChats(updatedChats);
+                }
               } else {
-                setCopyOfChats([newMessageReceived.chat, ...copyOfChats]);
-                setOriginalChats([newMessageReceived.chat, ...OriginalChats]);
-                setNotification([newMessageReceived, ...notification]);
+                setCopyOfChats([result.payload, ...copyOfChats]);
+                setOriginalChats([result.payload, ...OriginalChats]);
               }
+              setNotification([newMessageReceived, ...notification]);
             }
           });
-        } else {
-          setUnreadMessages((prevUnreadMessages) => ({
-            ...prevUnreadMessages,
-            [newMessageReceived.newMessage.chatId]:
-              (prevUnreadMessages[newMessageReceived.newMessage.chatId] || 1) +
-              1,
-          }));
         }
       } else {
         if (messages) {
@@ -173,8 +186,49 @@ const ChatPopup = () => {
         }
       }
     });
+
     return () => {
       socket?.off("message received");
+    };
+  });
+
+  useEffect(() => {
+    if (!socket) return;
+
+    if (chatAndUserId) {
+      socket?.emit("updateTheChatNotificationCount", chatAndUserId);
+    }
+
+    return () => {
+      socket?.off("updateTheChatNotificationCount");
+    };
+  }, [chatAndUserId]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket?.on("updatedCount", (data) => {
+      console.log(data, "  data");
+      // Use a callback function to update the state based on the previous state
+      setUnreadMessages((prevUnreadMessages) => {
+        // Check if the chat ID already exists in the unreadMessages state
+        if (prevUnreadMessages[data.chatId] !== undefined) {
+          // If the chat ID exists, update its unread count
+          return {
+            ...prevUnreadMessages,
+            [data.chatId]: data.unreadCount,
+          };
+        } else {
+          // If the chat ID does not exist, add it to the unreadMessages state
+          return {
+            ...prevUnreadMessages,
+            [data.chatId]: data.unreadCount,
+          };
+        }
+      });
+    });
+
+    return () => {
+      socket?.off("updatedCount");
     };
   });
 
@@ -188,9 +242,10 @@ const ChatPopup = () => {
 
   const sendMessage = async (e) => {
     e.preventDefault();
+        // Add loading state until the message is sent
+        setLoadingSendMessage(true);
     setSendButtonDisabled(true);
-    // Add loading state until the message is sent
-    setLoadingSendMessage(true);
+
 
     try {
       if (newMessageText) {
@@ -213,10 +268,23 @@ const ChatPopup = () => {
             setSelectedChatCompare(result.payload.chat);
             setSelectedChat(() => SelectChat(result.payload.chat));
           }
+          if (
+            chat._id &&
+            copyOfChats.length > 1 &&
+            copyOfChats[0]._id !== result.payload.chat._id
+          ) {
+            // Move the chat to the top
+            let updatedChats = copyOfChats.filter(
+              (chat) => chat._id !== result.payload.chat._id
+            );
+            updatedChats.unshift(result.payload.chat);
+            setCopyOfChats(updatedChats);
+            setOriginalChats(updatedChats);
+          }
           setMessages([...messages, result.payload.message]);
           const NewMessageAndUserId = {
             newMessage: result.payload.message,
-            chat: chat._id ? chat : result.payload.chat,
+            chat: result.payload.chat,
           };
           socket?.emit("new message", NewMessageAndUserId);
           if (messages) {
@@ -236,9 +304,21 @@ const ChatPopup = () => {
   };
 
   const handleChatSelection = (chat) => {
+    setNewMessageText("");  
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
+    const data = {
+      userId: user._id,
+      chatId: chat._id,
+    };
+    socket?.emit("chat read", data);
+    if (unreadMessages[chat._id]) {
+      setUnreadMessages((prevCount) => ({
+        ...prevCount,
+        [chat._id]: 0,
+      }));
+    }
   };
 
   const handleBack = () => {
@@ -327,11 +407,11 @@ const ChatPopup = () => {
               {isSameDay(new Date(), messageDate)
                 ? ChatPopUpPage.MESSAGE_TODAY
                 : isSameDay(
-                  new Date(new Date().setDate(new Date().getDate() - 1)),
-                  messageDate
-                )
-                  ? ChatPopUpPage.MESSAGE_YESTERDAY
-                  : messageDate.toLocaleDateString()}
+                    new Date(new Date().setDate(new Date().getDate() - 1)),
+                    messageDate
+                  )
+                ? ChatPopUpPage.MESSAGE_YESTERDAY
+                : messageDate.toLocaleDateString()}
             </div>
           );
         }
@@ -342,10 +422,11 @@ const ChatPopup = () => {
           <React.Fragment key={message._id}>
             {separator}
             <div
-              className={`ps-3 ${message.sender._id === user._id
+              className={`ps-3 ${
+                message.sender._id === user._id
                   ? "sent-message justify-content-end w-50 mt-4 me-4"
                   : "received-message mt-4 w-50"
-                }`}
+              }`}
               style={{
                 wordWrap: "break-word",
                 maxWidth: "100%",
@@ -439,13 +520,18 @@ const ChatPopup = () => {
                                 placeholder="Type a message..."
                                 value={newMessageText}
                                 onChange={(e) => {
-                                  setSendButtonDisabled(false);
+                                  if (hasOnlyWhiteSpace(e.target.value)) {
+                                    setSendButtonDisabled(true);
+                                  } else {
+                                    setSendButtonDisabled(false);
+                                  }
+
                                   setNewMessageText(e.target.value);
                                 }}
-                                disabled={isLoading}
+                                disabled={loadingSendMessage|| isLoading}
                               />
                               <Button
-                                disabled={sendButtonDisabled || isLoading}
+                                disabled={sendButtonDisabled || loadingSendMessage || isLoading}
                                 color={ChatPopUpPage.SEND_BUTTON_COLOR}
                                 outline
                               >
@@ -458,60 +544,75 @@ const ChatPopup = () => {
                             </form>
                           </div>
                         ) : copyOfChats?.length > 0 ? (
-                          copyOfChats.map((chat) => (
-                            <React.Fragment key={chat._id}>
-                              <div
-                                className={`d-flex flex-row align-items-center my-2`}
-                              >
-                                <div className="d-flex flex-column w-100">
-                                  {chat.users.map((chatUser) => {
-                                    if (
-                                      chatUser &&
-                                      chatUser._id &&
-                                      String(chatUser._id) !== String(user._id)
-                                    ) {
-                                      const isBlockedByAdmin =
-                                        chatUser.access === "denied"
-                                          ? true
-                                          : false;
-                                      return (
-                                        <div
-                                          key={chatUser._id}
-                                          className={`pt-2 d-flex flex-row justify-content-between ${isBlockedByAdmin
-                                              ? "blocked-user"
-                                              : ""
-                                            }`}
-                                          onClick={() =>
-                                            !isBlockedByAdmin &&
-                                            handleChatSelection(chat)
+                          chatTransitions(
+                            (style, item) =>
+                              item && (
+                                <animated.div style={style}>
+                                  <React.Fragment key={item._id}>
+                                    <div
+                                      className={`d-flex flex-row align-items-center my-2`}
+                                    >
+                                      <div className="d-flex flex-column w-100">
+                                        {item.users.map((chatUser) => {
+                                          if (
+                                            chatUser &&
+                                            chatUser._id &&
+                                            String(chatUser._id) !==
+                                              String(user._id)
+                                          ) {
+                                            const isBlockedByAdmin =
+                                              chatUser.access === "denied"
+                                                ? true
+                                                : false;
+                                            return (
+                                              <div
+                                                key={chatUser._id}
+                                                className={`pt-2 d-flex flex-row justify-content-between ${
+                                                  isBlockedByAdmin
+                                                    ? "blocked-user"
+                                                    : ""
+                                                }`}
+                                                onClick={() =>
+                                                  !isBlockedByAdmin &&
+                                                  handleChatSelection(item)
+                                                }
+                                              >
+                                                <h5>
+                                                  {chatUser.firstName}{" "}
+                                                  {chatUser.lastName}
+                                                </h5>
+                                                {unreadMessages[item._id] > 0 &&
+                                                  item.latestMessage?.sender !==
+                                                    user._id && (
+                                                    <div className="notification-circle rounded-circle bg-danger text-white">
+                                                      <span className="align-self-center">
+                                                        {
+                                                          unreadMessages[
+                                                            item._id
+                                                          ]
+                                                        }
+                                                      </span>
+                                                    </div>
+                                                  )}
+                                                {isBlockedByAdmin && (
+                                                  <span className="text-danger">
+                                                    {
+                                                      ChatPopUpPage.BLOCKED_BY_ADMIN
+                                                    }
+                                                  </span>
+                                                )}
+                                              </div>
+                                            );
                                           }
-                                        >
-                                          <h5>
-                                            {chatUser.firstName}{" "}
-                                            {chatUser.lastName}
-                                          </h5>
-                                          {!chat?.seen &&
-                                            chat.latestMessage?.sender !==
-                                            user._id && (
-                                              <span>
-                                                <FaDotCircle className="text-primary me-3" />
-                                              </span>
-                                            )}
-                                          {isBlockedByAdmin && (
-                                            <span className="text-danger">
-                                              {ChatPopUpPage.BLOCKED_BY_ADMIN}
-                                            </span>
-                                          )}
-                                        </div>
-                                      );
-                                    }
-                                    return null;
-                                  })}
-                                </div>
-                              </div>
-                              <hr />
-                            </React.Fragment>
-                          ))
+                                          return null;
+                                        })}
+                                      </div>
+                                    </div>
+                                    <hr />
+                                  </React.Fragment>
+                                </animated.div>
+                              )
+                          )
                         ) : (
                           // Render when no chats available
                           <div>{ChatPopUpPage.NO_CHATS}</div>
@@ -529,62 +630,75 @@ const ChatPopup = () => {
                         {copyOfChats?.length === 0 ? (
                           <div>{ChatPopUpPage.NO_CHATS}</div>
                         ) : (
-                          copyOfChats?.map((chat) => (
-                            <>
-                              <div
-                                className={`d-flex flex-row align-items-center my-2`}
-                                key={chat._id}
-                              >
-                                <div className="d-flex flex-column w-100">
-                                  {chat.users.map((chatUser) => {
-                                    if (
-                                      chatUser &&
-                                      chatUser._id &&
-                                      String(chatUser._id) !== String(user._id)
-                                    ) {
-                                      const isBlockedByAdmin =
-                                        chatUser.access === "denied"
-                                          ? true
-                                          : false;
-                                      return (
-                                        <div
-                                          key={chatUser._id}
-                                          className={`pt-2 d-flex flex-row justify-content-between ${
-                                            isBlockedByAdmin
-                                              ? "blocked-user"
-                                              : ""
-                                          }`}
-                                          onClick={() =>
-                                            !isBlockedByAdmin &&
-                                            handleChatSelection(chat)
+                          chatTransitions(
+                            (style, item) =>
+                              item && (
+                                <animated.div style={style}>
+                                  <React.Fragment key={item._id}>
+                                    <div
+                                      className={`d-flex flex-row align-items-center my-2`}
+                                    >
+                                      <div className="d-flex flex-column w-100">
+                                        {item.users.map((chatUser) => {
+                                          if (
+                                            chatUser &&
+                                            chatUser._id &&
+                                            String(chatUser._id) !==
+                                              String(user._id)
+                                          ) {
+                                            const isBlockedByAdmin =
+                                              chatUser.access === "denied"
+                                                ? true
+                                                : false;
+                                            return (
+                                              <div
+                                                key={chatUser._id}
+                                                className={`pt-2 d-flex flex-row justify-content-between ${
+                                                  isBlockedByAdmin
+                                                    ? "blocked-user"
+                                                    : ""
+                                                }`}
+                                                onClick={() =>
+                                                  !isBlockedByAdmin &&
+                                                  handleChatSelection(item)
+                                                }
+                                              >
+                                                <h5>
+                                                  {chatUser.firstName}{" "}
+                                                  {chatUser.lastName}
+                                                </h5>
+                                                {unreadMessages[item._id] > 0 &&
+                                                  item.latestMessage?.sender !==
+                                                    user._id && (
+                                                    <div className="notification-circle rounded-circle bg-danger text-white">
+                                                      <span className="align-self-center">
+                                                        {
+                                                          unreadMessages[
+                                                            item._id
+                                                          ]
+                                                        }
+                                                      </span>
+                                                    </div>
+                                                  )}
+                                                {isBlockedByAdmin && (
+                                                  <span className="text-danger">
+                                                    {
+                                                      ChatPopUpPage.BLOCKED_BY_ADMIN
+                                                    }
+                                                  </span>
+                                                )}
+                                              </div>
+                                            );
                                           }
-                                        >
-                                          <h5>
-                                            {chatUser.firstName}{" "}
-                                            {chatUser.lastName}
-                                          </h5>
-                                          {!chat?.seen &&
-                                            chat.latestMessage?.sender !==
-                                              user._id && (
-                                              <span>
-                                                <FaDotCircle className="text-primary me-3" />
-                                              </span>
-                                            )}
-                                          {isBlockedByAdmin && (
-                                            <span className="text-danger">
-                                              {ChatPopUpPage.BLOCKED_BY_ADMIN}
-                                            </span>
-                                          )}
-                                        </div>
-                                      );
-                                    }
-                                    return null;
-                                  })}
-                                </div>
-                              </div>
-                              <hr />
-                            </>
-                          ))
+                                          return null;
+                                        })}
+                                      </div>
+                                    </div>
+                                    <hr />
+                                  </React.Fragment>
+                                </animated.div>
+                              )
+                          )
                         )}
                       </div>
                     </div>
@@ -634,13 +748,17 @@ const ChatPopup = () => {
                               placeholder="Type a message..."
                               value={newMessageText}
                               onChange={(e) => {
-                                setSendButtonDisabled(false);
+                                if (hasOnlyWhiteSpace(e.target.value)) {
+                                  setSendButtonDisabled(true);
+                                } else {
+                                  setSendButtonDisabled(false);
+                                }
                                 setNewMessageText(e.target.value);
                               }}
-                              disabled={isLoading}
+                              disabled={loadingSendMessage|| isLoading}
                             />
                             <Button
-                              disabled={sendButtonDisabled || isLoading}
+                              disabled={sendButtonDisabled || loadingSendMessage || isLoading}
                               color={ChatPopUpPage.SEND_BUTTON_COLOR}
                               outline
                             >

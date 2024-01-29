@@ -24,14 +24,14 @@ export const checkRole = () => {
 
 
 export const truncateText = (text, maxLength) => {
-  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  return text?.length > maxLength ? `${text?.slice(0, maxLength)}...` : text;
 };
 
 export const transformOrderDetails = (order, showFullDetailsMap) => {
-  let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+  let transformedDetails = order?.details?.replace(/<br\s*\/?>/g, "\n");
 
-  return showFullDetailsMap[order._id]
-    ? order.details
+  return showFullDetailsMap[order?._id]
+    ? order?.details
     : truncateText(transformedDetails, 25);
 };
 

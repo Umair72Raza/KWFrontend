@@ -18,7 +18,8 @@ const Services = () => {
   const [showEditButtons, setShowEditButton] = useState(false);
   const [editedService, setEditedService] = useState({ id: null, name: "" });
   const [updateButtonDisabled, setUpdateButtonDisabled] = useState(false);
-  const [showEditors,setShowEditors] = useState(false);
+  const [showEditors, setShowEditors] = useState(false);
+  const [addButtonDisabled, setAddButtonDisabled] = useState(true);
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
@@ -70,6 +71,10 @@ const Services = () => {
   };
 
   const handleAddService = async () => {
+    setShowEditors(false);
+    setShowEditButton(true);
+    setEditedService({ id: null, name: "" });
+
     setAddButtonDisabled(true); // Disable the button
     const MAX_LETTERS = 24; // Adjust the maximum allowed letters as needed
     let reason;
@@ -102,7 +107,7 @@ const Services = () => {
       }
     } else {
       reason =
-        "This Service cannot be added because the characters limit wasn't met!";
+        "Cannot add service' exceeded character limit";
       displayErrorMessage(reason);
       setAddButtonDisabled(false); // Enable the button
     }
@@ -201,7 +206,7 @@ const Services = () => {
         setUpdateButtonDisabled(false);
       }
     } else {
-      displayErrorMessage("because letters limit wasnt met!");
+      displayErrorMessage("because letters limit was not met!");
     }
   };
 
@@ -219,7 +224,20 @@ const Services = () => {
       <div>
         <UserNavbar />
       </div>
-      <Container style={{ padding: "4%" }}>
+      <Container style={{ padding: "1%" }}>
+      <Col>
+        <Button
+          style={{
+            backgroundColor: "#48629b",
+            border: "none",
+          }}
+          onClick={() => navigate(-1)}
+        >
+          {SERVICE_CONSTS.BACK}
+        </Button>
+      </Col>
+
+     
         {loading ? (
           <div style={{ textAlign: "center" }}>
             <Spinner color="primary" />
@@ -227,22 +245,10 @@ const Services = () => {
         ) : (
           <>
             <Row style={{ marginTop: "1%", textAlign: "center" }}>
-              <Col>
-                <Button
-                  style={{
-                    marginRight: "",
-                    backgroundColor: "#48629b",
-                    border: "none",
-                  }}
-                  onClick={() => navigate(-1)}
-                >
-                  {SERVICE_CONSTS.BACK}
-                </Button>
-              </Col>
-              <Col>
+              <Col xs={{ size: 6, offset: 3 }}>
                 <h2>{SERVICE_CONSTS.SERVICES_HEADING}</h2>
               </Col>
-              <Col>
+              <Col xs="auto">
                 {!showEditButtons ? (
                   <Button color="success" onClick={toggleshowEdits}>
                     {SERVICE_CONSTS.ADD_A_SERVICE}
@@ -317,18 +323,10 @@ const Services = () => {
                             </span>
                           )}
                         </Col>
+
                         <Col>
-                          <Button
-                            color="danger"
-                            size="sm"
-                            className="ml-2"
-                            onClick={() => handleRemoveService(service)}
-                          >
-                            {SERVICE_CONSTS.REMOVE}
-                          </Button>
-                        </Col>
-                        <Col>
-                          {showEditors===true && editedService.id === service._id ? (
+                          {showEditors === true &&
+                          editedService.id === service._id ? (
                             <>
                               <Button
                                 style={{
@@ -355,6 +353,16 @@ const Services = () => {
                               {SERVICE_CONSTS.EDIT}
                             </Button>
                           )}
+                        </Col>
+                        <Col>
+                          <Button
+                            color="danger"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => handleRemoveService(service)}
+                          >
+                            {SERVICE_CONSTS.REMOVE}
+                          </Button>
                         </Col>
                       </Row>
                     </ListGroupItem>

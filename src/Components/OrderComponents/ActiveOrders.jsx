@@ -68,7 +68,7 @@ const ActiveOrders = ({
     };
     socket.emit("finishJob-accept-reject", data);
     Swal.fire({
-      title: "Finish Request Job Request Sent!",
+      title: "Finish Job Request Sent!",
       icon: "success",
     });
   };

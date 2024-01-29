@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Collapse,
   Navbar,
@@ -50,10 +50,18 @@ const UserNavbar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
+  const [newMessage, setNewMessage] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
+
+  useEffect(() => { 
+    if(unreadMessages){
+      const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
+      setNewMessage(hasUnreadMessages);
+    }
+  },[unreadMessages]);
 
   const Logout = async () => {
     Swal.fire({
@@ -79,11 +87,16 @@ const UserNavbar = () => {
   const HandleNotificationSelection = (item) => {
     setChat(item.chat);
     setSelectedChatCompare(item.chat);
+    const data = {
+      userId: user?._id,
+      chatId: item?.chat?._id,
+    };
+    socket?.emit("chat read", data);
     setUnreadMessages((prevCount) => ({
       ...prevCount,
-      [item.chat._id]:0,
+      [item?.chat?._id]:0,
     }));
-    setSelectedChat(() => SelectChat(item.chat));
+    setSelectedChat(() => SelectChat(item?.chat));
     setNotification(notification.filter((n) => n !== item));
     setShowModal(true);
   };
@@ -110,7 +123,7 @@ const UserNavbar = () => {
     setShowModal(true);
     setCopyOfChats(OriginalChats);
   };
-console.log(unreadMessages)
+
   return (
     <>
       <Navbar className="bg-primary w-full" expand="sm" dark container="fluid">
@@ -130,7 +143,6 @@ console.log(unreadMessages)
                   title="Edit Profile"
                 >
                   <CgProfile
-                    className="hover-text-3d rounded-5"
                     onClick={HandleEditProfile}
                   />
                 </NavItem>
@@ -142,7 +154,7 @@ console.log(unreadMessages)
                 >
                   <DropdownToggle nav className="d-flex">
                     <div>
-                      <IoIosNotifications className=" text-white hover-pointer hover-text-3d rounded-5 " />
+                      <IoIosNotifications className=" text-white hover-pointer " />
                     </div>
                     {notification.length > 0 && (
                       <h6>
@@ -186,7 +198,7 @@ console.log(unreadMessages)
                   >
                     <div>
                       <RiInboxArchiveLine
-                        className="hover-text-3d rounded-5"
+                       
                         onClick={orders}
                       />
                     </div>
@@ -208,11 +220,16 @@ console.log(unreadMessages)
                   className="text-white fs-3 hover-pointer "
                   title="Chats"
                 >
+                  {newMessage && (
+                     <div className=" position-relative  z-3 notification-Dot"></div>
+                    )}
+                  
                   <FiMessageCircle
-                    className="hover-text-3d rounded-5"
+                    className={`${newMessage ? "mb-2" : ""}`}
                     onClick={handleMessageIconClick}
-                  />
+                  /> 
                 </NavItem>
+               
               </>
             ) : (
               []

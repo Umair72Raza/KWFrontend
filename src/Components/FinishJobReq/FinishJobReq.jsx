@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Modal,
@@ -14,11 +14,27 @@ import { changeStatusToPastAsync } from "../../Redux/Slices/OrderSlice";
 
 import Feedback from "../../Components/feedback/feedback";
 import { truncateText } from "../../utils";
+import { PopUpState } from "../../Context/PopUpProvider";
 
-const FinishJobReq = ({ order, setFinishOrderReq }) => {
+const FinishJobReq = () => {
+  let { fOrder,
+    setFOrder,
+    finishOrderReq,
+    setFinishOrderReq } = PopUpState();
+
+    useEffect(() => {
+      if (!socket) return;
+      socket?.on("finishjob-request", (order) => {
+        setFinishOrderReq(true);
+        setFOrder(order);
+      });
+      return () => {
+        socket?.off("finishjob-request");
+      };
+    });
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const [modal, setModal] = useState(true);
+  const [modal, setModal] = useState(finishOrderReq);
   const [showMoreDetails, setShowMoreDetails] = useState(false);
   const [finishConfirmed, setFinishConfirmed] = useState(false);
 
@@ -28,16 +44,17 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
 
   const toggleModal = () => {
     setModal(!modal);
+    setFinishOrderReq(!finishOrderReq)
   };
 
   const handleConfirm = async () => {
     const result = await dispatch(
-      changeStatusToPastAsync({ orderId: order._id })
+      changeStatusToPastAsync({ orderId: fOrder._id })
     );
 
     if (
       result.type === "orders/changeToPastOrders/fulfilled" &&
-      result.payload.Status === "Past"
+      result?.payload?.Status === "Past"
     ) {
       const data = {
         order: result.payload,
@@ -52,9 +69,10 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
 
   const handleCancel = () => {
     const data = {
-      order,
+      order:fOrder,
       result: "false",
     };
+    console.log(fOrder,"order in cancel")
     socket.emit("finishjob-response", data);
     setFinishOrderReq(false);
   };
@@ -62,13 +80,13 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
   return (
     <>
       <Modal
-        isOpen={modal}
+        isOpen={finishOrderReq}
         toggle={toggleModal}
         centered
         backdrop="static"
         keyboard={false}
       >
-        <ModalHeader toggle={toggleModal} className="text-center">
+        <ModalHeader  className="text-center">
           Worker wants to Finish the job!
         </ModalHeader>
         <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
@@ -76,17 +94,17 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
             <Row>
               <Col>
                 <b>Order Title: </b>
-                {order.Title}
+                {fOrder.Title}
               </Col>
             </Row>
             <Row>
               <Col>
-                <b>Service:</b> {order.service}
+                <b>Service:</b> {fOrder.service}
               </Col>
 
             </Row>
             <Row>
-              <Col><b>Amount:</b> {order.amount}</Col>
+              <Col><b>Amount:</b> {fOrder.amount}</Col>
 
             </Row>
             <Row>
@@ -94,15 +112,15 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
                 <b>Order Details: </b>
 
                 {showMoreDetails
-                  ? order.details.replace(/<br\s*\/?>/gi, "\n")
+                  ? fOrder?.details?.replace(/<br\s*\/?>/gi, "\n")
                   : truncateText(
-                    order.details.replace(/<br\s*\/?>/gi, "\n"),
+                    fOrder?.details?.replace(/<br\s*\/?>/gi, "\n"),
                     55
                   )}
               </Col>
             </Row>
             <Row>
-              {order.details.trim().length > 55 && (
+              {fOrder?.details?.trim()?.length > 55 && (
                 <Button
                   color="link"
                   onClick={toggleDetails}
@@ -132,7 +150,7 @@ const FinishJobReq = ({ order, setFinishOrderReq }) => {
       {finishConfirmed === true && (
         <Feedback
           flag={finishConfirmed}
-          order={order}
+          order={fOrder}
           setFinishOrderReq={setFinishOrderReq}
           SetConfirm={""}
         />

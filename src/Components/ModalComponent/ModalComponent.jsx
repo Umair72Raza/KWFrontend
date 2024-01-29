@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Form,
@@ -10,24 +10,80 @@ import {
   ModalFooter,
   ModalHeader,
 } from "reactstrap";
-
-const ModalComponent = (props) => {
+import { PopUpState } from "../../Context/PopUpProvider";
+import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
+import { useDispatch, useSelector } from "react-redux";
+const ModalComponent = () => {
+  const socket = useSelector((state) => state?.socket?.socket);
+  const dispatch = useDispatch();
   const {
     modalHeader,
     isFinalize,
     isModalOpen,
-    toggleModal,
     inputLabel,
     modalInputValue,
-    modalInputSetter,
-    finalizeFunction,
+    setModalInputValue,
     cancelButtonLabel,
     finalizeButtonLabel,
     showInput,
-    cancel,
     order,
-  } = props;
+    toggleModal, cancel,
+     setFinalizeFunction,
+     setIsFinalize,setOrder,setModalHeader,setFinalizeButtonLabel,setCancelButtonLabel
+    
+  } = PopUpState();
+  useEffect(() => {
+    socket?.on("startjob-request", (order) => {
+      setOrder(order);
+      setModalHeader("Order Activation")
+      setIsFinalize(true)
+      setFinalizeButtonLabel("Finalize Order Start")
+      setCancelButtonLabel("Cancel Order Start")
+      toggleModal();
+    });
+    return () => {
+      socket?.off("startjob-request");
+    };
+  });
+  
+  const activatingOrder = async () => {
+    const result = await dispatch(activateOrderAsync({ orderId: order._id }));
+    if (result.type === "orders/activateOrders/fulfilled") {
+      if (result.payload.Status === "Active") {
+        const data = {
+          order: order,
+          result: "true",
+        };
+        const startJobSocket = () => {
+          if (!socket) return;
+          socket?.emit("startjob-response", data);
 
+          toggleModal();
+          return () => {
+            socket?.off("startjob-response");
+          };
+        };
+        startJobSocket();
+        setIsFinalize(false);
+        setOrder(null);
+      }
+    }
+  };
+
+  const Cancel = async () => {
+    const data = {
+      result: "false",
+      order: order,
+    };
+    socket?.emit("startjob-response", data);
+    setIsFinalize(false);
+    setOrder(null);
+    toggleModal();
+    return () => {
+      socket?.off("startjob-response");
+    };
+  };
+  
   return (
     <Modal
       isOpen={isModalOpen}
@@ -37,7 +93,7 @@ const ModalComponent = (props) => {
       keyboard={false}
 
     >
-      <ModalHeader toggle={toggleModal}>{modalHeader}</ModalHeader>
+      <ModalHeader >{modalHeader}</ModalHeader>
       <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
 
         {order && (
@@ -68,24 +124,31 @@ const ModalComponent = (props) => {
                 id="cancelReason"
                 placeholder="Enter reason"
                 value={modalInputValue}
-                onChange={(e) => modalInputSetter(e.target.value)}
+                onChange={(e) => setModalInputValue(e.target.value)}
               />
             </FormGroup>
           </Form>
         )}
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={cancel}>
+        <Button color="secondary" onClick={isFinalize ? () => { Cancel(); toggleModal(); } : cancel}>
           {cancelButtonLabel}
         </Button>
         <Button
           color={isFinalize ? "success" : "danger"}
-          onClick={finalizeFunction}
+          onClick={isFinalize ?
+            () => {
+              activatingOrder()
+              toggleModal()
+            } : () => {
+              setFinalizeFunction(true)
+              toggleModal()
+            }}
         >
           {finalizeButtonLabel}
         </Button>
       </ModalFooter>
-    </Modal>
+    </Modal >
   );
 };
 

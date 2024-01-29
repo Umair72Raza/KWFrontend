@@ -8,14 +8,17 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { store } from "./Redux/store.js";
 import { Provider } from "react-redux";
 import ChatProvider from "./Context/ChatProvider.jsx";
+import PopUpContext from "./Context/PopUpProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <ChatProvider>
-    <Provider store={store}>
-      <React.StrictMode>
-        <App />
-        <ToastContainer />
-      </React.StrictMode>
-    </Provider>
-  </ChatProvider>
+  <PopUpContext>
+    <ChatProvider>
+      <Provider store={store}>
+        <React.StrictMode>
+          <App />
+          <ToastContainer />
+        </React.StrictMode>
+      </Provider>
+    </ChatProvider>
+  </PopUpContext>
 );

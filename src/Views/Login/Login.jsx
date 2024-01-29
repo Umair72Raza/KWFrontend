@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import { loginAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { set } from "lodash";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -41,6 +42,7 @@ const Login = () => {
 
   const handleEmailChange = (e) => {
     setErrors({ ...errors, email: "" });
+    setLoginDisabled(false);
     setFormData({
       ...formData,
       email: e.target.value,
@@ -49,6 +51,7 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setLoginDisabled(false);
     setFormData({
       ...formData,
       [name]: value,
@@ -85,6 +88,7 @@ const Login = () => {
             navigate("/user/homepage");
           }
         } else if (result.type === "auth/login/rejected") {
+          setLoginDisabled(true);
           failureToast(result.payload);
         }
       }
@@ -95,7 +99,6 @@ const Login = () => {
     }
   };
 
-
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
@@ -104,7 +107,11 @@ const Login = () => {
       <Row className="w-100 d-flex justify-content-center">
         <Col md={6} lg={4} xl={3}>
           <h2 className="text-center mt-5 mb-4">{LoginPage.LABELS.LOGIN}</h2>
-          <Form onSubmit={handleSubmit} autoComplete="off" style={{ userSelect: "none" }}>
+          <Form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            style={{ userSelect: "none" }}
+          >
             <FormGroup>
               <Label
                 className="fw-semibold"
@@ -121,7 +128,7 @@ const Login = () => {
                 value={formData[LoginPage.FORM_FIELDS.EMAIL]}
                 onChange={handleEmailChange}
                 onKeyDown={(event) => {
-                  if (event.key === ' ') {
+                  if (event.key === " ") {
                     event.preventDefault();
                   }
                 }}
@@ -132,19 +139,13 @@ const Login = () => {
               )}
             </FormGroup>
             <FormGroup>
-              <Col className="d-flex flex-row justify-content-between">
+              <Col>
                 <Label
                   className="fw-semibold"
                   for={LoginPage.FORM_FIELDS.PASSWORD}
                 >
                   {LoginPage.LABELS.PASSWORD}
                 </Label>
-                <Link
-                  to={LoginPage.ROUTES.FORGET_PASSWORD}
-                  className="text-primary"
-                >
-                  {LoginPage.LABELS.FORGET_PASSWORD}
-                </Link>
               </Col>
               <div className="password-input-wrapper">
                 <Input
@@ -169,20 +170,30 @@ const Login = () => {
                 </div>
               </div>
             </FormGroup>
-            <Link id="Login">
-              <Button
-                color="primary"
-                className="w-25"
-                block
-                onClick={handleSubmit}
-                disabled={loginDisabled || loading}
-              >
-                {loading ? (
-                  <Spinner size="sm" color="light" />
-                ) : (
-                  LoginPage.LABELS.LOGIN
-                )}
-              </Button>
+
+            <Button
+              id="Login"
+              color="primary"
+              className="w-25 hover-pointer"
+              block
+              onClick={handleSubmit}
+              disabled={loginDisabled || loading}
+            >
+              {loading ? (
+                <Spinner size="sm" color="light" />
+              ) : (
+                LoginPage.LABELS.LOGIN
+              )}
+            </Button>
+
+            <Link
+              to={LoginPage.ROUTES.FORGET_PASSWORD}
+              className="text-primary fw-bold mt-2 d-block text-center"
+              style={{ textDecoration: "none" }} // Remove underline by default
+            >
+              <span className="forget-password-link">
+                {LoginPage.LABELS.FORGET_PASSWORD}
+              </span>
             </Link>
             <Tooltip
               placement="right"
