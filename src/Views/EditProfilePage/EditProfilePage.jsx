@@ -46,8 +46,8 @@ const EditProfilePage = ({ ShowServices }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
-    phoneNumber: "",
+    // email: "",
+    // phoneNumber: "",
     location: {},
     // latitude:"",
     // longitude:"",
@@ -66,8 +66,8 @@ const EditProfilePage = ({ ShowServices }) => {
   useEffect(() => {
     if (UsersData) {
       const isFormValid =
-        !errors.email &&
-        !errors.phone &&
+        // !errors.email &&
+        // !errors.phone &&
         !hasOnlyWhiteSpace(formData?.address) &&
         !hasOnlyWhiteSpace(formData?.firstName) &&
         !hasOnlyWhiteSpace(formData?.lastName) &&
@@ -109,21 +109,21 @@ const EditProfilePage = ({ ShowServices }) => {
     fetchData();
   }, [dispatch, ShowServices]);
 
-  const handleEmailChange = (e) => {
-    setErrors({ ...errors, email: "" });
-    setFormData({
-      ...formData,
-      email: e.target.value,
-    });
-  };
+  // const handleEmailChange = (e) => {
+  //   setErrors({ ...errors, email: "" });
+  //   setFormData({
+  //     ...formData,
+  //     email: e.target.value,
+  //   });
+  // };
 
-  const handlePhoneChange = (value) => {
-    setErrors({ ...errors, phone: "" });
-    setFormData({
-      ...formData,
-      phoneNumber: value,
-    });
-  };
+  // const handlePhoneChange = (value) => {
+  //   setErrors({ ...errors, phone: "" });
+  //   setFormData({
+  //     ...formData,
+  //     phoneNumber: value,
+  //   });
+  // };
 
   const handleServiceChange = (e) => {
     const selectedService = e.target.value;
@@ -155,20 +155,20 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const FormValidation = (formData) => {
     const errors = {};
-    if (!validateEmail(formData.email)) {
-      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
-    }
-    if (!formData.email.includes(".com")) {
-      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
-    }
+    // if (!validateEmail(formData.email)) {
+    //   errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+    // }
+    // if (!formData.email.includes(".com")) {
+    //   errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+    // }
 
-    if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
-      isValidPhoneNumber(formData.phoneNumber)
-        ? setErrors({ ...errors, phone: "" })
-        : (errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
-    } else {
-      errors.phone = RegisterPage.ERROR_MESSAGES.emptyPhone;
-    }
+    // if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
+    //   isValidPhoneNumber(formData.phoneNumber)
+    //     ? setErrors({ ...errors, phone: "" })
+    //     : (errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
+    // } else {
+    //   errors.phone = RegisterPage.ERROR_MESSAGES.emptyPhone;
+    // }
 
     if (ShowServices && formData.services.length === 0) {
       errors.services = RegisterPage.ERROR_MESSAGES.invalidService;
@@ -231,8 +231,8 @@ const EditProfilePage = ({ ShowServices }) => {
         setFormData({
           firstName,
           lastName,
-          email,
-          phoneNumber,
+          // email,
+          // phoneNumber,
           location,
           // latitude,
           // longitude,
@@ -292,8 +292,8 @@ const EditProfilePage = ({ ShowServices }) => {
     setFormData({
       firstName: UsersData?.firstName,
       lastName: UsersData?.lastName,
-      email: UsersData?.email,
-      phoneNumber: UsersData?.phoneNumber,
+      // email: UsersData?.email,
+      // phoneNumber: UsersData?.phoneNumber,
       location: UsersData?.location,
       // latitude: UsersData?.latitude,
       // longitude: UsersData?.longitude,
@@ -307,8 +307,8 @@ const EditProfilePage = ({ ShowServices }) => {
     setFormData({
       firstName: UsersData?.firstName,
       lastName: UsersData?.lastName,
-      email: UsersData?.email,
-      phoneNumber: UsersData?.phoneNumber,
+      // email: UsersData?.email,
+      // phoneNumber: UsersData?.phoneNumber,
       location: UsersData?.location,
       // latitude: UsersData?.latitude,
       // longitude: UsersData?.longitude,
@@ -413,7 +413,7 @@ const EditProfilePage = ({ ShowServices }) => {
                       </FormGroup>
                     </Col>
                   </Row>
-                  <Row>
+               {/*   <Row>
                     <Col md={6}>
                       <FormGroup>
                         <Label className="fw-semibold" for="email">
@@ -465,7 +465,7 @@ const EditProfilePage = ({ ShowServices }) => {
                         )}
                       </FormGroup>
                     </Col>
-                  </Row>
+                  </Row>*/}
                   {ShowServices && (
                     <>
                       <Row className="my-4">
