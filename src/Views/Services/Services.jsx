@@ -64,10 +64,7 @@ const Services = () => {
       title: `${reason}!`,
       allowOutsideClick: false,
       icon: "error",
-    }).then(() => {
-      // Reset the error state
-      setShowErrorPopUp(false);
-    });
+    })
   };
 
   const handleAddService = async () => {

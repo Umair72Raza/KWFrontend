@@ -101,8 +101,8 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
   };
 
   return (
-    <Container>
-      <Col xs="12" sm="12" md="8" lg="8">
+    <Row >
+      <Col >
         <Card className="mb-4" style={{ width: "100%" }}>
           <CardBody>
             <CardTitle tag="h5">{`${person.firstName} ${person.lastName}`}</CardTitle>
@@ -165,7 +165,7 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
       ) : (
         <></>
       )}
-    </Container>
+    </Row>
   );
 };
 
