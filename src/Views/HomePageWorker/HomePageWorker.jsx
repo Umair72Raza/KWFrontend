@@ -36,6 +36,7 @@ import {
 } from "../../Redux/Slices/LoaderSlice";
 import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
 import { useStartJob } from "../../Context/StartJobContext";
+import { PopUpState } from "../../Context/PopUpProvider";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
@@ -54,7 +55,7 @@ const HomePageWorker = () => {
   const [latestOrder, setLatestOrders] = useState();
   const [scheduledOrders, setScheduledOrders] = useState([]);
   const [pastOrders, setPastOrders] = useState([]);
-  const [cancelledOrders, setCancelledOrders] = useState([]);
+  // const [cancelledOrders, setCancelledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   const { socket } = useSelector((state) => state?.socket);
@@ -75,6 +76,9 @@ const HomePageWorker = () => {
     setUnreadMessages,
     unreadMessages
   } = ChatState();
+
+  let {cancelledOrders, setCancelledOrders} = PopUpState()
+
 
   const [startJobStatus, setStartJobStatus] = useState("");
 
