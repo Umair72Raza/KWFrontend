@@ -29,9 +29,10 @@ const ModalComponent = () => {
     order,
     toggleModal, cancel,
      setFinalizeFunction,
-   
+     setIsFinalize,setOrder
     
   } = PopUpState();
+  
   const activatingOrder = async () => {
     const result = await dispatch(activateOrderAsync({ orderId: order._id }));
     if (result.type === "orders/activateOrders/fulfilled") {
@@ -50,6 +51,8 @@ const ModalComponent = () => {
           };
         };
         startJobSocket();
+        setIsFinalize(false);
+        setOrder(null);
       }
     }
   };
@@ -60,6 +63,8 @@ const ModalComponent = () => {
       order: order,
     };
     socket?.emit("startjob-response", data);
+    setIsFinalize(false);
+    setOrder(null);
     toggleModal();
     return () => {
       socket?.off("startjob-response");
@@ -75,7 +80,7 @@ const ModalComponent = () => {
       keyboard={false}
 
     >
-      <ModalHeader toggle={toggleModal}>{modalHeader}</ModalHeader>
+      <ModalHeader >{modalHeader}</ModalHeader>
       <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
 
         {order && (

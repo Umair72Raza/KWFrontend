@@ -38,7 +38,12 @@ const OrderCard = ({
     setModalInputValue,
     setCancelButtonLabel,
     setFinalizeButtonLabel,
-    setShowInput, toggleModal, orderToCancel, setOrderToCancel, finalizeFunction,setFinalizeFunction } = PopUpState()
+    setShowInput,
+     toggleModal,
+      orderToCancel,
+       setOrderToCancel,
+        finalizeFunction,
+        setFinalizeFunction } = PopUpState()
 
 
 
@@ -69,6 +74,16 @@ const OrderCard = ({
     setFinalizeButtonLabel("Finalize Order Cancellation")
     setCancelButtonLabel("Cancel Order Cancellation")
     toggleModal()
+  }
+  const Clear =()=>
+  {
+    setOrderToCancel(null)
+    setModalHeader("")
+    setInputLabel("")
+    setShowInput(false)
+    setFinalizeButtonLabel("")
+    setCancelButtonLabel("")
+    setFinalizeFunction(false)
   }
 
   useEffect(() => {
@@ -101,9 +116,9 @@ const OrderCard = ({
       };
     };
     const dataWithToken = { token: token, data: data };
-    //dispatch(cancelOrderAsync(dataWithToken));
+    dispatch(cancelOrderAsync(dataWithToken));
     cancelOrderSocketEvent();
-    setFinalizeFunction(false)
+    
     setModalInputValue("");
     setIsModalOpen(false);
 
@@ -117,6 +132,7 @@ const OrderCard = ({
       ...prevCancelledOrders,
       order,
     ]);
+    Clear();
     setToggleCancel(!toggleCancel);
   };
 

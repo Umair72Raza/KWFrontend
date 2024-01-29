@@ -20,6 +20,13 @@ const PopUpContext = ({ children }) => {
     const [showInput,setShowInput] = useState(false);
     const [cancelStart,setCancelStart] = useState(false);  
     const cancel=()=>{
+    setOrderToCancel(null)
+    setModalHeader("")
+    setInputLabel("")
+    setShowInput(false)
+    setFinalizeButtonLabel("")
+    setCancelButtonLabel("")
+    setFinalizeFunction(false)
         toggleModal();
     }
     const [order,setOrder] = useState("");
