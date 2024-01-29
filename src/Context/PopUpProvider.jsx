@@ -2,35 +2,35 @@ import { createContext, useContext, useState } from "react";
 const PopupContext = createContext();
 
 const PopUpContext = ({ children }) => {
-  const [finishOrderReq, setFinishOrderReq] = useState(false);
-  const [fOrder, setFOrder] = useState("");
-  const [orderToCancel, setOrderToCancel] = useState(null);
-  const [modalHeader, setModalHeader] = useState("");
-  const [isFinalize, setIsFinalize] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-  const [inputLabel, setInputLabel] = useState("");
-  const [modalInputValue, setModalInputValue] = useState("");
-  const [finalizeFunction, setFinalizeFunction] = useState(false);
-  //const [FinalizeFunction,setFinalizefunction] = useState(false);
-  const [cancelButtonLabel, setCancelButtonLabel] = useState("");
-  const [finalizeButtonLabel, setFinalizeButtonLabel] = useState("");
-  const [showInput, setShowInput] = useState(false);
-  const [cancelledOrders, setCancelledOrders] = useState([]);
-  const [cancelStart, setCancelStart] = useState(false);
-  const cancel = () => {
-    setOrderToCancel(null);
-    setModalHeader("");
-    setInputLabel("");
-    setShowInput(false);
-    setFinalizeButtonLabel("");
-    setCancelButtonLabel("");
-    setFinalizeFunction(false);
-    toggleModal();
-  };
-  const [order, setOrder] = useState("");
+    const [finishOrderReq, setFinishOrderReq] = useState(false);
+    const [fOrder, setFOrder] = useState("");
+    const [orderToCancel, setOrderToCancel] = useState(null);
+    const [modalHeader,setModalHeader] = useState("");
+    const [isFinalize,setIsFinalize] = useState(false);
+    const [isModalOpen,setIsModalOpen] = useState(false);
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+      };
+    const [inputLabel,setInputLabel] = useState("");
+    const [modalInputValue,setModalInputValue] = useState("");
+    const [finalizeFunction,setFinalizeFunction] = useState(false);
+    //const [FinalizeFunction,setFinalizefunction] = useState(false);
+    const [cancelButtonLabel,setCancelButtonLabel] = useState("");
+    const [finalizeButtonLabel,setFinalizeButtonLabel] = useState("");
+    const [showInput,setShowInput] = useState(false);
+    const [cancelStart,setCancelStart] = useState(false);  
+    const [params, SetParams] = useState({});
+    const cancel=()=>{
+    setOrderToCancel(null)
+    setModalHeader("")
+    setInputLabel("")
+    setShowInput(false)
+    setFinalizeButtonLabel("")
+    setCancelButtonLabel("")
+    setFinalizeFunction(false)
+        toggleModal();
+    }
+    const [order,setOrder] = useState("");
   return (
     <PopupContext.Provider
       value={{
@@ -65,7 +65,7 @@ const PopUpContext = ({ children }) => {
         cancelStart,
         setCancelStart,
         cancelledOrders,
-        setCancelledOrders,
+        setCancelledOrders,,params,SetParams,
       }}
     >
       {children}
