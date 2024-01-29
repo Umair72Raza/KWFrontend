@@ -267,7 +267,7 @@ const UserNavbar = () => {
               </OffcanvasBody>
             </Offcanvas>
             <NavItem className="text-white ">
-              <Button color="danger" className="p-1 " onClick={Logout}>
+              <Button color="danger" className=" " onClick={Logout}>
                 Logout
               </Button>
             </NavItem>
