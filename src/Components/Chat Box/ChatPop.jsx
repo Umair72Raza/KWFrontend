@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import Booking from "../booking popup/booking";
 import { ChatPopUpPage } from "../../Constants/Constants";
 import { useTransition, animated } from "@react-spring/web";
+import { is } from "@react-spring/shared";
 
 const ChatPopup = () => {
   let {
@@ -241,9 +242,10 @@ const ChatPopup = () => {
 
   const sendMessage = async (e) => {
     e.preventDefault();
+        // Add loading state until the message is sent
+        setLoadingSendMessage(true);
     setSendButtonDisabled(true);
-    // Add loading state until the message is sent
-    setLoadingSendMessage(true);
+
 
     try {
       if (newMessageText) {
@@ -302,6 +304,7 @@ const ChatPopup = () => {
   };
 
   const handleChatSelection = (chat) => {
+    setNewMessageText("");  
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
@@ -525,10 +528,10 @@ const ChatPopup = () => {
 
                                   setNewMessageText(e.target.value);
                                 }}
-                                disabled={isLoading}
+                                disabled={loadingSendMessage|| isLoading}
                               />
                               <Button
-                                disabled={sendButtonDisabled || isLoading}
+                                disabled={sendButtonDisabled || loadingSendMessage || isLoading}
                                 color={ChatPopUpPage.SEND_BUTTON_COLOR}
                                 outline
                               >
@@ -752,10 +755,10 @@ const ChatPopup = () => {
                                 }
                                 setNewMessageText(e.target.value);
                               }}
-                              disabled={isLoading}
+                              disabled={loadingSendMessage|| isLoading}
                             />
                             <Button
-                              disabled={sendButtonDisabled || isLoading}
+                              disabled={sendButtonDisabled || loadingSendMessage || isLoading}
                               color={ChatPopUpPage.SEND_BUTTON_COLOR}
                               outline
                             >

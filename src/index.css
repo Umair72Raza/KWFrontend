@@ -18,6 +18,11 @@ li {
 
 }
 
+.forget-password-link:hover {
+text-decoration: underline !important;
+
+}
+
 .password-input-wrapper {
   position: relative;
 }

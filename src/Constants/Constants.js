@@ -75,7 +75,7 @@ export const RegisterPage = {
     invalidEmail: "Invalid email address.",
     invalidPhoneNumber: "Please enter a valid phone number.",
     invalidPassword:
-      "Password must contain at least one special character, one uppercase letter, one number, and between 8 to 12 characters long.",
+      "Password must contain at least one special character, one uppercase letter, one number, and atleast 8 characters long.",
     passwordsNotMatch: "Passwords do not match.",
     enterAllFields: "Enter all the fields to sign up.",
   },

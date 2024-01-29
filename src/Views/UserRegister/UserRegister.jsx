@@ -54,6 +54,7 @@ const UserRegister = ({ ShowServices }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const toggle = () => setTooltipOpen(!tooltipOpen);
@@ -112,7 +113,7 @@ const UserRegister = ({ ShowServices }) => {
   const handlePasswordChange = (e) => {
     let password = e.target.value;
     password = password.replace(/\s/g, '');
-    setErrors({ ...errors, password: "" });
+    setErrors({ ...errors, confirmPassword: "" , password: ""});
 
     setFormData({
       ...formData,
@@ -123,7 +124,7 @@ const UserRegister = ({ ShowServices }) => {
   const handleConfirmPasswordChange = (e) => {
     let confirmPassword = e.target.value;
     confirmPassword = confirmPassword.replace(/\s/g, '');
-    setErrors({ ...errors, confirmPassword: "" });
+    setErrors({ ...errors, confirmPassword: "" , password: ""});
 
     setFormData({
       ...formData,
@@ -134,6 +135,7 @@ const UserRegister = ({ ShowServices }) => {
   const handleEmailChange = (e) => {
     setErrors({ ...errors, email: "" });
     let email = e.target.value;
+    setIsSignupDisabled(false)
     email = email.replace(/\s/g, '');
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -144,6 +146,7 @@ const UserRegister = ({ ShowServices }) => {
 
   const handlePhoneChange = (value) => {
     setErrors({ ...errors, phone: "" });
+    setIsSignupDisabled(false)
     setFormData({
       ...formData,
       phoneNumber: value,
@@ -204,6 +207,7 @@ const UserRegister = ({ ShowServices }) => {
 
     if (formData.confirmPassword !== formData.password) {
       errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
+      errors.password = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
     }
 
     if (hasOnlyWhiteSpace(formData.firstName)) {
@@ -253,6 +257,7 @@ const UserRegister = ({ ShowServices }) => {
           successToast("SignUP Successful!");
           navigate("/auth/login");
         } else if (result.type === "auth/signup/rejected") {
+          setIsSignupDisabled(true)
           failureToast(result.payload);
         }
       } catch (error) {
@@ -431,7 +436,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper">
                     <Input
-                      type={showPassword ? "text" : "password"}
+                      type={showConfirmPassword ? "text" : "password"}
                       name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       placeholder={
@@ -444,10 +449,10 @@ const UserRegister = ({ ShowServices }) => {
                     />
                     <div
                       className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
+                        icon={showConfirmPassword ? faEye : faEyeSlash}
                         className="password-icon"
                       />
                     </div>
