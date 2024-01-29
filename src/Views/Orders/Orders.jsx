@@ -40,11 +40,8 @@ const Orders = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [cancelledClicked, setcancelledClicked] = useState(false); //checks if cancel was ever clicked
   const dispatch = useDispatch();
-  const [scheduledOrders, setScheduledOrders] = useState([]);
-  const [pastOrders, setPastOrders] = useState([]);
-  //const [cancelledOrders, setCancelledOrders] = useState([]);
-
-  const [activeOrder, setActiveOrder] = useState([]);
+  //const [pastOrders, setPastOrders] = useState([]);
+  // const [activeOrder, setActiveOrder] = useState([]);
   const [isScheduledOrdersFetched, setIsScheduledOrdersFetched] =
     useState(false);
   const [isPastOrdersFetched, setIsPastOrdersFetched] = useState(false);
@@ -52,7 +49,16 @@ const Orders = () => {
     useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
-  const { cancelledOrders, setCancelledOrders } = PopUpState();
+  let {
+    cancelledOrders,
+    setCancelledOrders,
+    scheduledOrders,
+    setScheduledOrders,
+    activeOrder,
+    setActiveOrder,
+    pastOrders,
+    setPastOrders
+  } = PopUpState();
 
   const navigate = useNavigate();
   const { newOrder } = useSelector((state) => state.booking);

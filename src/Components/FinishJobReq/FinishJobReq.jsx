@@ -17,21 +17,25 @@ import { truncateText } from "../../utils";
 import { PopUpState } from "../../Context/PopUpProvider";
 
 const FinishJobReq = () => {
-  let { fOrder,
+  let {
+    fOrder,
     setFOrder,
     finishOrderReq,
-    setFinishOrderReq } = PopUpState();
+    setFinishOrderReq,
+    setActiveOrder,
+    setPastOrders,
+  } = PopUpState();
 
-    useEffect(() => {
-      if (!socket) return;
-      socket?.on("finishjob-request", (order) => {
-        setFinishOrderReq(true);
-        setFOrder(order);
-      });
-      return () => {
-        socket?.off("finishjob-request");
-      };
+  useEffect(() => {
+    if (!socket) return;
+    socket?.on("finishjob-request", (order) => {
+      setFinishOrderReq(true);
+      setFOrder(order);
     });
+    return () => {
+      socket?.off("finishjob-request");
+    };
+  });
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   const [modal, setModal] = useState(finishOrderReq);
@@ -44,7 +48,7 @@ const FinishJobReq = () => {
 
   const toggleModal = () => {
     setModal(!modal);
-    setFinishOrderReq(!finishOrderReq)
+    setFinishOrderReq(!finishOrderReq);
   };
 
   const handleConfirm = async () => {
@@ -60,6 +64,16 @@ const FinishJobReq = () => {
         order: result.payload,
         result: "true",
       };
+
+      setActiveOrder((prevActiveOrders) =>
+        prevActiveOrders.filter((activeOrder) => activeOrder._id !== fOrder._id)
+      );
+      //globalize the past orders
+      setPastOrders((prevPastOrders) => [
+        ...prevPastOrders,
+        fOrder,
+      ]);
+
       socket?.emit("finishjob-response", data);
 
       setFinishConfirmed(true);
@@ -69,10 +83,10 @@ const FinishJobReq = () => {
 
   const handleCancel = () => {
     const data = {
-      order:fOrder,
+      order: fOrder,
       result: "false",
     };
-    console.log(fOrder,"order in cancel")
+    console.log(fOrder, "order in cancel");
     socket.emit("finishjob-response", data);
     setFinishOrderReq(false);
   };
@@ -86,7 +100,7 @@ const FinishJobReq = () => {
         backdrop="static"
         keyboard={false}
       >
-        <ModalHeader  className="text-center">
+        <ModalHeader className="text-center">
           Worker wants to Finish the job!
         </ModalHeader>
         <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
@@ -101,11 +115,11 @@ const FinishJobReq = () => {
               <Col>
                 <b>Service:</b> {fOrder.service}
               </Col>
-
             </Row>
             <Row>
-              <Col><b>Amount:</b> {fOrder.amount}</Col>
-
+              <Col>
+                <b>Amount:</b> {fOrder.amount}
+              </Col>
             </Row>
             <Row>
               <Col>
@@ -114,9 +128,9 @@ const FinishJobReq = () => {
                 {showMoreDetails
                   ? fOrder?.details?.replace(/<br\s*\/?>/gi, "\n")
                   : truncateText(
-                    fOrder?.details?.replace(/<br\s*\/?>/gi, "\n"),
-                    55
-                  )}
+                      fOrder?.details?.replace(/<br\s*\/?>/gi, "\n"),
+                      55
+                    )}
               </Col>
             </Row>
             <Row>
@@ -130,9 +144,7 @@ const FinishJobReq = () => {
                 </Button>
               )}
             </Row>
-
           </Container>
-
         </ModalBody>
 
         <ModalFooter style={{ textAlign: "center" }}>
@@ -143,7 +155,6 @@ const FinishJobReq = () => {
             <Button color="danger" onClick={handleCancel}>
               No, Cancel
             </Button>
-
           </Container>
         </ModalFooter>
       </Modal>
