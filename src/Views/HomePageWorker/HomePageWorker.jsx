@@ -36,6 +36,7 @@ import {
 } from "../../Redux/Slices/LoaderSlice";
 import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
 import { useStartJob } from "../../Context/StartJobContext";
+import { PopUpState } from "../../Context/PopUpProvider";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
@@ -52,15 +53,13 @@ const HomePageWorker = () => {
   const { user, token } = useSelector((state) => state.auth);
   const [updateScheduled, setUpdateScheduled] = useState(false);
   const [latestOrder, setLatestOrders] = useState();
-  const [scheduledOrders, setScheduledOrders] = useState([]);
-  const [pastOrders, setPastOrders] = useState([]);
-  const [cancelledOrders, setCancelledOrders] = useState([]);
-  const [activeOrder, setActiveOrder] = useState([]);
+  // const [pastOrders, setPastOrders] = useState([]);
+  // const [cancelledOrders, setCancelledOrders] = useState([]);
+  //const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   const { socket } = useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
   const [oId, setOid] = useState();
-  // const { startJobResult, hideStartJobResult, showStartJobResult  } = useStartJob();
   let {
     setOriginalChats,
     setCopyOfChats,
@@ -73,8 +72,19 @@ const HomePageWorker = () => {
     setGotOffer,
     setUserOffering,
     setUnreadMessages,
-    unreadMessages
+    unreadMessages,
   } = ChatState();
+
+  let {
+    cancelledOrders,
+    setCancelledOrders,
+    scheduledOrders,
+    setScheduledOrders,
+    activeOrder,
+    setActiveOrder,
+    pastOrders,
+    setPastOrders,
+  } = PopUpState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
 
@@ -103,50 +113,53 @@ const HomePageWorker = () => {
     socket?.on("startjob-result", (data) => {
       if (data.result === "true") {
         setStartJobStatus("true");
-       setStartJobVerified(true);
-
-
+        setStartJobVerified(true);
+        console.log(scheduledOrders, "all scheduled orders");
+        console.log(data.order, "order in start job data");
         setOid(data?.order?.Title);
         //showStartJobResult("true", data.order.Title);
 
         // Use the functional form of setScheduledOrders to access the previous state
-        setScheduledOrders((prevScheduledOrders) => {
-          // Check if the order exists in scheduledOrders
-          const scheduledOrderIndex = prevScheduledOrders.findIndex(
-            (order) => order.id === data.order.id
-          );
+        // setScheduledOrders((prevScheduledOrders) => {
+        //   // Check if the order exists in scheduledOrders
+        //   const scheduledOrderIndex = prevScheduledOrders.findIndex(
+        //     (order) => order.id === data.order.id
+        //   );
 
-          if (scheduledOrderIndex !== -1) {
-            // Remove from scheduledOrders
-            const updatedScheduledOrders = [...prevScheduledOrders];
-            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+        //   if (scheduledOrderIndex !== -1) {
+        //     // Remove from scheduledOrders
+        //     const updatedScheduledOrders = [...prevScheduledOrders];
+        //     updatedScheduledOrders.splice(scheduledOrderIndex, 1);
+        //     // Set the updated scheduled orders to the local state
+        //     setScheduledOrders(updatedScheduledOrders);
 
-            // Set the updated scheduled orders to the local state
-            setScheduledOrders(updatedScheduledOrders);
+        //     setActiveOrder((prevActiveOrders) => {
+        //       // Check if the order is already present in active orders
+        //       const isOrderAlreadyPresent = prevActiveOrders.some(
+        //         (order) => order._id === data.order._id
+        //       );
+        //       if (!isOrderAlreadyPresent) {
+        //         // Add the order to active orders if it's not present
+        //         return [...prevActiveOrders, data.order];
+        //       }
+        //       // If the order is already present, return the current state
+        //       return prevActiveOrders;
+        //     });
+        //     return updatedScheduledOrders;
+        //   }
+        //   return prevScheduledOrders;
+        // });
 
-            setActiveOrder((prevActiveOrders) => {
-              // Check if the order is already present in active orders
-              const isOrderAlreadyPresent = prevActiveOrders.some(
-                (order) => order._id === data.order._id
-              );
+        setScheduledOrders((prevScheduledOrders) =>
+          prevScheduledOrders.filter(
+            (scheduledOrder) => scheduledOrder._id !== data.order._id
+          )
+        );
 
-              if (!isOrderAlreadyPresent) {
-                // Add the order to active orders if it's not present
-                return [...prevActiveOrders, data.order];
-              }
-
-              // If the order is already present, return the current state
-              return prevActiveOrders;
-            });
-
-            return updatedScheduledOrders;
-          }
-
-          return prevScheduledOrders;
-        });
+        setActiveOrder((prevActiveOrders) => [...prevActiveOrders, data.order]);
       } else if (data.result == "false") {
         setStartJobStatus("false");
-         setStartJobVerified(true);
+        setStartJobVerified(true);
         //showStartJobResult("false");
       }
     });
@@ -155,9 +168,6 @@ const HomePageWorker = () => {
     };
   });
 
-
-
-  
   useEffect(() => {
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
@@ -201,40 +211,16 @@ const HomePageWorker = () => {
           allowOutsideClick: false,
         });
 
-        setScheduledOrders((prevScheduledOrders) => {
-          // Check if the order exists in scheduledOrders
-          const scheduledOrderIndex = prevScheduledOrders.findIndex(
-            (order) => order.id === Corder.id
-          );
+        setScheduledOrders((prevScheduledOrders) =>
+          prevScheduledOrders.filter(
+            (scheduledOrder) => scheduledOrder._id !== Corder._id
+          )
+        );
 
-          if (scheduledOrderIndex !== -1) {
-            // Remove from scheduledOrders
-            const updatedScheduledOrders = [...prevScheduledOrders];
-            updatedScheduledOrders.splice(scheduledOrderIndex, 1);
-
-            // Set the updated scheduled orders to the local state
-            setScheduledOrders(updatedScheduledOrders);
-
-            setCancelledOrders((prevCancelledOrders) => {
-              // Check if the order is already present in active orders
-              const isOrderAlreadyPresent = prevCancelledOrders.some(
-                (order) => order._id === Corder._id
-              );
-
-              if (!isOrderAlreadyPresent) {
-                // Add the order to active orders if it's not present
-                return [...prevCancelledOrders, Corder];
-              }
-
-              // If the order is already present, return the current state
-              return prevCancelledOrders;
-            });
-
-            return updatedScheduledOrders;
-          }
-
-          return prevScheduledOrders;
-        });
+        setCancelledOrders((prevCancelledOrders) => [
+          ...prevCancelledOrders,
+          Corder,
+        ]);
       }
     });
     return () => {
@@ -265,32 +251,30 @@ const HomePageWorker = () => {
   };
 
   useEffect(() => {
-    if(user && token){
-    
-    dispatch(fetchChatsAsync({ user, token }));
+    if (user && token) {
+      dispatch(fetchChatsAsync({ user, token }));
     }
   }, []);
 
-  
   useEffect(() => {
     if (chats && chats.length > 0) {
       // Emitting notifications to the server for all chats
       socket?.emit("notifications", { user, chats });
-  
+
       // Handling incoming chat notifications from the server
       socket?.on("chat-notifications", (chatNotifications) => {
         // console.log(chatNotifications);
         const newUnreadMessages = {};
-  
+
         // Update the unread message count state for each chat
         chatNotifications.forEach(({ chatId, unreadCount }) => {
           newUnreadMessages[chatId] = unreadCount;
         });
-  
+
         // Update the state with all chat IDs and their unread message counts
         setUnreadMessages(newUnreadMessages);
       });
-  
+
       // Set the original and copy of chats
       setOriginalChats(chats);
       setCopyOfChats(chats);
@@ -298,10 +282,9 @@ const HomePageWorker = () => {
 
     return () => {
       socket?.off("chat-notification");
-      socket?.off("notifications")
+      socket?.off("notifications");
     };
   }, [chats]);
-  
 
   useEffect(() => {
     const fetchData = async () => {

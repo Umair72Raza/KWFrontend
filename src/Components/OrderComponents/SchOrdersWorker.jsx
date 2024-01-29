@@ -94,7 +94,7 @@ const ScheduledOrdersCardWorker = ({
         (scheduledOrder) => scheduledOrder._id !== order._id
       )
     );
-    setUpdateScheduled(false);
+    //setUpdateScheduled(false);
     setCancelledOrders((prevCancelledOrders) => [
       ...prevCancelledOrders,
       order,
