@@ -80,47 +80,48 @@ const AdminWorkers = () => {
         updatedWorker.access === "denied"
           ? [...prevInactiveWorkers, updatedWorker]
           : prevInactiveWorkers.filter(
-            (person) => person._id !== updatedWorker._id
-          )
+              (person) => person._id !== updatedWorker._id
+            )
       );
 
       setActiveWorkers((prevActiveWorkers) =>
         updatedWorker.access === "accepted"
           ? [...prevActiveWorkers, updatedWorker]
           : prevActiveWorkers.filter(
-            (person) => person._id !== updatedWorker._id
-          )
+              (person) => person._id !== updatedWorker._id
+            )
       );
     }
   }, [newfilWorkers]);
 
   return (
     <>
-    <div>
-      <UserNavbar />
+      <div>
+        <UserNavbar />
       </div>
+      <Col>
+      <Button
+        style={{
+          margin: "10px 10px 0px 10px",
+          backgroundColor: "#48629b",
+          border: "none",
+        }}
+        color="danger"
+        onClick={() => navigate(-1)}
+      >
+        {ADMIN_WORKERS.BACK}
+      </Button>
+      </Col>
       <h1 style={{ textAlign: "center" }}>{ADMIN_WORKERS.WORKERS_HEADING}</h1>
-      <Navbar color="light" light expand="md" style={{marginLeft:"2%"}}>
-        <Nav tabs style={{cursor:"pointer"}}>
-          <NavItem>
-            <Button
-              style={{
-                marginRight: "10px",
-                backgroundColor: "#48629b",
-                border: "none",
-              }}
-              color="danger"
-              onClick={() => navigate(-1)}
-            >
-              {ADMIN_WORKERS.BACK}
-            </Button>
-          </NavItem>
+      <Navbar color="light" light expand="md" style={{ marginLeft: "2%" }}>
+        <Nav tabs style={{ cursor: "pointer" }}>
+          <NavItem></NavItem>
           <NavItem>
             <NavLink
               onClick={() => handleButtonClick("workers")}
               className={classnames({ active: activeTab === "workers" })}
             >
-             {ADMIN_WORKERS.ACTIVE_WORKERS}
+              {ADMIN_WORKERS.ACTIVE_WORKERS}
             </NavLink>
           </NavItem>
           <NavItem>
@@ -155,26 +156,26 @@ const AdminWorkers = () => {
             {ADMIN_WORKERS.NO_INACTIVE_WORKERS}
           </p>
         ) : (
-          <Row xs="1" md="2" lg="3">
+          <Row xs="1" md="2" lg="2" style={{marginLeft:"5%"}} className="justify-content-center">
             {activeTab === "workers"
               ? activeWorkers.map((person, index) => (
-                <Col key={index}>
-                  <PeopleDetails
-                    key={index}
-                    person={person}
-                    setNewFilPerson={setNewFilWorkers}
-                  />
-                </Col>
-              ))
+                  <Col key={index}>
+                    <PeopleDetails
+                      key={index}
+                      person={person}
+                      setNewFilPerson={setNewFilWorkers}
+                    />
+                  </Col>
+                ))
               : inactiveWorkers.map((person, index) => (
-                <Col key={index}>
-                  <PeopleDetails
-                    key={index}
-                    person={person}
-                    setNewFilPerson={setNewFilWorkers}
-                  />
-                </Col>
-              ))}
+                  <Col key={index}>
+                    <PeopleDetails
+                      key={index}
+                      person={person}
+                      setNewFilPerson={setNewFilWorkers}
+                    />
+                  </Col>
+                ))}
           </Row>
         )}
       </Row>

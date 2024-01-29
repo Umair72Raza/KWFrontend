@@ -114,13 +114,14 @@ export const requestOTPAsync = createAsyncThunk(
 
 export const requestOTPverification = createAsyncThunk(
   "auth/otpverify",
-  async (otp) => {
+  async (otp, { rejectWithValue }) => {
     try {
       const response = await OTPverify(otp);
       console.log("otp cerify response", response)
       return response.status;
     } catch (error) {
-      failureToast("Inavlid OTP");
+      if(error)
+      return rejectWithValue(error);
     }
   }
 );

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal as RsModal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import {
+  Button,
+  Modal as RsModal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const DetailsCard = ({
-  person,
-  setShowDetailsCard,
-  orders,
-}) => {
+const DetailsCard = ({ person, setShowDetailsCard, orders }) => {
   const { firstName, lastName, role } = person;
 
   const [scheduledCount, setScheduledCount] = useState(0);
@@ -57,22 +59,30 @@ const DetailsCard = ({
 
   return (
     <>
-      <RsModal isOpen={modalIsOpen} toggle={closeModal} centered>
+      <RsModal
+        isOpen={modalIsOpen}
+        toggle={closeModal}
+        centered
+        backdrop="static"
+      >
         <ModalHeader toggle={closeModal}>
           <strong>{firstName}</strong>
         </ModalHeader>
         <ModalBody>
           <p>
-            First Name: {firstName} <br />
-            Last Name: {lastName} <br />
-            Role: {role} <br />
+            <b>First Name:</b> {firstName} <br />
+            <b>Last Name:</b> {lastName} <br />
+            <b>Role:</b> {role} <br />
           </p>
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={closeModal}>
             Okay
           </Button>
-          <Button style={{ backgroundColor: "#5d12cf" }} onClick={openSecondModal}>
+          <Button
+            style={{ backgroundColor: "#5d12cf" }}
+            onClick={openSecondModal}
+          >
             Details
           </Button>
         </ModalFooter>
@@ -81,10 +91,18 @@ const DetailsCard = ({
       <RsModal isOpen={secondModalIsOpen} toggle={closeSecondModal} centered>
         <ModalHeader toggle={closeSecondModal}>Order Details</ModalHeader>
         <ModalBody>
-          <p>Scheduled: {scheduledCount}</p>
-          <p>Active: {activeCount}</p>
-          <p>Past: {pastCount}</p>
-          <p>Cancelled: {cancelledCount}</p>
+          <p>
+            <b>Scheduled:</b> {scheduledCount}
+          </p>
+          <p>
+            <b>Active:</b> {activeCount}
+          </p>
+          <p>
+            <b>Past:</b> {pastCount}
+          </p>
+          <p>
+            <b>Cancelled:</b> {cancelledCount}
+          </p>
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={closeSecondModal}>

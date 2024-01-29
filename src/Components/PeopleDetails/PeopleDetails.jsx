@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Card, CardBody, CardTitle, CardText, Col, Button, Container } from "reactstrap";
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  CardText,
+  Col,
+  Button,
+  Container,
+  Row,
+} from "reactstrap";
 import DetailsCard from "../DetailsCard/DetailsCard";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,7 +20,6 @@ import FeedbacksComp from "../FeedbacksComp/FeedbacksComp";
 import Swal from "sweetalert2";
 import { capitalizeFirstLetter } from "../../utils";
 const PeopleDetails = ({ person, setNewFilPerson }) => {
-
   const [orders, setOrders] = useState();
   const [feedbacks, setFeedbacks] = useState([]);
   const [disableFeedbackButton, setDisableFeebackButton] = useState(false);
@@ -90,46 +98,48 @@ const PeopleDetails = ({ person, setNewFilPerson }) => {
   const feedbackfunction = (person) => {
     setDisableFeebackButton(true);
     seeFeedbacks(person);
-  }
-
+  };
 
   return (
     <Container>
-      <Col xs="12" sm="12" md="12" lg="8">
+      <Col xs="12" sm="12" md="8" lg="8">
         <Card className="mb-4" style={{ width: "100%" }}>
           <CardBody>
             <CardTitle tag="h5">{`${person.firstName} ${person.lastName}`}</CardTitle>
-            <CardText>Role: {capitalizeFirstLetter(person.role)}</CardText>
-            <CardText>Access: {capitalizeFirstLetter(person.access)}</CardText>
+            <CardText><b>Role: </b>{capitalizeFirstLetter(person.role)}</CardText>
+            <CardText><b>Access: </b>{capitalizeFirstLetter(person.access)}</CardText>
             <CardText>
               {" "}
               <b>Rating:</b>{" "}
               {person.rating > 0 ? starRating(person.rating) : "Not Rated Yet!"}
             </CardText>
-            <Col className="d-flex flex-column gap-2 flex-md-row ">
-              <Button
-                color={person.access === "accepted" ? "danger" : "success"}
+            <CardText>
+              <Row>
+                <Col className="d-flex flex-column gap-2 flex-sm-column flex-md-column flex-lg-row ">
+                  <Button
+                    color={person.access === "accepted" ? "danger" : "success"}
+                    onClick={() => confirmationPopUp(person)}
+                  >
+                    {person.access === "accepted" ? "Block" : "Unblock"}
+                  </Button>
 
-                onClick={() => confirmationPopUp(person)}
-              >
-                {person.access === "accepted" ? "Block" : "Unblock"}
-              </Button>
+                  <Button
+                    style={{ backgroundColor: "#5d12cf", border: "none" }}
+                    onClick={() => getOrders(person)}
+                  >
+                    See More Details
+                  </Button>
 
-              <Button
-                style={{ backgroundColor: "#5d12cf", border: "none" }}
-                onClick={() => getOrders(person)}
-              >
-                See More Details
-              </Button>
-
-              <Button
-                color="warning"
-                onClick={() => feedbackfunction(person)}
-                disabled={disableFeedbackButton}
-              >
-                See Feedbacks
-              </Button>
-            </Col>
+                  <Button
+                    color="warning"
+                    onClick={() => feedbackfunction(person)}
+                    disabled={disableFeedbackButton}
+                  >
+                    See Feedbacks
+                  </Button>
+                </Col>
+              </Row>
+            </CardText>
           </CardBody>
         </Card>
       </Col>

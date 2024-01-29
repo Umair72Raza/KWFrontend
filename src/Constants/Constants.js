@@ -299,15 +299,16 @@ export const forgetPasswordConstants = {
   FP_FIELDS: {
     EMAIL: "Please Provide the Email Address.",
     MSG: "An OTP will be sent to your Email",
-    EG_MAIL: "example@gmail.com",
+    EG_MAIL: "Enter your Email",
     FP_TOAST_MSG: "OTP Sent Successfully!",
   }
 }
 
 export const newpasswordConstants = {
   NP_CONSTANTS: {
-    NP_HEADING: "Confirm your OTP and Add a new Password",
-    PROVIDE_OTP_LABEL: " Please Provide the OTP sent to you via Email",
+    NP_HEADING: "Confirm your OTP.",
+    ADD_NEW_PASS_HEADING: "Add New Password.",
+    PROVIDE_OTP_LABEL: " Please Provide the OTP sent to you via Email!",
     NEWPASSWORD: "New Password",
     PASSWORD_PH: "Enter new password",
     CONFIRMPASSWORD: "Confirm Password",
@@ -317,7 +318,6 @@ export const newpasswordConstants = {
   }
 
 }
-
 
 export const SERVICE_CONSTS = {
   SERVICES_HEADING: "Services",
