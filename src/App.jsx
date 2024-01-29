@@ -12,6 +12,7 @@ import ChatPopup from "./Components/Chat Box/ChatPop";
 import ModalComponent from "./Components/ModalComponent/ModalComponent";
 import FinishJobReq from "./Components/FinishJobReq/FinishJobReq";
 import Swal from "sweetalert2";
+import OfferResult from "./Components/OfferResult/OfferResult";
 function App() {
   const [authenticated, setAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
@@ -142,6 +143,7 @@ useEffect(() => {
           <ChatPopup />
           <ModalComponent />
           <FinishJobReq />
+          <OfferResult />
           <Routes>{routes}</Routes>
         </BrowserRouter>
       )}

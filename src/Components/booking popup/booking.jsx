@@ -12,10 +12,11 @@ import {
 import Swal from "sweetalert2";
 import { BookingConstants } from "../../Constants/Constants.js";
 import { useDispatch, useSelector } from "react-redux";
-import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
+//import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 
 import OfferResult from "../../Components/OfferResult/OfferResult.jsx";
 import { failureToast } from "../../utils.js";
+import { PopUpState } from "../../Context/PopUpProvider.jsx";
 
 const Booking = ({ modal, toggle, worker, chat }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -26,7 +27,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const [dateTime, setDateTime] = useState("");
   const [amountPerHour, setAmountPerHour] = useState("");
   const [serviceOption, setServiceOption] = useState("none");
-  const [params, SetParams] = useState({});
+ // const [params, SetParams] = useState({});
   const [offerResult, setOfferResult] = useState("");
   const dateTimeObject = new Date(dateTime);
   const datePart = dateTimeObject.toLocaleDateString();
@@ -35,7 +36,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const [dateTimeError, setDateTimeError] = useState("");
 
   let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-
+  let {params, SetParams}=PopUpState()
   useEffect(() => {
     setFormComplete(
       taskTitle.trim() !== "" &&
@@ -45,25 +46,25 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       serviceOption !== "none"
     );
   }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption]);
-  useEffect(() => {
-    socket?.on("offerResult", (result) => {
-      if (result == "accept") {
-        setOfferResult("true");
-        clear();
-      } else if (result == "cancel") {
-        setOfferResult("false");
-      }
-    });
-    return () => {
-      socket?.off("offerResult");
-    };
-  });
+  // useEffect(() => {
+  //   socket?.on("offerResult", (result) => {
+  //     if (result == "accept") {
+  //       setOfferResult("true");
+  //       clear();
+  //     } else if (result == "cancel") {
+  //       setOfferResult("false");
+  //     }
+  //   });
+  //   return () => {
+  //     socket?.off("offerResult");
+  //   };
+  // });
 
-  useEffect(() => {
-    if (user && user._id && offerResult == "true") {
-      dispatch(CreateOrder({ params, token }));
-    }
-  }, [dispatch, offerResult]);
+  // useEffect(() => {
+  //   if (user && user._id && offerResult == "true") {
+  //     dispatch(CreateOrder({ params, token }));
+  //   }
+  // }, [dispatch, offerResult]);
 
   const handleDateTimeChange = (e) => {
     const selectedDateTime = e.target.value;
@@ -298,17 +299,15 @@ const Booking = ({ modal, toggle, worker, chat }) => {
           </Button>
         </ModalFooter>
       </Modal>
-      {offerResult ? (
+      {/* {offerResult ? (
         <>
           <OfferResult
-            result={offerResult}
-            params={params}
-            setOfferResult={setOfferResult}
+          
           />
         </>
       ) : (
         <></>
-      )}
+      )} */}
     </div>
   );
 };

@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 const ModalComponent = () => {
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const {
+  let {
     modalHeader,
     isFinalize,
     isModalOpen,

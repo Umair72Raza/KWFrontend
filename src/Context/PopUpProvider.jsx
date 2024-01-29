@@ -19,6 +19,7 @@ const PopUpContext = ({ children }) => {
     const [finalizeButtonLabel,setFinalizeButtonLabel] = useState("");
     const [showInput,setShowInput] = useState(false);
     const [cancelStart,setCancelStart] = useState(false);  
+    const [params, SetParams] = useState({});
     const cancel=()=>{
     setOrderToCancel(null)
     setModalHeader("")
@@ -58,7 +59,7 @@ const PopUpContext = ({ children }) => {
         toggleModal,cancel,
         orderToCancel, setOrderToCancel,
         finalizeFunction,setFinalizeFunction,
-        cancelStart,setCancelStart
+        cancelStart,setCancelStart,params,SetParams,
       }}
     >
       {children}

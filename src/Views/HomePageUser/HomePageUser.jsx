@@ -37,7 +37,7 @@ const HomePageUser = () => {
   const { user, token } = useSelector((state) => state.auth);
   let users = useSelector((state) => state?.homepage?.workers);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
-  const { newOrder } = useSelector((state) => state.booking);
+ 
   const [showFilters, setShowFilters] = useState(false);
   const [sortOption, setSortOption] = useState("none");
   const [sortOption2, setSortOption2] = useState("none");
@@ -124,16 +124,7 @@ const HomePageUser = () => {
       socket?.off("status-change");
     };
   });
-  useEffect(() => {
-    if (newOrder !== null) {
-      const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
-
-      socket?.emit("new-order-created", data);
-    }
-    return () => {
-      socket?.off("new-order-created");
-    };
-  }, [newOrder]);
+  
 
   //search
   let debouncedsearch = useDebounce(searchInput);

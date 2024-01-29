@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Row,
   Col,
@@ -12,10 +12,45 @@ import {
 import { truncateText } from "../../utils";
 import accpetance from "../../assets/images/OfferResultpngs/acceptance.png";
 import failure from "../../assets/images/OfferResultpngs/failure.png";
+import { CreateOrder } from "../../Redux/Slices/BookingSlice";
+import { PopUpState } from "../../Context/PopUpProvider";
+import { useDispatch, useSelector } from "react-redux";
 
-const OfferResult = ({ result, params, setOfferResult }) => {
+const OfferResult = () => {
   const [showMoreDetails, setShowMoreDetails] = useState(false);
-  const [modalOpen, setModalOpen] = useState(true); // Open the modal by default
+  const [modalOpen, setModalOpen] = useState(false); // Open the modal by default
+  const [offerResult, setOfferResult] = useState("");
+  const [result, setResult] = useState("")
+  const { user, token } = useSelector((state) => state.auth);
+  let { params, SetParams } = PopUpState()
+  const { newOrder } = useSelector((state) => state.booking);
+
+  
+  const socket = useSelector((state) => state?.socket?.socket);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    socket?.on("offerResult", (result) => {
+      setModalOpen(true)
+      setResult(result)
+      if (result == "accept") {
+        setOfferResult("true");
+
+        //clear();
+      } else if (result == "cancel") {
+        setOfferResult("false");
+      }
+    });
+    return () => {
+      socket?.off("offerResult");
+    };
+  });
+
+  useEffect(() => {
+    if (user && user._id && offerResult == "true") {
+      dispatch(CreateOrder({ params, token }));
+      setOfferResult("")
+    }
+  }, [offerResult]);
 
   const toggleDetails = () => {
     setShowMoreDetails(!showMoreDetails);
@@ -24,7 +59,17 @@ const OfferResult = ({ result, params, setOfferResult }) => {
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
+  
+  useEffect(() => {
+    if (newOrder !== null) {
+      const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
 
+      socket?.emit("new-order-created", data);
+    }
+    return () => {
+      socket?.off("new-order-created");
+    };
+  }, [newOrder]);
   return (
     <Modal
       isOpen={modalOpen}
@@ -51,20 +96,20 @@ const OfferResult = ({ result, params, setOfferResult }) => {
               </CardTitle>
               <CardText>
                 {" "}
-                <b>Title</b>: {params.Title}
+                <b>Title</b>: {params?.Title}
               </CardText>
               <CardText>
-                <b>Service</b>: {params.service}
+                <b>Service</b>: {params?.service}
               </CardText>
               <CardText>
                 {" "}
-                <b>Amount</b>: {params.amount}
+                <b>Amount</b>: {params?.amount}
               </CardText>
               <CardText>
                 {" "}
                 <Row>
                   <Col>
-                    {params.details.length > 25 ? (
+                    {params?.details?.length > 25 ? (
                       <>
                         <b>Details: </b>
                         <div
@@ -74,8 +119,8 @@ const OfferResult = ({ result, params, setOfferResult }) => {
                           }}
                           dangerouslySetInnerHTML={{
                             __html: showMoreDetails
-                              ? params.details
-                              : truncateText(params.details, 25),
+                              ? params?.details
+                              : truncateText(params?.details, 25),
                           }}
                         />
                         <br />
@@ -88,9 +133,11 @@ const OfferResult = ({ result, params, setOfferResult }) => {
                         </Button>
                       </>
                     ) : (
-                      <div
-                        dangerouslySetInnerHTML={{ __html: params.details }}
-                      />
+                      <>
+                        <b>Details: </b>
+                        <div
+                          dangerouslySetInnerHTML={{ __html: params?.details }}
+                        /></>
                     )}
                   </Col>
                 </Row>
@@ -100,7 +147,10 @@ const OfferResult = ({ result, params, setOfferResult }) => {
                   <Col>
                     <Button
                       color="primary"
-                      onClick={() => setOfferResult(false)}
+                      onClick={() => {
+                        setOfferResult(false)
+                        toggleModal()
+                      }}
                       style={{ marginTop: "10px", marginLeft: "" }}
                     >
                       OK
