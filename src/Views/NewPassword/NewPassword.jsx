@@ -281,7 +281,7 @@ const NewPassword = () => {
                                     />
                                   </InputGroupText>
                                   <Input
-                                    style={{ textAlign: "center" }}
+                                    style={{ textAlign: "center", paddingLeft:"5%" }}
                                     type={
                                       showConfirmPassword ? "text" : "password"
                                     }
@@ -291,7 +291,7 @@ const NewPassword = () => {
                                     onBlur={() => setShowConfPassPlaceholer(false)}
                                     placeholder={showConfPassPlaceholer ? "" : newpasswordConstants.NP_CONSTANTS
                                     .CONFIRMPASSWORD_PH
-                                    .PASSWORD_PH}
+                                    }
                                     value={confirmNewPassword}
                                     onChange={handleConfirmNewPassword}
                                   />
