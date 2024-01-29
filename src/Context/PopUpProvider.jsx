@@ -8,13 +8,14 @@ const PopUpContext = ({ children }) => {
   const [modalHeader, setModalHeader] = useState("");
   const [isFinalize, setIsFinalize] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [finishConfirmed, setFinishConfirmed] = useState(false);
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
   const [inputLabel, setInputLabel] = useState("");
   const [modalInputValue, setModalInputValue] = useState("");
   const [finalizeFunction, setFinalizeFunction] = useState(false);
-  //const [FinalizeFunction,setFinalizefunction] = useState(false);
+  const [clear,setClear] = useState(false);
   const [cancelButtonLabel, setCancelButtonLabel] = useState("");
   const [finalizeButtonLabel, setFinalizeButtonLabel] = useState("");
   const [showInput, setShowInput] = useState(false);
@@ -77,7 +78,7 @@ const PopUpContext = ({ children }) => {
         activeOrder,
         setActiveOrder,
         pastOrders,
-        setPastOrders,
+        setPastOrders,finishConfirmed, setFinishConfirmed,clear,setClear
       }}
     >
       {children}

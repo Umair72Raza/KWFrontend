@@ -23,7 +23,7 @@ const FinishJobReq = () => {
     finishOrderReq,
     setFinishOrderReq,
     setActiveOrder,
-    setPastOrders,
+    setPastOrders,finishConfirmed, setFinishConfirmed
   } = PopUpState();
 
   useEffect(() => {
@@ -38,9 +38,9 @@ const FinishJobReq = () => {
   });
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const [modal, setModal] = useState(finishOrderReq);
+  const [modal, setModal] = useState(true);
   const [showMoreDetails, setShowMoreDetails] = useState(false);
-  const [finishConfirmed, setFinishConfirmed] = useState(false);
+  
 
   const toggleDetails = () => {
     setShowMoreDetails(!showMoreDetails);
@@ -68,6 +68,9 @@ const FinishJobReq = () => {
       setActiveOrder((prevActiveOrders) =>
         prevActiveOrders.filter((activeOrder) => activeOrder._id !== fOrder._id)
       );
+      console.log(finishConfirmed,finishOrderReq,fOrder,"details in the popup")
+      setFinishConfirmed(true);
+      //setFinishOrderReq(false)
       //globalize the past orders
       setPastOrders((prevPastOrders) => [
         ...prevPastOrders,
@@ -75,10 +78,11 @@ const FinishJobReq = () => {
       ]);
 
       socket?.emit("finishjob-response", data);
-
-      setFinishConfirmed(true);
+     
+      //setIsModalOpen(true)
+     
     }
-    setModal(true);
+    // setModal(true);
   };
 
   const handleCancel = () => {
@@ -90,7 +94,9 @@ const FinishJobReq = () => {
     socket.emit("finishjob-response", data);
     setFinishOrderReq(false);
   };
-
+    useEffect(()=>{
+    console.log("first")
+    },[finishConfirmed])
   return (
     <>
       <Modal
@@ -158,7 +164,7 @@ const FinishJobReq = () => {
           </Container>
         </ModalFooter>
       </Modal>
-      {finishConfirmed === true && (
+      {finishConfirmed == true && (
         <Feedback
           flag={finishConfirmed}
           order={fOrder}

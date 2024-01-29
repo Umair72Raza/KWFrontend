@@ -9,7 +9,7 @@ const OnOffButton = ({ user }) => {
   const dispatch = useDispatch();
   const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
-    user.status === "online" ? setIsOn(true) : setIsOn(false);
+    user.status === "online" ? setIsOn(true)  : setIsOn(false);
     socket?.emit("online-offline", user);
   }, [user]);
 
@@ -23,6 +23,7 @@ const OnOffButton = ({ user }) => {
     const id = user._id;
     const data = { id, status, token };
     const result = await dispatch(toggleStatusAsync(data));
+    console.log(result)
     if (result.type === "/auth/toggleStatus/fulfilled") {
       setIsOn(!isOn);
 

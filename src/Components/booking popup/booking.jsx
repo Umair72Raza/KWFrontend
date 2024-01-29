@@ -36,7 +36,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const [dateTimeError, setDateTimeError] = useState("");
 
   let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-  let {params, SetParams}=PopUpState()
+  let {params, SetParams,clear,setClear}=PopUpState()
   useEffect(() => {
     setFormComplete(
       taskTitle.trim() !== "" &&
@@ -164,7 +164,14 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       setAmountPerHour(selectedService.rate);
     }
   };
-
+  useEffect(()=>
+  {
+    if(clear==true)
+    {
+      resetForm();
+      setClear(false);
+    }
+  },[clear])
   const resetForm = () => {
     setTaskTitle("");
     setTaskDetails(``);
@@ -174,9 +181,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     setDateTimeError("");
     setFormComplete(false);
   };
-  const clear = () => {
-    resetForm();
-  };
+ 
   return (
     <div>
       <Modal isOpen={modal} centered>

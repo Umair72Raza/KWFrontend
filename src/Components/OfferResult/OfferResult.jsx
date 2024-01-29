@@ -22,7 +22,7 @@ const OfferResult = () => {
   const [offerResult, setOfferResult] = useState("");
   const [result, setResult] = useState("")
   const { user, token } = useSelector((state) => state.auth);
-  let { params, SetParams } = PopUpState()
+  let { params, SetParams,clear,setClear } = PopUpState()
   const { newOrder } = useSelector((state) => state.booking);
 
   
@@ -35,7 +35,7 @@ const OfferResult = () => {
       if (result == "accept") {
         setOfferResult("true");
 
-        //clear();
+        setClear(true);
       } else if (result == "cancel") {
         setOfferResult("false");
       }
