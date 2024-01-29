@@ -1,4 +1,5 @@
 export const LoginPage = {
+  TITLE:"Welcome to KaamWala App!",
   ROUTES: {
     LOGIN: "/auth/login",
     REGISTER: "/auth/createAccount",
@@ -78,7 +79,24 @@ export const RegisterPage = {
       "Password must contain at least one special character, one uppercase letter, one number, and atleast 8 characters long.",
     passwordsNotMatch: "Passwords do not match.",
     enterAllFields: "Enter all the fields to sign up.",
+    invalidRate: "One or more rates are outside the valid range (10 to 999).",
+    invalidAddress: "Address cannot be empty",
+    invalidLastName: "Last Name cannot be empty",
+    invalidFirstName: "First Name cannot be empty",
+    invalidService: "Please select at least one service.",
+    emptyPhone: "Phone number is required",
   },
+  SUCCESS_MESSAGES: {
+    CONFIRMPASSWORD: "Password Matched.",
+    PASSWORD_VALID: "Password is valid.",
+  },
+  LOADER_MESSAGES: {
+    SERVICES_LOADING: "Loading Services...",
+    LIST_NOT_AVAILABLE:"No services listed by admin yet.",
+  },
+TOOLTIPS: {
+  ALL_FIELDS:"Enter all fields to sign up!",
+},
   FORM_GROUPS: {
     PERSONAL_INFO: "Personal Information",
     ACCOUNT_INFO: "Account Information",
@@ -119,6 +137,7 @@ export const RegisterPage = {
       name: "services",
       type: "select",
       placeholder: "Select a service",
+      rate:"($/hr)"
     },
   },
   SERVICES_MAPPING: [
@@ -146,14 +165,13 @@ export const ChatPopUpPage = {
   SEND_BUTTON_LABEL: "Send",
   SEND_BUTTON_COLOR: "primary",
   SELECT_CHAT_LABEL: "Select a chat to start messaging",
-  BLOCKED_BY_ADMIN:"Blocked by Admin",
-  NO_CHATS:"No Chats!",
+  BLOCKED_BY_ADMIN: "Blocked by Admin",
+  NO_CHATS: "No Chats!",
 };
 
 export const HomePageWorkerConsts = {
   REASON_NOT_MENTIONED: "Reason not mentioned",
-
-}
+};
 
 export const TABS = {
   SCHEDULED: "Scheduled",
@@ -168,7 +186,7 @@ export const TABS = {
   NO_CANC_ORDERS: "No Cancelled Orders",
   ACTIVE_ORDERS: "Active Orders",
   NO_ACTIVE_ORDERS: "No Active Orders!",
-}
+};
 
 export const GOTOFFER = {
   OFFER_HEADER: "Do you want to Accept the Offer?",
@@ -183,13 +201,13 @@ export const GOTOFFER = {
   SEE_DETAILS_BUTTON: "See Full Details",
   FULL_DETAILS: "Full Details",
   FULL_DETAILS_HEADING: "Full Details: ",
-  CLOSE_BUTTON: "Close"
-}
+  CLOSE_BUTTON: "Close",
+};
 
 export const FORGET_PASSWORD = {
   SEND_OTP_BUTTON: "Send OTP",
-  EG_MAIL:""
-}
+  EG_MAIL: "",
+};
 
 export const EDITPROFILE_PAGE = {
   LABELS: {
@@ -209,7 +227,11 @@ export const EDITPROFILE_PAGE = {
     SERVICES: "Services:",
     RATE: "$/hr",
   },
-}
+  ROUTES:{
+    BACK_USER:"/user/homepage",
+    BACK_WORKER:"/worker/workerHomepage"
+  }
+};
 
 export const HomePageUserConst = {
   button: {
@@ -217,46 +239,43 @@ export const HomePageUserConst = {
     filters: "Filters",
   },
   heading: {
-    filter: "Filters and Sort"
-  }
-}
+    filter: "Filters and Sort",
+  },
+};
 
 export const BookingConstants = {
   button: {
     send: "Send",
-    cancel: "Cancel"
-  }
+    cancel: "Cancel",
+  },
 
-  , heading: {
-    book: "Book a Service"
-  }
+  heading: {
+    book: "Book a Service",
+  },
 
-  , div: {
-    "name": "Name: ",
-    "status": "Status: ",
-    "rating": "Rating: "
-  }
-  , Labels: {
+  div: {
+    name: "Name: ",
+    status: "Status: ",
+    rating: "Rating: ",
+  },
+  Labels: {
     taskTitle: "Task Title",
     worker: "Worker Details",
     taskDetail: "Task Details",
     service: "Service Type",
     datetime: "Date and Time",
     amount: "Amount Per Hour ($)",
-
-
-  }
-}
+  },
+};
 export const feedbackConstants = {
   heading: {
     rateService: "Rate The Service",
-    rateUser: "Rate The User"
-  }
-}
+    rateUser: "Rate The User",
+  },
+};
 export const filterConstants = {
   button: {
-
-    clear: "Clear Filters"
+    clear: "Clear Filters",
   },
   Labels: {
     sort1: "Sort by Rating:",
@@ -277,32 +296,31 @@ export const filterConstants = {
     htlR: "High to Low Rating",
     lthR: "Low to High Rating",
     htld: "High to Low Distance",
-    lthd: "Low to High Distance"
-  }
-}
+    lthd: "Low to High Distance",
+  },
+};
 export const navbarConstants = {
   NavBar: {
-    brandName: "KaamWala"
-  }
-}
+    brandName: "KaamWala",
+  },
+};
 export const workerCardConstants = {
   WorkerCardText: {
-    Services: "Services:"
-  }
-  ,
+    Services: "Services:",
+  },
   WorkerCardButtons: {
     chat: "Chat",
-    book: "Book"
-  }
-}
+    book: "Book",
+  },
+};
 export const forgetPasswordConstants = {
   FP_FIELDS: {
     EMAIL: "Please Provide the Email Address.",
     MSG: "An OTP will be sent to your Email",
     EG_MAIL: "Enter your Email",
     FP_TOAST_MSG: "OTP Sent Successfully!",
-  }
-}
+  },
+};
 
 export const newpasswordConstants = {
   NP_CONSTANTS: {
@@ -314,10 +332,9 @@ export const newpasswordConstants = {
     CONFIRMPASSWORD: "Confirm Password",
     CONFIRMPASSWORD_PH: "Confirm new password",
     SAVEBUTTON: "Save New Password",
-    VERIFYOTP: "VERIFY OTP"
-  }
-
-}
+    VERIFYOTP: "VERIFY OTP",
+  },
+};
 
 export const SERVICE_CONSTS = {
   SERVICES_HEADING: "Services",
@@ -328,24 +345,23 @@ export const SERVICE_CONSTS = {
   UPDATE: "Update",
   CANCEL: "Cancel",
   EDIT: "Edit",
-  BACK: "Back"
-}
+  BACK: "Back",
+};
 
+export const ADMIN_WORKERS = {
+  WORKERS_HEADING: "Workers",
+  BACK: "Back",
+  ACTIVE_WORKERS: "Active Workers",
+  INACTIVE_WORKERS: "Inactive Workers",
+  NO_ACTIVE_WORKERS: "No Active Workers found",
+  NO_INACTIVE_WORKERS: "No Inactive Workers found",
+};
 
-  export const ADMIN_WORKERS = {
-    WORKERS_HEADING : "Workers",
-    BACK: "Back",
-    ACTIVE_WORKERS: "Active Workers",
-    INACTIVE_WORKERS: "Inactive Workers",
-    NO_ACTIVE_WORKERS: "No Active Workers found",
-    NO_INACTIVE_WORKERS: "No Inactive Workers found"
-  }
-
-  export const ADMIN_USERS = {
-    USERS_HEADING: "Users",
-    BACK: "Back",
-    ACTIVE_USERS: "Active Users",
-    INACTIVE_USERS: "Inactive Users",
-    NO_ACTIVE_USERS: "No Active Users found",
-    NO_INACTIVE_USERS: "No Inactive Users found"
-  }
+export const ADMIN_USERS = {
+  USERS_HEADING: "Users",
+  BACK: "Back",
+  ACTIVE_USERS: "Active Users",
+  INACTIVE_USERS: "Inactive Users",
+  NO_ACTIVE_USERS: "No Active Users found",
+  NO_INACTIVE_USERS: "No Inactive Users found",
+};

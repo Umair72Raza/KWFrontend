@@ -82,8 +82,15 @@ const Map = React.memo(
                 setFormData((prev) => ({
                   ...prev,
                   address: results[0].formatted_address,
-                  latitude: results[0].geometry.location.lat(),
-                  longitude: results[0].geometry.location.lng(),
+                  location: {
+                    type: "Point",
+                    coordinates: [
+                      results[0].geometry.location.lng(),
+                      results[0].geometry.location.lat(),
+                    ],
+                  },
+                  // latitude: results[0].geometry.location.lat(),
+                  // longitude: results[0].geometry.location.lng(),
                   country:
                     results[0].address_components.find((component) =>
                       component.types.includes("country")
@@ -94,8 +101,15 @@ const Map = React.memo(
                 setFormData((prev) => ({
                   ...prev,
                   address: results[0].formatted_address,
-                  latitude: results[0].geometry.location.lat(),
-                  longitude: results[0].geometry.location.lng(),
+                  location: {
+                    type: "Point",
+                    coordinates: [
+                      results[0].geometry.location.lng(),
+                      results[0].geometry.location.lat(),
+                    ],
+                  },
+                  // latitude: results[0].geometry.location.lat(),
+                  // longitude: results[0].geometry.location.lng(),
                   country:
                     results[0].address_components.find((component) =>
                       component.types.includes("country")
@@ -137,8 +151,15 @@ const Map = React.memo(
             setFormData((prev) => ({
               ...prev,
               address: place.formatted_address,
-              latitude: place.geometry.location.lat(),
-              longitude: place.geometry.location.lng(),
+              location: {
+                type: "Point",
+                coordinates: [
+                  place.geometry.location.lng(),
+                  place.geometry.location.lat(),
+                ],
+              },
+              // latitude: place.geometry.location.lat(),
+              // longitude: place.geometry.location.lng(),
               country:
                 place.address_components.find((component) =>
                   component.types.includes("country")
@@ -154,8 +175,7 @@ const Map = React.memo(
         if (
           (location.pathname === "/auth/createAccount" ||
             location.pathname === "/auth/workerRegister") &&
-          !formData?.latitude &&
-          !formData?.longitude
+          !formData?.location
         ) {
           if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
@@ -177,9 +197,18 @@ const Map = React.memo(
                     setFormData((prev) => ({
                       ...prev,
                       address: results[0].formatted_address,
-                      country: countryComponent ? countryComponent.short_name : "Unknown",
-                      latitude,
-                      longitude,
+                      country: countryComponent
+                        ? countryComponent.short_name
+                        : "Unknown",
+                      location: {
+                        type: "Point",
+                        coordinates: [
+                          longitude,
+                          latitude,
+                        ],
+                      },
+                      // latitude,
+                      // longitude,
                     }));
                     setCurrentLocation({
                       lat: latitude,
@@ -226,8 +255,8 @@ const Map = React.memo(
         ) {
           setCountry(formData?.country);
           if (editMode) {
-            const latitude = UsersData?.latitude;
-            const longitude = UsersData?.longitude;
+            const latitude = UsersData?.location?.coordinates[1];
+            const longitude = UsersData?.location?.coordinates[0];
             const userCurrentCountry = UsersData?.country;
             setTimeout(() => {
               setMapLoaded(true);
@@ -259,8 +288,8 @@ const Map = React.memo(
       }
     }, [
       location.pathname,
-      formData?.latitude,
-      formData?.longitude,
+      formData?.location?.coordinates[1],
+      formData?.location?.coordinates[0],
       handleLoadScript,
     ]);
 
@@ -272,7 +301,7 @@ const Map = React.memo(
 
     useEffect(() => {
       setupAutocomplete();
-    }, [currentLocation, country, setupAutocomplete,location.pathname]);
+    }, [currentLocation, country, setupAutocomplete, location.pathname]);
 
     return (
       <Container>
@@ -303,7 +332,10 @@ const Map = React.memo(
           onLoad={handleLoadScript}
         >
           {isLoading ? (
-            <div className=" d-flex flex-column justify-content-center align-items-center" style={{ height: "25vh" }} >
+            <div
+              className=" d-flex flex-column justify-content-center align-items-center"
+              style={{ height: "25vh" }}
+            >
               {" "}
               <Spinner
                 style={{ width: "3rem", height: "3rem", marginTop: "25px" }}

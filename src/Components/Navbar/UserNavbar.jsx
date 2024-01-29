@@ -55,13 +55,20 @@ const UserNavbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-
+  
   useEffect(() => { 
-    if(unreadMessages){
+    if (unreadMessages) {
       const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
       setNewMessage(hasUnreadMessages);
     }
-  },[unreadMessages]);
+  }, [unreadMessages]);
+
+  // useEffect(() => { 
+  //   if(unreadMessages){
+  //     const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
+  //     setNewMessage(hasUnreadMessages);
+  //   }
+  // },[unreadMessages]);
 
   const Logout = async () => {
     Swal.fire({
@@ -87,19 +94,41 @@ const UserNavbar = () => {
   const HandleNotificationSelection = (item) => {
     setChat(item.chat);
     setSelectedChatCompare(item.chat);
+  
     const data = {
       userId: user?._id,
       chatId: item?.chat?._id,
     };
     socket?.emit("chat read", data);
+  
     setUnreadMessages((prevCount) => ({
       ...prevCount,
-      [item?.chat?._id]:0,
+      [item?.chat?._id]: 0,
     }));
+  
     setSelectedChat(() => SelectChat(item?.chat));
-    setNotification(notification.filter((n) => n !== item));
+  
+    setNotification((prevNotifications) => prevNotifications.filter((n) => n !== item));
+  
     setShowModal(true);
   };
+
+  // const HandleNotificationSelection = (item) => {
+  //   setChat(item.chat);
+  //   setSelectedChatCompare(item.chat);
+  //   const data = {
+  //     userId: user?._id,
+  //     chatId: item?.chat?._id,
+  //   };
+  //   socket?.emit("chat read", data);
+  //   setUnreadMessages((prevCount) => ({
+  //     ...prevCount,
+  //     [item?.chat?._id]:0,
+  //   }));
+  //   setSelectedChat(() => SelectChat(item?.chat));
+  //   setNotification(notification.filter((n) => n !== item));
+  //   setShowModal(true);
+  // };
 
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
@@ -120,9 +149,24 @@ const UserNavbar = () => {
   };
 
   const handleMessageIconClick = () => {
+    setCopyOfChats((prevChats) => {
+      // Avoid unnecessary state updates if `OriginalChats` is the same as the current `copyOfChats`
+      if (prevChats === OriginalChats) {
+        return prevChats;
+      }
+      
+      // Update `copyOfChats` to match `OriginalChats`
+      return OriginalChats.slice();
+    });
+  
     setShowModal(true);
-    setCopyOfChats(OriginalChats);
   };
+  
+
+  // const handleMessageIconClick = () => {
+  //   setShowModal(true);
+  //   setCopyOfChats(OriginalChats);
+  // };
 
   return (
     <>
@@ -169,7 +213,7 @@ const UserNavbar = () => {
                   </DropdownToggle>
                   <DropdownMenu className=" Z-index" end container="body">
                     {notification.length === 0 ? (
-                      <DropdownItem>No new messages</DropdownItem>
+                      <DropdownItem>No new notification.</DropdownItem>
                     ) : (
                       notification.map((item) => (
                         <DropdownItem

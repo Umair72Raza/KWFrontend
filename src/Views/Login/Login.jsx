@@ -100,10 +100,10 @@ const Login = () => {
   };
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: "90vh" }}
-    >
+    <Container className="d-flex flex-column gap-5 justify-content-center align-items-center" style={{ minHeight: "90vh" }}>
+    <Row>
+      <Col><h1>{LoginPage.TITLE}</h1></Col>
+    </Row>
       <Row className="w-100 d-flex justify-content-center">
         <Col md={6} lg={4} xl={3}>
           <h2 className="text-center mt-5 mb-4">{LoginPage.LABELS.LOGIN}</h2>
@@ -170,22 +170,22 @@ const Login = () => {
                 </div>
               </div>
             </FormGroup>
-
-            <Button
-              id="Login"
-              color="primary"
-              className="w-25 hover-pointer"
-              block
-              onClick={handleSubmit}
-              disabled={loginDisabled || loading}
-            >
-              {loading ? (
-                <Spinner size="sm" color="light" />
-              ) : (
-                LoginPage.LABELS.LOGIN
-              )}
-            </Button>
-
+            <Link id="Login" style={{ textDecoration: "none" }}>
+              <Button
+                color="primary"
+                className="w-25 hover-pointer"
+                type="submit"
+                block
+                onClick={handleSubmit}
+                disabled={loginDisabled || loading}
+              >
+                {loading ? (
+                  <Spinner size="sm" color="light" />
+                ) : (
+                  LoginPage.LABELS.LOGIN
+                )}
+              </Button>
+            </Link>
             <Link
               to={LoginPage.ROUTES.FORGET_PASSWORD}
               className="text-primary fw-bold mt-2 d-block text-center"
