@@ -9,15 +9,68 @@ import Worker from "./Layouts/WorkerLayout";
 import AdminLayout from "./Layouts/AdminLayout";
 import { Spinner } from "reactstrap";
 import ChatPopup from "./Components/Chat Box/ChatPop";
-
-
+import ModalComponent from "./Components/ModalComponent/ModalComponent";
+import FinishJobReq from "./Components/FinishJobReq/FinishJobReq";
+import Swal from "sweetalert2";
 function App() {
   const [authenticated, setAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState(null);
   let { loginStatus, } = useSelector((state) => state.auth);
+  const socket = useSelector((state) => state?.socket?.socket);
 
+/// cancel order message 
+useEffect(() => {
+  socket?.on("order-canceled", (data) => {
+    const Corder = data.order;
+    let reason = data.reason;
 
+    // Check if reason is empty and set a default message
+    if (!reason || !reason?.length) {
+      reason = "Reason not mentioned";
+    }
+
+    if (Corder) {
+      Swal.fire({
+        title: "Order Cancelled",
+        html: `
+          <div class="custom-align-left swal-text-content">
+            <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
+          </div>
+
+          <div class="custom-align-left swal-text-content">
+            <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
+          </div>
+
+          <div class="custom-align-left swal-text-content">
+            <strong class="custom-align-left">Service:</strong> ${Corder.service}
+          </div>
+
+          <div class="custom-align-left swal-text-content">
+            <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
+          </div>
+         
+          <div class="custom-align-left swal-text-content">
+          <strong class="custom-align-left">Reasons:</strong> ${reason}
+        </div>
+        `,
+        icon: "error",
+        customClass: {
+          content: 'swal-content-custom' // You can add a custom class for the content
+        }, didOpen: () => {
+          document.body.style.overflow = 'hidden'; // Disable scroll when SweetAlert is open
+        },
+        willClose: () => {
+          document.body.style.overflow = ''; // Re-enable scroll when SweetAlert is closing
+        },
+        allowOutsideClick: false
+      });
+    }
+  });
+  return () => {
+    socket?.off("order-canceled");
+  };
+});
   useEffect(() => {
     let isMounted = true;
 
@@ -86,7 +139,9 @@ function App() {
         <Spinner />
       ) : (
         <BrowserRouter>
-        <ChatPopup />
+          <ChatPopup />
+          <ModalComponent />
+          <FinishJobReq />
           <Routes>{routes}</Routes>
         </BrowserRouter>
       )}
