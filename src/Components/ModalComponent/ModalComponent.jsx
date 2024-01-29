@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Form,
@@ -29,9 +29,22 @@ const ModalComponent = () => {
     order,
     toggleModal, cancel,
      setFinalizeFunction,
-     setIsFinalize,setOrder
+     setIsFinalize,setOrder,setModalHeader,setFinalizeButtonLabel,setCancelButtonLabel
     
   } = PopUpState();
+  useEffect(() => {
+    socket?.on("startjob-request", (order) => {
+      setOrder(order);
+      setModalHeader("Order Activation")
+      setIsFinalize(true)
+      setFinalizeButtonLabel("Finalize Order Start")
+      setCancelButtonLabel("Cancel Order Start")
+      toggleModal();
+    });
+    return () => {
+      socket?.off("startjob-request");
+    };
+  });
   
   const activatingOrder = async () => {
     const result = await dispatch(activateOrderAsync({ orderId: order._id }));
@@ -70,7 +83,7 @@ const ModalComponent = () => {
       socket?.off("startjob-response");
     };
   };
-
+  
   return (
     <Modal
       isOpen={isModalOpen}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Modal,
@@ -21,6 +21,17 @@ const FinishJobReq = () => {
     setFOrder,
     finishOrderReq,
     setFinishOrderReq } = PopUpState();
+
+    useEffect(() => {
+      if (!socket) return;
+      socket?.on("finishjob-request", (order) => {
+        setFinishOrderReq(true);
+        setFOrder(order);
+      });
+      return () => {
+        socket?.off("finishjob-request");
+      };
+    });
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   const [modal, setModal] = useState(finishOrderReq);
