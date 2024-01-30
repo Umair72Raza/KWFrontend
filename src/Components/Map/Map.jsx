@@ -301,7 +301,7 @@ const Map = React.memo(
 
     useEffect(() => {
       setupAutocomplete();
-    }, [currentLocation, country, setupAutocomplete, location.pathname]);
+    }, [currentLocation, country, setupAutocomplete, location.pathname,UsersData]);
 
     return (
       <Container>

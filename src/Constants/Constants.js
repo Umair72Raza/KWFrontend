@@ -72,6 +72,10 @@ export const RegisterPage = {
     ADDRESS: "Enter your address",
     SERVICES: "Select a service",
   },
+  SUCCESS_MESSAGES:{
+    WORKER_SIGNUP:"Worker ID  is created successfully. Please login into your Account.",
+    USER_SIGNUP:"User ID is created successfully. Please login into your Account.",
+  },
   ERROR_MESSAGES: {
     invalidEmail: "Invalid email address.",
     invalidPhoneNumber: "Please enter a valid phone number.",

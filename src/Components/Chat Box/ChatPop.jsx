@@ -650,7 +650,7 @@ const ChatPopup = () => {
                   <div className="row">
                     {!chatFromWorkerCard && (
                        <div className="col-3 chat-list">
-                       <div className="chat-preview overflow-y-auto max-height-chat-users">
+                       <div className="chat-preview max-height-chat-users">
                          {copyOfChats?.length === 0 ? (
                            <div>{ChatPopUpPage.NO_CHATS}</div>
                          ) : (
@@ -761,7 +761,7 @@ const ChatPopup = () => {
                             </div>
                           </div>
                           <div
-                            className="messages d-flex flex-column overflow-y-auto max-height-message"
+                            className="messages d-flex flex-column  max-height-message"
                             ref={messagesContainerRef}
                           >
                             {renderMessages()}

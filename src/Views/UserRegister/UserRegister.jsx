@@ -43,7 +43,7 @@ const UserRegister = ({ ShowServices }) => {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
-    location:{},
+    location: {},
     // latitude: "",
     // longitude: "",
     address: "",
@@ -274,7 +274,7 @@ const UserRegister = ({ ShowServices }) => {
         const result = await dispatch(signUpUserAsync(formData));
 
         if (result.type === "auth/signup/fulfilled") {
-          console.log("Sign up successful!", formData)
+          console.log("Sign up successful!", formData);
           // Reset form data on successful signup
           setFormData({
             firstName: "",
@@ -283,14 +283,19 @@ const UserRegister = ({ ShowServices }) => {
             phoneNumber: "",
             password: "",
             confirmPassword: "",
-            location:{},
+            location: {},
             // latitude: "",
             // longitude: "",
             address: "",
             country: "",
             services: [],
           });
-          successToast("SignUP Successful!");
+          const successMessage = ShowServices
+            ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
+            : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
+
+          successToast(successMessage);
+
           navigate("/auth/login");
         } else if (result.type === "auth/signup/rejected") {
           setIsSignupDisabled(true);
