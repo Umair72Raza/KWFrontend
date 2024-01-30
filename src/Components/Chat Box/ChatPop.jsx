@@ -314,7 +314,7 @@ const ChatPopup = () => {
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
-    setNotification((prevNotifications) => prevNotifications.filter((n) => n !== item));
+    setNotification((prevNotifications) => prevNotifications.filter((n) => n?.chat?._id !== chat?._id));
     socket?.emit("chat read", data);
   
     if (unreadMessages[chat._id]) {
