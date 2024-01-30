@@ -304,17 +304,19 @@ const ChatPopup = () => {
       setSendButtonDisabled(false);
     }
   };
-
   const handleChatSelection = (chat) => {
-    setNewMessageText("");
-    setChat(chat);
-    setSelectedChatCompare(chat);
-    setSelectedChat(() => SelectChat(chat));
     const data = {
       userId: user._id,
       chatId: chat._id,
     };
+  
+    setNewMessageText("");
+    setChat(chat);
+    setSelectedChatCompare(chat);
+    setSelectedChat(() => SelectChat(chat));
+    setNotification((prevNotifications) => prevNotifications.filter((n) => n !== item));
     socket?.emit("chat read", data);
+  
     if (unreadMessages[chat._id]) {
       setUnreadMessages((prevCount) => ({
         ...prevCount,
@@ -322,7 +324,7 @@ const ChatPopup = () => {
       }));
     }
   };
-
+  
   const handleBack = () => {
     const updatedChats = copyOfChats.filter(
       (chat) => chat.chatName !== "fakeChat"
