@@ -78,6 +78,7 @@ export const RegisterPage = {
   },
   ERROR_MESSAGES: {
     invalidEmail: "Invalid email address.",
+    emptyEmail:"Email cannot be empty",
     invalidPhoneNumber: "Please enter a valid phone number.",
     invalidPassword:
       "Password must contain at least one special character, one uppercase letter, one number, and atleast 8 characters long.",

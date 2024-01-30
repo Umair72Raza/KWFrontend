@@ -59,6 +59,7 @@ const UserRegister = ({ ShowServices }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordInfo, setPasswordInfo] = useState("");
+  const [confirmPasswordInfo, setConfirmPasswordInfo] = useState("");
   const [passwordValid, setPasswordValid] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [listLoading, setListLoading] = useState(true);
@@ -139,18 +140,14 @@ const UserRegister = ({ ShowServices }) => {
     let confirmPassword = e.target.value;
     confirmPassword = confirmPassword.replace(/\s/g, "");
     if (confirmPassword !== formData.password) {
-      setErrors({
-        ...errors,
-        confirmPassword: RegisterPage.ERROR_MESSAGES.passwordsNotMatch,
-      });
+      setConfirmPasswordInfo(RegisterPage.ERROR_MESSAGES.passwordsNotMatch);
+    } else if(confirmPassword=== "") {
+ setConfirmPasswordInfo("")
     } else {
-      setErrors({
-        ...errors,
-        confirmPassword: RegisterPage.SUCCESS_MESSAGES.CONFIRMPASSWORD,
-      });
+      setConfirmPasswordInfo(RegisterPage.SUCCESS_MESSAGES.CONFIRMPASSWORD)
     }
 
-    // setErrors({ ...errors, confirmPassword: "" , password: ""});
+    setErrors({ ...errors, confirmPassword: "" , password: ""});
 
     setFormData({
       ...formData,
@@ -248,6 +245,9 @@ const UserRegister = ({ ShowServices }) => {
     }
     if (hasOnlyWhiteSpace(formData.address)) {
       errors.address = RegisterPage.ERROR_MESSAGES.invalidAddress;
+    } 
+    if(hasOnlyWhiteSpace(formData.email)){
+      errors.email =RegisterPage.ERROR_MESSAGES.emptyEmail
     }
 
     if (!ratesValid) {
@@ -333,6 +333,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.FIRST_NAME}
                   </Label>
                   <Input
+                   invalid={errors.firstName? true : false}
                     type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
                     name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
                     id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
@@ -352,7 +353,7 @@ const UserRegister = ({ ShowServices }) => {
                       )
                     }
                   />{" "}
-                  {errors.lastName && (
+                  {errors.firstName && (
                     <span className="text-danger">{errors.firstName}</span>
                   )}
                 </FormGroup>
@@ -363,6 +364,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.LAST_NAME}
                   </Label>
                   <Input
+                  invalid={errors.lastName? true : false}
                     type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
                     name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
                     id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
@@ -395,6 +397,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.EMAIL}
                   </Label>
                   <Input
+                 invalid={errors.email? true : false}
                     type={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     name={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     id={RegisterPage.INPUT_FIELDS.EMAIL.name}
@@ -420,6 +423,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.PHONE}
                   </Label>
                   <PhoneInput
+                  invalid={errors.phone? true : false}
                     defaultCountry="PK"
                     id={RegisterPage.INPUT_FIELDS.PHONE.name}
                     placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
@@ -443,6 +447,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper">
                     <Input
+                   invalid={errors.password? true : false}
                       type={showPassword ? "text" : "password"}
                       name="password"
                       id="password"
@@ -460,7 +465,7 @@ const UserRegister = ({ ShowServices }) => {
                     >
                       <FontAwesomeIcon
                         icon={showPassword ? faEye : faEyeSlash}
-                        className="password-icon"
+                        className="password-icon pe-4"
                       />
                     </div>
                   </div>
@@ -484,8 +489,10 @@ const UserRegister = ({ ShowServices }) => {
                   <Label className="fw-semibold" for="confirmPassword">
                     {RegisterPage.LABELS.CONFIRM_PASSWORD}
                   </Label>
-                  <div className="password-input-wrapper">
+                  <div className="password-input-wrapper ">
                     <Input
+                   
+                    invalid={errors.confirmPassword? true : false}
                       type={showConfirmPassword ? "text" : "password"}
                       name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
@@ -505,20 +512,21 @@ const UserRegister = ({ ShowServices }) => {
                     >
                       <FontAwesomeIcon
                         icon={showConfirmPassword ? faEye : faEyeSlash}
-                        className="password-icon"
+                        className="password-icon pe-4"
                       />
                     </div>
                   </div>
-                  {errors.confirmPassword &&
-                  errors.confirmPassword === "Password Matched." ? (
+                  {confirmPasswordInfo && 
+                  confirmPasswordInfo === "Password Matched." ? (
                     <span className=" fw-bold text-success">
-                      <FaCheckCircle /> {errors.confirmPassword}
+                      <FaCheckCircle /> {confirmPasswordInfo}
                     </span>
                   ) : (
                     <span className="text-danger">
-                      {errors.confirmPassword}
+                      {confirmPasswordInfo}
                     </span>
                   )}
+                  {/* {errors?.confirmPassword && (<span className="text-danger">{errors?.confirmPassword}</span>)} */}
                 </FormGroup>
               </Col>
             </Row>
