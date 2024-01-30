@@ -225,10 +225,8 @@ const ScheduledOrdersCardWorker = ({
                         >
                           {showFullDetailsMap[order._id] ? (
                             <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
+                              dangerouslySetInnerHTML={{
+                                __html: order.details,
                               }}
                             />
                           ) : (
