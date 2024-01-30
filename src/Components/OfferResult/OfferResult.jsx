@@ -85,13 +85,13 @@ const OfferResult = () => {
               <CardTitle>
                 <Col>
                   <img
-                    src={result === "false" ? failure : accpetance}
+                    src={result === "cancel" ? failure : accpetance}
                     alt={
-                      result === "false" ? "Failure Image" : "Acceptance Image"
+                      result === "cancel" ? "Failure Image" : "Acceptance Image"
                     }
                     className="mx-auto"
                   />
-                  {result === "false" ? "Offer Cancelled!" : "Offer Accepted!"}
+                  {result === "cancel" ? "Offer Cancelled!" : "Offer Accepted!"}
                 </Col>
               </CardTitle>
               <CardText>
