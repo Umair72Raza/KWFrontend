@@ -5,6 +5,7 @@ import { useDebounce } from "../../Hooks/Debounce";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { map } from "lodash";
 
 const libraries = [import.meta.env.VITE_GOOGLE_API_LIBARARY];
 
@@ -298,10 +299,10 @@ const Map = React.memo(
         handleLoadScript();
       }
     }, [editMode, handleLoadScript]);
-
+   
     useEffect(() => {
       setupAutocomplete();
-    }, [currentLocation, country, setupAutocomplete, location.pathname,UsersData]);
+    }, [location.pathname,isMapLoaded]);
 
     return (
       <Container>

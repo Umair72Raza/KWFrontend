@@ -695,9 +695,8 @@ const ChatPopup = () => {
                                                     {chatUser.firstName}{" "}
                                                     {chatUser.lastName}
                                                   </h5>
-                                                  {unreadMessages &&
-                                                    unreadMessages[item._id] >
-                                                      0 &&
+                                                  {unreadMessages[item._id] >
+                                                    0 &&
                                                     item.latestMessage
                                                       ?.sender !== user._id && (
                                                       <div className="notification-circle rounded-circle bg-danger text-white">

@@ -353,7 +353,7 @@ const UserRegister = ({ ShowServices }) => {
                     }
                   />{" "}
                   {errors.lastName && (
-                    <span className="text-danger">{errors.lastName}</span>
+                    <span className="text-danger">{errors.firstName}</span>
                   )}
                 </FormGroup>
               </Col>
@@ -469,10 +469,13 @@ const UserRegister = ({ ShowServices }) => {
                       <FaCheckCircle /> {passwordInfo}
                     </span>
                   ) : (
-                    <span className="text-info fw-bold">{passwordInfo}</span>
-                  )}
-                  {errors.password && (
-                    <span className="text-danger">{errors.password}</span>
+                    <span
+                      className={`fw-bold ${
+                        errors.password ? "text-danger" : "text-info"
+                      }`}
+                    >
+                      {passwordInfo}
+                    </span>
                   )}
                 </FormGroup>
               </Col>
@@ -541,11 +544,17 @@ const UserRegister = ({ ShowServices }) => {
                           selectedServices={formData?.services}
                           handleServiceChange={handleServiceChange}
                           handleRateChange={handleRateChange}
-                          errors={errors}
                         />
                       )}
+                      
                     </FormGroup>
+                  
                   </Col>
+                  <Col className="text-center mt-3">
+                        {errors?.rate && (
+                          <span className="text-danger">{errors?.rate}</span>
+                        )}
+                      </Col>
                 </Row>
               </>
             )}
