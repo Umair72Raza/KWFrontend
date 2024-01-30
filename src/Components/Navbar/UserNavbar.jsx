@@ -332,7 +332,9 @@ const UserNavbar = () => {
                 caret
               ></DropdownToggle>
               <DropdownMenu className="p-2">
-                {!user.role === "admin" ? (
+                {user.role === "admin" ? (
+                  <></>
+                ) : (
                   <>
                     <DropdownItem
                       className="d-flex gap-2"
@@ -343,8 +345,6 @@ const UserNavbar = () => {
                       <b className="align-self-center">Edit Profile</b>
                     </DropdownItem>
                   </>
-                ) : (
-                  <></>
                 )}
 
                 <DropdownItem className="d-flex flex-row"></DropdownItem>
