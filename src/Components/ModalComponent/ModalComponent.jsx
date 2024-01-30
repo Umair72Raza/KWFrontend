@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 const ModalComponent = () => {
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const {
+  let {
     modalHeader,
     isFinalize,
     isModalOpen,
@@ -27,25 +27,32 @@ const ModalComponent = () => {
     finalizeButtonLabel,
     showInput,
     order,
-    toggleModal, cancel,
-     setFinalizeFunction,
-     setIsFinalize,setOrder,setModalHeader,setFinalizeButtonLabel,setCancelButtonLabel
-    
+    toggleModal,
+    cancel,
+    setFinalizeFunction,
+    setIsFinalize,
+    setOrder,
+    setModalHeader,
+    setFinalizeButtonLabel,
+    setCancelButtonLabel,
+    setScheduledOrders,
+    setActiveOrder
   } = PopUpState();
   useEffect(() => {
     socket?.on("startjob-request", (order) => {
       setOrder(order);
-      setModalHeader("Order Activation")
-      setIsFinalize(true)
-      setFinalizeButtonLabel("Finalize Order Start")
-      setCancelButtonLabel("Cancel Order Start")
+      setModalHeader("Order Activation");
+      setIsFinalize(true);
+      setFinalizeButtonLabel("Finalize Order Start");
+      setCancelButtonLabel("Cancel Order Start");
       toggleModal();
+
     });
     return () => {
       socket?.off("startjob-request");
     };
   });
-  
+
   const activatingOrder = async () => {
     const result = await dispatch(activateOrderAsync({ orderId: order._id }));
     if (result.type === "orders/activateOrders/fulfilled") {
@@ -64,6 +71,19 @@ const ModalComponent = () => {
           };
         };
         startJobSocket();
+
+
+        setScheduledOrders((prevScheduledOrders) =>
+        prevScheduledOrders.filter(
+          (scheduledOrder) => scheduledOrder._id !== order._id
+        ));
+          
+      setActiveOrder((prevActiveOrders) => [
+        ...prevActiveOrders,
+        order,
+      ]);
+
+
         setIsFinalize(false);
         setOrder(null);
       }
@@ -83,7 +103,7 @@ const ModalComponent = () => {
       socket?.off("startjob-response");
     };
   };
-  
+
   return (
     <Modal
       isOpen={isModalOpen}
@@ -91,11 +111,9 @@ const ModalComponent = () => {
       centered
       backdrop="static"
       keyboard={false}
-
     >
-      <ModalHeader >{modalHeader}</ModalHeader>
+      <ModalHeader>{modalHeader}</ModalHeader>
       <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
-
         {order && (
           <>
             <div>
@@ -111,7 +129,6 @@ const ModalComponent = () => {
               <strong>Order Details:</strong>{" "}
               {order.details.replace(/<br\s*\/?>/g, "\n")}
             </div>
-
           </>
         )}
 
@@ -131,24 +148,37 @@ const ModalComponent = () => {
         )}
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={isFinalize ? () => { Cancel(); toggleModal(); } : cancel}>
+        <Button
+          color="secondary"
+          onClick={
+            isFinalize
+              ? () => {
+                  Cancel();
+                  toggleModal();
+                }
+              : cancel
+          }
+        >
           {cancelButtonLabel}
         </Button>
         <Button
           color={isFinalize ? "success" : "danger"}
-          onClick={isFinalize ?
-            () => {
-              activatingOrder()
-              toggleModal()
-            } : () => {
-              setFinalizeFunction(true)
-              toggleModal()
-            }}
+          onClick={
+            isFinalize
+              ? () => {
+                  activatingOrder();
+                  toggleModal();
+                }
+              : () => {
+                  setFinalizeFunction(true);
+                  toggleModal();
+                }
+          }
         >
           {finalizeButtonLabel}
         </Button>
       </ModalFooter>
-    </Modal >
+    </Modal>
   );
 };
 

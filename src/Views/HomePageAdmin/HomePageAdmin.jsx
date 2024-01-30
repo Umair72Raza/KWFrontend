@@ -1,5 +1,4 @@
 import React from "react";
-import AdminNavbar from "../../Components/AdminNavbar/AdminNavbar";
 import { Col, Container, Row } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import CustomAdminCard from "../../Components/CustomAdminCard/CustomAdminCard";

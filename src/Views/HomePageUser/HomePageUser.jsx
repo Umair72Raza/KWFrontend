@@ -32,13 +32,14 @@ const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
-  const { setOriginalChats, setCopyOfChats,setUnreadMessages } = ChatState();
+  const { setOriginalChats, setCopyOfChats, setUnreadMessages } = ChatState();
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
   let users = useSelector((state) => state?.homepage?.workers);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
-  const { newOrder } = useSelector((state) => state.booking);
+
   const [showFilters, setShowFilters] = useState(false);
+  const [show, setShow] = useState(true)
   const [sortOption, setSortOption] = useState("none");
   const [sortOption2, setSortOption2] = useState("none");
   const [searchInput, setSearchInput] = useState("");
@@ -70,21 +71,21 @@ const HomePageUser = () => {
     if (chats && chats.length > 0) {
       // Emitting notifications to the server for all chats
       socket?.emit("notifications", { user, chats });
-  
+
       // Handling incoming chat notifications from the server
       socket?.on("chat-notifications", (chatNotifications) => {
         // console.log(chatNotifications);
         const newUnreadMessages = {};
-  
+
         // Update the unread message count state for each chat
         chatNotifications.forEach(({ chatId, unreadCount }) => {
           newUnreadMessages[chatId] = unreadCount;
         });
-  
+
         // Update the state with all chat IDs and their unread message counts
         setUnreadMessages(newUnreadMessages);
       });
-  
+
       // Set the original and copy of chats
       setOriginalChats(chats);
       setCopyOfChats(chats);
@@ -95,7 +96,7 @@ const HomePageUser = () => {
       socket?.off("notifications")
     };
   }, [chats]);
-  
+
   useEffect(() => {
     socket?.on("status-change", (User) => {
       if (users && User.status === "offline") {
@@ -124,20 +125,12 @@ const HomePageUser = () => {
       socket?.off("status-change");
     };
   });
-  useEffect(() => {
-    if (newOrder !== null) {
-      const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
 
-      socket?.emit("new-order-created", data);
-    }
-    return () => {
-      socket?.off("new-order-created");
-    };
-  }, [newOrder]);
 
   //search
   let debouncedsearch = useDebounce(searchInput);
   let memoizedSuggestions = useMemo(() => {
+
     const nameValues = list?.map((service) => service.name);
     return nameValues?.filter((item) =>
       item.toLowerCase().includes(debouncedsearch.toLowerCase())
@@ -147,6 +140,7 @@ const HomePageUser = () => {
   const handleSuggestionClick = (suggestion) => {
     setSearchInput(suggestion);
     memoizedSuggestions = null;
+    setShow(false)
   };
 
   const handleFiltersToggle = () => {
@@ -245,7 +239,10 @@ const HomePageUser = () => {
                 className="  search-border"
                 placeholder="Search For Category"
                 value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
+                onChange={(e) => {
+                  setSearchInput(e.target.value)
+                  setShow(true)
+                }}
               />
               <Button
                 color="primary"
@@ -256,7 +253,7 @@ const HomePageUser = () => {
               </Button>
             </div>
             <div className="w-75">
-              {debouncedsearch && memoizedSuggestions.length > 0 && (
+              {debouncedsearch && memoizedSuggestions.length > 0 && show == true && (
                 <ul className=" ">
                   {memoizedSuggestions.map((suggestion, index) => (
                     <li

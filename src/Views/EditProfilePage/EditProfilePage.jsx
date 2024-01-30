@@ -27,12 +27,14 @@ import {
   failureToast,
   handleNameChange,
   hasOnlyWhiteSpace,
+  infoToast,
   successToast,
   validateEmail,
 } from "../../utils";
 import { useNavigate } from "react-router-dom";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
+import { set } from "lodash";
 
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -42,28 +44,30 @@ const EditProfilePage = ({ ShowServices }) => {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: UsersData?.firstName,
-    lastName: UsersData?.lastName,
-    email: UsersData?.email,
-    phoneNumber: UsersData?.phoneNumber,
-    latitude: UsersData?.latitude,
-    longitude: UsersData?.longitude,
-    country: UsersData?.country,
-    address: UsersData?.address,
-    services: UsersData?.services || [],
+    firstName: "",
+    lastName: "",
+    // email: "",
+    // phoneNumber: "",
+    location: {},
+    // latitude:"",
+    // longitude:"",
+    country: "",
+    address: "",
+    services: [],
   });
 
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
-  const [listLoading, setListLoading] = useState(true); 
+  const [listLoading, setListLoading] = useState(true);
   const [userDataLoading, setUserDataLoading] = useState(true);
+  const [UserInfo, setUserInfo] = useState({});
 
   useEffect(() => {
     if (UsersData) {
       const isFormValid =
-        !errors.email &&
-        !errors.phone &&
+        // !errors.email &&
+        // !errors.phone &&
         !hasOnlyWhiteSpace(formData?.address) &&
         !hasOnlyWhiteSpace(formData?.firstName) &&
         !hasOnlyWhiteSpace(formData?.lastName) &&
@@ -73,12 +77,15 @@ const EditProfilePage = ({ ShowServices }) => {
     }
   }, [formData, errors.email, errors.phone]);
 
-
   useEffect(() => {
     if (user && user._id) {
       setUserDataLoading(true);
       dispatch(fetchUsersDataAsync({ id: user._id, token }))
-        .then(() => setUserDataLoading(false))
+        .then((result) => {
+          const { _id, ...userDataWithoutId } = result.payload;
+          setUserInfo(userDataWithoutId);
+          setUserDataLoading(false);
+        })
         .catch((error) => {
           console.error("Error fetching user data:", error);
           setUserDataLoading(false);
@@ -102,21 +109,21 @@ const EditProfilePage = ({ ShowServices }) => {
     fetchData();
   }, [dispatch, ShowServices]);
 
-  const handleEmailChange = (e) => {
-    setErrors({ ...errors, email: "" });
-    setFormData({
-      ...formData,
-      email: e.target.value,
-    });
-  };
+  // const handleEmailChange = (e) => {
+  //   setErrors({ ...errors, email: "" });
+  //   setFormData({
+  //     ...formData,
+  //     email: e.target.value,
+  //   });
+  // };
 
-  const handlePhoneChange = (value) => {
-    setErrors({ ...errors, phone: "" });
-    setFormData({
-      ...formData,
-      phoneNumber: value,
-    });
-  };
+  // const handlePhoneChange = (value) => {
+  //   setErrors({ ...errors, phone: "" });
+  //   setFormData({
+  //     ...formData,
+  //     phoneNumber: value,
+  //   });
+  // };
 
   const handleServiceChange = (e) => {
     const selectedService = e.target.value;
@@ -148,62 +155,94 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const FormValidation = (formData) => {
     const errors = {};
-    if (!validateEmail(formData.email)) {
-      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
-    }
-    if (!formData.email.includes(".com")) {
-      errors.email = "Invalid email address";
-    }
+    // if (!validateEmail(formData.email)) {
+    //   errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+    // }
+    // if (!formData.email.includes(".com")) {
+    //   errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+    // }
 
-    if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
-      isValidPhoneNumber(formData.phoneNumber)
-        ? setErrors({ ...errors, phone: "" })
-        : (errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
-    } else {
-      errors.phone = "Phone number is required";
-    }
+    // if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
+    //   isValidPhoneNumber(formData.phoneNumber)
+    //     ? setErrors({ ...errors, phone: "" })
+    //     : (errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
+    // } else {
+    //   errors.phone = RegisterPage.ERROR_MESSAGES.emptyPhone;
+    // }
 
     if (ShowServices && formData.services.length === 0) {
-      errors.services = "Please select at least one service.";
+      errors.services = RegisterPage.ERROR_MESSAGES.invalidService;
+    }
+
+    const areObjectsDifferent =
+      UserInfo &&
+      formData &&
+      Object.keys(UserInfo).some((key) => {
+        return formData[key] !== UserInfo[key];
+      });
+    if (!areObjectsDifferent) {
+      errors.noChanges = "No Changes Made";
     }
 
     return errors;
   };
   const handleKeyPress = (e) => {
     // Check if the pressed key is "Enter" (key code 13)
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       // Prevent the default form submission behavior
       e.preventDefault();
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
 
-    try {
-      if (Object.keys(validationErrors).length === 0) {
-        setLoading(true);
-        const data = { id: UsersData?._id, token, formData };
-        const result = await dispatch(updateProfileAsync(data));
+    if (Object.keys(validationErrors).length > 0) {
+      if (validationErrors.noChanges) {
+        infoToast(validationErrors.noChanges);
+        setEditMode(false);
+      }
+      return; // Early return for validation errors
+    }
 
-        if (result.type === "/UpdateProfile/fulfilled") {
-          successToast("Profile Updated Successfully!");
-          setFormData({
-            firstName: UsersData?.firstName,
-            lastName: result.payload?.lastName,
-            email: result.payload?.email,
-            phoneNumber: result.payload?.phoneNumber,
-            latitude: result.payload?.latitude,
-            longitude: result.payload?.longitude,
-            country: result.payload?.country,
-            address: result.payload?.address,
-            services: result.payload?.services || [],
-          });
-          setEditMode(false);
-        } else if (result.type === "/UpdateProfile/rejected") {
-          failureToast(result.payload);
-        }
+    setLoading(true);
+
+    try {
+      const data = { id: UsersData?._id, token, formData };
+      const result = await dispatch(updateProfileAsync(data));
+      if (result.type === "/UpdateProfile/fulfilled") {
+        console.log("result.payload", result.payload);
+        const {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          location,
+          // latitude,
+          // longitude,
+          country,
+          address,
+          services,
+        } = result.payload || {};
+        successToast("Profile Updated Successfully!");
+        setFormData({
+          firstName,
+          lastName,
+          // email,
+          // phoneNumber,
+          location,
+          // latitude,
+          // longitude,
+          country,
+          address,
+          services: services || [],
+        });
+        setEditMode(false);
+      } else if (result.type === "/UpdateProfile/rejected") {
+        failureToast(result.payload);
       }
     } catch (err) {
       console.log("Error updating profile:", err);
@@ -212,30 +251,67 @@ const EditProfilePage = ({ ShowServices }) => {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const validationErrors = FormValidation(formData);
+  //   setErrors(validationErrors);
+
+  //   try {
+  //     if (Object.keys(validationErrors).length === 0) {
+  //       setLoading(true);
+  //       const data = { id: UsersData?._id, token, formData };
+  //       const result = await dispatch(updateProfileAsync(data));
+
+  //       if (result.type === "/UpdateProfile/fulfilled") {
+  //         successToast("Profile Updated Successfully!");
+  //         setFormData({
+  //           firstName: UsersData?.firstName,
+  //           lastName: result.payload?.lastName,
+  //           email: result.payload?.email,
+  //           phoneNumber: result.payload?.phoneNumber,
+  //           latitude: result.payload?.latitude,
+  //           longitude: result.payload?.longitude,
+  //           country: result.payload?.country,
+  //           address: result.payload?.address,
+  //           services: result.payload?.services || [],
+  //         });
+  //         setEditMode(false);
+  //       } else if (result.type === "/UpdateProfile/rejected") {
+  //         failureToast(result.payload);
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.log("Error updating profile:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleEditModeToggle = () => {
+    setEditMode(true);
     setFormData({
       firstName: UsersData?.firstName,
       lastName: UsersData?.lastName,
-      email: UsersData?.email,
-      phoneNumber: UsersData?.phoneNumber,
-      latitude: UsersData?.latitude,
-      longitude: UsersData?.longitude,
+      // email: UsersData?.email,
+      // phoneNumber: UsersData?.phoneNumber,
+      location: UsersData?.location,
+      // latitude: UsersData?.latitude,
+      // longitude: UsersData?.longitude,
       country: UsersData?.country,
       address: UsersData?.address,
       services: UsersData?.services || [],
     });
-    setEditMode(!editMode);
   };
 
   const handleCancelEdit = () => {
     setFormData({
       firstName: UsersData?.firstName,
       lastName: UsersData?.lastName,
-      email: UsersData?.email,
-      phoneNumber: UsersData?.phoneNumber,
-      latitude: UsersData?.latitude,
-      longitude: UsersData?.longitude,
+      // email: UsersData?.email,
+      // phoneNumber: UsersData?.phoneNumber,
+      location: UsersData?.location,
+      // latitude: UsersData?.latitude,
+      // longitude: UsersData?.longitude,
       country: UsersData?.country,
       address: UsersData?.address,
       services: UsersData?.services || [],
@@ -244,10 +320,10 @@ const EditProfilePage = ({ ShowServices }) => {
   };
 
   const handleGoBack = () => {
-    if(user?.role === "user"){
-      navigate("/user/homepage");
-    } else if(user?.role === "worker"){
-      navigate("/worker/workerHomepage");
+    if (user?.role === "user") {
+      navigate(EDITPROFILE_PAGE.ROUTES.BACK_USER);
+    } else if (user?.role === "worker") {
+      navigate(EDITPROFILE_PAGE.ROUTES.BACK_WORKER);
     }
   };
 
@@ -265,17 +341,20 @@ const EditProfilePage = ({ ShowServices }) => {
                 </Button>
               </Col>
             )}
-            <Col className="fw-bold fs-3">
-              {EDITPROFILE_PAGE.LABELS.TITLE}
-            </Col>
+            <Col className="fw-bold fs-3">{EDITPROFILE_PAGE.LABELS.TITLE}</Col>
           </Row>
           {userDataLoading ? (
             <div className="d-flex justify-content-center">
               <Spinner color="primary" />
-            </div>) : (
+            </div>
+          ) : (
             <Row>
               {editMode ? (
-                <Form className="mt-5" onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
+                <Form
+                  className="mt-5"
+                  onSubmit={handleSubmit}
+                  onKeyDown={handleKeyPress}
+                >
                   <Row>
                     <Col md={6}>
                       <FormGroup>
@@ -321,14 +400,20 @@ const EditProfilePage = ({ ShowServices }) => {
                           required
                           value={formData.lastName}
                           onChange={(e) =>
-                            handleNameChange(formData, setFormData, setErrors,
-                              errors, "lastName", e)
+                            handleNameChange(
+                              formData,
+                              setFormData,
+                              setErrors,
+                              errors,
+                              "lastName",
+                              e
+                            )
                           }
                         />{" "}
                       </FormGroup>
                     </Col>
                   </Row>
-                  <Row>
+               {/*   <Row>
                     <Col md={6}>
                       <FormGroup>
                         <Label className="fw-semibold" for="email">
@@ -341,11 +426,12 @@ const EditProfilePage = ({ ShowServices }) => {
                           placeholder={
                             RegisterPage.INPUT_FIELDS.EMAIL.placeholder
                           }
+                          disabled="true"
                           maxLength={70}
                           value={formData.email}
                           onChange={handleEmailChange}
                           onKeyDown={(event) => {
-                            if (event.key === ' ') {
+                            if (event.key === " ") {
                               event.preventDefault();
                             }
                           }}
@@ -366,6 +452,7 @@ const EditProfilePage = ({ ShowServices }) => {
                           placeholder={
                             RegisterPage.INPUT_FIELDS.PHONE.placeholder
                           }
+                          disabled="true"
                           maxLength={20}
                           required
                           value={formData.phoneNumber}
@@ -378,7 +465,7 @@ const EditProfilePage = ({ ShowServices }) => {
                         )}
                       </FormGroup>
                     </Col>
-                  </Row>
+                  </Row>*/}
                   {ShowServices && (
                     <>
                       <Row className="my-4">
@@ -389,21 +476,26 @@ const EditProfilePage = ({ ShowServices }) => {
                           md={12}
                           className="d-flex flex-row Service-overflow-y-scroll"
                         >
-                               <FormGroup>
-                        {listLoading && ShowServices ? (
-                       <div className="text-center w-100">
-                       <Spinner />
-                       <p>Loading Services...</p>
-                     </div>
-                  ) : (
-                    <CustomServiceDropdown
-                      list={list}
-                      selectedServices={formData?.services}
-                      handleServiceChange={handleServiceChange}
-                      handleRateChange={handleRateChange}
-                    />
-                  )}
-                        </FormGroup>
+                          <FormGroup>
+                            {listLoading && ShowServices ? (
+                              <div className="text-center w-100">
+                                <Spinner />
+                                <p>
+                                  {
+                                    RegisterPage.LOADER_MESSAGES
+                                      .SERVICES_LOADING
+                                  }
+                                </p>
+                              </div>
+                            ) : (
+                              <CustomServiceDropdown
+                                list={list}
+                                selectedServices={formData?.services}
+                                handleServiceChange={handleServiceChange}
+                                handleRateChange={handleRateChange}
+                              />
+                            )}
+                          </FormGroup>
                         </Col>
                       </Row>
                     </>
@@ -433,14 +525,19 @@ const EditProfilePage = ({ ShowServices }) => {
                     disabled={isSaveDisabled || loading}
                     className="me-2"
                   >
-                    {loading ? <Spinner size="sm" color="light" /> : <>{EDITPROFILE_PAGE.BUTTONS.SAVE}</>}
+                    {loading ? (
+                      <Spinner size="sm" color="light" />
+                    ) : (
+                      <>{EDITPROFILE_PAGE.BUTTONS.SAVE}</>
+                    )}
                   </Button>
                   <Button
                     color="danger"
                     onClick={handleCancelEdit}
                     disabled={loading}
                   >
-                    <FontAwesomeIcon icon={faTimes} /> {EDITPROFILE_PAGE.BUTTONS.CANCEL}
+                    <FontAwesomeIcon icon={faTimes} />{" "}
+                    {EDITPROFILE_PAGE.BUTTONS.CANCEL}
                   </Button>
                 </Form>
               ) : (
@@ -451,44 +548,58 @@ const EditProfilePage = ({ ShowServices }) => {
                   <CardBody>
                     <Row>
                       <Col xs={6}>
-                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.FIRST_NAME}</p>
+                        <p className="fw-semibold">
+                          {EDITPROFILE_PAGE.CARD_LABELS.FIRST_NAME}
+                        </p>
                         <p className="w-100">{UsersData?.firstName}</p>
                       </Col>
                       <Col xs={6}>
-                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.LAST_NAME}</p>
+                        <p className="fw-semibold">
+                          {EDITPROFILE_PAGE.CARD_LABELS.LAST_NAME}
+                        </p>
                         <p className="w-100">{UsersData?.lastName}</p>
                       </Col>
                     </Row>
                     <Row>
                       <Col xs={6}>
-                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.EMAIL}</p>
+                        <p className="fw-semibold">
+                          {EDITPROFILE_PAGE.CARD_LABELS.EMAIL}
+                        </p>
                         <p className="w-100">{UsersData?.email}</p>
                       </Col>
                       <Col xs={6}>
-                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.PHONE}</p>
+                        <p className="fw-semibold">
+                          {EDITPROFILE_PAGE.CARD_LABELS.PHONE}
+                        </p>
                         <p className="w-100">{UsersData?.phoneNumber}</p>
                       </Col>
                     </Row>
                     <Row>
                       {ShowServices && (
                         <Col>
-                          <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.SERVICES}</p>
-                          <ol >
+                          <p className="fw-semibold">
+                            {EDITPROFILE_PAGE.CARD_LABELS.SERVICES}
+                          </p>
+                          <ol>
                             {UsersData?.services?.map((service) => (
                               <li className="pb-2" key={service.name}>
-                                {service.name} - {service.rate} {EDITPROFILE_PAGE.CARD_LABELS.RATE}
+                                {service.name} - {service.rate}{" "}
+                                {EDITPROFILE_PAGE.CARD_LABELS.RATE}
                               </li>
                             ))}
                           </ol>
                         </Col>
                       )}
                       <Col>
-                        <p className="fw-semibold">{EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}</p>
+                        <p className="fw-semibold">
+                          {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
+                        </p>
                         <p className="w-100">{UsersData?.address}</p>
                       </Col>
-
                     </Row>
-                    <Button color="primary" onClick={handleEditModeToggle}>{EDITPROFILE_PAGE.BUTTONS.EDIT}</Button>
+                    <Button color="primary" onClick={handleEditModeToggle}>
+                      {EDITPROFILE_PAGE.BUTTONS.EDIT}
+                    </Button>
                   </CardBody>
                 </Card>
               )}

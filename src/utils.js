@@ -22,7 +22,6 @@ export const checkRole = () => {
   }
 };
 
-
 export const truncateText = (text, maxLength) => {
   return text?.length > maxLength ? `${text?.slice(0, maxLength)}...` : text;
 };
@@ -42,17 +41,16 @@ export const toggleDetails = (prevMap, orderId) => {
   };
 };
 
-
 export const checkToken = () => {
   const token = localStorage.getItem("token");
-  
+
   if (token) {
     try {
       const decodedToken = jwtDecode(token);
-    
+
       if (decodedToken.exp) {
         const currentTime = Math.floor(Date.now() / 1000);
-    
+
         if (decodedToken.exp > currentTime) {
           return decodedToken;
         } else {
@@ -63,7 +61,9 @@ export const checkToken = () => {
           return null;
         }
       } else {
-        console.warn("Token does not have an expiration time. Consider using an exp claim in your token.");
+        console.warn(
+          "Token does not have an expiration time. Consider using an exp claim in your token."
+        );
         return decodedToken;
       }
     } catch (error) {
@@ -80,11 +80,10 @@ export const checkToken = () => {
 
 export const validatePassword = (password) => {
   // Password pattern with disallowance of spaces
-  const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;;
+  const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
 
   return password.match(passwordPattern);
 };
-
 
 export const hasOnlyWhiteSpace = (str) => {
   return !str?.trim();
@@ -94,7 +93,14 @@ export const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export const handleNameChange = (formData, setFormData, setErrors,errors, fieldName, e) => {
+export const handleNameChange = (
+  formData,
+  setFormData,
+  setErrors,
+  errors,
+  fieldName,
+  e
+) => {
   const { value } = e.target;
   setErrors({ ...errors, [fieldName]: "" });
   // Check if the entered value is a valid string (only letters and spaces)
@@ -112,9 +118,7 @@ export const handleNameChange = (formData, setFormData, setErrors,errors, fieldN
       [fieldName]: capitalizedValue,
     });
   }
-
 };
-
 
 export const validateEmail = (email) => {
   const trimmedEmail = email.trim(); // Remove leading and trailing spaces
@@ -133,13 +137,11 @@ export const successToast = (message) => {
     autoClose: 3000, // Duration in milliseconds
     hideProgressBar: false,
     closeOnClick: true,
-    pauseOnHover: true,
+    pauseOnHover: false,
     draggable: true,
     progress: undefined,
   });
 };
-
-
 
 export const failureToast = (message) => {
   toast.error(message, {
@@ -147,7 +149,19 @@ export const failureToast = (message) => {
     autoClose: 3000,
     hideProgressBar: false,
     closeOnClick: true,
-    pauseOnHover: true,
+    pauseOnHover: false,
+    draggable: true,
+    progress: undefined,
+  });
+};
+
+export const infoToast = (message) => {
+  toast.info(message, {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
     draggable: true,
     progress: undefined,
   });

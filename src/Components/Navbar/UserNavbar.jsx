@@ -21,7 +21,7 @@ import { RiInboxArchiveLine } from "react-icons/ri";
 import { navbarConstants } from "../../Constants/Constants";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutAsync } from "../../Redux/Slices/AuthSlice";
+import { logoutAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import { IoIosNotifications } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
@@ -51,31 +51,44 @@ const UserNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const { user } = useSelector((state) => state.auth);
+  const { user,token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-
+  
   useEffect(() => { 
-    if(unreadMessages){
+    if (unreadMessages) {
       const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
       setNewMessage(hasUnreadMessages);
     }
-  },[unreadMessages]);
+  }, [unreadMessages]);
+
+  // useEffect(() => { 
+  //   if(unreadMessages){
+  //     const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
+  //     setNewMessage(hasUnreadMessages);
+  //   }
+  // },[unreadMessages]);
 
   const Logout = async () => {
     Swal.fire({
       title: "Are You Sure You Want To Log Out?",
       showCancelButton: true,
-      confirmButtonText: "Log Out",
+      confirmButtonText: "Logout",
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        await socket?.disconnect();
+       
+        const id = user._id;
+        const data = { id, status:"offline", token };
+         const Result =await dispatch(toggleStatusAsync(data));
+         console.log(Result.payload.updatedStatus)
+        await socket?.emit("online-offline", Result.payload.updatedStatus);
         const result = await dispatch(logoutAsync());
+        await socket?.disconnect();
         if (result.type === "auth/logout/fulfilled") {
           navigate("/auth/login");
-        }
+        } 
       }
     });
   };
@@ -87,19 +100,41 @@ const UserNavbar = () => {
   const HandleNotificationSelection = (item) => {
     setChat(item.chat);
     setSelectedChatCompare(item.chat);
+  
     const data = {
       userId: user?._id,
       chatId: item?.chat?._id,
     };
     socket?.emit("chat read", data);
+  
     setUnreadMessages((prevCount) => ({
       ...prevCount,
-      [item?.chat?._id]:0,
+      [item?.chat?._id]: 0,
     }));
+  
     setSelectedChat(() => SelectChat(item?.chat));
-    setNotification(notification.filter((n) => n !== item));
+  
+    setNotification((prevNotifications) => prevNotifications.filter((n) => n !== item));
+  
     setShowModal(true);
   };
+
+  // const HandleNotificationSelection = (item) => {
+  //   setChat(item.chat);
+  //   setSelectedChatCompare(item.chat);
+  //   const data = {
+  //     userId: user?._id,
+  //     chatId: item?.chat?._id,
+  //   };
+  //   socket?.emit("chat read", data);
+  //   setUnreadMessages((prevCount) => ({
+  //     ...prevCount,
+  //     [item?.chat?._id]:0,
+  //   }));
+  //   setSelectedChat(() => SelectChat(item?.chat));
+  //   setNotification(notification.filter((n) => n !== item));
+  //   setShowModal(true);
+  // };
 
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
@@ -120,9 +155,24 @@ const UserNavbar = () => {
   };
 
   const handleMessageIconClick = () => {
+    setCopyOfChats((prevChats) => {
+      // Avoid unnecessary state updates if `OriginalChats` is the same as the current `copyOfChats`
+      if (prevChats === OriginalChats) {
+        return prevChats;
+      }
+      
+      // Update `copyOfChats` to match `OriginalChats`
+      return OriginalChats.slice();
+    });
+  
     setShowModal(true);
-    setCopyOfChats(OriginalChats);
   };
+  
+
+  // const handleMessageIconClick = () => {
+  //   setShowModal(true);
+  //   setCopyOfChats(OriginalChats);
+  // };
 
   return (
     <>
@@ -141,10 +191,15 @@ const UserNavbar = () => {
                 <NavItem
                   className="fs-3 text-white hover-pointer "
                   title="Edit Profile"
+                  style={{marginTop:"2%"}}
                 >
-                  <CgProfile
-                    onClick={HandleEditProfile}
-                  />
+                  {user.role === "worker" ? (
+                    <>
+                      <OnOffButton user={user} />
+                    </>
+                  ) : (
+                    []
+                  )}
                 </NavItem>
                 <UncontrolledDropdown
                   className=" fs-3"
@@ -152,6 +207,7 @@ const UserNavbar = () => {
                   inNavbar
                   title="View Notifications"
                 >
+                  
                   <DropdownToggle nav className="d-flex">
                     <div>
                       <IoIosNotifications className=" text-white hover-pointer " />
@@ -169,7 +225,7 @@ const UserNavbar = () => {
                   </DropdownToggle>
                   <DropdownMenu className=" Z-index" end container="body">
                     {notification.length === 0 ? (
-                      <DropdownItem>No new messages</DropdownItem>
+                      <DropdownItem>No new notification.</DropdownItem>
                     ) : (
                       notification.map((item) => (
                         <DropdownItem
@@ -191,16 +247,14 @@ const UserNavbar = () => {
                   </DropdownMenu>
                 </UncontrolledDropdown>
 
+                
                 {user.role == "worker" ? (
                   <NavItem
                     className="text-white fs-3  d-flex hover-pointer "
                     title="View New Offers"
                   >
                     <div>
-                      <RiInboxArchiveLine
-                       
-                        onClick={orders}
-                      />
+                      <RiInboxArchiveLine onClick={orders} />
                     </div>
                     {offerNotification.length > 0 && (
                       <h6>
@@ -221,15 +275,14 @@ const UserNavbar = () => {
                   title="Chats"
                 >
                   {newMessage && (
-                     <div className=" position-relative  z-3 notification-Dot"></div>
-                    )}
-                  
+                    <div className=" position-relative  z-3 notification-Dot"></div>
+                  )}
+
                   <FiMessageCircle
                     className={`${newMessage ? "mb-2" : ""}`}
                     onClick={handleMessageIconClick}
-                  /> 
+                  />
                 </NavItem>
-               
               </>
             ) : (
               []
@@ -266,20 +319,43 @@ const UserNavbar = () => {
                 )}
               </OffcanvasBody>
             </Offcanvas>
-            <NavItem className="text-white ">
-              <Button color="danger" className="p-1 " onClick={Logout}>
-                Logout
-              </Button>
-            </NavItem>
-            {user.role === "worker" ? (
-              <>
-                <NavItem className="text-white ">
-                  <OnOffButton user={user} />
-                </NavItem>
-              </>
-            ) : (
-              []
-            )}
+            
+            <span className="fs-5" style={{marginTop:"2%", color:"white"}}> {user.firstName} {user.lastName}</span>
+            <UncontrolledDropdown>
+              <DropdownToggle
+                style={{
+                  border: "2px solid #007BFF",
+                  background: "transparent",
+                }}
+                caret
+              >
+               
+              </DropdownToggle>
+              <DropdownMenu className="p-2">
+                <DropdownItem
+                  className="d-flex gap-2"
+                  onClick={HandleEditProfile}
+                >
+                  {" "}
+                  <CgProfile className="fs-4" />{" "}
+                  <b className="align-self-center">Edit Profile</b>
+                </DropdownItem>
+                <DropdownItem className="d-flex flex-row">
+                 
+                </DropdownItem>
+                <DropdownItem
+                  className="d-flex gap-2 justify-content-center"
+                  onClick={Logout}
+                >
+                  {" "}
+                  <Button color="danger" className=" ">
+                    Logout
+                  </Button>
+                </DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+
+            {/* <NavItem className="text-white "></NavItem> */}
           </Nav>
         </Collapse>
       </Navbar>

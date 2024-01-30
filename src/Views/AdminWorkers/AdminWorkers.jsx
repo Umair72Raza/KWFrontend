@@ -156,7 +156,7 @@ const AdminWorkers = () => {
             {ADMIN_WORKERS.NO_INACTIVE_WORKERS}
           </p>
         ) : (
-          <Row xs="1" md="2" lg="2" style={{marginLeft:"5%"}} className="justify-content-center">
+          <Row xs="1" md="2" lg="2" xl="3" style={{padding:"1% 5% 0% 5%"}} className="justify-content-center">
             {activeTab === "workers"
               ? activeWorkers.map((person, index) => (
                   <Col key={index}>

@@ -14,6 +14,7 @@ import Booking from "../booking popup/booking";
 import { ChatState } from "../../Context/ChatProvider";
 import { useSelector } from "react-redux";
 import { SelectChat } from "../../utils";
+import { set } from "lodash";
 
 const WorkerCard = ({ worker }) => {
   const { user } = useSelector((state) => state.auth);
@@ -25,6 +26,8 @@ const WorkerCard = ({ worker }) => {
     setSelectedChat,
     setSelectedChatCompare,
     setChat,
+    chatFromWorkerCard,
+    setChatFromWorkerCard,
   } = ChatState();
   const [modal, setModal] = useState(false);
   const [bookingWorker, SetBookingWorker] = useState();
@@ -40,11 +43,15 @@ const WorkerCard = ({ worker }) => {
     return stars;
   };
 
+
   const HandleChat = () => {
     setShowModal(true);
-    const isWorkerInChats = copyOfChats?.some((chat) =>
-      chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
+    setChatFromWorkerCard(true);
+  
+    const isWorkerInChats = copyOfChats?.some(
+      (chat) => chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
     );
+  
     if (!isWorkerInChats) {
       // Create a fake chat
       const fakeChat = {
@@ -54,29 +61,71 @@ const WorkerCard = ({ worker }) => {
         latestMessage: null,
         seen: true,
       };
-      // Add the fake chat to the chats array
-      if (copyOfChats?.length > 0) {
-        setCopyOfChats([fakeChat, ...copyOfChats]);
+  
+      setCopyOfChats((prevCopyOfChats) => {
+        const updatedChats = prevCopyOfChats.length > 0
+          ? [fakeChat, ...prevCopyOfChats]
+          : [fakeChat];
+        
         setChat(fakeChat);
         setSelectedChatCompare(fakeChat);
         setSelectedChat(() => SelectChat(fakeChat));
-      } else {
-        setCopyOfChats([fakeChat]);
-        setChat(fakeChat);
-        setSelectedChatCompare(fakeChat);
-        setSelectedChat(() => SelectChat(fakeChat));
-      }
+  
+        return updatedChats;
+      });
     } else {
+      const workerChat = copyOfChats.find(
+        (chat) => chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
+      );
+  
       if (worker.access === "accepted") {
-        const chat = copyOfChats.find((chat) =>
-          chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
-        );
-        setChat(chat);
-        setSelectedChatCompare(chat);
-        setSelectedChat(() => SelectChat(chat));
+        setChat(workerChat);
+        setSelectedChatCompare(workerChat);
+        setSelectedChat(() => SelectChat(workerChat));
       }
     }
   };
+  
+  // const HandleChat = () => {
+  //   setShowModal(true);
+  //   setChatFromWorkerCard(true);
+  //   const isWorkerInChats = copyOfChats?.some((chat) =>
+  //     chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
+  //   );
+  //   if (!isWorkerInChats) {
+  //     // Create a fake chat
+  //     const fakeChat = {
+  //       _id: "",
+  //       chatName: "fakeChat",
+  //       users: [worker, user],
+  //       latestMessage: null,
+  //       seen: true,
+  //     };
+  //     // Add the fake chat to the chats array
+  //     if (copyOfChats?.length > 0) {
+  //       setCopyOfChats([fakeChat, ...copyOfChats]);
+  //       setChat(fakeChat);
+  //       setSelectedChatCompare(fakeChat);
+  //       setSelectedChat(() => SelectChat(fakeChat));
+  //     } else {
+  //       setCopyOfChats([fakeChat]);
+  //       setChat(fakeChat);
+  //       setSelectedChatCompare(fakeChat);
+  //       setSelectedChat(() => SelectChat(fakeChat));
+  //     }
+  //   } else {
+  //     if (worker.access === "accepted") {
+  //       const chat = copyOfChats.find((chat) =>
+  //         chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
+  //       );
+  //       setChat(chat);
+  //       setSelectedChatCompare(chat);
+  //       setSelectedChat(() => SelectChat(chat));
+  //     }
+  //   }
+  // };
+
+  
   const toggleModal = () => {
     setModal(!modal);
   };
