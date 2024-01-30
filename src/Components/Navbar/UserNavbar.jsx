@@ -51,19 +51,21 @@ const UserNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const { user,token } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
-  
-  useEffect(() => { 
+
+  useEffect(() => {
     if (unreadMessages) {
-      const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
+      const hasUnreadMessages = Object.values(unreadMessages).some(
+        (value) => value > 0
+      );
       setNewMessage(hasUnreadMessages);
     }
   }, [unreadMessages]);
 
-  // useEffect(() => { 
+  // useEffect(() => {
   //   if(unreadMessages){
   //     const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
   //     setNewMessage(hasUnreadMessages);
@@ -78,16 +80,15 @@ const UserNavbar = () => {
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-       
         const id = user._id;
-        const data = { id, status:"offline", token };
-         const Result =await dispatch(toggleStatusAsync(data));
+        const data = { id, status: "offline", token };
+        const Result = await dispatch(toggleStatusAsync(data));
         await socket?.emit("online-offline", Result.payload.updatedStatus);
         const result = await dispatch(logoutAsync());
         await socket?.disconnect();
         if (result.type === "auth/logout/fulfilled") {
           navigate("/auth/login");
-        } 
+        }
       }
     });
   };
@@ -99,22 +100,24 @@ const UserNavbar = () => {
   const HandleNotificationSelection = (item) => {
     setChat(item.chat);
     setSelectedChatCompare(item.chat);
-  
+
     const data = {
       userId: user?._id,
       chatId: item?.chat?._id,
     };
     socket?.emit("chat read", data);
-  
+
     setUnreadMessages((prevCount) => ({
       ...prevCount,
       [item?.chat?._id]: 0,
     }));
-  
+
     setSelectedChat(() => SelectChat(item?.chat));
-  
-    setNotification((prevNotifications) => prevNotifications.filter((n) => n !== item));
-  
+
+    setNotification((prevNotifications) =>
+      prevNotifications.filter((n) => n !== item)
+    );
+
     setShowModal(true);
   };
 
@@ -159,14 +162,13 @@ const UserNavbar = () => {
       if (prevChats === OriginalChats) {
         return prevChats;
       }
-      
+
       // Update `copyOfChats` to match `OriginalChats`
       return OriginalChats.slice();
     });
-  
+
     setShowModal(true);
   };
-  
 
   // const handleMessageIconClick = () => {
   //   setShowModal(true);
@@ -190,7 +192,7 @@ const UserNavbar = () => {
                 <NavItem
                   className="fs-3 text-white hover-pointer "
                   title="Edit Profile"
-                  style={{marginTop:"2%"}}
+                  style={{ marginTop: "2%" }}
                 >
                   {user.role === "worker" ? (
                     <>
@@ -206,7 +208,6 @@ const UserNavbar = () => {
                   inNavbar
                   title="View Notifications"
                 >
-                  
                   <DropdownToggle nav className="d-flex">
                     <div>
                       <IoIosNotifications className=" text-white hover-pointer " />
@@ -246,7 +247,6 @@ const UserNavbar = () => {
                   </DropdownMenu>
                 </UncontrolledDropdown>
 
-                
                 {user.role == "worker" ? (
                   <NavItem
                     className="text-white fs-3  d-flex hover-pointer "
@@ -318,8 +318,11 @@ const UserNavbar = () => {
                 )}
               </OffcanvasBody>
             </Offcanvas>
-            
-            <span className="fs-5" style={{marginTop:"2%", color:"white"}}> {user.firstName} {user.lastName}</span>
+
+            <span className="fs-5" style={{ marginTop: "2%", color: "white" }}>
+              {" "}
+              {user.firstName} {user.lastName}
+            </span>
             <UncontrolledDropdown>
               <DropdownToggle
                 style={{
@@ -327,21 +330,24 @@ const UserNavbar = () => {
                   background: "transparent",
                 }}
                 caret
-              >
-               
-              </DropdownToggle>
+              ></DropdownToggle>
               <DropdownMenu className="p-2">
-                <DropdownItem
-                  className="d-flex gap-2"
-                  onClick={HandleEditProfile}
-                >
-                  {" "}
-                  <CgProfile className="fs-4" />{" "}
-                  <b className="align-self-center">Edit Profile</b>
-                </DropdownItem>
-                <DropdownItem className="d-flex flex-row">
-                 
-                </DropdownItem>
+                {!user.role === "admin" ? (
+                  <>
+                    <DropdownItem
+                      className="d-flex gap-2"
+                      onClick={HandleEditProfile}
+                    >
+                      {" "}
+                      <CgProfile className="fs-4" />{" "}
+                      <b className="align-self-center">Edit Profile</b>
+                    </DropdownItem>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                <DropdownItem className="d-flex flex-row"></DropdownItem>
                 <DropdownItem
                   className="d-flex gap-2 justify-content-center"
                   onClick={Logout}
