@@ -14,8 +14,8 @@ import {
 } from "reactstrap";
 import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
 import { failureToast, successToast, validateEmail } from "../../utils";
-import { useDispatch } from "react-redux";
-import { loginAsync } from "../../Redux/Slices/AuthSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loginAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { set } from "lodash";
@@ -32,7 +32,7 @@ const Login = () => {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const socket = useSelector((state) => state?.socket?.socket);
   const toggle = () => setTooltipOpen(!tooltipOpen);
 
   useEffect(() => {
@@ -85,6 +85,15 @@ const Login = () => {
               [LoginPage.FORM_FIELDS.PASSWORD]: "",
             });
             successToast("Login successful! Welcome back!");
+            if (result.payload.user.role == "worker") {
+              const id = result.payload.user._id;
+              
+              const data = { id, status: "online", token: result.payload.token };
+              console.log(data)
+              const Result = await dispatch(toggleStatusAsync(data));
+              console.log(Result)
+              //await socket?.emit("online-offline", Result.payload.updatedStatus);
+            }
             navigate("/user/homepage");
           }
         } else if (result.type === "auth/login/rejected") {
@@ -101,9 +110,9 @@ const Login = () => {
 
   return (
     <Container className="d-flex flex-column gap-5 justify-content-center align-items-center" style={{ minHeight: "90vh" }}>
-    <Row>
-      <Col><h1>{LoginPage.TITLE}</h1></Col>
-    </Row>
+      <Row>
+        <Col><h1>{LoginPage.TITLE}</h1></Col>
+      </Row>
       <Row className="w-100 d-flex justify-content-center">
         <Col md={6} lg={4} xl={3}>
           <h2 className="text-center mt-5 mb-4">{LoginPage.LABELS.LOGIN}</h2>

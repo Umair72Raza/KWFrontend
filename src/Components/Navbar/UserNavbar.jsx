@@ -82,7 +82,6 @@ const UserNavbar = () => {
         const id = user._id;
         const data = { id, status:"offline", token };
          const Result =await dispatch(toggleStatusAsync(data));
-         console.log(Result.payload.updatedStatus)
         await socket?.emit("online-offline", Result.payload.updatedStatus);
         const result = await dispatch(logoutAsync());
         await socket?.disconnect();
