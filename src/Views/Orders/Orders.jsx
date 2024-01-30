@@ -26,8 +26,13 @@ import { setnewOrderValue } from "../../Redux/Slices/BookingSlice";
 import OrderCard from "../../Components/OrderComponents/OrderCard";
 import { useNavigate } from "react-router-dom";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
-import { hideSpinner, selectSpinnerVisibility, showSpinner } from "../../Redux/Slices/LoaderSlice";
+import {
+  hideSpinner,
+  selectSpinnerVisibility,
+  showSpinner,
+} from "../../Redux/Slices/LoaderSlice";
 import { TABS } from "../../Constants/Constants";
+import { PopUpState } from "../../Context/PopUpProvider";
 
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
@@ -35,10 +40,8 @@ const Orders = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [cancelledClicked, setcancelledClicked] = useState(false); //checks if cancel was ever clicked
   const dispatch = useDispatch();
-  const [scheduledOrders, setScheduledOrders] = useState([]);
-  const [pastOrders, setPastOrders] = useState([]);
-  const [cancelledOrders, setCancelledOrders] = useState([]);
-  const [activeOrder, setActiveOrder] = useState([]);
+  //const [pastOrders, setPastOrders] = useState([]);
+  // const [activeOrder, setActiveOrder] = useState([]);
   const [isScheduledOrdersFetched, setIsScheduledOrdersFetched] =
     useState(false);
   const [isPastOrdersFetched, setIsPastOrdersFetched] = useState(false);
@@ -46,7 +49,16 @@ const Orders = () => {
     useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
-
+  let {
+    cancelledOrders,
+    setCancelledOrders,
+    scheduledOrders,
+    setScheduledOrders,
+    activeOrder,
+    setActiveOrder,
+    pastOrders,
+    setPastOrders
+  } = PopUpState();
 
   const navigate = useNavigate();
   const { newOrder } = useSelector((state) => state.booking);
@@ -56,13 +68,11 @@ const Orders = () => {
     }
   };
 
-
   useEffect(() => {
     const fetchData = async () => {
       let result;
       switch (activeTab) {
         case "1":
-
           // Check if scheduledOrders is already available locally
           if (!isScheduledOrdersFetched) {
             dispatch(showSpinner());
@@ -310,9 +320,9 @@ const Orders = () => {
             </TabPane>
           </TabContent>
         </Row>
-        <div style={{textAlign:"center"}}>
-      {spinnerVisible && <Spinner />}
-      </div>
+        <div style={{ textAlign: "center" }}>
+          {spinnerVisible && <Spinner />}
+        </div>
       </Container>
     </>
   );

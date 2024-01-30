@@ -12,17 +12,20 @@ import { FaStar } from "react-icons/fa";
 import { feedbackConstants } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import { AddFeedBack } from "../../Redux/Slices/FeedBackSlice";
-const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
+import { PopUpState } from "../../Context/PopUpProvider";
+const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
   const { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [rateing, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [modal2, setModal] = useState(true);
-
+  let {setFinishConfirmed}=PopUpState()
   const toggle = () => {
     if (user.role == "user") {
-      setFinishOrderReq(false);
       setModal(false);
+      setFinishConfirmed(false)
+      setFinishOrderReq(false);
+      
     } else if (user.role == "worker") {
       SetConfirm("");
       setModal(false);
@@ -40,6 +43,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm }) => {
       if (flag == true) {
         dispatch(AddFeedBack({ params, token }));
       }
+      setFinishConfirmed(false)
       setFinishOrderReq(false);
     } else if (user.role == "worker") {
       const params = {

@@ -21,7 +21,7 @@ import { RiInboxArchiveLine } from "react-icons/ri";
 import { navbarConstants } from "../../Constants/Constants";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutAsync } from "../../Redux/Slices/AuthSlice";
+import { logoutAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import { IoIosNotifications } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
@@ -51,7 +51,7 @@ const UserNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const { user } = useSelector((state) => state.auth);
+  const { user,token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
@@ -78,11 +78,17 @@ const UserNavbar = () => {
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        await socket?.disconnect();
+       
+        const id = user._id;
+        const data = { id, status:"offline", token };
+         const Result =await dispatch(toggleStatusAsync(data));
+         console.log(Result.payload.updatedStatus)
+        await socket?.emit("online-offline", Result.payload.updatedStatus);
         const result = await dispatch(logoutAsync());
+        await socket?.disconnect();
         if (result.type === "auth/logout/fulfilled") {
           navigate("/auth/login");
-        }
+        } 
       }
     });
   };
@@ -311,7 +317,7 @@ const UserNavbar = () => {
               </OffcanvasBody>
             </Offcanvas>
             <NavItem className="text-white ">
-              <Button color="danger" className="p-1 " onClick={Logout}>
+              <Button color="danger" className=" " onClick={Logout}>
                 Logout
               </Button>
             </NavItem>
