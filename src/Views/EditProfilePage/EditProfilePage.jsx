@@ -476,7 +476,7 @@ const EditProfilePage = ({ ShowServices }) => {
                           md={12}
                           className="d-flex flex-row Service-overflow-y-scroll"
                         >
-                          <FormGroup>
+                          <FormGroup className="w-100">
                             {listLoading && ShowServices ? (
                               <div className="text-center w-100">
                                 <Spinner />

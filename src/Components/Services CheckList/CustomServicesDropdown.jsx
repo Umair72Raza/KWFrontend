@@ -78,8 +78,8 @@ const CustomServiceDropdown = ({
       <div>{RegisterPage.LOADER_MESSAGES.LIST_NOT_AVAILABLE}</div>
     )}
     <div className="text-center mt-3">
-      {errors.rate && (
-        <span className="text-danger">{errors.rate}</span>
+      {errors?.rate && (
+        <span className="text-danger">{errors?.rate}</span>
       )}
     </div>
   </div>
