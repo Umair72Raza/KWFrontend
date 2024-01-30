@@ -40,7 +40,9 @@ const NewPassword = () => {
   const { otpStatus } = useSelector((state) => state?.auth);
   const [otpVisible, setOtpVisible] = useState(false);
   const [showPassPlaceholder, setShowPassPlaceHolder] = useState(false);
-  const [showConfPassPlaceholer,setShowConfPassPlaceholer] = useState(false)
+  const [showConfPassPlaceholer, setShowConfPassPlaceholer] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   useEffect(() => {
     if (otpStatus === "succeeded") {
@@ -49,21 +51,21 @@ const NewPassword = () => {
     }
   }, [otpStatus]);
 
-  useEffect(() => {
-    if (newPassword !== confirmNewPassword) {
-      setNotEqualError("Both Passwords must match");
-    } else {
-      setNotEqualError(null);
-    }
-  }, [newPassword, confirmNewPassword]);
-
   const handlePasswordChange = (e) => {
     const password = e.target.value;
     setNewPassword(password);
+    if (attempts > 0) {
+      setShowValidationErrors(true);
+      validatePassword(password, confirmNewPassword);
+    }
   };
 
   const handleConfirmNewPassword = (e) => {
     setConfirmNewPassword(e.target.value);
+    if (attempts > 0) {
+      setShowValidationErrors(true);
+      validatePassword(newPassword, confirmNewPassword);
+    }
   };
 
   const verifyOTPSENT = async (e) => {
@@ -88,6 +90,8 @@ const NewPassword = () => {
 
   const saveNewPassword = async (e) => {
     e.preventDefault();
+    setAttempts(attempts + 1);
+    setShowValidationErrors(true);
     setSaveClicked(true);
     const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
     if (!newPassword.match(passwordPattern)) {
@@ -105,6 +109,20 @@ const NewPassword = () => {
       }
     } catch (error) {
       failureToast("OTP expired");
+    }
+  };
+
+  const validatePassword = (password, confirmPassword) => {
+    const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
+
+    if (!password.match(passwordPattern)) {
+      setNotEqualError(
+        "Password must contain at least one special character, one uppercase letter, one number, and be at least 8 characters long."
+      );
+    } else if (password !== confirmPassword) {
+      setNotEqualError("Both Passwords must match");
+    } else {
+      setNotEqualError(null);
     }
   };
 
@@ -243,8 +261,12 @@ const NewPassword = () => {
                                     id="password"
                                     onFocus={() => setShowPassPlaceHolder(true)}
                                     onBlur={() => setShowPassPlaceHolder(false)}
-                                    placeholder={showPassPlaceholder ? "" : newpasswordConstants.NP_CONSTANTS
-                                    .PASSWORD_PH}
+                                    placeholder={
+                                      showPassPlaceholder
+                                        ? ""
+                                        : newpasswordConstants.NP_CONSTANTS
+                                            .PASSWORD_PH
+                                    }
                                     value={newPassword}
                                     onChange={handlePasswordChange}
                                   />
@@ -281,16 +303,26 @@ const NewPassword = () => {
                                     />
                                   </InputGroupText>
                                   <Input
-                                    style={{ textAlign: "center", paddingLeft:"5%" }}
+                                    style={{
+                                      textAlign: "center",
+                                      paddingLeft: "5%",
+                                    }}
                                     type={
                                       showConfirmPassword ? "text" : "password"
                                     }
                                     id="confirmNewPassword"
                                     name="confirmNewPassword"
-                                    onFocus={() => setShowConfPassPlaceholer(true)}
-                                    onBlur={() => setShowConfPassPlaceholer(false)}
-                                    placeholder={showConfPassPlaceholer ? "" : newpasswordConstants.NP_CONSTANTS
-                                    .CONFIRMPASSWORD_PH
+                                    onFocus={() =>
+                                      setShowConfPassPlaceholer(true)
+                                    }
+                                    onBlur={() =>
+                                      setShowConfPassPlaceholer(false)
+                                    }
+                                    placeholder={
+                                      showConfPassPlaceholer
+                                        ? ""
+                                        : newpasswordConstants.NP_CONSTANTS
+                                            .CONFIRMPASSWORD_PH
                                     }
                                     value={confirmNewPassword}
                                     onChange={handleConfirmNewPassword}
@@ -312,13 +344,48 @@ const NewPassword = () => {
                                     </Button>
                                   </InputGroupText>
                                 </InputGroup>
-                                {notEqualError && saveClicked && (
+                                {/* {notEqualError && saveClicked && (
                                   <span className="text-danger">
                                     {notEqualError}
                                   </span>
-                                )}
+                                )} */}
                               </Col>
                             </Row>
+
+                            {/* {showValidationErrors && attempts > 0 && (
+                              <Row>
+                                <Col
+                                  style={{ textAlign: "center" }}
+                                  md={{
+                                    offset: 3,
+                                    size: 6,
+                                  }}
+                                >
+                                  {notEqualError && (
+                                    <span className="text-danger">
+                                      {notEqualError}
+                                    </span>
+                                  )}
+                                </Col>
+                              </Row>
+                            )} */}
+                            {showValidationErrors && attempts > 0 && (
+                              <Row>
+                                <Col
+                                  style={{ textAlign: "center" }}
+                                  md={{
+                                    offset: 3,
+                                    size: 6,
+                                  }}
+                                >
+                                  {notEqualError && (
+                                    <span className="text-danger">
+                                      {notEqualError}
+                                    </span>
+                                  )}
+                                </Col>
+                              </Row>
+                            )}
                           </FormGroup>
                           <Button onClick={saveNewPassword} color="success">
                             {newpasswordConstants.NP_CONSTANTS.SAVEBUTTON}

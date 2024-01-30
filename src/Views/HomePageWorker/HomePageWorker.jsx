@@ -27,7 +27,6 @@ import StartJob from "../../Components/StartJob/StartJob";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import Swal from "sweetalert2";
-import "./styles.css";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
 import {
   hideSpinner,
@@ -35,7 +34,6 @@ import {
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
 import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
-import { useStartJob } from "../../Context/StartJobContext";
 import { PopUpState } from "../../Context/PopUpProvider";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
@@ -53,9 +51,6 @@ const HomePageWorker = () => {
   const { user, token } = useSelector((state) => state.auth);
   const [updateScheduled, setUpdateScheduled] = useState(false);
   const [latestOrder, setLatestOrders] = useState();
-  // const [pastOrders, setPastOrders] = useState([]);
-  // const [cancelledOrders, setCancelledOrders] = useState([]);
-  //const [activeOrder, setActiveOrder] = useState([]);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   const { socket } = useSelector((state) => state?.socket);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
@@ -117,39 +112,6 @@ const HomePageWorker = () => {
         console.log(scheduledOrders, "all scheduled orders");
         console.log(data.order, "order in start job data");
         setOid(data?.order?.Title);
-        //showStartJobResult("true", data.order.Title);
-
-        // Use the functional form of setScheduledOrders to access the previous state
-        // setScheduledOrders((prevScheduledOrders) => {
-        //   // Check if the order exists in scheduledOrders
-        //   const scheduledOrderIndex = prevScheduledOrders.findIndex(
-        //     (order) => order.id === data.order.id
-        //   );
-
-        //   if (scheduledOrderIndex !== -1) {
-        //     // Remove from scheduledOrders
-        //     const updatedScheduledOrders = [...prevScheduledOrders];
-        //     updatedScheduledOrders.splice(scheduledOrderIndex, 1);
-        //     // Set the updated scheduled orders to the local state
-        //     setScheduledOrders(updatedScheduledOrders);
-
-        //     setActiveOrder((prevActiveOrders) => {
-        //       // Check if the order is already present in active orders
-        //       const isOrderAlreadyPresent = prevActiveOrders.some(
-        //         (order) => order._id === data.order._id
-        //       );
-        //       if (!isOrderAlreadyPresent) {
-        //         // Add the order to active orders if it's not present
-        //         return [...prevActiveOrders, data.order];
-        //       }
-        //       // If the order is already present, return the current state
-        //       return prevActiveOrders;
-        //     });
-        //     return updatedScheduledOrders;
-        //   }
-        //   return prevScheduledOrders;
-        // });
-
         setScheduledOrders((prevScheduledOrders) =>
           prevScheduledOrders.filter(
             (scheduledOrder) => scheduledOrder._id !== data.order._id
@@ -160,7 +122,6 @@ const HomePageWorker = () => {
       } else if (data.result == "false") {
         setStartJobStatus("false");
         setStartJobVerified(true);
-        //showStartJobResult("false");
       }
     });
     return () => {
@@ -172,7 +133,6 @@ const HomePageWorker = () => {
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
       let reason = data.reason;
-
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {
         reason = HomePageWorkerConsts.REASON_NOT_MENTIONED;

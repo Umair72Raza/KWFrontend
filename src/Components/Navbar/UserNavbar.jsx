@@ -74,7 +74,7 @@ const UserNavbar = () => {
     Swal.fire({
       title: "Are You Sure You Want To Log Out?",
       showCancelButton: true,
-      confirmButtonText: "Log Out",
+      confirmButtonText: "Logout",
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
@@ -191,10 +191,15 @@ const UserNavbar = () => {
                 <NavItem
                   className="fs-3 text-white hover-pointer "
                   title="Edit Profile"
+                  style={{marginTop:"2%"}}
                 >
-                  <CgProfile
-                    onClick={HandleEditProfile}
-                  />
+                  {user.role === "worker" ? (
+                    <>
+                      <OnOffButton user={user} />
+                    </>
+                  ) : (
+                    []
+                  )}
                 </NavItem>
                 <UncontrolledDropdown
                   className=" fs-3"
@@ -202,6 +207,7 @@ const UserNavbar = () => {
                   inNavbar
                   title="View Notifications"
                 >
+                  
                   <DropdownToggle nav className="d-flex">
                     <div>
                       <IoIosNotifications className=" text-white hover-pointer " />
@@ -241,16 +247,14 @@ const UserNavbar = () => {
                   </DropdownMenu>
                 </UncontrolledDropdown>
 
+                
                 {user.role == "worker" ? (
                   <NavItem
                     className="text-white fs-3  d-flex hover-pointer "
                     title="View New Offers"
                   >
                     <div>
-                      <RiInboxArchiveLine
-                       
-                        onClick={orders}
-                      />
+                      <RiInboxArchiveLine onClick={orders} />
                     </div>
                     {offerNotification.length > 0 && (
                       <h6>
@@ -271,15 +275,14 @@ const UserNavbar = () => {
                   title="Chats"
                 >
                   {newMessage && (
-                     <div className=" position-relative  z-3 notification-Dot"></div>
-                    )}
-                  
+                    <div className=" position-relative  z-3 notification-Dot"></div>
+                  )}
+
                   <FiMessageCircle
                     className={`${newMessage ? "mb-2" : ""}`}
                     onClick={handleMessageIconClick}
-                  /> 
+                  />
                 </NavItem>
-               
               </>
             ) : (
               []
@@ -316,20 +319,43 @@ const UserNavbar = () => {
                 )}
               </OffcanvasBody>
             </Offcanvas>
-            <NavItem className="text-white ">
-              <Button color="danger" className=" " onClick={Logout}>
-                Logout
-              </Button>
-            </NavItem>
-            {user.role === "worker" ? (
-              <>
-                <NavItem className="text-white ">
-                  <OnOffButton user={user} />
-                </NavItem>
-              </>
-            ) : (
-              []
-            )}
+            
+            <span className="fs-5" style={{marginTop:"2%", color:"white"}}> {user.firstName} {user.lastName}</span>
+            <UncontrolledDropdown>
+              <DropdownToggle
+                style={{
+                  border: "2px solid #007BFF",
+                  background: "transparent",
+                }}
+                caret
+              >
+               
+              </DropdownToggle>
+              <DropdownMenu className="p-2">
+                <DropdownItem
+                  className="d-flex gap-2"
+                  onClick={HandleEditProfile}
+                >
+                  {" "}
+                  <CgProfile className="fs-4" />{" "}
+                  <b className="align-self-center">Edit Profile</b>
+                </DropdownItem>
+                <DropdownItem className="d-flex flex-row">
+                 
+                </DropdownItem>
+                <DropdownItem
+                  className="d-flex gap-2 justify-content-center"
+                  onClick={Logout}
+                >
+                  {" "}
+                  <Button color="danger" className=" ">
+                    Logout
+                  </Button>
+                </DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+
+            {/* <NavItem className="text-white "></NavItem> */}
           </Nav>
         </Collapse>
       </Navbar>

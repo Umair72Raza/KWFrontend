@@ -20,6 +20,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
   const [comment, setComment] = useState("");
   const [modal2, setModal] = useState(true);
   let {setFinishConfirmed}=PopUpState()
+  const [disableSend,setDisableSend] = useState(false);
   const toggle = () => {
     if (user.role == "user") {
       setModal(false);
@@ -30,8 +31,10 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
       SetConfirm("");
       setModal(false);
     }
+    setDisableSend(false)
   };
   const send = () => {
+    setDisableSend(true);
     if (user.role == "user") {
       const params = {
         orderId: order._id,
@@ -111,7 +114,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
                 setComment(e.target.value);
               }}
             />
-            <Button color="primary" onClick={send}>
+            <Button color="primary" disabled={disableSend} onClick={send}>
               Send
             </Button>
           </div>
