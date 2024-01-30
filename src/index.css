@@ -23,20 +23,9 @@ text-decoration: underline !important;
 
 }
 .List-Width{
-  width: 50% !important;
+  width: 100% !important;
 }
-@media screen and (max-width: 768px) {
-  .List-Width{
-    width: 70% !important;
-  }
-  
-}
-@media screen and (max-width: 576px) {
-  .List-Width{
-    width: 100% !important;
-  }
-  
-}
+
 
 .password-input-wrapper {
   position: relative;
