@@ -11,7 +11,7 @@ const OnOffButton = () => {
   const dispatch = useDispatch();
   const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
-    user.status === "online" ? setIsOn(true)  : setIsOn(false);
+    user?.status === "online" ? setIsOn(true)  : setIsOn(false);
     socket?.emit("online-offline", user);
   }, [user]);
 

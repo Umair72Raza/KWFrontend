@@ -25,7 +25,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDetails, setTaskDetails] = useState(``);
   const [dateTime, setDateTime] = useState("");
-  const [amountPerHour, setAmountPerHour] = useState("");
+  const [amountPerHour, setAmountPerHour] = useState(5);
   const [serviceOption, setServiceOption] = useState("none");
   // const [params, SetParams] = useState({});
   const [offerResult, setOfferResult] = useState("");
@@ -198,12 +198,13 @@ const getCurrentDateTime = () => {
 };
 const handleAmountChange = (e) => {
   const enteredValue = e.target.value;
-
+  setAmountPerHour(enteredValue);
   // Validate if the entered value is within the range 5 to 100000
   if (enteredValue >= 5 && enteredValue <= 100000) {
-    setAmountPerHour(enteredValue);
-
-    //setAmountError(""); // Clear the error message if the value is valid
+    
+    setAmountError(""); // Clear the error message if the value is valid
+  }else{
+    setAmountError("Enter amount in range 5-100000")
   }
 };
 
@@ -319,6 +320,12 @@ return (
             onChange={(e) => handleAmountChange(e)}
             min={5}
             max={100000}
+            //readOnly={amountPerHour?.length > 6}
+            onKeyDown={(e) => {
+              if (amountPerHour.length >= 6 && e.key !== 'Backspace') {
+                e.preventDefault();
+              }
+            }}
           />
           {amountError && (
             <div style={{ color: "red" }}>{amountError}</div>
