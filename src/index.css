@@ -111,7 +111,7 @@ text-decoration: underline !important;
 
 .messages {
   flex-grow: 1 !important;
-  overflow-y: scroll !important;
+  overflow-y: auto !important;
   padding: 10px !important;
 }
 
