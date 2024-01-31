@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { Container, Input, Spinner } from "reactstrap";
+import { Container, Input, Label, Spinner } from "reactstrap";
 import { useDebounce } from "../../Hooks/Debounce";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { map } from "lodash";
 
 const libraries = [import.meta.env.VITE_GOOGLE_API_LIBARARY];
 
@@ -298,14 +299,16 @@ const Map = React.memo(
         handleLoadScript();
       }
     }, [editMode, handleLoadScript]);
-
+   
     useEffect(() => {
       setupAutocomplete();
-    }, [currentLocation, country, setupAutocomplete, location.pathname]);
+    }, [location.pathname,isMapLoaded]);
 
     return (
       <Container>
+        <Label for="AutoSearch" className="fw-semibold ">Search Address*</Label>
         <Input
+        id="AutoSearch"
           innerRef={autocompleteRef}
           type="text"
           placeholder={

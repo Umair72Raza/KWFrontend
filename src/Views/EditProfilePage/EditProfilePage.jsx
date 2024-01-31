@@ -218,8 +218,8 @@ const EditProfilePage = ({ ShowServices }) => {
         const {
           firstName,
           lastName,
-          email,
-          phoneNumber,
+          // email,
+          // phoneNumber,
           location,
           // latitude,
           // longitude,

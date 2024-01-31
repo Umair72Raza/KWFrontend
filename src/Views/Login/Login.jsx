@@ -33,16 +33,14 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const socket = useSelector((state) => state?.socket?.socket);
-  const toggle = () => setTooltipOpen(!tooltipOpen);
 
   useEffect(() => {
     const isFormValid = !errors.email && formData.email && formData.password;
     setLoginDisabled(!isFormValid);
-  }, [formData]);
+  }, [errors, formData]);
 
   const handleEmailChange = (e) => {
     setErrors({ ...errors, email: "" });
-    setLoginDisabled(false);
     setFormData({
       ...formData,
       email: e.target.value,
@@ -51,7 +49,6 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setLoginDisabled(false);
     setFormData({
       ...formData,
       [name]: value,
@@ -63,7 +60,6 @@ const Login = () => {
     if (!validateEmail(formData.email)) {
       errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
     }
-
     return errors;
   };
 
@@ -87,17 +83,12 @@ const Login = () => {
             successToast("Login successful! Welcome back!");
             if (result.payload.user.role == "worker") {
               const id = result.payload.user._id;
-              
               const data = { id, status: "online", token: result.payload.token };
-              console.log(data)
               const Result = await dispatch(toggleStatusAsync(data));
-              console.log(Result)
-              //await socket?.emit("online-offline", Result.payload.updatedStatus);
             }
             navigate("/user/homepage");
           }
         } else if (result.type === "auth/login/rejected") {
-          setLoginDisabled(true);
           failureToast(result.payload);
         }
       }
@@ -209,7 +200,7 @@ const Login = () => {
               autohide={false}
               isOpen={tooltipOpen && loginDisabled}
               target="Login"
-              toggle={toggle}
+              toggle={() => setTooltipOpen(!tooltipOpen)}
             >
               Enter all fields to login!
             </Tooltip>
