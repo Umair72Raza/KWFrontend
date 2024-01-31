@@ -27,6 +27,7 @@ const NewPassword = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const email = location?.state?.email;
+  console.log(email)
   const [OTP, setOTP] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");

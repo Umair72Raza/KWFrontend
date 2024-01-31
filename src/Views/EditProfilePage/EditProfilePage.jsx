@@ -35,6 +35,8 @@ import { useNavigate } from "react-router-dom";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
 import { set } from "lodash";
+import { hideSpinner, showSpinner } from "../../Redux/Slices/LoaderSlice";
+import { requestOTPforEmailAsync } from "../../Redux/Slices/AuthSlice";
 
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -56,6 +58,9 @@ const EditProfilePage = ({ ShowServices }) => {
     services: [],
   });
 
+  const [emailEdit, setEmailEdit] = useState(false);
+  const [newMail, setNewMail] = useState("");
+  const [validNewMail, setValidNewMail] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
@@ -327,6 +332,58 @@ const EditProfilePage = ({ ShowServices }) => {
     }
   };
 
+  const showEmailEdits = () => {
+    setEmailEdit(true);
+  };
+
+  const toggleEditEmail = () => {
+    setEmailEdit(!emailEdit);
+  };
+
+  const requestOTP = async () => {
+    //dispatch the api to send the otp
+    const mail = UsersData?.email;
+    const data = { mail, token, newMail };
+    console.log(newMail)
+    try {
+      dispatch(showSpinner());
+      const otpResp = await dispatch(requestOTPforEmailAsync(data));
+      if (otpResp.type === "auth/requestOTPforEmailAsync/fulfilled") {
+        successToast("OTP sent successfully!");
+        user.role === "worker"
+          ? navigate("/worker/otpVerification", {
+              state: { email: UsersData.email, newMail: newMail },
+            })
+          : navigate("/user/otpVerification ", {
+              state: { email: UsersData.email, newMail: newMail },
+            });
+      }
+    } catch (error) {
+      failureToast("Error sending OTP");
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
+  const updateEmail = () => {
+    toggleEditEmail();
+    requestOTP();
+
+    // send the old email
+  };
+
+  const handleChange = (e) => {
+    const enteredEmail = e.target.value;
+    setNewMail(enteredEmail);
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Check if entered email matches the regex
+    const isValid = emailRegex.test(enteredEmail);
+    setValidNewMail(isValid);
+    // setIsValidEmail(isValid);
+    // setEnableButton(isValid);
+  };
+
   return (
     <>
       <UserNavbar />
@@ -413,7 +470,7 @@ const EditProfilePage = ({ ShowServices }) => {
                       </FormGroup>
                     </Col>
                   </Row>
-               {/*   <Row>
+                  {/*   <Row>
                     <Col md={6}>
                       <FormGroup>
                         <Label className="fw-semibold" for="email">
@@ -565,7 +622,56 @@ const EditProfilePage = ({ ShowServices }) => {
                         <p className="fw-semibold">
                           {EDITPROFILE_PAGE.CARD_LABELS.EMAIL}
                         </p>
-                        <p className="w-100">{UsersData?.email}</p>
+                        {emailEdit ? (
+                          <>
+                            <Input
+                              id="exampleEmail"
+                              name="email"
+                              placeholder="Enter the new email"
+                              type="email"
+                              onChange={handleChange}
+                              style={{
+                                fontSize: "1rem",
+                                border: `1px solid`,
+                                borderRadius: "5px",
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <p className="w-100">{UsersData?.email}</p>
+                          </>
+                        )}
+                        {emailEdit ? (
+                          <>
+                            <Row className="mt-1">
+                              <Col>
+                                {" "}
+                                <Button
+                                  disabled={!validNewMail}
+                                  onClick={updateEmail}
+                                  color="success"
+                                >
+                                  Update
+                                </Button>
+                              </Col>
+                              <Col>
+                                <Button
+                                  onClick={toggleEditEmail}
+                                  color="danger"
+                                >
+                                  Cancel Edit
+                                </Button>
+                              </Col>
+                            </Row>
+                          </>
+                        ) : (
+                          <>
+                            <Button onClick={showEmailEdits} color="primary">
+                              Edit
+                            </Button>
+                          </>
+                        )}
                       </Col>
                       <Col xs={6}>
                         <p className="fw-semibold">
@@ -597,7 +703,8 @@ const EditProfilePage = ({ ShowServices }) => {
                         <p className="w-100">{UsersData?.address}</p>
                       </Col>
                     </Row>
-                    <Button color="primary" onClick={handleEditModeToggle}>
+                    {/* ${edit ?"d-none" :""} */}
+                    <Button color={`primary`} onClick={handleEditModeToggle}>
                       {EDITPROFILE_PAGE.BUTTONS.EDIT}
                     </Button>
                   </CardBody>

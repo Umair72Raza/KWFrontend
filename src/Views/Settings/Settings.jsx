@@ -35,25 +35,6 @@ const Settings = () => {
   const [isEditingScheduledOrder, setIsEditingScheduledOrder] = useState(false);
   const [isEditingRadius, setIsEditingRadius] = useState(false);
 
-//   const checkValidation = (valids) => {
-//     const { newValue, upperLimit, lowerLimit, name, units } = valids;
-//     let capitalized = capitalizeFirstLetter(name);
-//     if (newValue > upperLimit) {
-//       failureToast(
-//         `${capitalized} cannot be more than ${upperLimit} ${units}!`
-//       );
-//       return false;
-//     } else if (newValue < lowerLimit) {
-//       failureToast(
-//         `${capitalized} cannot be less than ${lowerLimit} ${units}!`
-//       );
-//       return false;
-//     } else if (isNaN(newValue)) {
-//       failureToast(`${capitalized} must be a valid number!`);
-//       return false;
-//     }
-//     return true;
-//   };
 
 const checkValidation = (valids) => {
     const { newValue, upperLimit, lowerLimit, name, units } = valids;

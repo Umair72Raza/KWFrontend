@@ -82,8 +82,8 @@ export const deleteServiceAsync = createAsyncThunk(
   "/admin/deleteService",
   async (data) => {
     try {
-      const { token, id } = data;
-      const response = await deleteAService(token, id);
+      const { token, id, serviceName } = data;
+      const response = await deleteAService(token,id, serviceName);
       return response;
     } catch (error) {
       console.log(error, "error deleting service");

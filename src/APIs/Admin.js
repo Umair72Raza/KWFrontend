@@ -72,9 +72,9 @@ export const createNewService = async (token, name, id) => {
   }
 };
 
-export const deleteAService = async (token, id) => {
+export const deleteAService = async (token, id, serviceName) => {
   try {
-    const response = await API.delete(`admin/services/${id}`, {
+    const response = await API.delete(`admin/services/${id}/${serviceName}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -132,14 +132,12 @@ export const fetchFeedbacksofUser = async (data) => {
 
 export const fetchSettings = async (data) => {
   try {
-    //console.log(data,"data in the api")
     const { token } = data;
     const response = await API.get(`settings/getAllSettings`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    //console.log(response.data,"data response in api")
     return response.data;
   } catch (error) {
     throw error?.response?.data;
@@ -149,7 +147,7 @@ export const fetchSettings = async (data) => {
 export const updateSettings = async (data) => {
   try {
     const { token, newValue, propertyName } = data;
-    const actualData = {propertyName, newValue};
+    const actualData = { propertyName, newValue };
     console.log(propertyName, "propertyName");
 
     const response = await API.put(`settings/updateSettings`, actualData, {
