@@ -24,7 +24,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import { IoIosNotifications } from "react-icons/io";
-import { CgProfile } from "react-icons/cg";
+import { CgProfile  } from "react-icons/cg";
+import { CiSettings } from "react-icons/ci";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
 import Swal from "sweetalert2";
@@ -65,12 +66,6 @@ const UserNavbar = () => {
     }
   }, [unreadMessages]);
 
-  // useEffect(() => {
-  //   if(unreadMessages){
-  //     const hasUnreadMessages = Object.values(unreadMessages).some((value) => value > 0);
-  //     setNewMessage(hasUnreadMessages);
-  //   }
-  // },[unreadMessages]);
 
   const Logout = async () => {
     Swal.fire({
@@ -121,22 +116,6 @@ const UserNavbar = () => {
     setShowModal(true);
   };
 
-  // const HandleNotificationSelection = (item) => {
-  //   setChat(item.chat);
-  //   setSelectedChatCompare(item.chat);
-  //   const data = {
-  //     userId: user?._id,
-  //     chatId: item?.chat?._id,
-  //   };
-  //   socket?.emit("chat read", data);
-  //   setUnreadMessages((prevCount) => ({
-  //     ...prevCount,
-  //     [item?.chat?._id]:0,
-  //   }));
-  //   setSelectedChat(() => SelectChat(item?.chat));
-  //   setNotification(notification.filter((n) => n !== item));
-  //   setShowModal(true);
-  // };
 
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
@@ -152,6 +131,15 @@ const UserNavbar = () => {
       navigate("/worker/editprofile");
     }
   };
+
+  const HandleEditSettings = () =>{
+    if(user.role==="admin"){
+      navigate("/admin/settings");
+    }
+  }
+
+
+
   const toggleOffcanvas = () => {
     SetShowOffer(!offer);
   };
@@ -169,11 +157,6 @@ const UserNavbar = () => {
 
     setShowModal(true);
   };
-
-  // const handleMessageIconClick = () => {
-  //   setShowModal(true);
-  //   setCopyOfChats(OriginalChats);
-  // };
 
   return (
     <>
@@ -333,7 +316,16 @@ const UserNavbar = () => {
               ></DropdownToggle>
               <DropdownMenu className="p-2">
                 {user.role === "admin" ? (
-                  <></>
+                  <>
+                  <DropdownItem
+                      className="d-flex gap-2"
+                      onClick={HandleEditSettings}
+                    >
+                      {" "}
+                      <CiSettings className="fs-4" />{" "}
+                      <b className="align-self-center">Settings</b>
+                    </DropdownItem>
+                  </>
                 ) : (
                   <>
                     <DropdownItem
