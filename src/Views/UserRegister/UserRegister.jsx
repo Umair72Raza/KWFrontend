@@ -33,6 +33,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FaCheckCircle } from "react-icons/fa";
 import { set } from "lodash";
+import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -47,7 +48,10 @@ const UserRegister = ({ ShowServices }) => {
     // latitude: "",
     // longitude: "",
     address: "",
+    optionalAddress: "",
     country: "",
+    region_state: "",
+    city: "",
     services: [],
   });
   const dispatch = useDispatch();
@@ -141,13 +145,13 @@ const UserRegister = ({ ShowServices }) => {
     confirmPassword = confirmPassword.replace(/\s/g, "");
     if (confirmPassword !== formData.password) {
       setConfirmPasswordInfo(RegisterPage.ERROR_MESSAGES.passwordsNotMatch);
-    } else if(confirmPassword=== "") {
- setConfirmPasswordInfo("")
+    } else if (confirmPassword === "") {
+      setConfirmPasswordInfo("");
     } else {
-      setConfirmPasswordInfo(RegisterPage.SUCCESS_MESSAGES.CONFIRMPASSWORD)
+      setConfirmPasswordInfo(RegisterPage.SUCCESS_MESSAGES.CONFIRMPASSWORD);
     }
 
-    setErrors({ ...errors, confirmPassword: "" , password: ""});
+    setErrors({ ...errors, confirmPassword: "", password: "" });
 
     setFormData({
       ...formData,
@@ -203,6 +207,15 @@ const UserRegister = ({ ShowServices }) => {
       services: updatedServices,
     });
   };
+
+  const handleOptionalAddress = (e) => {
+    const value = e.target.value.trimStart().replace(/\s{2,}/g, " ");
+    setFormData({
+      ...formData,
+      optionalAddress: value,
+    });
+  };
+
   const FormValidation = (formData) => {
     const errors = {};
     // Check if all rates are within the specified range
@@ -245,10 +258,13 @@ const UserRegister = ({ ShowServices }) => {
     }
     if (hasOnlyWhiteSpace(formData.address)) {
       errors.address = RegisterPage.ERROR_MESSAGES.invalidAddress;
-    } 
-    if(hasOnlyWhiteSpace(formData.email)){
-      errors.email =RegisterPage.ERROR_MESSAGES.emptyEmail
     }
+    if (hasOnlyWhiteSpace(formData.email)) {
+      errors.email = RegisterPage.ERROR_MESSAGES.emptyEmail;
+    }
+    // if (hasOnlyWhiteSpace(formData.optionalAddress)) {
+    //   setFormData({ ...formData, optionalAddress: formData.address });
+    // }
 
     if (!ratesValid) {
       errors.rate = RegisterPage.ERROR_MESSAGES.invalidRate;
@@ -270,6 +286,7 @@ const UserRegister = ({ ShowServices }) => {
     // Check if there are validation errors
     if (Object.keys(validationErrors).length === 0) {
       try {
+        console.log("Form data", formData);
         // Dispatch the signup action
         const result = await dispatch(signUpUserAsync(formData));
 
@@ -287,7 +304,10 @@ const UserRegister = ({ ShowServices }) => {
             // latitude: "",
             // longitude: "",
             address: "",
+            optionalAddress: "",
             country: "",
+            region_state: "",
+            city: "",
             services: [],
           });
           const successMessage = ShowServices
@@ -333,7 +353,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.FIRST_NAME}
                   </Label>
                   <Input
-                   invalid={errors.firstName? true : false}
+                    invalid={errors.firstName ? true : false}
                     type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
                     name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
                     id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
@@ -364,7 +384,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.LAST_NAME}
                   </Label>
                   <Input
-                  invalid={errors.lastName? true : false}
+                    invalid={errors.lastName ? true : false}
                     type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
                     name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
                     id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
@@ -397,7 +417,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.EMAIL}
                   </Label>
                   <Input
-                 invalid={errors.email? true : false}
+                    invalid={errors.email ? true : false}
                     type={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     name={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     id={RegisterPage.INPUT_FIELDS.EMAIL.name}
@@ -423,7 +443,7 @@ const UserRegister = ({ ShowServices }) => {
                     {RegisterPage.LABELS.PHONE}
                   </Label>
                   <PhoneInput
-                  invalid={errors.phone? true : false}
+                    invalid={errors.phone ? true : false}
                     defaultCountry="PK"
                     id={RegisterPage.INPUT_FIELDS.PHONE.name}
                     placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
@@ -447,7 +467,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper">
                     <Input
-                   invalid={errors.password? true : false}
+                      invalid={errors.password ? true : false}
                       type={showPassword ? "text" : "password"}
                       name="password"
                       id="password"
@@ -491,8 +511,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper ">
                     <Input
-                   
-                    invalid={errors.confirmPassword? true : false}
+                      invalid={errors.confirmPassword ? true : false}
                       type={showConfirmPassword ? "text" : "password"}
                       name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
@@ -516,15 +535,13 @@ const UserRegister = ({ ShowServices }) => {
                       />
                     </div>
                   </div>
-                  {confirmPasswordInfo && 
+                  {confirmPasswordInfo &&
                   confirmPasswordInfo === "Password Matched." ? (
                     <span className=" fw-bold text-success">
                       <FaCheckCircle /> {confirmPasswordInfo}
                     </span>
                   ) : (
-                    <span className="text-danger">
-                      {confirmPasswordInfo}
-                    </span>
+                    <span className="text-danger">{confirmPasswordInfo}</span>
                   )}
                   {/* {errors?.confirmPassword && (<span className="text-danger">{errors?.confirmPassword}</span>)} */}
                 </FormGroup>
@@ -554,15 +571,13 @@ const UserRegister = ({ ShowServices }) => {
                           handleRateChange={handleRateChange}
                         />
                       )}
-                      
                     </FormGroup>
-                  
                   </Col>
                   <Col className="text-center mt-3">
-                        {errors?.rate && (
-                          <span className="text-danger">{errors?.rate}</span>
-                        )}
-                      </Col>
+                    {errors?.rate && (
+                      <span className="text-danger">{errors?.rate}</span>
+                    )}
+                  </Col>
                 </Row>
               </>
             )}
@@ -572,6 +587,24 @@ const UserRegister = ({ ShowServices }) => {
                   <Label className="fw-semibold" for="address">
                     {RegisterPage.LABELS.ADDRESS}
                   </Label>
+                  <Input
+                    type="text"
+                    placeholder="Enter your address(Optional)."
+                    value={formData.optionalAddress}
+                    onChange={handleOptionalAddress}
+                  />
+                </FormGroup>
+              </Col>
+              <Col md={12}>
+                {/* <Label className="fw-semibold" for="Country">
+               Select Country
+                  </Label> */}
+                <Dropdowns setFormData={setFormData} />
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <FormGroup>
                   <Map
                     setFormData={setFormData}
                     errors={errors}
