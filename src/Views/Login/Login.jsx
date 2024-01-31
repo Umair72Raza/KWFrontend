@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "reactstrap";
 import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
-import { failureToast, successToast, validateEmail } from "../../utils";
+import { emailPattern, failureToast, successToast, validateEmail } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -57,7 +57,7 @@ const Login = () => {
 
   const FormValidation = (formData) => {
     const errors = {};
-    if (!validateEmail(formData.email)) {
+    if (!emailPattern(formData.email)) {
       errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
     }
     return errors;

@@ -38,6 +38,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FaCheckCircle } from "react-icons/fa";
 import { set } from "lodash";
 import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
+import { City } from "country-state-city";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -69,6 +70,7 @@ const UserRegister = ({ ShowServices }) => {
   const [passwordInfo, setPasswordInfo] = useState("");
   const [confirmPasswordInfo, setConfirmPasswordInfo] = useState("");
   const [passwordValid, setPasswordValid] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const toggle = () => setTooltipOpen(!tooltipOpen);
@@ -204,7 +206,7 @@ const UserRegister = ({ ShowServices }) => {
 
   const handleRateChange = (e, serviceName) => {
     const value = parseFloat(e.target.value);
-    setErrors({ ...errors, rate: "" });
+    setErrors({ ...errors, [serviceName]: "" });
     const updatedServices = formData.services.map((service) =>
       service.name === serviceName ? { ...service, rate: value } : service
     );
@@ -244,15 +246,49 @@ const UserRegister = ({ ShowServices }) => {
 
   const FormValidation = (formData) => {
     const errors = {};
-  
+
     validateEmail(formData.email, errors);
     validatePhoneNumber(formData.phoneNumber, errors);
-    validateServices(ShowServices,formData.services, errors);
+    validateServices(ShowServices, formData.services, errors);
     validatePassword(formData.password, formData.confirmPassword, errors);
-    validateField(formData.firstName, 'firstName', RegisterPage.ERROR_MESSAGES.invalidFirstName, errors);
-    validateField(formData.lastName, 'lastName', RegisterPage.ERROR_MESSAGES.invalidLastName, errors);
-    validateField(formData.address, 'address', RegisterPage.ERROR_MESSAGES.invalidAddress, errors);
-  
+    validateField(
+      formData.firstName,
+      "firstName",
+      RegisterPage.ERROR_MESSAGES.invalidFirstName,
+      errors
+    );
+    validateField(
+      formData.lastName,
+      "lastName",
+      RegisterPage.ERROR_MESSAGES.invalidLastName,
+      errors
+    );
+    validateField(
+      formData.address,
+      "address",
+      RegisterPage.ERROR_MESSAGES.invalidAddress,
+      errors
+    );
+
+    errors.country = !formData.country ? "Country is required" : "";
+    errors.region_state = !formData.region_state
+      ? "Region/State is required"
+      : "";
+
+    if (
+      formData.region &&
+      City.getCitiesOfState(formData.country, formData.region_state).length ===
+        0
+    ) {
+      errors.city = "";
+    } else {
+      errors.city = !formData.city ? "City is required" : "";
+    }
+
+    if (!profilePicture) {
+      errors.profilePicture = "Profile picture is required";
+    }
+
     return errors;
   };
 
@@ -579,13 +615,18 @@ const UserRegister = ({ ShowServices }) => {
                           selectedServices={formData?.services}
                           handleServiceChange={handleServiceChange}
                           handleRateChange={handleRateChange}
+                          errors={errors}
                         />
                       )}
                     </FormGroup>
                   </Col>
                   <Col className="text-center mt-3">
-                    {errors?.rate && (
-                      <span className="text-danger">{errors?.rate}</span>
+                    {formData.services.length === 5 && !errors.services ? (
+                      <span className="text-info fw-semibold">
+                        {RegisterPage.SERVICES_INFO.SERVICES_SELECTION_LIMIT}
+                      </span>
+                    ) : (
+                      <span className="text-danger">{errors.services}</span>
                     )}
                   </Col>
                 </Row>
@@ -614,6 +655,7 @@ const UserRegister = ({ ShowServices }) => {
                     </span>
                   </Label>
                   <Input
+                    invalid={errors.profilePicture ? true : false}
                     type="file"
                     id="profilePicture"
                     accept="image/*"
@@ -626,10 +668,11 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={12}>
-                {/* <Label className="fw-semibold" for="Country">
-               Select Country
-                  </Label> */}
-                <Dropdowns setFormData={setFormData} />
+                <Dropdowns
+                  setFormData={setFormData}
+                  errors={errors}
+                  setErrors={setErrors}
+                />
               </Col>
             </Row>
             <Row>

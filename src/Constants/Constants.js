@@ -85,7 +85,7 @@ export const RegisterPage = {
       "Password must contain at least one special character, one uppercase letter, one number, and atleast 8 characters long.",
     passwordsNotMatch: "Passwords do not match.",
     enterAllFields: "Enter all the fields to sign up.",
-    invalidRate: "One or more rates are outside the valid range (10 to 999).",
+    invalidRate: "Rate is outside the valid range (10 to 999)$/hr.",
     invalidAddress: "Address cannot be empty",
     invalidLastName: "Last Name cannot be empty",
     invalidFirstName: "First Name cannot be empty",
@@ -145,6 +145,9 @@ TOOLTIPS: {
       placeholder: "Select a service",
       rate:"($/hr)"
     },
+  },
+  SERVICES_INFO :{
+SERVICES_SELECTION_LIMIT:"You can select upto 5 services.",
   },
   SERVICES_MAPPING: [
     { name: "Plumber", label: "Plumber" },

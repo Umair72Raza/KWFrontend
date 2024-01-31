@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { RegisterPage } from "./Constants/Constants";
+import { has } from "lodash";
 
 export const Toast_Notification = (string, type) => {
   toast[type](string, {
@@ -124,6 +125,8 @@ export const handleNameChange = (
 export  const validateEmail = (email, errors) => {
   if (!email || !email.includes('@') || !email.includes('.com')) {
     errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+  } else if(hasOnlyWhiteSpace(email)){
+    errors.email = RegisterPage.ERROR_MESSAGES.emptyEmail;
   }
 };
 
@@ -133,15 +136,24 @@ export  const validatePhoneNumber = (phoneNumber, errors) => {
   }
 };
 
-export  const validateServices = (ShowServices ,services, errors) => {
+export const validateServices = (ShowServices, services, errors) => {
   if (ShowServices && services.length === 0) {
     errors.services = RegisterPage.ERROR_MESSAGES.invalidService;
+  } else {
+    delete errors.services; // Clear previous error message
   }
 
-  if (services.some((service) => service.rate < 10 || service.rate > 999)) {
-    errors.rate = RegisterPage.ERROR_MESSAGES.invalidRate;
-  }
+  services.forEach((service) => {
+    if (service.rate < 10 || service.rate > 999) {
+      if (!errors[service.name]) {
+        errors[service.name] = RegisterPage.ERROR_MESSAGES.invalidRate;
+      }
+    } else {
+      delete errors[service.name]; // Clear previous error message
+    }
+  });
 };
+
   
 export  const validatePassword = (password, confirmPassword, errors) => {
   if (!passwordPattern(password)) {
