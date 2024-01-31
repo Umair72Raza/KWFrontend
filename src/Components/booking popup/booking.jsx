@@ -27,16 +27,17 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const [dateTime, setDateTime] = useState("");
   const [amountPerHour, setAmountPerHour] = useState("");
   const [serviceOption, setServiceOption] = useState("none");
- // const [params, SetParams] = useState({});
+  // const [params, SetParams] = useState({});
   const [offerResult, setOfferResult] = useState("");
   const dateTimeObject = new Date(dateTime);
   const datePart = dateTimeObject.toLocaleDateString();
   const timePart = dateTimeObject.toLocaleTimeString();
   const [formComplete, setFormComplete] = useState(false);
   const [dateTimeError, setDateTimeError] = useState("");
+  const [amountError, setAmountError] = useState("");
 
   let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-  let {params, SetParams,clear,setClear}=PopUpState()
+  let { params, SetParams, clear, setClear } = PopUpState()
   useEffect(() => {
     setFormComplete(
       taskTitle.trim() !== "" &&
@@ -80,231 +81,260 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   };
 
   const handleSend = () => {
-    const currentDate   = new Date();
+    const currentDate = new Date();
     const selectedDate = new Date(dateTime);
-    if(selectedDate > currentDate  ){
-    const data = {
-      Title: taskTitle,
-      Status: "Scheduled",
-      users: [user._id, worker._id],
-      date: datePart,
-      time: timePart,
-      details: taskDetails.replace(/\n/g, "<br>"),
-      amount: amountPerHour,
-      service: serviceOption,
-    };
-    SetParams(data);
-    
-
-    if (removedUsers) {
-      const present = removedUsers?.findIndex((u) => u._id === worker._id);
-      if (present !== -1) {
-        failureToast("Worker Gets Offline!");
-        toggle();
-      } else {
-        socket?.emit("newOffer", {
-          params: data,
-          Wid: worker._id,
-          chat: chat,
-          user,
-        });
-        Swal.fire({
-          title: "Offer Sent",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
-        toggle();
-        return () => {
-          socket?.off("newOffer");
-        };
-      }
-    } else {
-      socket?.emit("newOffer", {
-        params: data,
-        Wid: worker._id,
-        chat: chat,
-        user,
-      });
-      Swal.fire({
-        title: "Offer Sent",
-        icon: "success",
-        confirmButtonText: "OK",
-      });
-      toggle();
-      return () => {
-        socket?.off("newOffer");
+    if (selectedDate > currentDate) {
+      const data = {
+        Title: taskTitle,
+        Status: "Scheduled",
+        users: [user._id, worker._id],
+        date: datePart,
+        time: timePart,
+        details: taskDetails.replace(/\n/g, "<br>"),
+        amount: amountPerHour,
+        service: serviceOption,
       };
+      SetParams(data);
+
+
+      if (amountPerHour >= 5 && amountPerHour <= 100000) {
+        if (removedUsers) {
+          const present = removedUsers?.findIndex((u) => u._id === worker._id);
+          if (present !== -1) {
+            failureToast("Worker Gets Offline!");
+            toggle();
+          } else {
+            socket?.emit("newOffer", {
+              params: data,
+              Wid: worker._id,
+              chat: chat,
+              user,
+            });
+            Swal.fire({
+              title: "Offer Sent",
+              icon: "success",
+              confirmButtonText: "OK",
+            });
+            toggle();
+            return () => {
+              socket?.off("newOffer");
+            };
+          }
+        } else {
+          socket?.emit("newOffer", {
+            params: data,
+            Wid: worker._id,
+            chat: chat,
+            user,
+          });
+          Swal.fire({
+            title: "Offer Sent",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+          toggle();
+          return () => {
+            socket?.off("newOffer");
+          };
+        }
+    
+    
+    }
+    else {
+        setAmountError("Enter amount in range 5-100000")
     }
   }
-  else{
+  else {
     failureToast("Time is in past! select the future time");
-      
+
   }
-  };
+};
 
-  const starRating = (numStars) => {
-    const stars = [];
-    for (let i = 0; i < numStars; i++) {
-      stars.push(
-        <span key={i} className="y">
-          ★
-        </span>
-      );
-    }
-    return stars;
-  };
-
-  const handleServiceOptionChange = (e) => {
-    const selectedServiceName = e.target.value;
-    setServiceOption(selectedServiceName);
-    const selectedService = worker.services.find(
-      (service) => service.name === selectedServiceName
+const starRating = (numStars) => {
+  const stars = [];
+  for (let i = 0; i < numStars; i++) {
+    stars.push(
+      <span key={i} className="y">
+        ★
+      </span>
     );
-    if (selectedService) {
-      setAmountPerHour(selectedService.rate);
-    }
-  };
-  useEffect(()=>
-  {
-    if(clear==true)
-    {
-      resetForm();
-      setClear(false);
-    }
-  },[clear])
-  const resetForm = () => {
-    setTaskTitle("");
-    setTaskDetails(``);
-    setDateTime("");
-    setAmountPerHour("");
-    setServiceOption("none");
-    setDateTimeError("");
-    setFormComplete(false);
-  };
- 
-  return (
-    <div>
-      <Modal isOpen={modal} centered>
-        <ModalHeader
-          toggle={toggle}
-          className="justify-content-center fw-bold "
-        >
-          {BookingConstants.heading.book}
-        </ModalHeader>
-        <ModalBody>
-          <FormGroup>
-            <Label for="taskTitle" className="fw-bold">
-              {BookingConstants.Labels.taskTitle}
-            </Label>
-            <Input
-              type="text"
-              id="taskTitle"
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
-              maxLength={50}
-            />
-            {taskTitle.length >= 50 && (
-              <div style={{ color: "red" }}>Cannot exceed 50 characters</div>
-            )}
-          </FormGroup>
-          <FormGroup>
-            <Label className="fw-bold">{BookingConstants.Labels.worker}</Label>
-            <div className="d-flex flex-column flex-md-row  gap-md-4">
-              <div>
-                <b>{BookingConstants.div.name}</b>
-                {worker?.firstName + " " + worker?.lastName + "  "}
-              </div>
-              <div>
-                {" "}
-                <b>{BookingConstants.div.status}</b>
-                {worker?.status}
-              </div>
-              <div className="">
-                <b>{BookingConstants.div.rating}</b>
-                {worker?.rating > 0
-                  ? starRating(worker.rating)
-                  : "not rated yet"}
-              </div>
-            </div>
-          </FormGroup>
-          <FormGroup>
-            <Label for="taskDetails" className="fw-bold ">
-              {BookingConstants.Labels.taskDetail}
-            </Label>
-            <Input
-              type="textarea"
-              id="taskDetails"
-              value={taskDetails}
-              onChange={(e) => setTaskDetails(e.target.value)}
-              maxLength={1000}
-              style={{ minHeight: '100px',maxHeight: '100px' }}
-            />
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              {taskDetails.length}/1000
-            </div>
-            {taskDetails.length >= 1000 && (
-              <div style={{ color: "red" }}>Cannot exceed 1000 characters</div>
-            )}
-          </FormGroup>
-          <FormGroup>
-            <Label for="serviceOption " className="fw-bold">
-              {BookingConstants.Labels.service}
-            </Label>
-            <Input
-              type="select"
-              id="serviceOption"
-              value={serviceOption}
-              onChange={handleServiceOptionChange}
-            >
-              <option disabled value={"none"}>
-                None
-              </option>
-              {worker?.services?.map((service, key) => (
-                <option key={key} value={service?.name}>
-                  {service?.name}
-                </option>
-              ))}
-            </Input>
-          </FormGroup>
-          <FormGroup>
-            <Label for="dateTime" className="fw-bold">
-              {BookingConstants.Labels.datetime}
-            </Label>
-            <Input
-              type="datetime-local"
-              id="dateTime"
-              value={dateTime}
-              onChange={handleDateTimeChange}
-            />
-            {dateTimeError && (
-              <div style={{ color: "red" }}>{dateTimeError}</div>
-            )}
-          </FormGroup>
-          <FormGroup>
-            <Label for="amountPerHour" className="fw-bold">
-              {BookingConstants.Labels.amount}
-            </Label>
-            <Input
-              type="number"
-              id="amountPerHour"
-              value={amountPerHour}
-              onChange={(e) => setAmountPerHour(e.target.value)}
-              min={5}
-              max={50}
-            />
+  }
+  return stars;
+};
 
-          </FormGroup>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" disabled={!formComplete} onClick={handleSend}>
-            {BookingConstants.button.send}
-          </Button>{" "}
-          <Button color="secondary" onClick={toggle}>
-            {BookingConstants.button.cancel}
-          </Button>
-        </ModalFooter>
-      </Modal>
-      {/* {offerResult ? (
+const handleServiceOptionChange = (e) => {
+  const selectedServiceName = e.target.value;
+  setServiceOption(selectedServiceName);
+  const selectedService = worker.services.find(
+    (service) => service.name === selectedServiceName
+  );
+  if (selectedService) {
+    setAmountPerHour(selectedService.rate);
+  }
+};
+useEffect(() => {
+  if (clear == true) {
+    resetForm();
+    setClear(false);
+  }
+}, [clear])
+const resetForm = () => {
+  setTaskTitle("");
+  setTaskDetails(``);
+  setDateTime("");
+  setAmountPerHour("");
+  setServiceOption("none");
+  setDateTimeError("");
+  setFormComplete(false);
+};
+const getCurrentDateTime = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+const handleAmountChange = (e) => {
+  const enteredValue = e.target.value;
+
+  // Validate if the entered value is within the range 5 to 100000
+  if (enteredValue >= 5 && enteredValue <= 100000) {
+    setAmountPerHour(enteredValue);
+
+    //setAmountError(""); // Clear the error message if the value is valid
+  }
+};
+
+
+return (
+  <div>
+    <Modal isOpen={modal} centered>
+      <ModalHeader
+        toggle={toggle}
+        className="justify-content-center fw-bold "
+      >
+        {BookingConstants.heading.book}
+      </ModalHeader>
+      <ModalBody>
+        <FormGroup>
+          <Label for="taskTitle" className="fw-bold">
+            {BookingConstants.Labels.taskTitle}
+          </Label>
+          <Input
+            type="text"
+            id="taskTitle"
+            value={taskTitle}
+            onChange={(e) => setTaskTitle(e.target.value)}
+            maxLength={50}
+          />
+          {taskTitle.length >= 50 && (
+            <div style={{ color: "red" }}>Cannot exceed 50 characters</div>
+          )}
+        </FormGroup>
+        <FormGroup>
+          <Label className="fw-bold">{BookingConstants.Labels.worker}</Label>
+          <div className="d-flex flex-column flex-md-row  gap-md-4">
+            <div>
+              <b>{BookingConstants.div.name}</b>
+              {worker?.firstName + " " + worker?.lastName + "  "}
+            </div>
+            <div>
+              {" "}
+              <b>{BookingConstants.div.status}</b>
+              {worker?.status}
+            </div>
+            <div className="">
+              <b>{BookingConstants.div.rating}</b>
+              {worker?.rating > 0
+                ? starRating(worker.rating)
+                : "not rated yet"}
+            </div>
+          </div>
+        </FormGroup>
+        <FormGroup>
+          <Label for="taskDetails" className="fw-bold ">
+            {BookingConstants.Labels.taskDetail}
+          </Label>
+          <Input
+            type="textarea"
+            id="taskDetails"
+            value={taskDetails}
+            onChange={(e) => setTaskDetails(e.target.value)}
+            maxLength={1000}
+            style={{ minHeight: '100px', maxHeight: '100px' }}
+          />
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            {taskDetails.length}/1000
+          </div>
+          {taskDetails.length >= 1000 && (
+            <div style={{ color: "red" }}>Cannot exceed 1000 characters</div>
+          )}
+        </FormGroup>
+        <FormGroup>
+          <Label for="serviceOption " className="fw-bold">
+            {BookingConstants.Labels.service}
+          </Label>
+          <Input
+            type="select"
+            id="serviceOption"
+            value={serviceOption}
+            onChange={handleServiceOptionChange}
+          >
+            <option disabled value={"none"}>
+              None
+            </option>
+            {worker?.services?.map((service, key) => (
+              <option key={key} value={service?.name}>
+                {service?.name}
+              </option>
+            ))}
+          </Input>
+        </FormGroup>
+        <FormGroup>
+          <Label for="dateTime" className="fw-bold">
+            {BookingConstants.Labels.datetime}
+          </Label>
+          <Input
+            type="datetime-local"
+            id="dateTime"
+            value={dateTime}
+            onChange={handleDateTimeChange}
+            min={getCurrentDateTime()} // Set the minimum date and time
+
+          />
+          {dateTimeError && (
+            <div style={{ color: "red" }}>{dateTimeError}</div>
+          )}
+        </FormGroup>
+        <FormGroup>
+          <Label for="amountPerHour" className="fw-bold">
+            {BookingConstants.Labels.amount}
+          </Label>
+          <Input
+            type="number"
+            id="amountPerHour"
+            value={amountPerHour}
+            onChange={(e) => handleAmountChange(e)}
+            min={5}
+            max={100000}
+          />
+          {amountError && (
+            <div style={{ color: "red" }}>{amountError}</div>
+          )}
+        </FormGroup>
+      </ModalBody>
+      <ModalFooter>
+        <Button color="primary" disabled={!formComplete} onClick={handleSend}>
+          {BookingConstants.button.send}
+        </Button>{" "}
+        <Button color="secondary" onClick={toggle}>
+          {BookingConstants.button.cancel}
+        </Button>
+      </ModalFooter>
+    </Modal>
+    {/* {offerResult ? (
         <>
           <OfferResult
           
@@ -313,8 +343,8 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       ) : (
         <></>
       )} */}
-    </div>
-  );
+  </div>
+);
 };
 
 export default Booking;
