@@ -25,6 +25,7 @@ const PopUpContext = ({ children }) => {
   const [scheduledOrders, setScheduledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const [pastOrders, setPastOrders] = useState([]);
+  const [isOn, setIsOn] = useState(false);
   const cancel = () => {
     setOrderToCancel(null);
     setModalHeader("");
@@ -78,7 +79,7 @@ const PopUpContext = ({ children }) => {
         activeOrder,
         setActiveOrder,
         pastOrders,
-        setPastOrders,finishConfirmed, setFinishConfirmed,clear,setClear
+        setPastOrders,finishConfirmed, setFinishConfirmed,clear,setClear,isOn, setIsOn
       }}
     >
       {children}

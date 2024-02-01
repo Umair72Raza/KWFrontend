@@ -8,6 +8,7 @@ import {
   CardSubtitle,
   CardTitle,
   Button,
+  CardText,
 } from "reactstrap";
 import { workerCardConstants } from "../../Constants/Constants";
 import Booking from "../booking popup/booking";
@@ -147,10 +148,10 @@ const WorkerCard = ({ worker }) => {
                     {worker.firstName + " " + worker.lastName}
                   </CardTitle>
                   <CardSubtitle className="d-flex flex-row  justify-content-between" >
-                    <div className="fw-bold">Status:</div> <div>{worker.status}</div>
+                    <CardText className="fw-bold" >Status:</CardText> {worker.status == "online" ? <CardText className="text-success" >{worker.status}</CardText>:[]}
                   </CardSubtitle>
                   <CardSubtitle><b className="fw-bold">{workerCardConstants.WorkerCardText.Services}</b></CardSubtitle>
-                  <CardSubtitle className="overflow-y-scroll mt-1" style={{ minHeight: '60px' ,maxHeight: '60px'}}>
+                  <CardSubtitle className=" mt-1" style={{ minHeight: '60px' ,maxHeight: '60px' ,overflowY:'auto'}}>
                     {worker?.services.map((service, key) => (
                       <div
                         key={key}
@@ -179,7 +180,7 @@ const WorkerCard = ({ worker }) => {
                   <CardSubtitle className="d-flex flex-row  justify-content-between">
                     <div className="fw-bold mt-1">Distance: </div> <div>{worker.distance} </div>
                   </CardSubtitle>
-                  <div className="gap-3 d-flex flex-md-column ">
+                  <div className="gap-1 d-flex flex-md-column ">
                     <Button color="primary" onClick={HandleChat}>
                       {workerCardConstants.WorkerCardButtons.chat}
                     </Button>

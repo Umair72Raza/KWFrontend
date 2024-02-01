@@ -13,18 +13,21 @@ import {
   Tooltip,
 } from "reactstrap";
 import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
-import { failureToast, successToast, validateEmail } from "../../utils";
+import { emailPattern, failureToast, successToast, validateEmail } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { set } from "lodash";
+import { PopUpState } from "../../Context/PopUpProvider";
+import OnOffButton from "../../Components/OnOffButton/OnOffButton";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     [LoginPage.FORM_FIELDS.EMAIL]: "",
     [LoginPage.FORM_FIELDS.PASSWORD]: "",
   });
+  let {isOn, setIsOn}=PopUpState()
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState("");
   const [loginDisabled, setLoginDisabled] = useState(true);
@@ -57,7 +60,7 @@ const Login = () => {
 
   const FormValidation = (formData) => {
     const errors = {};
-    if (!validateEmail(formData.email)) {
+    if (!emailPattern(formData.email)) {
       errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
     }
     return errors;
@@ -85,8 +88,14 @@ const Login = () => {
               const id = result.payload.user._id;
               const data = { id, status: "online", token: result.payload.token };
               const Result = await dispatch(toggleStatusAsync(data));
+              console.log(Result)
+              //await socket?.emit("online-offline", Result.payload.updatedStatus);
+              await setIsOn(true)
+              navigate("/worker/workerHomepage");
             }
-            navigate("/user/homepage");
+            else
+            {
+            navigate("/user/homepage");}
           }
         } else if (result.type === "auth/login/rejected") {
           failureToast(result.payload);
@@ -226,6 +235,7 @@ const Login = () => {
           </Col>
         </Col>
       </Row>
+      
     </Container>
   );
 };

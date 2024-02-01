@@ -490,9 +490,8 @@ const ChatPopup = () => {
               <h5 className="ms-3 fw-bold">{ChatPopUpPage.CHAT_TITLE}</h5>
             </ModalHeader>
             <ModalBody className="" style={{ overflowY: "auto" }}>
-              {window.innerWidth <= 768 ? (
-                // For mobile devices, display only chats initially
-                <div className="container-fluid">
+                {/* // For mobile devices, display only chats initially */}
+                <div className="container-fluid d-lg-none d-block">
                   <div className="row">
                     <div className="col-12">
                       <div className="chat-preview overflow-y-auto max-height-chat-users">
@@ -648,9 +647,9 @@ const ChatPopup = () => {
                     </div>
                   </div>
                 </div>
-              ) : (
-                // For tablet and laptop, display chat and messages side by side
-                <div className="container-fluid">
+
+                {/* // For tablet and laptop, display chat and messages side by side */}
+                <div className="container-fluid d-none d-lg-block">
                   <div className="row">
                     {!chatFromWorkerCard && (
                       <div className="col-3 chat-list">
@@ -817,7 +816,6 @@ const ChatPopup = () => {
                     </div>
                   </div>
                 </div>
-              )}
             </ModalBody>
             <Booking
               modal={modal}
