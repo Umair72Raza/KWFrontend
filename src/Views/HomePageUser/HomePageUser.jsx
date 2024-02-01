@@ -367,7 +367,7 @@ const HomePageUser = () => {
                 </div>
               ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
                 filteredAndSortedUsers.map((worker, index) => (
-                  <Col md={4} lg={3}><WorkerCard worker={worker} key={index} /> </Col>
+                  <Col md={4} lg={3} className="mt-2"><WorkerCard worker={worker} key={index} /> </Col>
                 ))
               ) : (
                 <h3>No Workers found!</h3>

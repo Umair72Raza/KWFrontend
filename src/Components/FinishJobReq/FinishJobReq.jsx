@@ -78,7 +78,7 @@ const FinishJobReq = () => {
       ]);
 
       socket?.emit("finishjob-response", data);
-     
+      setFinishOrderReq(false);
       //setIsModalOpen(true)
      
     }
