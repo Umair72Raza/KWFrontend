@@ -36,7 +36,10 @@ import CustomServiceDropdown from "../../Components/Services CheckList/CustomSer
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
 import { set } from "lodash";
 import { hideSpinner, showSpinner } from "../../Redux/Slices/LoaderSlice";
-import { requestOTPforEmailAsync } from "../../Redux/Slices/AuthSlice";
+import {
+  requestOTPforEmailAsync,
+  requestOTPforPhoneAsync,
+} from "../../Redux/Slices/AuthSlice";
 
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -57,10 +60,13 @@ const EditProfilePage = ({ ShowServices }) => {
     address: "",
     services: [],
   });
-
+  const [phoneEdit, setPhoneEdit] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
+  const [validnewPhone, setValidNewPhone] = useState(false);
   const [emailEdit, setEmailEdit] = useState(false);
   const [newMail, setNewMail] = useState("");
-  const [validNewMail, setValidNewMail] = useState(false);
+  const [disableUpdateEmail, setDisableUpdateEmail] = useState(false);
+  const [newMailError, setNewMailError] = useState("");
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
@@ -334,54 +340,119 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const showEmailEdits = () => {
     setEmailEdit(true);
+    setPhoneEdit(false);
+  };
+  const showPhoneEdits = () => {
+    setEmailEdit(false);
+    setPhoneEdit(true);
   };
 
   const toggleEditEmail = () => {
     setEmailEdit(!emailEdit);
   };
 
+  const toggleEditPhone = () => {
+    setPhoneEdit(!phoneEdit);
+  };
+
   const requestOTP = async () => {
     //dispatch the api to send the otp
     const mail = UsersData?.email;
     const data = { mail, token, newMail };
-    console.log(newMail)
+    console.log(newMail);
     try {
       dispatch(showSpinner());
       const otpResp = await dispatch(requestOTPforEmailAsync(data));
       if (otpResp.type === "auth/requestOTPforEmailAsync/fulfilled") {
-        successToast("OTP sent successfully!");
-        user.role === "worker"
-          ? navigate("/worker/otpVerification", {
-              state: { email: UsersData.email, newMail: newMail },
-            })
-          : navigate("/user/otpVerification ", {
-              state: { email: UsersData.email, newMail: newMail },
-            });
+        console.log(otpResp, "response of otp[");
+        if (
+          otpResp?.payload?.data?.message ===
+          "New Email already taken by someone else."
+        ) {
+          const msg = `${newMail} is already taken by someone else.`;
+          return failureToast(msg);
+        } else {
+          successToast("OTP sent successfully!");
+          user.role === "worker"
+            ? navigate("/worker/otpVerification", {
+                state: { email: UsersData.email, newMail: newMail },
+              })
+            : navigate("/user/otpVerification ", {
+                state: { email: UsersData.email, newMail: newMail },
+              });
+        }
       }
     } catch (error) {
+      console.log(error);
       failureToast("Error sending OTP");
     } finally {
       dispatch(hideSpinner());
     }
   };
 
-  const updateEmail = () => {
-    toggleEditEmail();
-    requestOTP();
+  const requestOTPforPhone = async () => {
+    //dispatch the api to send the otp
+    const mail = UsersData?.email;
+    const data = { mail, token, newPhone };
+    console.log(newPhone);
+    try {
+      dispatch(showSpinner());
+      const otpResp = await dispatch(requestOTPforPhoneAsync(data));
+      if (otpResp.type === "auth/requestOTPforPhoneAsync/fulfilled") {
+        if (
+          otpResp?.payload?.data?.message ===
+          "New Phone already taken by someone else."
+        ) {
+          const msg = `${newPhone} is already taken by someone else.`;
+          return failureToast(msg);
+        } else {
+          console.log(otpResp, "response of otp for phone");
+          successToast("OTP sent successfully!");
 
-    // send the old email
+          user.role === "worker"
+            ? navigate("/worker/otpVerification", {
+                state: { email: UsersData.email, newPhone: newPhone },
+              })
+            : navigate("/user/otpVerification ", {
+                state: { email: UsersData.email, newPhone: newPhone },
+              });
+        }
+      } else if (otpResp.type === "auth/requestOTPforPhoneAsync/rejected") {
+        failureToast(otpResp.payload.error); // Display the error message
+      }
+    } catch (error) {
+      failureToast(error);
+    } finally {
+      dispatch(hideSpinner());
+    }
+  };
+
+  const updatePhone = () => {
+    toggleEditPhone();
+    requestOTPforPhone();
   };
 
   const handleChange = (e) => {
     const enteredEmail = e.target.value;
     setNewMail(enteredEmail);
-    // Email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //    Email validation regex
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
     // Check if entered email matches the regex
     const isValid = emailRegex.test(enteredEmail);
-    setValidNewMail(isValid);
-    // setIsValidEmail(isValid);
-    // setEnableButton(isValid);
+    setNewMailError(isValid);
+    setDisableUpdateEmail(!isValid);
+  };
+
+  const updateEmail = () => {
+    toggleEditEmail();
+    requestOTP();
+  };
+
+  const handlePhoneChange = (value) => {
+    setErrors({ ...errors, phone: "" });
+    setValidNewPhone(true);
+    setNewPhone(value);
   };
 
   return (
@@ -629,6 +700,7 @@ const EditProfilePage = ({ ShowServices }) => {
                               name="email"
                               placeholder="Enter the new email"
                               type="email"
+                              value={newMail}
                               onChange={handleChange}
                               style={{
                                 fontSize: "1rem",
@@ -648,7 +720,7 @@ const EditProfilePage = ({ ShowServices }) => {
                               <Col>
                                 {" "}
                                 <Button
-                                  disabled={!validNewMail}
+                                  disabled={disableUpdateEmail}
                                   onClick={updateEmail}
                                   color="success"
                                 >
@@ -677,7 +749,60 @@ const EditProfilePage = ({ ShowServices }) => {
                         <p className="fw-semibold">
                           {EDITPROFILE_PAGE.CARD_LABELS.PHONE}
                         </p>
-                        <p className="w-100">{UsersData?.phoneNumber}</p>
+                        {/* Inside the Phone section in the render */}
+                        {phoneEdit ? (
+                          <>
+                            <PhoneInput
+                              id="examplephone"
+                              name="phone"
+                              defaultCountry="PK"
+                              placeholder="Enter the new phone"
+                              type="text"
+                              international
+                              countryCallingCodeEditable={false}
+                              onChange={handlePhoneChange}
+                            />
+                            {/* Display error message if phone is not valid */}
+                            {/* {!validnewPhone && (
+                              <span className="text-danger">
+                                Invalid phone number. Please correct it.
+                              </span>
+                            )} */}
+                          </>
+                        ) : (
+                          <>
+                            <p className="w-100">{UsersData?.phoneNumber}</p>
+                          </>
+                        )}
+                        {phoneEdit ? (
+                          <>
+                            <Row className="mt-1">
+                              <Col>
+                                <Button
+                                  disabled={!validnewPhone}
+                                  onClick={updatePhone}
+                                  color="success"
+                                >
+                                  Update
+                                </Button>
+                              </Col>
+                              <Col>
+                                <Button
+                                  onClick={toggleEditPhone}
+                                  color="danger"
+                                >
+                                  Cancel Edit
+                                </Button>
+                              </Col>
+                            </Row>
+                          </>
+                        ) : (
+                          <>
+                            <Button onClick={showPhoneEdits} color="primary">
+                              Edit
+                            </Button>
+                          </>
+                        )}
                       </Col>
                     </Row>
                     <Row>

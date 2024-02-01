@@ -43,7 +43,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
 
     return showFullDetailsMap[order._id]
       ? order.details
-      : truncateText(transformedDetails, 5);
+      : truncateText(transformedDetails, 30);
   };
 
   const toggleDetails = (orderId) => {
@@ -106,10 +106,12 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                           </span>
                         </Col>{" "}
                       </CardTitle>
-                      <CardText>Status: {order.Status}</CardText>
-                      <CardText>Date and Time: {order.date}</CardText>
+                      <CardText><b>Status:</b> {order.Status}</CardText>
+                      <CardText><b>Date:</b> {order.date}</CardText>
+                      <CardText><b>Time:</b> {order.time}</CardText>
+                      <CardText><b>Amount:</b> ${order.amount}</CardText>
                       <CardText>
-                        Details:{" "}
+                        <b>Details:</b>{" "}
                         <div
                           style={{
                             maxHeight: "100px",
@@ -125,7 +127,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                           ) : (
                             transformOrderDetails(order)
                           )}
-                          {order.details.length > 5 && (
+                          {order.details.length > 30 && (
                             <Button
                               style={{ marginTop: "-5px" }}
                               color="link"
@@ -142,7 +144,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                       {order.cancelReason ? (
                         <>
                           <CardText>
-                            Cancelation Reason:{" "}
+                           <b>Cancellation Reason:</b> {" "}
                             <div
                               style={{
                                 maxHeight: "100px",
@@ -155,7 +157,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                                   order._id
                                 )}
                               </div>
-                              {order.cancelReason.reason.length > 50 && (
+                              {order.cancelReason.reason.length > 30 && (
                                 <Button
                                   style={{ marginTop: "-5px" }}
                                   color="link"

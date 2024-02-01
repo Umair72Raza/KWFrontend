@@ -45,6 +45,9 @@ const ScheduledOrdersCardWorker = ({
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
+  const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
+    useState(false);
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -103,10 +106,32 @@ const ScheduledOrdersCardWorker = ({
 
   const sendStartRequest = async (order, Uid) => {
     //  emit socket event to show Worker wants to start the job modal.
+
+    if (user.status !== "online") {
+      return Swal.fire({
+        title: "You are not online",
+        icon: "error",
+      });
+    }
+    setGlobalStartButtonDisabled(true);
+    setStartButtonDisabledMap((prevMap) => ({
+      ...prevMap,
+      [order._id]: true,
+    }));
+
     const data = {
       order,
       Uid,
     };
+
+    setTimeout(() => {
+      setGlobalStartButtonDisabled(false);
+      setStartButtonDisabledMap((prevMap) => ({
+        ...prevMap,
+        [order._id]: false,
+      }));
+    }, 60000); // 1 minute
+
     socket.emit("startJob-accept-reject", data);
     Swal.fire({
       title: "Start Job request sent!",
@@ -129,7 +154,7 @@ const ScheduledOrdersCardWorker = ({
 
     return showFullDetailsMap[order._id]
       ? order.details
-      : truncateText(transformedDetails, 25);
+      : truncateText(transformedDetails, 30);
   };
 
   return (
@@ -197,7 +222,8 @@ const ScheduledOrdersCardWorker = ({
                             <span
                               style={{ marginTop: "10px", marginRight: "1%" }}
                             >
-                              Status: {order.Status}
+                              <b>Status: </b>
+                              {order.Status}
                             </span>
                             <img
                               src={activeOrderspng}
@@ -213,10 +239,17 @@ const ScheduledOrdersCardWorker = ({
                           </div>
                         </Col>
                       </CardText>
-                      <CardText>Time: {order.time}</CardText>
-                      <CardText>Date: {order.date}</CardText>
                       <CardText>
-                        Details:{" "}
+                        <b>Time:</b> {order.time}
+                      </CardText>
+                      <CardText>
+                        <b>Date:</b> {order.date}
+                      </CardText>
+                      <CardText>
+                        <b>Amount:</b> ${order.amount}
+                      </CardText>
+                      <CardText>
+                        <b>Details:</b>{" "}
                         <div
                           style={{
                             maxHeight: "100px",
@@ -232,7 +265,7 @@ const ScheduledOrdersCardWorker = ({
                           ) : (
                             transformOrderDetails(order)
                           )}
-                          {order.details.length > 5 && (
+                          {order.details.length > 30 && (
                             <Button
                               style={{ marginTop: "-5px" }}
                               color="link"
@@ -246,7 +279,7 @@ const ScheduledOrdersCardWorker = ({
                         </div>
                       </CardText>
                       <CardText>
-                        Order By:{" "}
+                        <b>Order By:</b>{" "}
                         {order.users.length > 0 && order.users[0].firstName}
                       </CardText>
                       <Row>
@@ -274,7 +307,11 @@ const ScheduledOrdersCardWorker = ({
                                 }
                                 color="success"
                                 className={
-                                  activeOrder.length > 0 ? "disabled" : ""
+                                  globalStartButtonDisabled ||
+                                  startButtonDisabledMap[order._id] ||
+                                  activeOrder.length > 0
+                                    ? "disabled"
+                                    : ""
                                 }
                               >
                                 Start Job

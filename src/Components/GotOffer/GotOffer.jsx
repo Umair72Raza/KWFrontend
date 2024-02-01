@@ -75,7 +75,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
             <strong>{GOTOFFER.OFFER_TIME}</strong> {formattedOfferDetails?.time}
           </p>
           <p>
-            <strong>{GOTOFFER.OFFER_AMOUNT}</strong> {formattedOfferDetails?.amount}
+            <strong>{GOTOFFER.OFFER_AMOUNT}</strong>${formattedOfferDetails?.amount}
           </p>
           <p>
             <strong>{GOTOFFER.OFFER_SERVICE}</strong> {formattedOfferDetails?.service}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Input, Button, Container, Row, Col } from "reactstrap";
 import { failureToast, successToast } from "../../utils";
-import { changeEmail } from "../../Redux/Slices/AuthSlice";
+import { changeEmail, changePhone } from "../../Redux/Slices/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const OTPVerification = () => {
@@ -14,11 +14,62 @@ const OTPVerification = () => {
   const [disabledOTP, setDisabledOTP] = useState(false);
   const email = location?.state?.email;
   const newMail = location?.state?.newMail;
+  const newPhone = location?.state?.newPhone;
+  console.log(newMail)
+  console.log(newPhone)
 
   const [otp, setOtp] = useState("");
 
   const handleChange = (e) => {
     setOtp(e.target.value);
+  };
+
+  const verifyandChange = async() => {
+    if(newMail === undefined) {
+      VerifyOTPandChangePhone();
+    }
+    else if(newPhone === undefined)
+    {
+      VerifyOTPandChangeMail();
+    }
+  }
+  const VerifyOTPandChangePhone = async () => {
+    // Implement the logic to verify OTP here
+    if (!/^[0-9]+$/.test(otp)) {
+        failureToast(`OTP must be a valid non-decimal number!`);
+        return;
+    }
+    else if(otp.length > 4)
+    {
+        failureToast(`OTP must be a 4 digit number!`);
+        return;   
+    }
+
+    setDisabledOTP(true);
+    console.log(newPhone);
+    let data = { newPhone, otp ,token};
+    console.log("Verifying OTP:", data);
+
+    try {
+      const resp = await dispatch(changePhone(data));
+      console.log(resp, "response");
+      if (resp.type === "auth/otpverifyPhone/fulfilled") {
+        if (resp.payload === undefined) {
+          console.log(resp, "response on fail");
+          failureToast("Phone was not changed!");
+        } else {
+          console.log(resp, "response on success");
+          successToast("Phone changed!");
+          user.role === "worker"
+          ? navigate("/worker/editprofile")
+          : navigate("/user/editprofile ");
+        }
+      }
+    } catch (error) {
+      failureToast("Invalid OTP");
+    } finally {
+      setDisabledOTP(false);
+    }
   };
 
   const VerifyOTPandChangeMail = async () => {
@@ -44,7 +95,7 @@ const OTPVerification = () => {
       if (resp.type === "auth/otpverifyEmail/fulfilled") {
         if (resp.payload === undefined) {
           console.log(resp, "response on fail");
-          failureToast("email did nt changed!");
+          failureToast("email did not changed!");
         } else {
           console.log(resp, "response on success");
           successToast("email changed!");
@@ -84,7 +135,7 @@ const OTPVerification = () => {
             <Button
               color="primary"
               className="mb-3 text-center"
-              onClick={VerifyOTPandChangeMail}
+              onClick={verifyandChange}
               disabled={disabledOTP}
             >
               Verify OTP

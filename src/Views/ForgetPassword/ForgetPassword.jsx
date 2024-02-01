@@ -27,6 +27,7 @@ const ForgetPassword = () => {
   const [email, setEmail] = useState("");
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [enableButton, setEnableButton] = useState(false);
+  const [disableBack,setDisableBack] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -43,18 +44,27 @@ const ForgetPassword = () => {
   const requestOTP = async () => {
     //dispatch the api to send the otp
     setEnableButton(false);
+    setDisableBack(true);
     setIsLoading(true);
     try {
       dispatch(showSpinner());
       const otpResp = await dispatch(requestOTPAsync(email));
       if (otpResp.type === "auth/requestOTPAsync/fulfilled") {
-        navigate("/auth/newpassword", { state: { email: email } });
-        successToast("OTP sent successfully!");
+        if(otpResp.payload.data && otpResp.payload.status)
+        {
+          console.log(otpResp.payload,"payload in forget password")
+          navigate("/auth/newpassword", { state: { email: email } });
+          successToast("OTP sent successfully!");
+        }
+        else{
+          failureToast("Email not registered")
+        }
       }
     } catch (error) {
       failureToast("Error sending OTP");
     } finally {
       setIsLoading(false);
+      setDisableBack(false);
       dispatch(hideSpinner());
     }
   };
@@ -122,6 +132,7 @@ const ForgetPassword = () => {
                   style={{ marginRight: "3%" }}
                   color="danger"
                   onClick={() => navigate(-1)}
+                  disabled={disableBack}
                 >
                   Back
                 </Button>

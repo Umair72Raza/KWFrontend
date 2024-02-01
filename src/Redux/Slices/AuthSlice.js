@@ -2,10 +2,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   OTPverify,
   OTPverifyforEmail,
+  OTPverifyforPhone,
   loginUser,
   newPasswordSetter,
   sendOTP,
   sendOTPforEmail,
+  sendOTPforPhone,
   signUpUser,
   toggleStatus,
 } from "../../APIs/auth";
@@ -95,8 +97,8 @@ export const requestOTPAsync = createAsyncThunk(
     try {
       console.log(email, "email in async");
       const response = await sendOTP(email);
-      // console.log(response,"send otp resp")
-      // return response;
+      console.log(response.data);
+      console.log(response.status);
 
       const serializableResponse = {
         data: response.data,
@@ -105,7 +107,8 @@ export const requestOTPAsync = createAsyncThunk(
       };
       return serializableResponse;
     } catch (error) {
-      failureToast("Couldn't send OTP");
+      throw error
+      //failureToast("Email not Registered!");
     }
   }
 );
@@ -126,7 +129,28 @@ export const requestOTPforEmailAsync = createAsyncThunk(
       };
       return serializableResponse;
     } catch (error) {
-      failureToast("Couldn't send OTP");
+      console.log(error)
+      //failureToast("Couldn't send OTP");
+    }
+  }
+);
+
+export const requestOTPforPhoneAsync = createAsyncThunk(
+  "auth/requestOTPforPhoneAsync",
+  async (data) => {
+    try {
+      console.log(data, "data in thunk")
+      const response = await sendOTPforPhone(data);
+      const serializableResponse = {
+        data: response.data,
+        status: response.status,
+        // other serializable properties
+      };
+      console.log(serializableResponse, 'serialized response')
+      return serializableResponse;
+    } catch (error) {
+      console.log(error)
+      //failureToast("couldnt send otp");
     }
   }
 );
@@ -152,6 +176,20 @@ export const changeEmail = createAsyncThunk(
     try {
       console.log(data,"data in thunk")
       const response = await OTPverifyforEmail(data);
+      console.log("otp verify response", response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+export const changePhone = createAsyncThunk(
+  "auth/otpverifyPhone",
+  async (data) => {
+    try {
+      console.log(data,"data in thunk")
+      const response = await OTPverifyforPhone(data);
       console.log("otp verify response", response);
       return response.data;
     } catch (error) {
@@ -290,7 +328,7 @@ const authSlice = createSlice({
         state.emailOTP = "loading";
       })
       .addCase(requestOTPforEmailAsync.fulfilled, (state, action) => {
-        state.emailOTP = action.payload.updatedStatus;
+        state.emailOTP = action.payload;
         state.emailOTPError = null;
       })
       .addCase(requestOTPforEmailAsync.rejected, (state, action) => {

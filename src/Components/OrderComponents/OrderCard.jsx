@@ -197,7 +197,7 @@ const OrderCard = ({
                             <span
                               style={{ marginTop: "10px", marginRight: "1%" }}
                             >
-                              Status: {order.Status}
+                              <b>Status:</b> {order.Status}
                             </span>
                             <img
                               src={activeOrder}
@@ -213,10 +213,11 @@ const OrderCard = ({
                           </div>
                         </Col>
                       </CardText>
-                      <CardText>Time: {order.Time}</CardText>
-                      <CardText>Date: {order.date}</CardText>
+                      <CardText><b>Time:</b> {order.time}</CardText>
+                      <CardText><b>Date:</b> {order.date}</CardText>
+                      <CardText><b>Amount:</b> ${order.amount}</CardText>
                       <CardText>
-                        Details:{" "}
+                        <b>Details:</b>{" "}
                         <div
                           style={{
                             maxHeight: "100px",
@@ -247,7 +248,7 @@ const OrderCard = ({
                       </CardText>
                       {/* <CardText>OrderId: {order._id}</CardText> */}
                       <CardText>
-                        Worker:{" "}
+                        <b>Worker:</b>{" "}
                         {order?.users?.length > 0 && order?.users[1]?.firstName}
                       </CardText>
                       <Row>

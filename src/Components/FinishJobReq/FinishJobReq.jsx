@@ -107,7 +107,7 @@ const FinishJobReq = () => {
         keyboard={false}
       >
         <ModalHeader className="text-center">
-          Worker wants to Finish the job!
+          Job Finished
         </ModalHeader>
         <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
           <Container>
@@ -124,7 +124,7 @@ const FinishJobReq = () => {
             </Row>
             <Row>
               <Col>
-                <b>Amount:</b> {fOrder.amount}
+                <b>Amount:</b> ${fOrder.amount}
               </Col>
             </Row>
             <Row>
@@ -156,10 +156,10 @@ const FinishJobReq = () => {
         <ModalFooter style={{ textAlign: "center" }}>
           <Container style={{ marginTop: "2%" }}>
             <Button color="success" onClick={handleConfirm}>
-              Yes, Finish it!
+              Yes
             </Button>{" "}
             <Button color="danger" onClick={handleCancel}>
-              No, Cancel
+              Cancel
             </Button>
           </Container>
         </ModalFooter>
