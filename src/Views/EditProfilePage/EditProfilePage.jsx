@@ -12,6 +12,10 @@ import {
   Card,
   CardBody,
   Spinner,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -65,7 +69,8 @@ const EditProfilePage = ({ ShowServices }) => {
   const [validnewPhone, setValidNewPhone] = useState(false);
   const [emailEdit, setEmailEdit] = useState(false);
   const [newMail, setNewMail] = useState("");
-  const [disableUpdateEmail, setDisableUpdateEmail] = useState(false);
+  const [disableUpdateEmail, setDisableUpdateEmail] = useState(true);
+  const [disableUpdatePhone, setDisableUpdatePhone] = useState(true);
   const [newMailError, setNewMailError] = useState("");
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
@@ -73,6 +78,8 @@ const EditProfilePage = ({ ShowServices }) => {
   const [listLoading, setListLoading] = useState(true);
   const [userDataLoading, setUserDataLoading] = useState(true);
   const [UserInfo, setUserInfo] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState("");
 
   useEffect(() => {
     if (UsersData) {
@@ -370,9 +377,11 @@ const EditProfilePage = ({ ShowServices }) => {
           "New Email already taken by someone else."
         ) {
           const msg = `${newMail} is already taken by someone else.`;
+          setShowModal(false);
           return failureToast(msg);
         } else {
           successToast("OTP sent successfully!");
+          setShowModal(false);
           user.role === "worker"
             ? navigate("/worker/otpVerification", {
                 state: { email: UsersData.email, newMail: newMail },
@@ -387,11 +396,13 @@ const EditProfilePage = ({ ShowServices }) => {
       failureToast("Error sending OTP");
     } finally {
       dispatch(hideSpinner());
+      setDisableUpdateEmail(false);
     }
   };
 
   const requestOTPforPhone = async () => {
     //dispatch the api to send the otp
+    setDisableUpdatePhone(false);
     const mail = UsersData?.email;
     const data = { mail, token, newPhone };
     console.log(newPhone);
@@ -404,11 +415,12 @@ const EditProfilePage = ({ ShowServices }) => {
           "New Phone already taken by someone else."
         ) {
           const msg = `${newPhone} is already taken by someone else.`;
+          setShowModal(false);
           return failureToast(msg);
         } else {
           console.log(otpResp, "response of otp for phone");
           successToast("OTP sent successfully!");
-
+          setShowModal(false);
           user.role === "worker"
             ? navigate("/worker/otpVerification", {
                 state: { email: UsersData.email, newPhone: newPhone },
@@ -424,16 +436,21 @@ const EditProfilePage = ({ ShowServices }) => {
       failureToast(error);
     } finally {
       dispatch(hideSpinner());
+      setDisableUpdatePhone(true);
     }
   };
 
   const updatePhone = () => {
     toggleEditPhone();
+    setModalContent("Test: Wait while you are being redirected...");
+    console.log("Before setShowModal(true):", showModal);
+    setShowModal(true);
     requestOTPforPhone();
   };
 
   const handleChange = (e) => {
     const enteredEmail = e.target.value;
+
     setNewMail(enteredEmail);
     //    Email validation regex
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -441,18 +458,37 @@ const EditProfilePage = ({ ShowServices }) => {
     // Check if entered email matches the regex
     const isValid = emailRegex.test(enteredEmail);
     setNewMailError(isValid);
+    console.log(isValid);
     setDisableUpdateEmail(!isValid);
+    if (!newMail.trim()) {
+      // If newMail is empty or contains only whitespaces, do not dispatch the request
+      setDisableUpdateEmail(true);
+      return;
+    }
   };
 
   const updateEmail = () => {
     toggleEditEmail();
+    if (disableUpdateEmail || !newMail.trim()) {
+      // If newMail is empty or contains only whitespaces, do not dispatch the request
+      setDisableUpdateEmail(true);
+      return;
+    }
+    setModalContent("Test: Wait while you are being redirected...");
+    console.log("Before setShowModal(true):", showModal);
+    setShowModal(true);
     requestOTP();
   };
 
   const handlePhoneChange = (value) => {
-    setErrors({ ...errors, phone: "" });
     setValidNewPhone(true);
     setNewPhone(value);
+    if (!isValidPhoneNumber(value)) {
+      setValidNewPhone(false);
+      setDisableUpdatePhone(true);
+    } else {
+      setDisableUpdatePhone(false);
+    }
   };
 
   return (
@@ -762,12 +798,6 @@ const EditProfilePage = ({ ShowServices }) => {
                               countryCallingCodeEditable={false}
                               onChange={handlePhoneChange}
                             />
-                            {/* Display error message if phone is not valid */}
-                            {/* {!validnewPhone && (
-                              <span className="text-danger">
-                                Invalid phone number. Please correct it.
-                              </span>
-                            )} */}
                           </>
                         ) : (
                           <>
@@ -779,7 +809,9 @@ const EditProfilePage = ({ ShowServices }) => {
                             <Row className="mt-1">
                               <Col>
                                 <Button
-                                  disabled={!validnewPhone}
+                                  disabled={
+                                    !validnewPhone || disableUpdatePhone
+                                  }
                                   onClick={updatePhone}
                                   color="success"
                                 >
@@ -837,6 +869,18 @@ const EditProfilePage = ({ ShowServices }) => {
               )}
             </Row>
           )}
+          <Modal
+            isOpen={showModal}
+            toggle={() => setShowModal(!showModal)}
+            keyboard={false}
+            backdrop="static"
+            centered
+          >
+            <ModalHeader>Popup Title</ModalHeader>
+            <ModalBody>
+              <p>{modalContent}</p>
+            </ModalBody>
+          </Modal>
         </Container>
       </Container>
     </>
