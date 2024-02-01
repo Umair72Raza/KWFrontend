@@ -92,12 +92,16 @@ export const signUpUser = async (
   lastName,
   email,
   password,
+  profilePicture,
   phoneNumber,
   location,
   // longitude,
   // latitude,
   address,
+  optionalAddress,
   country,
+  region_state,
+  city,
   services
 ) => {
   try {
@@ -106,13 +110,21 @@ export const signUpUser = async (
       lastName,
       email,
       password,
+      profilePicture,
       phoneNumber,
       location,
       // longitude,
       // latitude,
       address,
+      optionalAddress,
       country,
+      region_state,
+      city,
       services,
+    },{
+      headers: {
+        "Content-Type":  "multipart/form-data",
+      },
     });
     return response.data;
   } catch (error) {

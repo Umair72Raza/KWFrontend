@@ -49,6 +49,7 @@ const UserRegister = ({ ShowServices }) => {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
+    profilePicture: null,
     location: {},
     // latitude: "",
     // longitude: "",
@@ -70,7 +71,7 @@ const UserRegister = ({ ShowServices }) => {
   const [passwordInfo, setPasswordInfo] = useState("");
   const [confirmPasswordInfo, setConfirmPasswordInfo] = useState("");
   const [passwordValid, setPasswordValid] = useState(false);
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePicture, setProfilePicture] = useState("");
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const toggle = () => setTooltipOpen(!tooltipOpen);
@@ -81,6 +82,7 @@ const UserRegister = ({ ShowServices }) => {
       "phone",
       "password",
       "confirmPassword",
+      "profilePicture",
       "allField",
       "address",
       "firstName",
@@ -102,9 +104,9 @@ const UserRegister = ({ ShowServices }) => {
     ];
 
     const isErrorsEmpty = errorFields.every((field) => !errors[field]);
-    const isFormDataValid = formDataFields.every(
-      (field) => !hasOnlyWhiteSpace(formData[field])
-    );
+    const isFormDataValid = formDataFields.every((field) => {
+      (field) => !hasOnlyWhiteSpace(formData[field]);
+    });
     const isServicesValid = ShowServices ? formData.services.length > 0 : true;
 
     return isErrorsEmpty && isFormDataValid && isServicesValid;
@@ -224,25 +226,52 @@ const UserRegister = ({ ShowServices }) => {
       optionalAddress: value,
     });
   };
+
+  const clearFileInput = () => {
+    const fileInput = document.getElementById("profilePicture");
+    if (fileInput) {
+      fileInput.value = ''; // Reset the value to clear the selection
+    }
+  };
   const handleProfilePictureChange = (event) => {
     const file = event.target.files[0];
-    const isValidImage = ["image/jpeg", "image/png", "image/gif"].includes(
-      file.type
-    );
-
-    if (!isValidImage) {
+  
+    // Define file size limit and accepted file types
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const acceptedTypes = ["image/jpeg", "image/png", "image/gif"];
+  
+    // Check if file size exceeds limit
+    if (file.size > maxSize) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        profilePicture: "Select a file with size equal to or smaller than 5Mb.",
+      }));
+      clearFileInput()
+      return;
+    }
+  
+    // Check if file type is valid
+    if (!acceptedTypes.includes(file.type)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
       }));
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        profilePicture: null,
-      }));
-      setProfilePicture(file);
+      clearFileInput()
+      return;
     }
+  
+    // If file passes validation, update state
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      profilePicture: null,
+    }));
+    setProfilePicture(file);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      profilePicture: file,
+    }));
   };
+  
 
   const FormValidation = (formData) => {
     const errors = {};
@@ -269,20 +298,18 @@ const UserRegister = ({ ShowServices }) => {
       RegisterPage.ERROR_MESSAGES.invalidAddress,
       errors
     );
-
-    errors.country = !formData.country ? "Country is required" : "";
-    errors.region_state = !formData.region_state
-      ? "Region/State is required"
-      : "";
-
+    if (!formData.country) {
+      errors.country = "Country is required";
+    }
+    if (!formData.region_state) {
+      errors.region_state = "Region/State is required";
+    }
     if (
       formData.region &&
-      City.getCitiesOfState(formData.country, formData.region_state).length ===
+      !City.getCitiesOfState(formData.country, formData.region_state).length ===
         0
     ) {
-      errors.city = "";
-    } else {
-      errors.city = !formData.city ? "City is required" : "";
+      errors.city = "City is required";
     }
 
     if (!profilePicture) {
@@ -297,15 +324,13 @@ const UserRegister = ({ ShowServices }) => {
 
     // Start loading spinner
     setLoading(true);
-
     // Perform form validation
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-
+   
     // Check if there are validation errors
     if (Object.keys(validationErrors).length === 0) {
       try {
-        console.log("Form data", formData);
         // Dispatch the signup action
         const result = await dispatch(signUpUserAsync(formData));
 
@@ -319,6 +344,7 @@ const UserRegister = ({ ShowServices }) => {
             phoneNumber: "",
             password: "",
             confirmPassword: "",
+            profilePicture: null,
             location: {},
             // latitude: "",
             // longitude: "",
@@ -367,7 +393,7 @@ const UserRegister = ({ ShowServices }) => {
           <Form onSubmit={handleSubmit} style={{ userSelect: "none" }}>
             <Row>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup >
                   <Label className="fw-semibold" for="firstName">
                     {RegisterPage.LABELS.FIRST_NAME}
                     <span className="text-danger fw-bold fs-5">
@@ -383,6 +409,7 @@ const UserRegister = ({ ShowServices }) => {
                       RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
                     }
                     required
+                    disabled={loading}
                     maxLength={12}
                     value={formData.firstName || ""}
                     onChange={(e) =>
@@ -402,7 +429,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup >
                   <Label className="fw-semibold" for="lastName">
                     {RegisterPage.LABELS.LAST_NAME}
                     <span className="text-danger fw-bold fs-5">
@@ -417,6 +444,7 @@ const UserRegister = ({ ShowServices }) => {
                     placeholder={
                       RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
                     }
+                    disabled={loading}
                     required
                     maxLength={12}
                     value={formData.lastName || ""}
@@ -439,7 +467,7 @@ const UserRegister = ({ ShowServices }) => {
             </Row>
             <Row>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup >
                   <Label className="fw-semibold" for="email">
                     {RegisterPage.LABELS.EMAIL}
                     <span className="text-danger fw-bold fs-5">
@@ -455,6 +483,7 @@ const UserRegister = ({ ShowServices }) => {
                     value={formData.email || ""}
                     maxLength={70}
                     required
+                    disabled={loading}
                     onChange={handleEmailChange}
                     autoComplete="new-email"
                     onKeyDown={(event) => {
@@ -469,7 +498,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup >
                   <Label className="fw-semibold" for="phoneNumber">
                     {RegisterPage.LABELS.PHONE}
                     <span className="text-danger fw-bold fs-5">
@@ -484,6 +513,7 @@ const UserRegister = ({ ShowServices }) => {
                     value={formData.phoneNumber || ""}
                     maxLength={20}
                     required
+                    disabled={loading}
                     onChange={handlePhoneChange}
                     international
                     countryCallingCodeEditable={false}
@@ -496,7 +526,7 @@ const UserRegister = ({ ShowServices }) => {
             </Row>
             <Row>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup >
                   <Label className="fw-semibold" for="password">
                     {RegisterPage.LABELS.PASSWORD}
                     <span className="text-danger fw-bold fs-5">
@@ -513,6 +543,7 @@ const UserRegister = ({ ShowServices }) => {
                         RegisterPage.INPUT_FIELDS.PASSWORD.placeholder
                       }
                       required
+                      disabled={loading}
                       maxLength={24}
                       value={formData.password}
                       onChange={handlePasswordChange}
@@ -528,7 +559,7 @@ const UserRegister = ({ ShowServices }) => {
                       />
                     </div>
                   </div>
-                  {passwordInfo && passwordValid ? (
+                  {passwordInfo && passwordValid && !errors.password ? (
                     <span className="text-success fw-bold">
                       <FaCheckCircle /> {passwordInfo}
                     </span>
@@ -541,10 +572,13 @@ const UserRegister = ({ ShowServices }) => {
                       {passwordInfo}
                     </span>
                   )}
+                  {errors?.password && !passwordInfo && (
+                    <span className="text-danger">{errors?.password}</span>
+                  )}
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup >
                   <Label className="fw-semibold" for="confirmPassword">
                     {RegisterPage.LABELS.CONFIRM_PASSWORD}
                     <span className="text-danger fw-bold fs-5">
@@ -561,6 +595,7 @@ const UserRegister = ({ ShowServices }) => {
                         RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
                       }
                       required
+                      disabled={loading}
                       value={formData.confirmPassword || ""}
                       maxLength={24}
                       onChange={handleConfirmPasswordChange}
@@ -579,6 +614,7 @@ const UserRegister = ({ ShowServices }) => {
                     </div>
                   </div>
                   {confirmPasswordInfo &&
+                  !errors.confirmPassword &&
                   confirmPasswordInfo === "Password Matched." ? (
                     <span className=" fw-bold text-success">
                       <FaCheckCircle /> {confirmPasswordInfo}
@@ -586,7 +622,11 @@ const UserRegister = ({ ShowServices }) => {
                   ) : (
                     <span className="text-danger">{confirmPasswordInfo}</span>
                   )}
-                  {/* {errors?.confirmPassword && (<span className="text-danger">{errors?.confirmPassword}</span>)} */}
+                  {errors?.confirmPassword && !confirmPasswordInfo && (
+                    <span className="text-danger">
+                      {errors?.confirmPassword}
+                    </span>
+                  )}
                 </FormGroup>
               </Col>
             </Row>
@@ -603,7 +643,7 @@ const UserRegister = ({ ShowServices }) => {
                     md={12}
                     className="d-flex flex-row Service-overflow-y-scroll"
                   >
-                    <FormGroup className="d-flex w-100" disabled={loading}>
+                    <FormGroup className="d-flex w-100" >
                       {listLoading && ShowServices ? (
                         <div className="text-center w-100">
                           <Spinner />
@@ -616,6 +656,7 @@ const UserRegister = ({ ShowServices }) => {
                           handleServiceChange={handleServiceChange}
                           handleRateChange={handleRateChange}
                           errors={errors}
+                          loading={loading}
                         />
                       )}
                     </FormGroup>
@@ -634,7 +675,7 @@ const UserRegister = ({ ShowServices }) => {
             )}
             <Row>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup>
                   <Label className="fw-semibold" for="address">
                     {RegisterPage.LABELS.ADDRESS}
                   </Label>
@@ -643,11 +684,12 @@ const UserRegister = ({ ShowServices }) => {
                     placeholder="Enter your address(Optional)."
                     value={formData.optionalAddress}
                     onChange={handleOptionalAddress}
+                    disabled={loading}
                   />
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup disabled={loading}>
+                <FormGroup >
                   <Label className="fw-semibold" for="profilePicture">
                     Profile Picture{" "}
                     <span className="text-danger fw-bold fs-5">
@@ -660,7 +702,9 @@ const UserRegister = ({ ShowServices }) => {
                     id="profilePicture"
                     accept="image/*"
                     onChange={handleProfilePictureChange}
+                    multiple={false}
                     required
+                    disabled={loading}
                   />
                   {errors.profilePicture && (
                     <span className="text-danger">{errors.profilePicture}</span>
@@ -668,22 +712,24 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={12}>
-                <FormGroup disabled={loading}>
-                <Dropdowns
-                  setFormData={setFormData}
-                  errors={errors}
-                  setErrors={setErrors}
-                />
+                <FormGroup>
+                  <Dropdowns
+                    setFormData={setFormData}
+                    errors={errors}
+                    setErrors={setErrors}
+                    loading={loading}
+                  />
                 </FormGroup>
               </Col>
             </Row>
             <Row>
               <Col>
-                <FormGroup disabled={loading}>
+                <FormGroup>
                   <Map
                     setFormData={setFormData}
                     errors={errors}
                     setErrors={setErrors}
+                    loading={loading}
                   />
                 </FormGroup>
               </Col>

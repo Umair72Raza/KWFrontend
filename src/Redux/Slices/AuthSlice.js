@@ -42,12 +42,16 @@ export const signUpUserAsync = createAsyncThunk(
         lastName,
         email,
         password,
+        profilePicture,
         phoneNumber,
         location,
         // longitude,
         // latitude,
         address,
+        optionalAddress,
         country,
+        region_state,
+        city,
         services,
       } = credentials;
       const response = await signUpUser(
@@ -55,12 +59,16 @@ export const signUpUserAsync = createAsyncThunk(
         lastName,
         email,
         password,
+        profilePicture,
         phoneNumber,
         location,
         // longitude,
         // latitude,
         address,
+        optionalAddress,
         country,
+        region_state,
+        city,
         services
       );
       console.log(response);
@@ -114,7 +122,7 @@ export const requestOTPforEmailAsync = createAsyncThunk(
   "auth/requestOTPforEmailAsync",
   async (data) => {
     try {
-      console.log(data, "data in thunk")
+      console.log(data, "data in thunk");
       const response = await sendOTPforEmail(data);
       // console.log(response,"send otp resp")
       // return response;
@@ -150,7 +158,7 @@ export const changeEmail = createAsyncThunk(
   "auth/otpverifyEmail",
   async (data) => {
     try {
-      console.log(data,"data in thunk")
+      console.log(data, "data in thunk");
       const response = await OTPverifyforEmail(data);
       console.log("otp verify response", response);
       return response.data;
@@ -296,7 +304,7 @@ const authSlice = createSlice({
       .addCase(requestOTPforEmailAsync.rejected, (state, action) => {
         state.emailOTP = "failed";
         state.emailOTPError = action.error.message;
-      })
+      });
   },
 });
 export const { updateOtpStatus } = authSlice.actions;

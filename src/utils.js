@@ -159,8 +159,13 @@ export  const validatePassword = (password, confirmPassword, errors) => {
   if (!passwordPattern(password)) {
     errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
   }
-
-  if (confirmPassword !== password) {
+if(hasOnlyWhiteSpace(confirmPassword) ){ 
+    errors.confirmPassword = RegisterPage.ERROR_MESSAGES.emptyPassword;
+}
+ if(hasOnlyWhiteSpace(password) ){ 
+  errors.password = RegisterPage.ERROR_MESSAGES.emptyPassword;
+}
+  if (!hasOnlyWhiteSpace(confirmPassword)  && confirmPassword !== password) {
     errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
     errors.password = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
   }
