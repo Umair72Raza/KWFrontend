@@ -5,6 +5,7 @@ import {
   OTPverifyforPhone,
   loginUser,
   newPasswordSetter,
+  optVerificationAtSingUp,
   sendOTP,
   sendOTPforEmail,
   sendOTPforPhone,
@@ -33,6 +34,16 @@ export const loginAsync = createAsyncThunk(
 
 export const logoutAsync = createAsyncThunk("auth/logout", async () => {
   Logout();
+});
+
+export const OTPverifyAsync = createAsyncThunk("auth/otpverifySignUp", async (credentials) => {
+  try {
+    const { email } = credentials;
+    const response = await optVerificationAtSingUp(email);
+    return response;
+  } catch (error) {
+    return error;
+  }
 });
 
 export const signUpUserAsync = createAsyncThunk(
@@ -249,7 +260,7 @@ const authSlice = createSlice({
     loginStatus: "idle",
     signupStatus: "idle",
     signupWorkerStatus: "idle",
-    otp: null,
+    signupOTP: null,
     emailOTP: null,
     emailOTPError: null,
     otpStatus: "idle",
@@ -342,7 +353,17 @@ const authSlice = createSlice({
       .addCase(requestOTPforEmailAsync.rejected, (state, action) => {
         state.emailOTP = "failed";
         state.emailOTPError = action.error.message;
-      });
+      }).addCase(OTPverifyAsync.pending, (state) => {
+        state.otpStatus = "loading";
+      })
+      .addCase(OTPverifyAsync.fulfilled, (state, action) => {
+        state.otpStatus = "succeeded";
+        state.signupOTP = action.payload;
+      })
+      .addCase(OTPverifyAsync.rejected, (state, action) => {
+        state.otpStatus = "failed";
+        state.otpError = action.error.message;
+      })
   },
 });
 export const { updateOtpStatus } = authSlice.actions;

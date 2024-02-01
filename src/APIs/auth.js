@@ -3,6 +3,16 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT,
 });
 
+export const optVerificationAtSingUp = async (email) => {
+  try {
+    
+    const response = await API.post(`user/otpVerification`, { email: email });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 export const sendOTP = async (email) => {
   try {
     const response = await API.post(`user/forgot-password`, { email: email });

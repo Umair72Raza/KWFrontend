@@ -26,7 +26,7 @@ import {
 } from "../../utils";
 import { RegisterPage } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { signUpUserAsync } from "../../Redux/Slices/AuthSlice.js";
+import { OTPverifyAsync } from "../../Redux/Slices/AuthSlice.js";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -230,36 +230,36 @@ const UserRegister = ({ ShowServices }) => {
   const clearFileInput = () => {
     const fileInput = document.getElementById("profilePicture");
     if (fileInput) {
-      fileInput.value = ''; // Reset the value to clear the selection
+      fileInput.value = ""; // Reset the value to clear the selection
     }
   };
   const handleProfilePictureChange = (event) => {
     const file = event.target.files[0];
-  
+
     // Define file size limit and accepted file types
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     const acceptedTypes = ["image/jpeg", "image/png", "image/gif"];
-  
+
     // Check if file size exceeds limit
     if (file.size > maxSize) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         profilePicture: "Select a file with size equal to or smaller than 5Mb.",
       }));
-      clearFileInput()
+      clearFileInput();
       return;
     }
-  
+
     // Check if file type is valid
     if (!acceptedTypes.includes(file.type)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
       }));
-      clearFileInput()
+      clearFileInput();
       return;
     }
-  
+
     // If file passes validation, update state
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -271,7 +271,6 @@ const UserRegister = ({ ShowServices }) => {
       profilePicture: file,
     }));
   };
-  
 
   const FormValidation = (formData) => {
     const errors = {};
@@ -327,45 +326,58 @@ const UserRegister = ({ ShowServices }) => {
     // Perform form validation
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
-   
+
     // Check if there are validation errors
     if (Object.keys(validationErrors).length === 0) {
       try {
-        // Dispatch the signup action
-        const result = await dispatch(signUpUserAsync(formData));
+        const email = formData.email;
+        dispatch(OTPverifyAsync({ email })).then((result) => {
+          if (result.type === "auth/otpverifySignUp/fulfilled") {
+            navigate("/auth/otpVerification", {
+              state: {
+                email: email,
+                formData: formData,
+              },
+            });
+            successToast("OTP sent successfully!");
+          }
+        });
 
-        if (result.type === "auth/signup/fulfilled") {
-          console.log("Sign up successful!", formData);
-          // Reset form data on successful signup
-          setFormData({
-            firstName: "",
-            lastName: "",
-            email: "",
-            phoneNumber: "",
-            password: "",
-            confirmPassword: "",
-            profilePicture: null,
-            location: {},
-            // latitude: "",
-            // longitude: "",
-            address: "",
-            optionalAddress: "",
-            country: "",
-            region_state: "",
-            city: "",
-            services: [],
-          });
-          const successMessage = ShowServices
-            ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
-            : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
+        // // Dispatch the signup action
+        // const result = await dispatch(signUpUserAsync(formData));
 
-          successToast(successMessage);
+        // if (result.type === "auth/signup/fulfilled") {
+        //   console.log("Sign up successful!", formData);
+        //   // Reset form data on successful signup
+        //   setFormData({
+        //     firstName: "",
+        //     lastName: "",
+        //     email: "",
+        //     phoneNumber: "",
+        //     password: "",
+        //     confirmPassword: "",
+        //     profilePicture: null,
+        //     location: {},
+        //     // latitude: "",
+        //     // longitude: "",
+        //     address: "",
+        //     optionalAddress: "",
+        //     country: "",
+        //     region_state: "",
+        //     city: "",
+        //     services: [],
+        //   });
+        //   const successMessage = ShowServices
+        //     ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
+        //     : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
 
-          navigate("/auth/login");
-        } else if (result.type === "auth/signup/rejected") {
-          setIsSignupDisabled(true);
-          failureToast(result.payload);
-        }
+        //   successToast(successMessage);
+
+        //   navigate("/auth/login");
+        // } else if (result.type === "auth/signup/rejected") {
+        //   setIsSignupDisabled(true);
+        //   failureToast(result.payload);
+        // }
       } catch (error) {
         console.log("Error in sign up!", error);
       } finally {
@@ -393,7 +405,7 @@ const UserRegister = ({ ShowServices }) => {
           <Form onSubmit={handleSubmit} style={{ userSelect: "none" }}>
             <Row>
               <Col md={6}>
-                <FormGroup >
+                <FormGroup>
                   <Label className="fw-semibold" for="firstName">
                     {RegisterPage.LABELS.FIRST_NAME}
                     <span className="text-danger fw-bold fs-5">
@@ -429,7 +441,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup >
+                <FormGroup>
                   <Label className="fw-semibold" for="lastName">
                     {RegisterPage.LABELS.LAST_NAME}
                     <span className="text-danger fw-bold fs-5">
@@ -467,7 +479,7 @@ const UserRegister = ({ ShowServices }) => {
             </Row>
             <Row>
               <Col md={6}>
-                <FormGroup >
+                <FormGroup>
                   <Label className="fw-semibold" for="email">
                     {RegisterPage.LABELS.EMAIL}
                     <span className="text-danger fw-bold fs-5">
@@ -498,7 +510,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup >
+                <FormGroup>
                   <Label className="fw-semibold" for="phoneNumber">
                     {RegisterPage.LABELS.PHONE}
                     <span className="text-danger fw-bold fs-5">
@@ -526,7 +538,7 @@ const UserRegister = ({ ShowServices }) => {
             </Row>
             <Row>
               <Col md={6}>
-                <FormGroup >
+                <FormGroup>
                   <Label className="fw-semibold" for="password">
                     {RegisterPage.LABELS.PASSWORD}
                     <span className="text-danger fw-bold fs-5">
@@ -578,7 +590,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup >
+                <FormGroup>
                   <Label className="fw-semibold" for="confirmPassword">
                     {RegisterPage.LABELS.CONFIRM_PASSWORD}
                     <span className="text-danger fw-bold fs-5">
@@ -643,7 +655,7 @@ const UserRegister = ({ ShowServices }) => {
                     md={12}
                     className="d-flex flex-row Service-overflow-y-scroll"
                   >
-                    <FormGroup className="d-flex w-100" >
+                    <FormGroup className="d-flex w-100">
                       {listLoading && ShowServices ? (
                         <div className="text-center w-100">
                           <Spinner />
@@ -689,7 +701,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup >
+                <FormGroup>
                   <Label className="fw-semibold" for="profilePicture">
                     Profile Picture{" "}
                     <span className="text-danger fw-bold fs-5">

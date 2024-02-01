@@ -1,3 +1,4 @@
+import OTPVerification from "../Components/OTPVerification/OTPVerification";
 import ForgetPassword from "../Views/ForgetPassword/ForgetPassword";
 import Login from "../Views/Login/Login";
 import NewPassword from "../Views/NewPassword/NewPassword";
@@ -35,5 +36,11 @@ const AuthRoutes = [
     component: <NewPassword />,
     layout: "/auth",
   },
+  {
+    path:"/otpVerification",
+    name:"OTPVerification",
+    component:<OTPVerification />,
+    layout:"/auth"
+  }
 ]
 export default AuthRoutes;
