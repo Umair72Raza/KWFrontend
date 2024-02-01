@@ -5,6 +5,7 @@ import {
   Col,
   Container,
   Form,
+  FormFeedback,
   FormGroup,
   Input,
   InputGroup,
@@ -27,7 +28,6 @@ const NewPassword = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const email = location?.state?.email;
-  console.log(email)
   const [OTP, setOTP] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -44,6 +44,7 @@ const NewPassword = () => {
   const [showConfPassPlaceholer, setShowConfPassPlaceholer] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [inputError, setInputError] = useState(false);
 
   useEffect(() => {
     if (otpStatus === "succeeded") {
@@ -127,6 +128,15 @@ const NewPassword = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    // Remove non-numeric characters from the input value
+    const numericValue = e.target.value.replace(/[^0-9]/g, "");
+   // setError("Only numbers are allowed!")
+    setOTP(numericValue);
+    setInputError(!/^[0-9]*$/.test(e.target.value));
+  };
+
+
   return (
     <>
       <Container
@@ -164,13 +174,13 @@ const NewPassword = () => {
                     </Col>
                     <FormGroup>
                       <Row>
-                        <Col
+                        {/* <Col
                           style={{ textAlign: "center" }}
                           md={{
                             offset: 3,
                             size: 6,
                           }}
-                        >
+                        > 
                           {" "}
                           <Label for="otp">
                             {
@@ -194,9 +204,39 @@ const NewPassword = () => {
                               onChange={(e) => setOTP(e.target.value)}
                             />
                           </InputGroup>
+                        </Col> */}
+                        <Col
+                          style={{ textAlign: "center" }}
+                          md={{ offset: 3, size: 6 }}
+                        >
+                          <Label for="otp">
+                            {
+                              newpasswordConstants.NP_CONSTANTS
+                                .PROVIDE_OTP_LABEL
+                            }
+                          </Label>
+                          <InputGroup>
+                            <InputGroupText>
+                              <img src={otppng} alt="otppng" />
+                            </InputGroupText>
+                            <Input
+                              style={{ textAlign: "center" }}
+                              id="otp"
+                              name="otp"
+                              placeholder={otpVisible ? "" : "****"}
+                              type="text"
+                              value={OTP}
+                              onFocus={() => setOtpVisible(true)}
+                              onBlur={() => setOtpVisible(false)}
+                              onChange={handleInputChange}
+                              pattern="[0-9]*" // Allow only numeric values
+                              invalid={inputError}
+                            />
+                             <FormFeedback>{inputError && "Only numbers are allowed."}</FormFeedback>
+                          </InputGroup>
                         </Col>
                       </Row>
-                      <Row style={{ textAlign: "center" }}>
+                      <Row>
                         <Col
                           md={{
                             offset: 3,
@@ -208,7 +248,7 @@ const NewPassword = () => {
                             onClick={verifyOTPSENT}
                             color="success"
                             disabled={!OTP || OTP.trim() === "" || disabledOTP}
-                            style={{ marginTop: "2%" }}
+                            className="align-self-center mt-2 offset-lg-1"
                           >
                             {newpasswordConstants.NP_CONSTANTS.VERIFYOTP}
                           </Button>

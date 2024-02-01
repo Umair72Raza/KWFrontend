@@ -21,7 +21,7 @@ const PastOrdersCard = ({ scheduledOrdersObject, spinnerVisible }) => {
   const userRole = user.role;
   let person = null;
   if (userRole === "user") {
-    person = "Was completed by: ";
+    person = "Was completed by ";
   } else {
     person = "Was Assigned By";
   }
@@ -34,7 +34,7 @@ const PastOrdersCard = ({ scheduledOrdersObject, spinnerVisible }) => {
     let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
     return showFullDetailsMap[order._id]
       ? order.details
-      : truncateText(transformedDetails, 5);
+      : truncateText(transformedDetails, 30);
   };
 
   const toggleDetails = (orderId) => {
@@ -100,7 +100,7 @@ const PastOrdersCard = ({ scheduledOrdersObject, spinnerVisible }) => {
                       >
                         {" "}
                         <span style={{ marginTop: "10px" }}>
-                          Status: {order.Status}
+                          <b>Status:</b> {order.Status}
                         </span>
                         <img
                           src={checkpng}
@@ -112,10 +112,11 @@ const PastOrdersCard = ({ scheduledOrdersObject, spinnerVisible }) => {
                           }}
                         />
                       </CardText>
-                      <CardText>Time: {order.time}</CardText>
-                      <CardText>Date: {order.date}</CardText>
+                      <CardText><b>Time:</b> {order.time}</CardText>
+                      <CardText><b>Date:</b> {order.date}</CardText>
+                      <CardText><b>Amount:</b> ${order.amount}</CardText>
                       <CardText>
-                        Details:{" "}
+                        <b>Details:</b>{" "}
                         <div
                           style={{
                             maxHeight: "100px",
@@ -131,7 +132,7 @@ const PastOrdersCard = ({ scheduledOrdersObject, spinnerVisible }) => {
                           ) : (
                             transformOrderDetails(order)
                           )}
-                          {order.details.length > 5 && (
+                          {order.details.length > 30 && (
                             <Button
                               style={{ marginTop: "-5px" }}
                               color="link"
@@ -145,7 +146,7 @@ const PastOrdersCard = ({ scheduledOrdersObject, spinnerVisible }) => {
                         </div>
                       </CardText>
                       <CardText>
-                        {person}{" "}
+                        <b>{person}</b>{" "}
                         {isUser
                           ? `Worker: ${order?.users[1]?.firstName}`
                           : `User: ${order?.users[0]?.firstName}`}

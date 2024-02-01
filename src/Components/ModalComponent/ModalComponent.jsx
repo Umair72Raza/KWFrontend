@@ -43,8 +43,8 @@ const ModalComponent = () => {
       setOrder(order);
       setModalHeader("Order Activation");
       setIsFinalize(true);
-      setFinalizeButtonLabel("Finalize Order Start");
-      setCancelButtonLabel("Cancel Order Start");
+      setFinalizeButtonLabel("Yes");
+      setCancelButtonLabel("Cancel");
       toggleModal();
 
     });
@@ -123,7 +123,7 @@ const ModalComponent = () => {
               <strong>Service:</strong> {order.service}
             </div>
             <div>
-              <strong>Amount:</strong> {order.amount}
+              <strong>Amount:</strong> ${order.amount}
             </div>
             <div>
               <strong>Order Details:</strong>{" "}

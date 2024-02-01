@@ -78,7 +78,7 @@ const ActiveOrders = ({
 
     return showFullDetailsMap[order._id]
       ? order.details
-      : truncateText(transformedDetails, 5);
+      : truncateText(transformedDetails, 30);
   };
 
   const toggleDetails = (orderId) => {
@@ -137,12 +137,21 @@ const ActiveOrders = ({
                       }}
                     >
                       {" "}
-                      <span style={{ marginTop: "10px" }}>Status: Active</span>
+                      <span style={{ marginTop: "10px" }}>
+                        <b>Status: Active</b>
+                      </span>
                     </CardText>
-                    <CardText>Time: {order.Time}</CardText>
-                    <CardText>Date: {order.date}</CardText>
                     <CardText>
-                      Details:{" "}
+                      <b>Time:</b> {order.time}
+                    </CardText>
+                    <CardText>
+                      <b>Date:</b> {order.date}
+                    </CardText>
+                    <CardText>
+                      <b>Amount:</b> ${order.amount}
+                    </CardText>
+                    <CardText>
+                      <b>Details:</b>{" "}
                       <div
                         style={{
                           maxHeight: "100px",
@@ -158,7 +167,7 @@ const ActiveOrders = ({
                         ) : (
                           transformOrderDetails(order)
                         )}
-                        {order.details.length > 5 && (
+                        {order.details.length > 30 && (
                           <Button
                             style={{ marginTop: "-5px" }}
                             color="link"
@@ -173,9 +182,15 @@ const ActiveOrders = ({
                     </CardText>
                     <CardText>
                       {" "}
-                      {isUser
-                        ? `Worker: ${order.users[1].firstName}`
-                        : `User: ${order.users[0].firstName}`}
+                      {isUser ? (
+                        <>
+                          <b>Worker:</b> {order.users[1].firstName}{order.users[1]?.lastName}
+                        </>
+                      ) : (
+                        <>
+                          <b>User:</b> {order.users[0].firstName}{order.users[0]?.lastName}
+                        </>
+                      )}
                     </CardText>
                     <Col style={{ margin: "2%" }} xs="12" md="3">
                       {" "}

@@ -115,7 +115,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
                 setComment(e.target.value);
               }}
             />
-            <Button color="primary" disabled={disableSend} onClick={send}>
+            <Button className="ml-2" color="primary" disabled={disableSend} onClick={send}>
               Send
             </Button>
           </div>

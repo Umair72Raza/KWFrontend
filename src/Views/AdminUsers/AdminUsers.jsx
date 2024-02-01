@@ -10,24 +10,38 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-import { fetchUsersAsync } from "../../Redux/Slices/AdminSlice";
+import {
+  fetchUsersAsync,
+  togglePersonAccessAsync,
+} from "../../Redux/Slices/AdminSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import classnames from "classnames";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import { ADMIN_USERS } from "../../Constants/Constants";
+import FeedbacksComp from "../../Components/FeedbacksComp/FeedbacksComp";
+import DetailsCard from "../../Components/DetailsCard/DetailsCard";
+import Swal from "sweetalert2";
+import BlockPopUp from "../../Components/BlockPopUp/BlockPopUp";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const [apiUsers, setApiUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("users");
   const [newfilUsers, setNewFilUsers] = useState();
-  const dispatch = useDispatch();
   const [activeUsers, setActiveUsers] = useState([]);
   const [inactiveUsers, setInactiveUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [showFeedbacksState, setShowFeedbacksState] = useState(false);
+  const [showDetailsCard, setShowDetailsCard] = useState(false);
+  const [orders, setOrders] = useState();
+  const [human, setHuman] = useState();
+  const [showBlock, setShowBlock] = useState();
+
   const handleButtonClick = (tab) => {
     setActiveTab(tab);
   };
@@ -55,11 +69,9 @@ const AdminUsers = () => {
       const filteredActiveUsers = Object.values(apiUsers)?.filter(
         (person) => person.access === "accepted"
       );
-
       const filteredInactiveUsers = Object.values(apiUsers).filter(
         (person) => person.access === "denied"
       );
-
       setActiveUsers(filteredActiveUsers);
       setInactiveUsers(filteredInactiveUsers);
     }
@@ -91,6 +103,31 @@ const AdminUsers = () => {
       );
     }
   }, [newfilUsers]);
+
+  const toggleAccess = async () => {
+    let access;
+    human.access === "accepted" ? (access = "denied") : (access = "accepted");
+    const id = human._id;
+    const data = { token, id, access };
+    const result = await dispatch(togglePersonAccessAsync(data));
+    if (result.type === "/admin/toggleAccess/fulfilled") {
+      // setNewFilPerson(human);
+      setNewFilUsers(human);
+    }
+  };
+  const toggleBlockModal = () => setShowBlock(!showBlock);
+
+  const confirmationPopUp = async () => {
+    setShowFeedbacksState(false);
+    setShowDetailsCard(false);
+  };
+
+  useEffect(() => {
+    if (showBlock === true) {
+      setShowFeedbacksState(false);
+      setShowDetailsCard(false);
+    }
+  }, [showBlock, showFeedbacksState, showDetailsCard]);
 
   return (
     <>
@@ -159,7 +196,14 @@ const AdminUsers = () => {
               {ADMIN_USERS.NO_INACTIVE_USERS}
             </p>
           ) : (
-            <Row xs="1" md="2" lg="2" xl="3" style={{padding:"1% 5% 0% 5%"}} className="d-flex">
+            <Row
+              xs="1"
+              md="2"
+              lg="2"
+              xl="3"
+              style={{ padding: "1% 5% 0% 5%" }}
+              className="d-flex"
+            >
               {activeTab === "users"
                 ? activeUsers.map((person, index) => (
                     <Col key={index}>
@@ -167,6 +211,13 @@ const AdminUsers = () => {
                         key={index}
                         person={person}
                         setNewFilPerson={setNewFilUsers}
+                        setHuman={setHuman}
+                        showFeedbacksState={showFeedbacksState}
+                        setShowFeedbacksState={setShowFeedbacksState}
+                        setShowDetailsCard={setShowDetailsCard}
+                        setOrders={setOrders}
+                        setFeedbacks={setFeedbacks}
+                        setShowBlock={setShowBlock}
                       />
                     </Col>
                   ))
@@ -176,12 +227,49 @@ const AdminUsers = () => {
                         key={index}
                         person={person}
                         setNewFilPerson={setNewFilUsers}
+                        setHuman={setHuman}
+                        showFeedbacksState={showFeedbacksState}
+                        setShowFeedbacksState={setShowFeedbacksState}
+                        setShowDetailsCard={setShowDetailsCard}
+                        setOrders={setOrders}
+                        setFeedbacks={setFeedbacks}
+                        setShowBlock={setShowBlock}
                       />
                     </Col>
                   ))}
             </Row>
           )}
         </Row>
+        {showDetailsCard === true ? (
+          <>
+            <DetailsCard
+              person={human}
+              setShowDetailsCard={setShowDetailsCard}
+              orders={orders}
+            />
+          </>
+        ) : (
+          <></>
+        )}
+
+        {showFeedbacksState ? (
+          <>
+            <FeedbacksComp
+              showFeedbacksState={showFeedbacksState}
+              setShowFeedbacksState={setShowFeedbacksState}
+              feedbacks={feedbacks}
+            />
+          </>
+        ) : (
+          <></>
+        )}
+        <BlockPopUp
+          isOpen={showBlock}
+          toggleAccess={toggleAccess}
+          toggle={toggleBlockModal}
+          onConfirm={confirmationPopUp}
+          person={human}
+        />
       </Container>
     </>
   );

@@ -57,7 +57,7 @@ const Orders = () => {
     activeOrder,
     setActiveOrder,
     pastOrders,
-    setPastOrders
+    setPastOrders,
   } = PopUpState();
 
   const navigate = useNavigate();
@@ -203,18 +203,12 @@ const Orders = () => {
         <Row>
           <UserNavbar />
         </Row>
+        <Button color="danger" className="mt-2" onClick={goBack}>
+          Back
+        </Button>
         <Row></Row>
         <Row style={{ marginTop: "0.5%" }}>
           <Nav tabs style={{ cursor: "pointer" }}>
-            <NavItem>
-              <Button
-                color="danger"
-                style={{ marginRight: "10px" }}
-                onClick={goBack}
-              >
-                Back
-              </Button>
-            </NavItem>
             <NavItem>
               <NavLink
                 className={classnames({ active: activeTab === "1" })}

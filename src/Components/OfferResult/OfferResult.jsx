@@ -20,18 +20,17 @@ const OfferResult = () => {
   const [showMoreDetails, setShowMoreDetails] = useState(false);
   const [modalOpen, setModalOpen] = useState(false); // Open the modal by default
   const [offerResult, setOfferResult] = useState("");
-  const [result, setResult] = useState("")
+  const [result, setResult] = useState("");
   const { user, token } = useSelector((state) => state.auth);
-  let { params, SetParams,clear,setClear } = PopUpState()
+  let { params, SetParams, clear, setClear } = PopUpState();
   const { newOrder } = useSelector((state) => state.booking);
 
-  
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   useEffect(() => {
     socket?.on("offerResult", (result) => {
-      setModalOpen(true)
-      setResult(result)
+      setModalOpen(true);
+      setResult(result);
       if (result == "accept") {
         setOfferResult("true");
 
@@ -48,7 +47,7 @@ const OfferResult = () => {
   useEffect(() => {
     if (user && user._id && offerResult == "true") {
       dispatch(CreateOrder({ params, token }));
-      setOfferResult("")
+      setOfferResult("");
     }
   }, [offerResult]);
 
@@ -59,7 +58,7 @@ const OfferResult = () => {
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
-  
+
   useEffect(() => {
     if (newOrder !== null) {
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
@@ -91,7 +90,15 @@ const OfferResult = () => {
                     }
                     className="mx-auto"
                   />
-                  {result === "cancel" ? "Offer Cancelled!" : "Offer Accepted!"}
+                  {result === "cancel" ? (
+                    <>
+                      <b>Offer Cancelled!</b>
+                    </>
+                  ) : (
+                    <>
+                      <b>Offer Accepted!!</b>
+                    </>
+                  )}
                 </Col>
               </CardTitle>
               <CardText>
@@ -103,7 +110,11 @@ const OfferResult = () => {
               </CardText>
               <CardText>
                 {" "}
-                <b>Amount</b>: {params?.amount}
+                <b>Amount</b>: ${params?.amount}
+              </CardText>
+              <CardText>
+                {" "}
+                <b>Time</b>: {params?.time}
               </CardText>
               <CardText>
                 {" "}
@@ -114,8 +125,8 @@ const OfferResult = () => {
                         <b>Details: </b>
                         <div
                           style={{
-                            maxHeight: showMoreDetails ? '200px' : '80px', // Set your desired height
-                            overflowY: 'auto',
+                            maxHeight: showMoreDetails ? "200px" : "80px", // Set your desired height
+                            overflowY: "auto",
                           }}
                           dangerouslySetInnerHTML={{
                             __html: showMoreDetails
@@ -137,7 +148,8 @@ const OfferResult = () => {
                         <b>Details: </b>
                         <div
                           dangerouslySetInnerHTML={{ __html: params?.details }}
-                        /></>
+                        />
+                      </>
                     )}
                   </Col>
                 </Row>
@@ -148,8 +160,8 @@ const OfferResult = () => {
                     <Button
                       color="primary"
                       onClick={() => {
-                        setOfferResult(false)
-                        toggleModal()
+                        setOfferResult(false);
+                        toggleModal();
                       }}
                       style={{ marginTop: "10px", marginLeft: "" }}
                     >
