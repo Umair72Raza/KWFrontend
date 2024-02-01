@@ -367,7 +367,7 @@ const UserRegister = ({ ShowServices }) => {
           <Form onSubmit={handleSubmit} style={{ userSelect: "none" }}>
             <Row>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="firstName">
                     {RegisterPage.LABELS.FIRST_NAME}
                     <span className="text-danger fw-bold fs-5">
@@ -402,7 +402,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="lastName">
                     {RegisterPage.LABELS.LAST_NAME}
                     <span className="text-danger fw-bold fs-5">
@@ -439,7 +439,7 @@ const UserRegister = ({ ShowServices }) => {
             </Row>
             <Row>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="email">
                     {RegisterPage.LABELS.EMAIL}
                     <span className="text-danger fw-bold fs-5">
@@ -469,7 +469,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="phoneNumber">
                     {RegisterPage.LABELS.PHONE}
                     <span className="text-danger fw-bold fs-5">
@@ -496,7 +496,7 @@ const UserRegister = ({ ShowServices }) => {
             </Row>
             <Row>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="password">
                     {RegisterPage.LABELS.PASSWORD}
                     <span className="text-danger fw-bold fs-5">
@@ -544,7 +544,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="confirmPassword">
                     {RegisterPage.LABELS.CONFIRM_PASSWORD}
                     <span className="text-danger fw-bold fs-5">
@@ -603,7 +603,7 @@ const UserRegister = ({ ShowServices }) => {
                     md={12}
                     className="d-flex flex-row Service-overflow-y-scroll"
                   >
-                    <FormGroup className="d-flex w-100">
+                    <FormGroup className="d-flex w-100" disabled={loading}>
                       {listLoading && ShowServices ? (
                         <div className="text-center w-100">
                           <Spinner />
@@ -634,7 +634,7 @@ const UserRegister = ({ ShowServices }) => {
             )}
             <Row>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="address">
                     {RegisterPage.LABELS.ADDRESS}
                   </Label>
@@ -647,7 +647,7 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={6}>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Label className="fw-semibold" for="profilePicture">
                     Profile Picture{" "}
                     <span className="text-danger fw-bold fs-5">
@@ -668,16 +668,18 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={12}>
+                <FormGroup disabled={loading}>
                 <Dropdowns
                   setFormData={setFormData}
                   errors={errors}
                   setErrors={setErrors}
                 />
+                </FormGroup>
               </Col>
             </Row>
             <Row>
               <Col>
-                <FormGroup>
+                <FormGroup disabled={loading}>
                   <Map
                     setFormData={setFormData}
                     errors={errors}
