@@ -12,17 +12,23 @@ import {
 import { useNavigate } from "react-router-dom";
 import classnames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWorkersAsync } from "../../Redux/Slices/AdminSlice";
+import {
+  fetchWorkersAsync,
+  togglePersonAccessAsync,
+} from "../../Redux/Slices/AdminSlice";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import { ADMIN_WORKERS } from "../../Constants/Constants";
 import FeedbacksComp from "../../Components/FeedbacksComp/FeedbacksComp";
 import DetailsCard from "../../Components/DetailsCard/DetailsCard";
+import Swal from "sweetalert2";
+import BlockPopUp from "../../Components/BlockPopUp/BlockPopUp";
 
 const AdminWorkers = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
+
   const [activeTab, setActiveTab] = useState("workers");
   const [newfilWorkers, setNewFilWorkers] = useState();
   const [activeWorkers, setActiveWorkers] = useState([]);
@@ -32,12 +38,9 @@ const AdminWorkers = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showFeedbacksState, setShowFeedbacksState] = useState(false);
   const [showDetailsCard, setShowDetailsCard] = useState(false);
-  const [disabledButtons, setDisabledButtons] = useState([]);
+  const [showBlock, setShowBlock] = useState();
   const [orders, setOrders] = useState();
   const [human, setHuman] = useState();
-
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [confirmationData, setConfirmationData] = useState(null);
 
   useEffect(() => {
     const gettingWorkers = async () => {
@@ -105,45 +108,54 @@ const AdminWorkers = () => {
     }
   }, [newfilWorkers]);
 
-  const handleConfirmationResult = async (confirmed) => {
-    if (confirmed) {
-      // User confirmed, perform the action (e.g., toggle access)
-      await toggleAccess(confirmationData);
+  const toggleAccess = async () => {
+    let access;
+    human.access === "accepted" ? (access = "denied") : (access = "accepted");
+    const id = human._id;
+    const data = { token, id, access };
+    const result = await dispatch(togglePersonAccessAsync(data));
+    if (result.type === "/admin/toggleAccess/fulfilled") {
+      // setNewFilPerson(human);
+      setNewFilWorkers(human);
     }
-  
-    // Reset confirmation-related state
-    setConfirmationData(null);
-    setShowConfirmation(false);
   };
-  
 
-  const confirmationPopUp = async () => {
-    let person = human;
-    let newAccess;
-    person.access === "accepted"
-      ? (newAccess = "Blocked")
-      : (newAccess = "Unblocked");
-    try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: `${person.firstName} will be ${newAccess}`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes",
-      });
+  useEffect(() => {
+    const disableOtherPopUps = () => {
+      console.log("Entering disableOtherPopUps");
 
-      if (result.isConfirmed) {
-        await toggleAccess();
-        Swal.fire({
-          title: `${newAccess}`,
-          icon: "success",
-        });
+      if (showBlock) {
+        console.log(
+          "Closing other pop-ups: showDetailsCard, showFeedbacksState"
+        );
+        setShowDetailsCard(false);
+        setShowFeedbacksState(false);
+      } else if (showDetailsCard) {
+        console.log("Closing other pop-ups: showBlock, showFeedbacksState");
+        setShowBlock(false);
+        setShowFeedbacksState(false);
+      } else if (showFeedbacksState) {
+        console.log("Closing other pop-ups: showBlock, showDetailsCard");
+        setShowBlock(false);
+        setShowDetailsCard(false);
       }
-    } finally {
-    }
+    };
+
+    disableOtherPopUps();
+  }, [showBlock, showDetailsCard, showFeedbacksState]);
+
+  const toggleBlockModal = () => setShowBlock(!showBlock);
+  const confirmationPopUp = async () => {
+    setShowFeedbacksState(false);
+    setShowDetailsCard(false);
   };
+
+  useEffect(() => {
+    if (showBlock === true) {
+      setShowFeedbacksState(false);
+      setShowDetailsCard(false);
+    }
+  }, [showBlock, showFeedbacksState, showDetailsCard]);
 
   return (
     <>
@@ -228,6 +240,7 @@ const AdminWorkers = () => {
                       setShowDetailsCard={setShowDetailsCard}
                       setOrders={setOrders}
                       setFeedbacks={setFeedbacks}
+                      setShowBlock={setShowBlock}
                     />
                   </Col>
                 ))
@@ -242,7 +255,7 @@ const AdminWorkers = () => {
                       setShowDetailsCard={setShowDetailsCard}
                       setOrders={setOrders}
                       setFeedbacks={setFeedbacks}
-                      confirmationPopUp={confirmationPopUp}
+                      setShowBlock={setShowBlock}
                     />
                   </Col>
                 ))}
@@ -273,6 +286,13 @@ const AdminWorkers = () => {
       ) : (
         <></>
       )}
+      <BlockPopUp
+        isOpen={showBlock}
+        toggleAccess={toggleAccess}
+        toggle={toggleBlockModal}
+        onConfirm={confirmationPopUp}
+        person={human}
+      />
     </>
   );
 };
