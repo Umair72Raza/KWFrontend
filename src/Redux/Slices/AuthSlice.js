@@ -1,14 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   OTPverify,
+  OTPverifyforEmail,
   loginUser,
   newPasswordSetter,
   sendOTP,
+  sendOTPforEmail,
   signUpUser,
   toggleStatus,
 } from "../../APIs/auth";
 import { Logout, failureToast } from "../../utils";
-
 
 export const loginAsync = createAsyncThunk(
   "auth/login",
@@ -25,13 +26,11 @@ export const loginAsync = createAsyncThunk(
         return rejectWithValue(error.error);
       }
     }
-
   }
 );
 
 export const logoutAsync = createAsyncThunk("auth/logout", async () => {
   Logout();
-
 });
 
 export const signUpUserAsync = createAsyncThunk(
@@ -64,7 +63,7 @@ export const signUpUserAsync = createAsyncThunk(
         country,
         services
       );
-      console.log(response)
+      console.log(response);
       return response.data;
     } catch (error) {
       if (
@@ -87,20 +86,38 @@ export const signUpUserAsync = createAsyncThunk(
         );
       }
     }
-
   }
 );
-
 
 export const requestOTPAsync = createAsyncThunk(
   "auth/requestOTPAsync",
   async (email) => {
     try {
-      console.log(email, "email in async")
+      console.log(email, "email in async");
       const response = await sendOTP(email);
       // console.log(response,"send otp resp")
       // return response;
 
+      const serializableResponse = {
+        data: response.data,
+        status: response.status,
+        // other serializable properties
+      };
+      return serializableResponse;
+    } catch (error) {
+      failureToast("Couldn't send OTP");
+    }
+  }
+);
+
+export const requestOTPforEmailAsync = createAsyncThunk(
+  "auth/requestOTPforEmailAsync",
+  async (data) => {
+    try {
+      console.log(data, "data in thunk")
+      const response = await sendOTPforEmail(data);
+      // console.log(response,"send otp resp")
+      // return response;
 
       const serializableResponse = {
         data: response.data,
@@ -119,11 +136,26 @@ export const requestOTPverification = createAsyncThunk(
   async (otp, { rejectWithValue }) => {
     try {
       const response = await OTPverify(otp);
-      console.log("otp cerify response", response)
+      console.log("otp cerify response", response);
       return response.status;
     } catch (error) {
-      if(error)
-      return rejectWithValue(error);
+      if (error) return rejectWithValue(error);
+    }
+  }
+);
+
+//changeEmail
+
+export const changeEmail = createAsyncThunk(
+  "auth/otpverifyEmail",
+  async (data) => {
+    try {
+      console.log(data,"data in thunk")
+      const response = await OTPverifyforEmail(data);
+      console.log("otp verify response", response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
     }
   }
 );
@@ -135,7 +167,7 @@ export const setNewPassAsync = createAsyncThunk(
       const { email, newPassword } = data;
       const password = newPassword;
       const response = await newPasswordSetter(email, password);
-      console.log(response,"response in async")
+      console.log(response, "response in async");
       if (response.status === 200) {
         return response.status;
       } else {
@@ -147,15 +179,14 @@ export const setNewPassAsync = createAsyncThunk(
   }
 );
 
-
 export const toggleStatusAsync = createAsyncThunk(
   "/auth/toggleStatus",
   async (data, { rejectWithValue }) => {
     try {
       const response = await toggleStatus(data);
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       user.status = response.updatedStatus.status;
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
       return response; // Assuming your relevant data is in response.data
     } catch (error) {
       // You can handle errors here, e.g., show a toast message
@@ -173,6 +204,8 @@ const authSlice = createSlice({
     signupStatus: "idle",
     signupWorkerStatus: "idle",
     otp: null,
+    emailOTP: null,
+    emailOTPError: null,
     otpStatus: "idle",
     otpError: "null",
     error: null,
@@ -187,7 +220,6 @@ const authSlice = createSlice({
     updateOtpStatus: (state, action) => {
       state.otpStatus = action.payload;
     },
-
   },
   extraReducers: (builder) => {
     builder
@@ -204,7 +236,6 @@ const authSlice = createSlice({
       .addCase(loginAsync.rejected, (state, action) => {
         state.loginStatus = "failed";
         state.error = action.error.message;
-
       })
       .addCase(signUpUserAsync.pending, (state) => {
         state.signupStatus = "loading";
@@ -251,11 +282,21 @@ const authSlice = createSlice({
       })
       .addCase(logoutAsync.fulfilled, (state) => {
         state.loginStatus = "failed";
-
       })
       .addCase(toggleStatusAsync.fulfilled, (state, action) => {
         state.user = action.payload.updatedStatus;
-      });
+      })
+      .addCase(requestOTPforEmailAsync.pending, (state) => {
+        state.emailOTP = "loading";
+      })
+      .addCase(requestOTPforEmailAsync.fulfilled, (state, action) => {
+        state.emailOTP = action.payload.updatedStatus;
+        state.emailOTPError = null;
+      })
+      .addCase(requestOTPforEmailAsync.rejected, (state, action) => {
+        state.emailOTP = "failed";
+        state.emailOTPError = action.error.message;
+      })
   },
 });
 export const { updateOtpStatus } = authSlice.actions;

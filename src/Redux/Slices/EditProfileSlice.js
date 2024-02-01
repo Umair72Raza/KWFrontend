@@ -10,6 +10,7 @@ export const fetchUsersDataAsync = createAsyncThunk(
       return response;
     } catch (error) {
       console.log(error, "error getting userData");
+      
     }
   }
 );

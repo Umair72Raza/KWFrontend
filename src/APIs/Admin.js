@@ -1,5 +1,7 @@
 import axios from "axios";
-const API = axios.create({ baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT });
+const API = axios.create({
+  baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT,
+});
 
 export const getAllTheUsers = async (token) => {
   try {
@@ -29,7 +31,6 @@ export const getAllTheWorkers = async (token) => {
 
 export const togglePersonAccess = async (token, id, access) => {
   try {
-
     const response = await API.put(
       `admin/users/${id}`,
       { access },
@@ -71,17 +72,13 @@ export const createNewService = async (token, name, id) => {
   }
 };
 
-
-export const deleteAService = async (token, id) => {
+export const deleteAService = async (token, id, serviceName) => {
   try {
-    const response = await API.delete(
-      `admin/services/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await API.delete(`admin/services/${id}/${serviceName}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -91,7 +88,8 @@ export const deleteAService = async (token, id) => {
 export const editNewService = async (token, name, id) => {
   try {
     const response = await API.put(
-      `admin/updateService/${id}`, { name },
+      `admin/updateService/${id}`,
+      { name },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -103,8 +101,7 @@ export const editNewService = async (token, name, id) => {
   } catch (error) {
     throw error.response.data;
   }
-}
-
+};
 
 export const getAllUserOrders = async (token, id) => {
   try {
@@ -121,7 +118,7 @@ export const getAllUserOrders = async (token, id) => {
 
 export const fetchFeedbacksofUser = async (data) => {
   try {
-    const { _id, token } = data
+    const { _id, token } = data;
     const response = await API.get(`admin/feedbacks/${_id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -133,4 +130,33 @@ export const fetchFeedbacksofUser = async (data) => {
   }
 };
 
+export const fetchSettings = async (data) => {
+  try {
+    const { token } = data;
+    const response = await API.get(`settings/getAllSettings`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error?.response?.data;
+  }
+};
 
+export const updateSettings = async (data) => {
+  try {
+    const { token, newValue, propertyName } = data;
+    const actualData = { propertyName, newValue };
+    console.log(propertyName, "propertyName");
+
+    const response = await API.put(`settings/updateSettings`, actualData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error?.response?.data;
+  }
+};
