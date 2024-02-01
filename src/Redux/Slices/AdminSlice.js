@@ -4,11 +4,13 @@ import {
   deleteAService,
   editNewService,
   fetchFeedbacksofUser,
+  fetchSettings,
   getAllServicesAdmin,
   getAllTheUsers,
   getAllTheWorkers,
   getAllUserOrders,
   togglePersonAccess,
+  updateSettings,
 } from "../../APIs/Admin";
 
 export const fetchUsersAsync = createAsyncThunk(
@@ -80,8 +82,8 @@ export const deleteServiceAsync = createAsyncThunk(
   "/admin/deleteService",
   async (data) => {
     try {
-      const { token, id } = data;
-      const response = await deleteAService(token, id);
+      const { token, id, serviceName } = data;
+      const response = await deleteAService(token,id, serviceName);
       return response;
     } catch (error) {
       console.log(error, "error deleting service");
@@ -129,6 +131,30 @@ export const fetchFeedbacksAsync = createAsyncThunk(
   }
 );
 
+export const getSettings = createAsyncThunk(
+  "/admin/getSettings",
+  async (data) => {
+    try {
+      const response = await fetchSettings(data);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+export const updateSettingsAsync = createAsyncThunk(
+  "/admin/updateSettings",
+  async (data) => {
+    try {
+      const response = await updateSettings(data);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
 const adminSlice = createSlice({
   name: "adminSlice",
   initialState: {
@@ -144,6 +170,7 @@ const adminSlice = createSlice({
     data: null,
     error: null,
     status: null,
+    settings: null,
   },
   extraReducers: (builder) => {
     builder
@@ -268,6 +295,20 @@ const adminSlice = createSlice({
       })
       .addCase(updateServiceAsync.rejected, (state, action) => {
         state.updatedService = {
+          data: null,
+          status: "failed",
+          error: action.error.message,
+        };
+      })
+      .addCase(getSettings.pending, (state) => {
+        state.settings = { data: null, status: "loading" };
+      })
+      .addCase(getSettings.fulfilled, (state, action) => {
+        state.settings = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(getSettings.rejected, (state, action) => {
+        state.settings = {
           data: null,
           status: "failed",
           error: action.error.message,

@@ -16,6 +16,8 @@ import { fetchWorkersAsync } from "../../Redux/Slices/AdminSlice";
 import PeopleDetails from "../../Components/PeopleDetails/PeopleDetails";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import { ADMIN_WORKERS } from "../../Constants/Constants";
+import FeedbacksComp from "../../Components/FeedbacksComp/FeedbacksComp";
+import DetailsCard from "../../Components/DetailsCard/DetailsCard";
 
 const AdminWorkers = () => {
   const navigate = useNavigate();
@@ -27,6 +29,15 @@ const AdminWorkers = () => {
   const [inactiveWorkers, setInactiveWorkers] = useState([]);
   const [apiWorkers, setApiWorkers] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [showFeedbacksState, setShowFeedbacksState] = useState(false);
+  const [showDetailsCard, setShowDetailsCard] = useState(false);
+  const [disabledButtons, setDisabledButtons] = useState([]);
+  const [orders, setOrders] = useState();
+  const [human, setHuman] = useState();
+
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationData, setConfirmationData] = useState(null);
 
   useEffect(() => {
     const gettingWorkers = async () => {
@@ -94,23 +105,63 @@ const AdminWorkers = () => {
     }
   }, [newfilWorkers]);
 
+  const handleConfirmationResult = async (confirmed) => {
+    if (confirmed) {
+      // User confirmed, perform the action (e.g., toggle access)
+      await toggleAccess(confirmationData);
+    }
+  
+    // Reset confirmation-related state
+    setConfirmationData(null);
+    setShowConfirmation(false);
+  };
+  
+
+  const confirmationPopUp = async () => {
+    let person = human;
+    let newAccess;
+    person.access === "accepted"
+      ? (newAccess = "Blocked")
+      : (newAccess = "Unblocked");
+    try {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: `${person.firstName} will be ${newAccess}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes",
+      });
+
+      if (result.isConfirmed) {
+        await toggleAccess();
+        Swal.fire({
+          title: `${newAccess}`,
+          icon: "success",
+        });
+      }
+    } finally {
+    }
+  };
+
   return (
     <>
       <div>
         <UserNavbar />
       </div>
       <Col>
-      <Button
-        style={{
-          margin: "10px 10px 0px 10px",
-          backgroundColor: "#48629b",
-          border: "none",
-        }}
-        color="danger"
-        onClick={() => navigate(-1)}
-      >
-        {ADMIN_WORKERS.BACK}
-      </Button>
+        <Button
+          style={{
+            margin: "10px 10px 0px 10px",
+            backgroundColor: "#48629b",
+            border: "none",
+          }}
+          color="danger"
+          onClick={() => navigate(-1)}
+        >
+          {ADMIN_WORKERS.BACK}
+        </Button>
       </Col>
       <h1 style={{ textAlign: "center" }}>{ADMIN_WORKERS.WORKERS_HEADING}</h1>
       <Navbar color="light" light expand="md" style={{ marginLeft: "2%" }}>
@@ -156,7 +207,14 @@ const AdminWorkers = () => {
             {ADMIN_WORKERS.NO_INACTIVE_WORKERS}
           </p>
         ) : (
-          <Row xs="1" md="2" lg="2" xl="3" style={{padding:"1% 5% 0% 5%"}} className="justify-content-center">
+          <Row
+            xs="1"
+            md="2"
+            lg="2"
+            xl="3"
+            style={{ padding: "1% 5% 0% 5%" }}
+            className="d-flex"
+          >
             {activeTab === "workers"
               ? activeWorkers.map((person, index) => (
                   <Col key={index}>
@@ -164,21 +222,57 @@ const AdminWorkers = () => {
                       key={index}
                       person={person}
                       setNewFilPerson={setNewFilWorkers}
+                      setHuman={setHuman}
+                      showFeedbacksState={showFeedbacksState}
+                      setShowFeedbacksState={setShowFeedbacksState}
+                      setShowDetailsCard={setShowDetailsCard}
+                      setOrders={setOrders}
+                      setFeedbacks={setFeedbacks}
                     />
                   </Col>
                 ))
               : inactiveWorkers.map((person, index) => (
                   <Col key={index}>
                     <PeopleDetails
-                      key={index}
                       person={person}
                       setNewFilPerson={setNewFilWorkers}
+                      setHuman={setHuman}
+                      showFeedbacksState={showFeedbacksState}
+                      setShowFeedbacksState={setShowFeedbacksState}
+                      setShowDetailsCard={setShowDetailsCard}
+                      setOrders={setOrders}
+                      setFeedbacks={setFeedbacks}
+                      confirmationPopUp={confirmationPopUp}
                     />
                   </Col>
                 ))}
           </Row>
         )}
       </Row>
+
+      {showDetailsCard === true ? (
+        <>
+          <DetailsCard
+            person={human}
+            setShowDetailsCard={setShowDetailsCard}
+            orders={orders}
+          />
+        </>
+      ) : (
+        <></>
+      )}
+
+      {showFeedbacksState ? (
+        <>
+          <FeedbacksComp
+            showFeedbacksState={showFeedbacksState}
+            setShowFeedbacksState={setShowFeedbacksState}
+            feedbacks={feedbacks}
+          />
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 };

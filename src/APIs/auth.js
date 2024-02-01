@@ -1,9 +1,32 @@
 import axios from "axios";
-const API = axios.create({ baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT });
+const API = axios.create({
+  baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT,
+});
 
 export const sendOTP = async (email) => {
   try {
     const response = await API.post(`user/forgot-password`, { email: email });
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+//sendOTPforEmail
+
+export const sendOTPforEmail = async (data) => {
+  try {
+    const { mail, token, newMail } = data;
+    console.log(newMail, token, "new mail and token in api");
+    const response = await API.put(
+      `user/newMailOTP`,
+      { email: mail, newMail: newMail },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response;
   } catch (error) {
     throw error.response.data;
@@ -25,7 +48,27 @@ export const newPasswordSetter = async (email, newPass) => {
 export const OTPverify = async (otp) => {
   try {
     const response = await API.put(`user/reset-password/${otp}`);
-    console.log("OTP verify resp", response)
+    console.log("OTP verify resp", response);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+//OTPverifyforEmail
+export const OTPverifyforEmail = async (data) => {
+  try {
+    const { newMail, otp, token } = data;
+    const response = await API.put(
+      `user/new-email`,
+      { newMail, otp },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("new mail resp", response);
     return response;
   } catch (error) {
     throw error.response.data;
@@ -42,7 +85,6 @@ export const loginUser = async (email, password) => {
   } catch (error) {
     throw error.response.data;
   }
-
 };
 
 export const signUpUser = async (
@@ -76,7 +118,7 @@ export const signUpUser = async (
   } catch (error) {
     throw error.response.data;
   }
-}
+};
 
 export const toggleStatus = async (data) => {
   try {

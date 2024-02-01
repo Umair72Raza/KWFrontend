@@ -1,3 +1,4 @@
+import OTPVerification from "../Components/OTPVerification/OTPVerification";
 import EditProfilePage from "../Views/EditProfilePage/EditProfilePage";
 import HomePageWorker from "../Views/HomePageWorker/HomePageWorker";
 
@@ -13,7 +14,13 @@ const WorkerRoutes = [
     name: "editprofile",
     component: <EditProfilePage ShowServices={true} />,
     layout: "/worker",
-  }
+  },
+  {
+    path: "/otpVerification",
+    name: "otpverification",
+    component: <OTPVerification />,
+    layout: "/worker",
+  },
 ];
 
 export default WorkerRoutes;

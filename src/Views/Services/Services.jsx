@@ -64,7 +64,7 @@ const Services = () => {
       title: `${reason}!`,
       allowOutsideClick: false,
       icon: "error",
-    })
+    });
   };
 
   const handleAddService = async () => {
@@ -78,13 +78,12 @@ const Services = () => {
     const trimmedService = newService.trim();
 
     if (trimmedService.length > 0 && trimmedService.length <= MAX_LETTERS) {
-      const normalizedNewService = trimmedService.toLowerCase();
+      const normalizedNewService = normalizeServiceName(trimmedService);
 
       if (
         !services.some(
           (service) =>
-            service.name.toLowerCase() === normalizedNewService ||
-            service.name.toLowerCase().startsWith(normalizedNewService + " ")
+            normalizeServiceName(service.name) === normalizedNewService
         )
       ) {
         // Dispatch addServiceAsync with the new service
@@ -98,21 +97,30 @@ const Services = () => {
         }
       } else {
         displayErrorMessage(
-          "Service already exists! Please add a different service!"
+          "Service already exists! Please try a different service name!"
         );
         setAddButtonDisabled(false); // Enable the button
       }
     } else {
-      reason =
-        "Cannot add service' exceeded character limit";
+      reason = "Cannot add service' exceeded character limit";
       displayErrorMessage(reason);
       setAddButtonDisabled(false); // Enable the button
     }
   };
 
+  const normalizeServiceName = (serviceName) => {
+    // Remove extra spaces, convert to lowercase, and remove spaces between characters
+    return serviceName
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/(.)(?=.)/g, "$1 ");
+  };
+
   const handleRemoveService = async (service) => {
     const id = service._id;
-    const data = { token, id };
+    const serviceName = service.name;
+    const data = { token, id, serviceName };
 
     // Display a confirmation popup
     Swal.fire({
@@ -130,11 +138,16 @@ const Services = () => {
           const removeResult = await dispatch(deleteServiceAsync(data));
 
           if (removeResult.type === "/admin/deleteService/fulfilled") {
+            console.log(removeResult, " result payload");
+            if (removeResult.payload === undefined) {
+              Swal.fire("Cannot Remove!", "This service is taken.", "error");
+            } else {
+              setServices((prevServices) =>
+                prevServices.filter((s) => s._id !== service._id)
+              );
+              Swal.fire("Removed!", "The service has been removed.", "success");
+            }
             // Update the state correctly
-            setServices((prevServices) =>
-              prevServices.filter((s) => s._id !== service._id)
-            );
-            Swal.fire("Removed!", "The service has been removed.", "success");
           } else {
             Swal.fire("Error!", "An error occurred during removal.", "error");
           }
@@ -153,6 +166,15 @@ const Services = () => {
 
   const handleEditService = async () => {
     setUpdateButtonDisabled(true);
+    const normalizeServiceName = (serviceName) => {
+      // Remove extra spaces, convert to lowercase, and remove spaces between characters
+      return serviceName
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/(.)(?=.)/g, "$1 ");
+    };
+
     // Validate the edited service name
     const MAX_LETTERS = 24;
     const trimmedEditedService = editedService.name.trim();
@@ -161,16 +183,16 @@ const Services = () => {
       trimmedEditedService.length > 0 &&
       trimmedEditedService.length <= MAX_LETTERS
     ) {
-      const normalizedEditedService = trimmedEditedService.toLowerCase();
+      const normalizedEditedService =
+        normalizeServiceName(trimmedEditedService);
 
       if (
         !services.some(
           (s) =>
-            s.name.toLowerCase() === normalizedEditedService &&
+            normalizeServiceName(s.name) === normalizedEditedService &&
             s._id !== editedService.id
         )
       ) {
-        // Dispatch updateServiceAsync with the edited service
         try {
           // Dispatch updateServiceAsync with the edited service
           const data = {
@@ -190,20 +212,25 @@ const Services = () => {
             );
             setEditedService({ id: null, name: "" });
           } else {
-            displayErrorMessage("because this service cannot be updated!");
+            displayErrorMessage("Failed to update the service!");
           }
         } catch (error) {
           console.error("Error updating service:", error);
-          displayErrorMessage("because an error occurred during update!");
+          displayErrorMessage(
+            "An error occurred during update! Please try again"
+          );
         } finally {
           setUpdateButtonDisabled(false);
         }
       } else {
-        displayErrorMessage("because this service already exists!");
+        displayErrorMessage(
+          "Service already exists! Please add a different service name"
+        );
         setUpdateButtonDisabled(false);
       }
     } else {
-      displayErrorMessage("because letters limit was not met!");
+      displayErrorMessage("Character limit was not met");
+      setUpdateButtonDisabled(false);
     }
   };
 
@@ -222,19 +249,18 @@ const Services = () => {
         <UserNavbar />
       </div>
       <Container style={{ padding: "1%" }}>
-      <Col>
-        <Button
-          style={{
-            backgroundColor: "#48629b",
-            border: "none",
-          }}
-          onClick={() => navigate(-1)}
-        >
-          {SERVICE_CONSTS.BACK}
-        </Button>
-      </Col>
+        <Col>
+          <Button
+            style={{
+              backgroundColor: "#48629b",
+              border: "none",
+            }}
+            onClick={() => navigate(-1)}
+          >
+            {SERVICE_CONSTS.BACK}
+          </Button>
+        </Col>
 
-     
         {loading ? (
           <div style={{ textAlign: "center" }}>
             <Spinner color="primary" />
