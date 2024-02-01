@@ -151,7 +151,7 @@ const WorkerCard = ({ worker }) => {
                     <CardText className="fw-bold" >Status:</CardText> {worker.status == "online" ? <CardText className="text-success" >{worker.status}</CardText>:[]}
                   </CardSubtitle>
                   <CardSubtitle><b className="fw-bold">{workerCardConstants.WorkerCardText.Services}</b></CardSubtitle>
-                  <CardSubtitle className="overflow-y-scroll mt-1" style={{ minHeight: '60px' ,maxHeight: '60px'}}>
+                  <CardSubtitle className=" mt-1" style={{ minHeight: '60px' ,maxHeight: '60px' ,overflowY:'auto'}}>
                     {worker?.services.map((service, key) => (
                       <div
                         key={key}
