@@ -13,18 +13,21 @@ import {
   Tooltip,
 } from "reactstrap";
 import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
-import { failureToast, successToast, validateEmail } from "../../utils";
+import { emailPattern, failureToast, successToast, validateEmail } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { set } from "lodash";
+import { PopUpState } from "../../Context/PopUpProvider";
+import OnOffButton from "../../Components/OnOffButton/OnOffButton";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     [LoginPage.FORM_FIELDS.EMAIL]: "",
     [LoginPage.FORM_FIELDS.PASSWORD]: "",
   });
+  let {isOn, setIsOn}=PopUpState()
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState("");
   const [loginDisabled, setLoginDisabled] = useState(true);
@@ -33,16 +36,14 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const socket = useSelector((state) => state?.socket?.socket);
-  const toggle = () => setTooltipOpen(!tooltipOpen);
 
   useEffect(() => {
     const isFormValid = !errors.email && formData.email && formData.password;
     setLoginDisabled(!isFormValid);
-  }, [formData]);
+  }, [errors, formData]);
 
   const handleEmailChange = (e) => {
     setErrors({ ...errors, email: "" });
-    setLoginDisabled(false);
     setFormData({
       ...formData,
       email: e.target.value,
@@ -51,7 +52,6 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setLoginDisabled(false);
     setFormData({
       ...formData,
       [name]: value,
@@ -60,10 +60,9 @@ const Login = () => {
 
   const FormValidation = (formData) => {
     const errors = {};
-    if (!validateEmail(formData.email)) {
+    if (!emailPattern(formData.email)) {
       errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
     }
-
     return errors;
   };
 
@@ -87,17 +86,18 @@ const Login = () => {
             successToast("Login successful! Welcome back!");
             if (result.payload.user.role == "worker") {
               const id = result.payload.user._id;
-              
               const data = { id, status: "online", token: result.payload.token };
-              console.log(data)
               const Result = await dispatch(toggleStatusAsync(data));
               console.log(Result)
               //await socket?.emit("online-offline", Result.payload.updatedStatus);
+              await setIsOn(true)
+              navigate("/worker/workerHomepage");
             }
-            navigate("/user/homepage");
+            else
+            {
+            navigate("/user/homepage");}
           }
         } else if (result.type === "auth/login/rejected") {
-          setLoginDisabled(true);
           failureToast(result.payload);
         }
       }
@@ -209,7 +209,7 @@ const Login = () => {
               autohide={false}
               isOpen={tooltipOpen && loginDisabled}
               target="Login"
-              toggle={toggle}
+              toggle={() => setTooltipOpen(!tooltipOpen)}
             >
               Enter all fields to login!
             </Tooltip>
@@ -235,6 +235,7 @@ const Login = () => {
           </Col>
         </Col>
       </Row>
+      
     </Container>
   );
 };

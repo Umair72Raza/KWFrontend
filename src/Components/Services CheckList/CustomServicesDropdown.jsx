@@ -8,6 +8,7 @@ const CustomServiceDropdown = ({
   handleServiceChange,
   handleRateChange,
   errors
+
 }) => {
   const handleInputKeyDown = (e) => {
     const keyCode = e.which || e.keyCode;
@@ -52,8 +53,10 @@ const CustomServiceDropdown = ({
               </Label>
             </Col>
             {selectedServices?.some((s) => s?.name === service?.name) && (
-              <Col xs="auto" className="ml-2 d-flex flex-row">
+              <Col lg={6} className="d-flex flex-column">
+              <Col className="ml-2 mt-1 d-flex flex-row align-self-end">
                 <Input
+                 invalid={errors && errors[service?.name] ? true : false}
                   type="number"
                   min="10"
                   max="999"
@@ -66,9 +69,13 @@ const CustomServiceDropdown = ({
                   }
                   onChange={(e) => handleRateChange(e, service?.name)}
                   onKeyDown={handleInputKeyDown}
-                  style={{ height: "25px" }}
+                  style={{ height: "25px", width:"100px" }}
                 />
                 <span className="align-self-center fw-bold">{RegisterPage.INPUT_FIELDS.SERVICES.rate}</span>
+                </Col>
+                {errors && errors[service?.name] && (
+                  <span className="text-danger text-end fw-medium">{errors[service?.name]}</span>
+                )}
               </Col>
             )}
           </Row>
@@ -77,11 +84,6 @@ const CustomServiceDropdown = ({
     ) : (
       <div>{RegisterPage.LOADER_MESSAGES.LIST_NOT_AVAILABLE}</div>
     )}
-    <div className="text-center mt-3">
-      {errors?.rate && (
-        <span className="text-danger">{errors?.rate}</span>
-      )}
-    </div>
   </div>
 );
 };

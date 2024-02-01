@@ -1,6 +1,9 @@
 import { toast } from "react-toastify";
 
 import { jwtDecode } from "jwt-decode";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import { RegisterPage } from "./Constants/Constants";
+import { has } from "lodash";
 
 export const Toast_Notification = (string, type) => {
   toast[type](string, {
@@ -78,7 +81,7 @@ export const checkToken = () => {
   return null; // No token found
 };
 
-export const validatePassword = (password) => {
+export const passwordPattern = (password) => {
   // Password pattern with disallowance of spaces
   const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
 
@@ -119,14 +122,63 @@ export const handleNameChange = (
     });
   }
 };
+export  const validateEmail = (email, errors) => {
+  if (!email || !email.includes('@') || !email.includes('.com')) {
+    errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
+  } else if(hasOnlyWhiteSpace(email)){
+    errors.email = RegisterPage.ERROR_MESSAGES.emptyEmail;
+  }
+};
 
-export const validateEmail = (email) => {
+export  const validatePhoneNumber = (phoneNumber, errors) => {
+  if (phoneNumber && !isValidPhoneNumber(phoneNumber)) {
+    errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber;
+  }
+};
+
+export const validateServices = (ShowServices, services, errors) => {
+  if (ShowServices && services.length === 0) {
+    errors.services = RegisterPage.ERROR_MESSAGES.invalidService;
+  } else {
+    delete errors.services; // Clear previous error message
+  }
+
+  services.forEach((service) => {
+    if (service.rate < 10 || service.rate > 999) {
+      if (!errors[service.name]) {
+        errors[service.name] = RegisterPage.ERROR_MESSAGES.invalidRate;
+      }
+    } else {
+      delete errors[service.name]; // Clear previous error message
+    }
+  });
+};
+
+  
+export  const validatePassword = (password, confirmPassword, errors) => {
+  if (!passwordPattern(password)) {
+    errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
+  }
+
+  if (confirmPassword !== password) {
+    errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
+    errors.password = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
+  }
+};
+
+export const validateField = (fieldValue, fieldName, errorMessage, errors) => {
+  if (!fieldValue || hasOnlyWhiteSpace(fieldValue)) {
+    errors[fieldName] = errorMessage;
+  }
+};
+
+export const emailPattern = (email) => {
   const trimmedEmail = email.trim(); // Remove leading and trailing spaces
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@0-9]{2,}$/;
   return trimmedEmail.match(emailPattern);
 };
 
-export const validatePhoneNumber = (phoneNumber) => {
+export const phoneNumberPattern = (phoneNumber) => {
   const phonePattern = /^\d{10}$/;
   return phoneNumber.match(phonePattern);
 };

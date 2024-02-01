@@ -5,15 +5,20 @@ import {
   Form,
   FormGroup,
   Label,
-  Button
+  Button,
+  Col,
+  Container,
+  Row
 } from "reactstrap";
 const Filter = ({ sortOption, setSortOption, sortOption2,
   setSortOption2, distanceFilter, setDistanceFilter, rateFilter,
   setRateFilter, clearFilters }) => {
   return (
-    <>
-      <Form>
-        <FormGroup>
+     <Container className='pl-4 pr-4 px-3'>
+     
+      <Form >
+      <Row className='d-flex flex-column flex-md-row '>
+        <Col md={4} xl={3} ><FormGroup>
           <Label for="sortOption">{filterConstants.Labels.sort1}</Label>
           <Input
             type="select"
@@ -38,8 +43,8 @@ const Filter = ({ sortOption, setSortOption, sortOption2,
             <option value="highToLowDistance">{filterConstants.options.htld}</option>
             <option value="lowToHighDistance">{filterConstants.options.lthd}</option>
           </Input>
-        </FormGroup>
-        <FormGroup>
+        </FormGroup></Col>
+        <Col md={3} xl={3} className='d-flex justify-content-md-center'><FormGroup>
           <Label>{filterConstants.Labels.filter}</Label>
           <FormGroup check>
             <Label check>
@@ -89,8 +94,8 @@ const Filter = ({ sortOption, setSortOption, sortOption2,
               {filterConstants.Labels.l20}
             </Label>
           </FormGroup>
-        </FormGroup>
-        <FormGroup>
+        </FormGroup></Col>
+        <Col md={4} xl={3}><FormGroup>
           <Label>{filterConstants.Labels.filter1}</Label>
 
           <FormGroup check>
@@ -142,12 +147,14 @@ const Filter = ({ sortOption, setSortOption, sortOption2,
               {filterConstants.Labels.g20}
             </Label>
           </FormGroup>
-        </FormGroup>
-        <Button color="danger" onClick={clearFilters}>
+        </FormGroup></Col>
+        <Button className='d-md-none d-sm-block ' color="danger" onClick={clearFilters}>
           {filterConstants.button.clear}
         </Button>
+        </Row>
       </Form>
-    </>
+    
+     </Container>
   )
 }
 

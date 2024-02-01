@@ -1,7 +1,7 @@
 import { FaSearch } from "react-icons/fa";
 import Filter from "../../Components/Filter/Filter.jsx";
 import WorkerCard from "../../Components/workerCard/workerCard";
-import { HomePageUserConst } from "../../Constants/Constants.js";
+import { HomePageUserConst, filterConstants } from "../../Constants/Constants.js";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchChatsAsync } from "../../Redux/Slices/ChatSlice.js";
@@ -46,6 +46,7 @@ const HomePageUser = () => {
   const [distanceFilter, setDistanceFilter] = useState(0);
   const [rateFilter, setRateFilter] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [searchWorker, setSearchWorker] = useState(null)
   let removedUsers = [];
   removedUsers = useSelector((state) => state?.homepage?.removeWorker);
   useEffect(() => {
@@ -56,6 +57,7 @@ const HomePageUser = () => {
           await dispatch(getAllWorker({ userId: user._id, token }));
           await dispatch(fetchChatsAsync({ user, token }));
           await dispatch(allServicesAsync());
+          await setSearchWorker(users)
         } else {
           console.error("User object or _id is missing");
         }
@@ -128,29 +130,51 @@ const HomePageUser = () => {
 
 
   //search
-  let debouncedsearch = useDebounce(searchInput);
-  let memoizedSuggestions = useMemo(() => {
+  // let debouncedsearch = useDebounce(searchInput);
+  // let memoizedSuggestions = useMemo(() => {
 
-    const nameValues = list?.map((service) => service.name);
-    return nameValues?.filter((item) =>
-      item.toLowerCase().includes(debouncedsearch.toLowerCase())
-    );
-  }, [debouncedsearch]);
+  //   const nameValues = list?.map((service) => service.name);
+  //   return nameValues?.filter((item) =>
+  //     item.toLowerCase().includes(debouncedsearch.toLowerCase())
+  //   );
 
-  const handleSuggestionClick = (suggestion) => {
-    setSearchInput(suggestion);
-    memoizedSuggestions = null;
-    setShow(false)
-  };
+  // }, [debouncedsearch]);
+
+  // const handleSuggestionClick = (suggestion) => {
+  //   setSearchInput(suggestion);
+  //   memoizedSuggestions = null;
+  //   setShow(false)
+  // };
 
   const handleFiltersToggle = () => {
     setShowFilters(!showFilters);
   };
 
   const handleSearch = () => {
-    const type = searchInput;
-    const params = { userId: user._id, type, token };
-    dispatch(WorkersByType(params));
+    let workers = [];
+    if (searchInput?.length >= 3) {
+      workers = users?.filter((worker) => {
+        // Check if the searchInput is included in the worker's name or address
+        const fnameMatch = worker?.firstName?.toLowerCase()?.includes(searchInput?.toLowerCase());
+        const lnameMatch = worker?.lastName?.toLowerCase()?.includes(searchInput?.toLowerCase());
+        const addressMatch = worker?.address?.toLowerCase()?.includes(searchInput?.toLowerCase());
+
+        // Check if the searchInput is included in any of the service names
+        const serviceMatch = worker?.services?.some(service => service?.name?.toLowerCase()?.includes(searchInput?.toLowerCase()));
+
+        // Return true if any of the conditions are met
+        console.log(fnameMatch, lnameMatch, addressMatch, serviceMatch)
+        return fnameMatch || lnameMatch || addressMatch || serviceMatch;
+      });
+      setSearchWorker(workers)
+    }
+    else {
+      setSearchWorker(null)
+    }
+    console.log(workers, "workers")
+
+    // Do something with the filtered workers array
+    // For example, update the state or dispatch an action
   };
 
   const clearFilters = () => {
@@ -163,7 +187,10 @@ const HomePageUser = () => {
   //filter
   const filteredAndSortedUsers = useMemo(() => {
     let filteredUsers = users;
-
+    if (searchWorker?.length > 0) {
+      filteredUsers = searchWorker;
+      //setSearchWorker(null)
+    }
     if (sortOption !== "none" && sortOption === "highToLowRating") {
       filteredUsers = [...filteredUsers].sort(
         (a, b) => Number(b.rating) - Number(a.rating)
@@ -210,50 +237,53 @@ const HomePageUser = () => {
     return filteredUsers;
   }, [
     users,
-    debouncedsearch,
+    // debouncedsearch,
     sortOption,
     sortOption2,
     distanceFilter,
     rateFilter,
+    searchWorker
   ]);
 
   return (
     <>
       <Navbar />
-      <Container>
+      <Container className="px-3">
         {/* First Row */}
-        <Row className="mb-1 mt-1">
-          <Col className="text-start" xs={3}>
-            <Button
-              onClick={() => navigate("/user/Orders")}
-              color="primary"
-              className="p-1"
-            >
-              {HomePageUserConst.button.orders}
-            </Button>
-          </Col>
-          <Col className="   d-flex flex-column py-0" xs={6}>
-            <div className="d-flex gap-1 ">
-              <Input
-                type="text"
-                className="  search-border"
-                placeholder="Search For Category"
-                value={searchInput}
-                onChange={(e) => {
-                  setSearchInput(e.target.value)
-                  setShow(true)
-                }}
-              />
-              <Button
-                color="primary"
-                className="py-1 rounded text-white"
-                onClick={handleSearch}
-              >
-                <FaSearch />
-              </Button>
-            </div>
-            <div className="w-75">
-              {debouncedsearch && memoizedSuggestions.length > 0 && show == true && (
+        <Row className="px-3">
+          <Col className="px-3">
+            <Row className="mb-1 mt-1 px-3">
+              <Col className="text-start  " xs={3}>
+                <Button
+                  onClick={() => navigate("/user/Orders")}
+                  color="primary"
+                  className="p-1"
+                >
+                  {HomePageUserConst.button.orders}
+                </Button>
+              </Col>
+              <Col className="   d-flex flex-column py-0" xs={6}>
+                <div className="d-flex gap-1 ">
+                  <Input
+                    type="text"
+                    className="search-border"
+                    placeholder="Search For Category"
+                    value={searchInput}
+                    onChange={(e) => {
+                      setSearchInput(e.target.value)
+                      setShow(true)
+                    }}
+                  />
+                  <Button
+                    color="primary"
+                    className="py-1 rounded text-white"
+                    onClick={handleSearch}
+                  >
+                    <FaSearch />
+                  </Button>
+                </div>
+                <div className="w-75">
+                  {/* {debouncedsearch && memoizedSuggestions.length > 0 && show == true && (
                 <ul className=" ">
                   {memoizedSuggestions.map((suggestion, index) => (
                     <li
@@ -265,74 +295,86 @@ const HomePageUser = () => {
                     </li>
                   ))}
                 </ul>
+              )} */}
+                </div>
+              </Col>
+              <Col className="text-end d-md-none" xs={3}>
+                <Button
+                  className="p-1"
+                  color="primary"
+                  onClick={handleFiltersToggle}
+                >
+                  {HomePageUserConst.button.filters}
+                </Button>
+                <Offcanvas
+                  isOpen={showFilters}
+                  direction="end"
+                  fade={false}
+                  toggle={handleFiltersToggle}
+                >
+                  <OffcanvasHeader toggle={handleFiltersToggle}>
+                    {HomePageUserConst.heading.filter}
+                  </OffcanvasHeader>
+                  <OffcanvasBody>
+                    <Filter
+                      sortOption={sortOption}
+                      setSortOption={setSortOption}
+                      sortOption2={sortOption2}
+                      setSortOption2={setSortOption2}
+                      distanceFilter={distanceFilter}
+                      setDistanceFilter={setDistanceFilter}
+                      rateFilter={rateFilter}
+                      setRateFilter={setRateFilter}
+                      clearFilters={clearFilters}
+                    ></Filter>
+                  </OffcanvasBody>
+                </Offcanvas>
+              </Col>
+            </Row>
+            <Row className="d-none d-md-block mt-3 d-flex px-3" >
+
+              <Col className=" d-flex flex-row gap-5">
+                <div className="fw-bold fs-3"> {HomePageUserConst.heading.filter}</div>
+                <Button className='d-none d-sm-block my-2 ' color="danger" onClick={clearFilters}>
+                  {filterConstants.button.clear}
+                </Button>
+              </Col>
+              <Filter
+                sortOption={sortOption}
+                setSortOption={setSortOption}
+                sortOption2={sortOption2}
+                setSortOption2={setSortOption2}
+                distanceFilter={distanceFilter}
+                setDistanceFilter={setDistanceFilter}
+                rateFilter={rateFilter}
+                setRateFilter={setRateFilter}
+                clearFilters={clearFilters}
+              ></Filter>
+
+
+            </Row>
+
+            <Row>
+              {/* <Col className="mt-3"> */}
+              {loading ? (
+                <div className="d-flex flex-row justify-content-center">
+                  <Spinner
+                    style={{
+                      height: "3rem",
+                      width: "3rem",
+                    }}
+                  />
+                </div>
+              ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
+                filteredAndSortedUsers.map((worker, index) => (
+                  <Col md={4} lg={3} className="mt-2"><WorkerCard worker={worker} key={index} /> </Col>
+                ))
+              ) : (
+                <h3>No Workers found!</h3>
               )}
-            </div>
-          </Col>
-          <Col className="text-end d-md-none" xs={3}>
-            <Button
-              className="p-1"
-              color="primary"
-              onClick={handleFiltersToggle}
-            >
-              {HomePageUserConst.button.filters}
-            </Button>
-            <Offcanvas
-              isOpen={showFilters}
-              direction="end"
-              fade={false}
-              toggle={handleFiltersToggle}
-            >
-              <OffcanvasHeader toggle={handleFiltersToggle}>
-                {HomePageUserConst.heading.filter}
-              </OffcanvasHeader>
-              <OffcanvasBody>
-                <Filter
-                  sortOption={sortOption}
-                  setSortOption={setSortOption}
-                  sortOption2={sortOption2}
-                  setSortOption2={setSortOption2}
-                  distanceFilter={distanceFilter}
-                  setDistanceFilter={setDistanceFilter}
-                  rateFilter={rateFilter}
-                  setRateFilter={setRateFilter}
-                  clearFilters={clearFilters}
-                ></Filter>
-              </OffcanvasBody>
-            </Offcanvas>
-          </Col>
-        </Row>
-        <Row>
-          <Col className="mt-3" md={7}>
-            {loading ? (
-              <div className="d-flex justify-content-center">
-                <Spinner
-                  style={{
-                    height: "3rem",
-                    width: "3rem",
-                  }}
-                />
-              </div>
-            ) : filteredAndSortedUsers && filteredAndSortedUsers?.length > 0 ? (
-              filteredAndSortedUsers.map((worker, index) => (
-                <WorkerCard worker={worker} key={index} />
-              ))
-            ) : (
-              <h3>No Workers found!</h3>
-            )}
-          </Col>
-          <Col className="d-none d-md-block   mt-3" md={5}>
-            <h3>{HomePageUserConst.heading.filter}</h3>
-            <Filter
-              sortOption={sortOption}
-              setSortOption={setSortOption}
-              sortOption2={sortOption2}
-              setSortOption2={setSortOption2}
-              distanceFilter={distanceFilter}
-              setDistanceFilter={setDistanceFilter}
-              rateFilter={rateFilter}
-              setRateFilter={setRateFilter}
-              clearFilters={clearFilters}
-            ></Filter>
+              {/* </Col> */}
+
+            </Row>
           </Col>
         </Row>
       </Container>

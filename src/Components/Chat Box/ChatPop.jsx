@@ -309,14 +309,16 @@ const ChatPopup = () => {
       userId: user._id,
       chatId: chat._id,
     };
-  
+
     setNewMessageText("");
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
-    setNotification((prevNotifications) => prevNotifications.filter((n) => n?.chat?._id !== chat?._id));
+    setNotification((prevNotifications) =>
+      prevNotifications.filter((n) => n?.chat?._id !== chat?._id)
+    );
     socket?.emit("chat read", data);
-  
+
     if (unreadMessages[chat._id]) {
       setUnreadMessages((prevCount) => ({
         ...prevCount,
@@ -324,7 +326,7 @@ const ChatPopup = () => {
       }));
     }
   };
-  
+
   const handleBack = () => {
     const updatedChats = copyOfChats.filter(
       (chat) => chat.chatName !== "fakeChat"
@@ -340,7 +342,9 @@ const ChatPopup = () => {
   const Toggler = () => {
     setShowModal((prevShowModal) => !prevShowModal);
     setChatFromWorkerCard(false);
-    const updatedChats = copyOfChats.filter((chat) => chat.chatName !== "fakeChat");
+    const updatedChats = copyOfChats.filter(
+      (chat) => chat.chatName !== "fakeChat"
+    );
     setCopyOfChats(updatedChats);
     setOriginalChats(updatedChats);
     setSelectedChatCompare(null);
@@ -348,7 +352,7 @@ const ChatPopup = () => {
     setChat(null);
     setNewMessageText("");
   };
-  
+
   // const Toggler = () => {
   //   setShowModal(!showModal);
   //   setChatFromWorkerCard(false);
@@ -486,9 +490,8 @@ const ChatPopup = () => {
               <h5 className="ms-3 fw-bold">{ChatPopUpPage.CHAT_TITLE}</h5>
             </ModalHeader>
             <ModalBody className="" style={{ overflowY: "auto" }}>
-              {window.innerWidth <= 768 ? (
-                // For mobile devices, display only chats initially
-                <div className="container-fluid">
+                {/* // For mobile devices, display only chats initially */}
+                <div className="container-fluid d-lg-none d-block">
                   <div className="row">
                     <div className="col-12">
                       <div className="chat-preview overflow-y-auto max-height-chat-users">
@@ -644,102 +647,105 @@ const ChatPopup = () => {
                     </div>
                   </div>
                 </div>
-              ) : (
-                // For tablet and laptop, display chat and messages side by side
-                <div className="container-fluid">
+
+                {/* // For tablet and laptop, display chat and messages side by side */}
+                <div className="container-fluid d-none d-lg-block">
                   <div className="row">
                     {!chatFromWorkerCard && (
-                       <div className="col-3 chat-list">
-                       <div className="chat-preview overflow-y-auto max-height-chat-users">
-                         {copyOfChats?.length === 0 ? (
-                           <div>{ChatPopUpPage.NO_CHATS}</div>
-                         ) : (
-                           chatTransitions(
-                             (style, item) =>
-                               item && (
-                                 <animated.div style={style}>
-                                   <React.Fragment key={item._id}>
-                                     <div
-                                       className={`d-flex flex-row align-items-center my-2`}
-                                     >
-                                       <div className="d-flex flex-column w-100">
-                                         {item.users.map((chatUser) => {
-                                           if (
-                                             chatUser &&
-                                             chatUser._id &&
-                                             String(chatUser._id) !==
-                                               String(user._id)
-                                           ) {
-                                             const isBlockedByAdmin =
-                                               chatUser.access === "denied"
-                                                 ? true
-                                                 : false;
-                                             return (
-                                               <div
-                                                 key={chatUser._id}
-                                                 className={`pt-2 d-flex flex-row justify-content-between ${
-                                                   isBlockedByAdmin
-                                                     ? "blocked-user"
-                                                     : ""
-                                                 }`}
-                                                 onClick={() =>
-                                                   !isBlockedByAdmin &&
-                                                   handleChatSelection(item)
-                                                 }
-                                               >
-                                                 <h5>
-                                                   {chatUser.firstName}{" "}
-                                                   {chatUser.lastName}
-                                                 </h5>
-                                                 {unreadMessages[item._id] > 0 &&
-                                                   item.latestMessage?.sender !==
-                                                     user._id && (
-                                                     <div className="notification-circle rounded-circle bg-danger text-white">
-                                                       <span className="align-self-center">
-                                                         {
-                                                           unreadMessages[
-                                                             item._id
-                                                           ]
-                                                         }
-                                                       </span>
-                                                     </div>
-                                                   )}
-                                                 {isBlockedByAdmin && (
-                                                   <span className="text-danger">
-                                                     {
-                                                       ChatPopUpPage.BLOCKED_BY_ADMIN
-                                                     }
-                                                   </span>
-                                                 )}
-                                               </div>
-                                             );
-                                           }
-                                           return null;
-                                         })}
-                                       </div>
-                                     </div>
-                                     <hr />
-                                   </React.Fragment>
-                                 </animated.div>
-                               )
-                           )
-                         )}
-                       </div>
-                     </div>
-                      )}
-                   
-                    <div className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}>
+                      <div className="col-3 chat-list">
+                        <div className="chat-preview max-height-chat-users">
+                          {copyOfChats?.length === 0 ? (
+                            <div>{ChatPopUpPage.NO_CHATS}</div>
+                          ) : (
+                            chatTransitions(
+                              (style, item) =>
+                                item && (
+                                  <animated.div style={style}>
+                                    <React.Fragment key={item._id}>
+                                      <div
+                                        className={`d-flex flex-row align-items-center my-2`}
+                                      >
+                                        <div className="d-flex flex-column w-100">
+                                          {item.users.map((chatUser) => {
+                                            if (
+                                              chatUser &&
+                                              chatUser._id &&
+                                              String(chatUser._id) !==
+                                                String(user._id)
+                                            ) {
+                                              const isBlockedByAdmin =
+                                                chatUser.access === "denied"
+                                                  ? true
+                                                  : false;
+                                              return (
+                                                <div
+                                                  key={chatUser._id}
+                                                  className={`pt-2 d-flex flex-row justify-content-between ${
+                                                    isBlockedByAdmin
+                                                      ? "blocked-user"
+                                                      : ""
+                                                  }`}
+                                                  onClick={() =>
+                                                    !isBlockedByAdmin &&
+                                                    handleChatSelection(item)
+                                                  }
+                                                >
+                                                  <h5>
+                                                    {chatUser.firstName}{" "}
+                                                    {chatUser.lastName}
+                                                  </h5>
+                                                  {unreadMessages[item._id] >
+                                                    0 &&
+                                                    item.latestMessage
+                                                      ?.sender !== user._id && (
+                                                      <div className="notification-circle rounded-circle bg-danger text-white">
+                                                        <span className="align-self-center">
+                                                          {
+                                                            unreadMessages[
+                                                              item._id
+                                                            ]
+                                                          }
+                                                        </span>
+                                                      </div>
+                                                    )}
+                                                  {isBlockedByAdmin && (
+                                                    <span className="text-danger">
+                                                      {
+                                                        ChatPopUpPage.BLOCKED_BY_ADMIN
+                                                      }
+                                                    </span>
+                                                  )}
+                                                </div>
+                                              );
+                                            }
+                                            return null;
+                                          })}
+                                        </div>
+                                      </div>
+                                      <hr />
+                                    </React.Fragment>
+                                  </animated.div>
+                                )
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}
+                    >
                       {selectedChat ? (
                         <div className="selected-chat">
                           <div className="chat-header d-flex flex-row align-items-center">
-                          {!chatFromWorkerCard && (
-                                <div>
-                                  <FiArrowLeft
-                                    className="fs-4 me-3 hover-pointer"
-                                    onClick={handleBack}
-                                  />
-                                </div>
-                              )}
+                            {!chatFromWorkerCard && (
+                              <div>
+                                <FiArrowLeft
+                                  className="fs-4 me-3 hover-pointer"
+                                  onClick={handleBack}
+                                />
+                              </div>
+                            )}
                             <div className="d-flex flex-row justify-content-between w-100">
                               <div>
                                 <h5 className="ms-1 mt-2">
@@ -761,7 +767,7 @@ const ChatPopup = () => {
                             </div>
                           </div>
                           <div
-                            className="messages d-flex flex-column overflow-y-auto max-height-message"
+                            className="messages d-flex flex-column  max-height-message"
                             ref={messagesContainerRef}
                           >
                             {renderMessages()}
@@ -810,7 +816,6 @@ const ChatPopup = () => {
                     </div>
                   </div>
                 </div>
-              )}
             </ModalBody>
             <Booking
               modal={modal}

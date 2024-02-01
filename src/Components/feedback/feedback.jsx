@@ -67,7 +67,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
 
   return (
     <div>
-      <Modal isOpen={modal2} centered>
+      <Modal isOpen={modal2} centered className="" >
         {user.role == "user" ? (
           <ModalHeader toggle={toggle} className="justify-content-center">
             {feedbackConstants.heading.rateService}
@@ -78,8 +78,9 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
           </ModalHeader>
         )}
         <ModalBody>
-          <Container className="">
-            {[...Array(5)].map((item, index) => {
+          <Container className="d-flex flex-row gap-5">
+            <div className="fw-bold fs-4">{order.service}</div>
+            <div className="pr-5">{[...Array(5)].map((item, index) => {
               const givenRating = index + 1;
               return (
                 <label>
@@ -100,11 +101,11 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
                   />
                 </label>
               );
-            })}
+            })}</div>
           </Container>
         </ModalBody>
-        <ModalFooter className="justify-content-start">
-          <div className="d-flex flex-row ">
+        <ModalFooter className="">
+          <div className="d-flex flex-row w-100 gap-2">
             <Input
               type="text"
               className="px-sm-5 text-contain"

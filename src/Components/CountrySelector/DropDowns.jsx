@@ -1,0 +1,201 @@
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, FormGroup, Label, Input } from "reactstrap";
+import { Country, State, City } from "country-state-city";
+import { RegisterPage } from "../../Constants/Constants";
+import { set } from "lodash";
+
+const Dropdowns = ({ setFormData,errors,setErrors }) => {
+  const [country, setCountry] = useState("");
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
+  // const [errors, setErrors] = useState({});
+
+  // useEffect(() => {
+  //   setErrors((prevErrors) => ({
+  //     ...prevErrors,
+  //     country: !country ? "Country is required" : "",
+  //   }));
+  // }, [country]);
+
+  // useEffect(() => {
+  //   setErrors((prevErrors) => ({
+  //     ...prevErrors,
+  //     region: !region ? "Region/State is required" : "",
+  //   }));
+  // }, [region]);
+
+  // useEffect(() => {
+  //   if (region && City.getCitiesOfState(country, region).length === 0) {
+  //     setCity(""); // Reset city if the state doesn't have cities
+  //     setErrors((prevErrors) => ({
+  //       ...prevErrors,
+  //       city: "",
+  //     }));
+  //   } else {
+  //     setErrors((prevErrors) => ({
+  //       ...prevErrors,
+  //       city: !city ? "City is required" : "",
+  //     }));
+  //   }
+  // }, [region, city]);
+
+  const handleCountryChange = (event) => {
+    const selectedCountry = event.target.value;
+    setFormData((prev) => ({ ...prev, country: selectedCountry }));
+    setErrors((prevErrors) => ({  
+      ...prevErrors,
+      country: "",
+    }));
+    setCountry(selectedCountry);
+
+    // Reset state and city if the country has no states
+    if (!State.getStatesOfCountry(selectedCountry).length) {
+      setRegion("");
+      setCity("");
+    }
+  };
+
+  const handleRegionChange = (event) => {
+    setFormData((prev) => ({ ...prev, region_state: event.target.value }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      region_state: "",
+    }));
+    setRegion(event.target.value);
+  };
+
+  const handleCityChange = (event) => {
+    setFormData((prev) => ({ ...prev, city: event.target.value }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      city: "",
+    }));
+    setCity(event.target.value);
+  };
+
+  return (
+    <Container>
+      <Row>
+        <Col md={4}>
+          <FormGroup>
+            <Label for="country" className="fw-semibold">
+              Country
+              <span className="text-danger fw-bold fs-5">
+                {RegisterPage.FORM_FIELDS.REQUIRED}
+              </span>
+            </Label>
+            <Input
+              type="select"
+              id="country"
+              value={country}
+              onChange={handleCountryChange}
+              className="form-select"
+              required
+              invalid={!!errors.country}
+            >
+              <option value="">Select Country</option>
+              {Country.getAllCountries().map((country) => (
+                <option key={country.isoCode} value={country.isoCode}>
+                  {country.name}
+                </option>
+              ))}
+            </Input>
+            <span className="text-danger">{errors.country}</span>
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label for="region" className="fw-semibold">
+              Region/State
+              <span className="text-danger fw-bold fs-5">
+                {RegisterPage.FORM_FIELDS.REQUIRED}
+              </span>
+            </Label>
+            <Input
+              type="select"
+              id="region"
+              value={region}
+              onChange={handleRegionChange}
+              className="form-select"
+              required
+              invalid={!!errors.region_state}
+              disabled={
+                !country || State.getStatesOfCountry(country).length === 0
+              }
+            >
+              {country ? (
+                State.getStatesOfCountry(country).length > 0 ? (
+                  <>
+                    <option value="">
+                      Select Region/State
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </option>
+                    {State.getStatesOfCountry(country).map((state) => (
+                      <option key={state.isoCode} value={state.isoCode}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </>
+                ) : (
+                  <option value="">No states available for this country</option>
+                )
+              ) : (
+                <option value="" disabled>
+                  Select a country first
+                </option>
+              )}
+            </Input>
+            <span className="text-danger">{errors.region_state}</span>
+          </FormGroup>
+        </Col>
+
+        <Col md={4}>
+          <FormGroup>
+            <Label for="city" className="fw-semibold">
+              City
+              <span className="text-danger fw-bold fs-5">
+                {RegisterPage.FORM_FIELDS.REQUIRED}
+              </span>
+            </Label>
+            <Input
+              type="select"
+              id="city"
+              value={city}
+              onChange={handleCityChange}
+              className="form-select"
+              required
+              invalid={!!(region && errors.city)}
+              disabled={
+                !region || City.getCitiesOfState(country, region).length === 0
+              }
+            >
+              {region ? (
+                City.getCitiesOfState(country, region).length > 0 ? (
+                  <>
+                    <option value="">Select City</option>
+                    {City.getCitiesOfState(country, region).map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </>
+                ) : (
+                  <option value="">No cities available for this state</option>
+                )
+              ) : (
+                <option value="" disabled>
+                  Select a region first
+                </option>
+              )}
+            </Input>
+            {region && <span className="text-danger">{errors.city}</span>}
+          </FormGroup>
+        </Col>
+      </Row>
+    </Container>
+  );
+};
+
+export default Dropdowns;

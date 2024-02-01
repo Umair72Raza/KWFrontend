@@ -19,6 +19,10 @@ import {
   successToast,
   failureToast,
   hasOnlyWhiteSpace,
+  validateField,
+  validateServices,
+  validatePhoneNumber,
+  passwordPattern,
 } from "../../utils";
 import { RegisterPage } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,6 +37,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FaCheckCircle } from "react-icons/fa";
 import { set } from "lodash";
+import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
+import { City } from "country-state-city";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -43,11 +49,14 @@ const UserRegister = ({ ShowServices }) => {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
-    location:{},
+    location: {},
     // latitude: "",
     // longitude: "",
     address: "",
+    optionalAddress: "",
     country: "",
+    region_state: "",
+    city: "",
     services: [],
   });
   const dispatch = useDispatch();
@@ -59,7 +68,9 @@ const UserRegister = ({ ShowServices }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordInfo, setPasswordInfo] = useState("");
+  const [confirmPasswordInfo, setConfirmPasswordInfo] = useState("");
   const [passwordValid, setPasswordValid] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const toggle = () => setTooltipOpen(!tooltipOpen);
@@ -85,6 +96,9 @@ const UserRegister = ({ ShowServices }) => {
       "password",
       "confirmPassword",
       "phoneNumber",
+      "country",
+      "region_state",
+      "city",
     ];
 
     const isErrorsEmpty = errorFields.every((field) => !errors[field]);
@@ -119,7 +133,7 @@ const UserRegister = ({ ShowServices }) => {
   const handlePasswordChange = (e) => {
     let password = e.target.value;
     password = password.replace(/\s/g, "");
-    if (!validatePassword(password)) {
+    if (!passwordPattern(password)) {
       setPasswordValid(false);
       setPasswordInfo(RegisterPage.ERROR_MESSAGES.invalidPassword);
     } else {
@@ -139,18 +153,14 @@ const UserRegister = ({ ShowServices }) => {
     let confirmPassword = e.target.value;
     confirmPassword = confirmPassword.replace(/\s/g, "");
     if (confirmPassword !== formData.password) {
-      setErrors({
-        ...errors,
-        confirmPassword: RegisterPage.ERROR_MESSAGES.passwordsNotMatch,
-      });
+      setConfirmPasswordInfo(RegisterPage.ERROR_MESSAGES.passwordsNotMatch);
+    } else if (confirmPassword === "") {
+      setConfirmPasswordInfo("");
     } else {
-      setErrors({
-        ...errors,
-        confirmPassword: RegisterPage.SUCCESS_MESSAGES.CONFIRMPASSWORD,
-      });
+      setConfirmPasswordInfo(RegisterPage.SUCCESS_MESSAGES.CONFIRMPASSWORD);
     }
 
-    // setErrors({ ...errors, confirmPassword: "" , password: ""});
+    setErrors({ ...errors, confirmPassword: "", password: "" });
 
     setFormData({
       ...formData,
@@ -196,7 +206,7 @@ const UserRegister = ({ ShowServices }) => {
 
   const handleRateChange = (e, serviceName) => {
     const value = parseFloat(e.target.value);
-    setErrors({ ...errors, rate: "" });
+    setErrors({ ...errors, [serviceName]: "" });
     const updatedServices = formData.services.map((service) =>
       service.name === serviceName ? { ...service, rate: value } : service
     );
@@ -206,52 +216,77 @@ const UserRegister = ({ ShowServices }) => {
       services: updatedServices,
     });
   };
-  const FormValidation = (formData) => {
-    const errors = {};
-    // Check if all rates are within the specified range
-    const ratesValid = formData.services.every(
-      (service) => service.rate >= 10 && service.rate <= 999
+
+  const handleOptionalAddress = (e) => {
+    const value = e.target.value.trimStart().replace(/\s{2,}/g, " ");
+    setFormData({
+      ...formData,
+      optionalAddress: value,
+    });
+  };
+  const handleProfilePictureChange = (event) => {
+    const file = event.target.files[0];
+    const isValidImage = ["image/jpeg", "image/png", "image/gif"].includes(
+      file.type
     );
 
-    if (!validateEmail(formData.email)) {
-      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
-    }
-    if (!formData.email.includes(".com")) {
-      errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
-    }
-
-    if (formData.phoneNumber && typeof formData.phoneNumber === "string") {
-      isValidPhoneNumber(formData.phoneNumber)
-        ? setErrors({ ...errors, phone: "" })
-        : (errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber);
+    if (!isValidImage) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
+      }));
     } else {
-      errors.phone = RegisterPage.ERROR_MESSAGES.emptyPhone;
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        profilePicture: null,
+      }));
+      setProfilePicture(file);
+    }
+  };
+
+  const FormValidation = (formData) => {
+    const errors = {};
+
+    validateEmail(formData.email, errors);
+    validatePhoneNumber(formData.phoneNumber, errors);
+    validateServices(ShowServices, formData.services, errors);
+    validatePassword(formData.password, formData.confirmPassword, errors);
+    validateField(
+      formData.firstName,
+      "firstName",
+      RegisterPage.ERROR_MESSAGES.invalidFirstName,
+      errors
+    );
+    validateField(
+      formData.lastName,
+      "lastName",
+      RegisterPage.ERROR_MESSAGES.invalidLastName,
+      errors
+    );
+    validateField(
+      formData.address,
+      "address",
+      RegisterPage.ERROR_MESSAGES.invalidAddress,
+      errors
+    );
+
+    errors.country = !formData.country ? "Country is required" : "";
+    errors.region_state = !formData.region_state
+      ? "Region/State is required"
+      : "";
+
+    if (
+      formData.region &&
+      City.getCitiesOfState(formData.country, formData.region_state).length ===
+        0
+    ) {
+      errors.city = "";
+    } else {
+      errors.city = !formData.city ? "City is required" : "";
     }
 
-    if (ShowServices && formData.services.length === 0) {
-      errors.services = RegisterPage.ERROR_MESSAGES.invalidService;
-    }
-
-    if (!validatePassword(formData.password)) {
-      errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
-    }
-
-    if (formData.confirmPassword !== formData.password) {
-      errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
-      errors.password = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
-    }
-    if (hasOnlyWhiteSpace(formData.firstName)) {
-      errors.firstName = RegisterPage.ERROR_MESSAGES.invalidFirstName;
-    }
-    if (hasOnlyWhiteSpace(formData.lastName)) {
-      errors.lastName = RegisterPage.ERROR_MESSAGES.invalidLastName;
-    }
-    if (hasOnlyWhiteSpace(formData.address)) {
-      errors.address = RegisterPage.ERROR_MESSAGES.invalidAddress;
-    }
-
-    if (!ratesValid) {
-      errors.rate = RegisterPage.ERROR_MESSAGES.invalidRate;
+    if (!profilePicture) {
+      errors.profilePicture = "Profile picture is required";
     }
 
     return errors;
@@ -270,11 +305,12 @@ const UserRegister = ({ ShowServices }) => {
     // Check if there are validation errors
     if (Object.keys(validationErrors).length === 0) {
       try {
+        console.log("Form data", formData);
         // Dispatch the signup action
         const result = await dispatch(signUpUserAsync(formData));
 
         if (result.type === "auth/signup/fulfilled") {
-          console.log("Sign up successful!", formData)
+          console.log("Sign up successful!", formData);
           // Reset form data on successful signup
           setFormData({
             firstName: "",
@@ -283,14 +319,22 @@ const UserRegister = ({ ShowServices }) => {
             phoneNumber: "",
             password: "",
             confirmPassword: "",
-            location:{},
+            location: {},
             // latitude: "",
             // longitude: "",
             address: "",
+            optionalAddress: "",
             country: "",
+            region_state: "",
+            city: "",
             services: [],
           });
-          successToast("SignUP Successful!");
+          const successMessage = ShowServices
+            ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
+            : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
+
+          successToast(successMessage);
+
           navigate("/auth/login");
         } else if (result.type === "auth/signup/rejected") {
           setIsSignupDisabled(true);
@@ -326,14 +370,19 @@ const UserRegister = ({ ShowServices }) => {
                 <FormGroup>
                   <Label className="fw-semibold" for="firstName">
                     {RegisterPage.LABELS.FIRST_NAME}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
                   </Label>
                   <Input
+                    invalid={errors.firstName ? true : false}
                     type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
                     name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
                     id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
                     placeholder={
                       RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
                     }
+                    required
                     maxLength={12}
                     value={formData.firstName || ""}
                     onChange={(e) =>
@@ -347,8 +396,8 @@ const UserRegister = ({ ShowServices }) => {
                       )
                     }
                   />{" "}
-                  {errors.lastName && (
-                    <span className="text-danger">{errors.lastName}</span>
+                  {errors.firstName && (
+                    <span className="text-danger">{errors.firstName}</span>
                   )}
                 </FormGroup>
               </Col>
@@ -356,14 +405,19 @@ const UserRegister = ({ ShowServices }) => {
                 <FormGroup>
                   <Label className="fw-semibold" for="lastName">
                     {RegisterPage.LABELS.LAST_NAME}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
                   </Label>
                   <Input
+                    invalid={errors.lastName ? true : false}
                     type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
                     name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
                     id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
                     placeholder={
                       RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
                     }
+                    required
                     maxLength={12}
                     value={formData.lastName || ""}
                     onChange={(e) =>
@@ -388,14 +442,19 @@ const UserRegister = ({ ShowServices }) => {
                 <FormGroup>
                   <Label className="fw-semibold" for="email">
                     {RegisterPage.LABELS.EMAIL}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
                   </Label>
                   <Input
+                    invalid={errors.email ? true : false}
                     type={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     name={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     id={RegisterPage.INPUT_FIELDS.EMAIL.name}
                     placeholder={RegisterPage.INPUT_FIELDS.EMAIL.placeholder}
                     value={formData.email || ""}
                     maxLength={70}
+                    required
                     onChange={handleEmailChange}
                     autoComplete="new-email"
                     onKeyDown={(event) => {
@@ -413,13 +472,18 @@ const UserRegister = ({ ShowServices }) => {
                 <FormGroup>
                   <Label className="fw-semibold" for="phoneNumber">
                     {RegisterPage.LABELS.PHONE}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
                   </Label>
                   <PhoneInput
+                    invalid={errors.phone ? true : false}
                     defaultCountry="PK"
                     id={RegisterPage.INPUT_FIELDS.PHONE.name}
                     placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
                     value={formData.phoneNumber || ""}
                     maxLength={20}
+                    required
                     onChange={handlePhoneChange}
                     international
                     countryCallingCodeEditable={false}
@@ -435,15 +499,20 @@ const UserRegister = ({ ShowServices }) => {
                 <FormGroup>
                   <Label className="fw-semibold" for="password">
                     {RegisterPage.LABELS.PASSWORD}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
                   </Label>
                   <div className="password-input-wrapper">
                     <Input
+                      invalid={errors.password ? true : false}
                       type={showPassword ? "text" : "password"}
                       name="password"
                       id="password"
                       placeholder={
                         RegisterPage.INPUT_FIELDS.PASSWORD.placeholder
                       }
+                      required
                       maxLength={24}
                       value={formData.password}
                       onChange={handlePasswordChange}
@@ -455,7 +524,7 @@ const UserRegister = ({ ShowServices }) => {
                     >
                       <FontAwesomeIcon
                         icon={showPassword ? faEye : faEyeSlash}
-                        className="password-icon"
+                        className="password-icon pe-4"
                       />
                     </div>
                   </div>
@@ -464,10 +533,13 @@ const UserRegister = ({ ShowServices }) => {
                       <FaCheckCircle /> {passwordInfo}
                     </span>
                   ) : (
-                    <span className="text-info fw-bold">{passwordInfo}</span>
-                  )}
-                  {errors.password && (
-                    <span className="text-danger">{errors.password}</span>
+                    <span
+                      className={`fw-bold ${
+                        errors.password ? "text-danger" : "text-info"
+                      }`}
+                    >
+                      {passwordInfo}
+                    </span>
                   )}
                 </FormGroup>
               </Col>
@@ -475,15 +547,20 @@ const UserRegister = ({ ShowServices }) => {
                 <FormGroup>
                   <Label className="fw-semibold" for="confirmPassword">
                     {RegisterPage.LABELS.CONFIRM_PASSWORD}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
                   </Label>
-                  <div className="password-input-wrapper">
+                  <div className="password-input-wrapper ">
                     <Input
+                      invalid={errors.confirmPassword ? true : false}
                       type={showConfirmPassword ? "text" : "password"}
                       name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       placeholder={
                         RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
                       }
+                      required
                       value={formData.confirmPassword || ""}
                       maxLength={24}
                       onChange={handleConfirmPasswordChange}
@@ -497,20 +574,19 @@ const UserRegister = ({ ShowServices }) => {
                     >
                       <FontAwesomeIcon
                         icon={showConfirmPassword ? faEye : faEyeSlash}
-                        className="password-icon"
+                        className="password-icon pe-4"
                       />
                     </div>
                   </div>
-                  {errors.confirmPassword &&
-                  errors.confirmPassword === "Password Matched." ? (
+                  {confirmPasswordInfo &&
+                  confirmPasswordInfo === "Password Matched." ? (
                     <span className=" fw-bold text-success">
-                      <FaCheckCircle /> {errors.confirmPassword}
+                      <FaCheckCircle /> {confirmPasswordInfo}
                     </span>
                   ) : (
-                    <span className="text-danger">
-                      {errors.confirmPassword}
-                    </span>
+                    <span className="text-danger">{confirmPasswordInfo}</span>
                   )}
+                  {/* {errors?.confirmPassword && (<span className="text-danger">{errors?.confirmPassword}</span>)} */}
                 </FormGroup>
               </Col>
             </Row>
@@ -519,6 +595,9 @@ const UserRegister = ({ ShowServices }) => {
                 <Row className="my-4">
                   <Label className="fw-semibold">
                     {RegisterPage.LABELS.SERVICES}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
                   </Label>
                   <Col
                     md={12}
@@ -541,15 +620,64 @@ const UserRegister = ({ ShowServices }) => {
                       )}
                     </FormGroup>
                   </Col>
+                  <Col className="text-center mt-3">
+                    {formData.services.length === 5 && !errors.services ? (
+                      <span className="text-info fw-semibold">
+                        {RegisterPage.SERVICES_INFO.SERVICES_SELECTION_LIMIT}
+                      </span>
+                    ) : (
+                      <span className="text-danger">{errors.services}</span>
+                    )}
+                  </Col>
                 </Row>
               </>
             )}
             <Row>
-              <Col>
+              <Col md={6}>
                 <FormGroup>
                   <Label className="fw-semibold" for="address">
                     {RegisterPage.LABELS.ADDRESS}
                   </Label>
+                  <Input
+                    type="text"
+                    placeholder="Enter your address(Optional)."
+                    value={formData.optionalAddress}
+                    onChange={handleOptionalAddress}
+                  />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label className="fw-semibold" for="profilePicture">
+                    Profile Picture{" "}
+                    <span className="text-danger fw-bold fs-5">
+                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                    </span>
+                  </Label>
+                  <Input
+                    invalid={errors.profilePicture ? true : false}
+                    type="file"
+                    id="profilePicture"
+                    accept="image/*"
+                    onChange={handleProfilePictureChange}
+                    required
+                  />
+                  {errors.profilePicture && (
+                    <span className="text-danger">{errors.profilePicture}</span>
+                  )}
+                </FormGroup>
+              </Col>
+              <Col md={12}>
+                <Dropdowns
+                  setFormData={setFormData}
+                  errors={errors}
+                  setErrors={setErrors}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <FormGroup>
                   <Map
                     setFormData={setFormData}
                     errors={errors}

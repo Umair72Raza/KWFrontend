@@ -71,7 +71,7 @@ const UserNavbar = () => {
     Swal.fire({
       title: "Are You Sure You Want To Log Out?",
       showCancelButton: true,
-      confirmButtonText: "Logout",
+      confirmButtonText: "Log Out",
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {

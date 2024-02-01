@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { Container, Input, Spinner } from "reactstrap";
+import { Container, Input, Label, Spinner } from "reactstrap";
 import { useDebounce } from "../../Hooks/Debounce";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { map } from "lodash";
+import { hasOnlyWhiteSpace } from "../../utils";
+import { RegisterPage } from "../../Constants/Constants";
 
 const libraries = [import.meta.env.VITE_GOOGLE_API_LIBARARY];
 
@@ -150,6 +153,9 @@ const Map = React.memo(
             setNewInput(place.formatted_address);
             setFormData((prev) => ({
               ...prev,
+              optionalAddress: hasOnlyWhiteSpace(prev.optionalAddress)
+                ? place.formatted_address
+                : prev.optionalAddress,
               address: place.formatted_address,
               location: {
                 type: "Point",
@@ -202,10 +208,7 @@ const Map = React.memo(
                         : "Unknown",
                       location: {
                         type: "Point",
-                        coordinates: [
-                          longitude,
-                          latitude,
-                        ],
+                        coordinates: [longitude, latitude],
                       },
                       // latitude,
                       // longitude,
@@ -301,11 +304,18 @@ const Map = React.memo(
 
     useEffect(() => {
       setupAutocomplete();
-    }, [currentLocation, country, setupAutocomplete, location.pathname]);
+    }, [location.pathname, isMapLoaded]);
 
     return (
       <Container>
+        <Label for="AutoSearch" className="fw-semibold ">
+          Search Address
+          <span className="text-danger fw-bold fs-5">
+            {RegisterPage.FORM_FIELDS.REQUIRED}
+          </span>
+        </Label>
         <Input
+          id="AutoSearch"
           innerRef={autocompleteRef}
           type="text"
           placeholder={
@@ -313,6 +323,7 @@ const Map = React.memo(
               ? "Search for a place"
               : "Please allow location access to search for a place"
           }
+          required
           value={newInput || ""}
           onChange={(e) => {
             setErrors({ ...errors, address: "" });
