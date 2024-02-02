@@ -39,6 +39,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { set } from "lodash";
 import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
 import { City } from "country-state-city";
+import SignUpOtpVerify from "../../Components/SingUpOtpVerify/SignUpOtpVerify.jsx";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -72,6 +73,7 @@ const UserRegister = ({ ShowServices }) => {
   const [confirmPasswordInfo, setConfirmPasswordInfo] = useState("");
   const [passwordValid, setPasswordValid] = useState(false);
   const [profilePicture, setProfilePicture] = useState("");
+  const [OtpSent, setOtpSent] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const toggle = () => setTooltipOpen(!tooltipOpen);
@@ -333,12 +335,13 @@ const UserRegister = ({ ShowServices }) => {
         const email = formData.email;
         dispatch(OTPverifyAsync({ email })).then((result) => {
           if (result.type === "auth/otpverifySignUp/fulfilled") {
-            navigate("/auth/otpVerification", {
-              state: {
-                email: email,
-                formData: formData,
-              },
-            });
+            setOtpSent(true);
+            // navigate("/auth/otpVerification", {
+            //   state: {
+            //     email: email,
+            //     formData: formData,
+            //   },
+            // });
             successToast("OTP sent successfully!");
           }
         });
@@ -395,399 +398,409 @@ const UserRegister = ({ ShowServices }) => {
       className="d-flex justify-content-center align-items-center"
       style={{ minHeight: "90vh" }}
     >
-      <Row className="w-100 d-flex justify-content-center">
-        <Col md={10} lg={8} xl={6}>
-          <h2 className="text-center mt-5 mb-4">
-            {ShowServices
-              ? RegisterPage.LABELS.WORKER_TITLE
-              : RegisterPage.LABELS.USER_TITLE}
-          </h2>
-          <Form onSubmit={handleSubmit} style={{ userSelect: "none" }}>
-            <Row>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="firstName">
-                    {RegisterPage.LABELS.FIRST_NAME}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <Input
-                    invalid={errors.firstName ? true : false}
-                    type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
-                    name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
-                    id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
-                    placeholder={
-                      RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
-                    }
-                    required
-                    disabled={loading}
-                    maxLength={12}
-                    value={formData.firstName || ""}
-                    onChange={(e) =>
-                      handleNameChange(
-                        formData,
-                        setFormData,
-                        setErrors,
-                        errors,
-                        "firstName",
-                        e
-                      )
-                    }
-                  />{" "}
-                  {errors.firstName && (
-                    <span className="text-danger">{errors.firstName}</span>
-                  )}
-                </FormGroup>
-              </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="lastName">
-                    {RegisterPage.LABELS.LAST_NAME}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <Input
-                    invalid={errors.lastName ? true : false}
-                    type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
-                    name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
-                    id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
-                    placeholder={
-                      RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
-                    }
-                    disabled={loading}
-                    required
-                    maxLength={12}
-                    value={formData.lastName || ""}
-                    onChange={(e) =>
-                      handleNameChange(
-                        formData,
-                        setFormData,
-                        setErrors,
-                        errors,
-                        "lastName",
-                        e
-                      )
-                    }
-                  />{" "}
-                  {errors.firstName && (
-                    <span className="text-danger">{errors.firstName}</span>
-                  )}
-                </FormGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="email">
-                    {RegisterPage.LABELS.EMAIL}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <Input
-                    invalid={errors.email ? true : false}
-                    type={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                    name={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                    id={RegisterPage.INPUT_FIELDS.EMAIL.name}
-                    placeholder={RegisterPage.INPUT_FIELDS.EMAIL.placeholder}
-                    value={formData.email || ""}
-                    maxLength={70}
-                    required
-                    disabled={loading}
-                    onChange={handleEmailChange}
-                    autoComplete="new-email"
-                    onKeyDown={(event) => {
-                      if (event.key === " ") {
-                        event.preventDefault();
-                      }
-                    }}
-                  />
-                  {errors.email && (
-                    <span className="text-danger">{errors.email}</span>
-                  )}
-                </FormGroup>
-              </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="phoneNumber">
-                    {RegisterPage.LABELS.PHONE}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <PhoneInput
-                    invalid={errors.phone ? true : false}
-                    defaultCountry="PK"
-                    id={RegisterPage.INPUT_FIELDS.PHONE.name}
-                    placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
-                    value={formData.phoneNumber || ""}
-                    maxLength={20}
-                    required
-                    disabled={loading}
-                    onChange={handlePhoneChange}
-                    international
-                    countryCallingCodeEditable={false}
-                  />
-                  {errors.phone && (
-                    <span className="text-danger">{errors.phone}</span>
-                  )}
-                </FormGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="password">
-                    {RegisterPage.LABELS.PASSWORD}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <div className="password-input-wrapper">
+      {!OtpSent && (
+        <Row className="w-100 d-flex justify-content-center">
+          <Col md={10} lg={8} xl={6}>
+            <h2 className="text-center mt-5 mb-4">
+              {ShowServices
+                ? RegisterPage.LABELS.WORKER_TITLE
+                : RegisterPage.LABELS.USER_TITLE}
+            </h2>
+            <Form onSubmit={handleSubmit} style={{ userSelect: "none" }}>
+              <Row>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="firstName">
+                      {RegisterPage.LABELS.FIRST_NAME}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
                     <Input
-                      invalid={errors.password ? true : false}
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      id="password"
+                      invalid={errors.firstName ? true : false}
+                      type={RegisterPage.INPUT_FIELDS.FIRST_NAME.type}
+                      name={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
+                      id={RegisterPage.INPUT_FIELDS.FIRST_NAME.name}
                       placeholder={
-                        RegisterPage.INPUT_FIELDS.PASSWORD.placeholder
+                        RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
                       }
                       required
                       disabled={loading}
-                      maxLength={24}
-                      value={formData.password}
-                      onChange={handlePasswordChange}
-                      autoComplete="new-password"
-                    />
-                    <div
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
-                        className="password-icon pe-4"
-                      />
-                    </div>
-                  </div>
-                  {passwordInfo && passwordValid && !errors.password ? (
-                    <span className="text-success fw-bold">
-                      <FaCheckCircle /> {passwordInfo}
-                    </span>
-                  ) : (
-                    <span
-                      className={`fw-bold ${
-                        errors.password ? "text-danger" : "text-info"
-                      }`}
-                    >
-                      {passwordInfo}
-                    </span>
-                  )}
-                  {errors?.password && !passwordInfo && (
-                    <span className="text-danger">{errors?.password}</span>
-                  )}
-                </FormGroup>
-              </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="confirmPassword">
-                    {RegisterPage.LABELS.CONFIRM_PASSWORD}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <div className="password-input-wrapper ">
-                    <Input
-                      invalid={errors.confirmPassword ? true : false}
-                      type={showConfirmPassword ? "text" : "password"}
-                      name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
-                      id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
-                      placeholder={
-                        RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
+                      maxLength={12}
+                      value={formData.firstName || ""}
+                      onChange={(e) =>
+                        handleNameChange(
+                          formData,
+                          setFormData,
+                          setErrors,
+                          errors,
+                          "firstName",
+                          e
+                        )
                       }
+                    />{" "}
+                    {errors.firstName && (
+                      <span className="text-danger">{errors.firstName}</span>
+                    )}
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="lastName">
+                      {RegisterPage.LABELS.LAST_NAME}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
+                    <Input
+                      invalid={errors.lastName ? true : false}
+                      type={RegisterPage.INPUT_FIELDS.LAST_NAME.type}
+                      name={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
+                      id={RegisterPage.INPUT_FIELDS.LAST_NAME.name}
+                      placeholder={
+                        RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
+                      }
+                      disabled={loading}
+                      required
+                      maxLength={12}
+                      value={formData.lastName || ""}
+                      onChange={(e) =>
+                        handleNameChange(
+                          formData,
+                          setFormData,
+                          setErrors,
+                          errors,
+                          "lastName",
+                          e
+                        )
+                      }
+                    />{" "}
+                    {errors.firstName && (
+                      <span className="text-danger">{errors.firstName}</span>
+                    )}
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="email">
+                      {RegisterPage.LABELS.EMAIL}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
+                    <Input
+                      invalid={errors.email ? true : false}
+                      type={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                      name={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                      id={RegisterPage.INPUT_FIELDS.EMAIL.name}
+                      placeholder={RegisterPage.INPUT_FIELDS.EMAIL.placeholder}
+                      value={formData.email || ""}
+                      maxLength={70}
                       required
                       disabled={loading}
-                      value={formData.confirmPassword || ""}
-                      maxLength={24}
-                      onChange={handleConfirmPasswordChange}
-                      autoComplete="new-password"
+                      onChange={handleEmailChange}
+                      autoComplete="new-email"
+                      onKeyDown={(event) => {
+                        if (event.key === " ") {
+                          event.preventDefault();
+                        }
+                      }}
                     />
-                    <div
-                      className="password-toggle"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                    >
-                      <FontAwesomeIcon
-                        icon={showConfirmPassword ? faEye : faEyeSlash}
-                        className="password-icon pe-4"
+                    {errors.email && (
+                      <span className="text-danger">{errors.email}</span>
+                    )}
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="phoneNumber">
+                      {RegisterPage.LABELS.PHONE}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
+                    <PhoneInput
+                      invalid={errors.phone ? true : false}
+                      defaultCountry="PK"
+                      id={RegisterPage.INPUT_FIELDS.PHONE.name}
+                      placeholder={RegisterPage.INPUT_FIELDS.PHONE.placeholder}
+                      value={formData.phoneNumber || ""}
+                      maxLength={20}
+                      required
+                      disabled={loading}
+                      onChange={handlePhoneChange}
+                      international
+                      countryCallingCodeEditable={false}
+                    />
+                    {errors.phone && (
+                      <span className="text-danger">{errors.phone}</span>
+                    )}
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="password">
+                      {RegisterPage.LABELS.PASSWORD}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
+                    <div className="password-input-wrapper">
+                      <Input
+                        invalid={errors.password ? true : false}
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        id="password"
+                        placeholder={
+                          RegisterPage.INPUT_FIELDS.PASSWORD.placeholder
+                        }
+                        required
+                        disabled={loading}
+                        maxLength={24}
+                        value={formData.password}
+                        onChange={handlePasswordChange}
+                        autoComplete="new-password"
                       />
-                    </div>
-                  </div>
-                  {confirmPasswordInfo &&
-                  !errors.confirmPassword &&
-                  confirmPasswordInfo === "Password Matched." ? (
-                    <span className=" fw-bold text-success">
-                      <FaCheckCircle /> {confirmPasswordInfo}
-                    </span>
-                  ) : (
-                    <span className="text-danger">{confirmPasswordInfo}</span>
-                  )}
-                  {errors?.confirmPassword && !confirmPasswordInfo && (
-                    <span className="text-danger">
-                      {errors?.confirmPassword}
-                    </span>
-                  )}
-                </FormGroup>
-              </Col>
-            </Row>
-            {ShowServices && (
-              <>
-                <Row className="my-4">
-                  <Label className="fw-semibold">
-                    {RegisterPage.LABELS.SERVICES}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <Col
-                    md={12}
-                    className="d-flex flex-row Service-overflow-y-scroll"
-                  >
-                    <FormGroup className="d-flex w-100">
-                      {listLoading && ShowServices ? (
-                        <div className="text-center w-100">
-                          <Spinner />
-                          <p>{RegisterPage.LOADER_MESSAGES.SERVICES_LOADING}</p>
-                        </div>
-                      ) : (
-                        <CustomServiceDropdown
-                          list={list}
-                          selectedServices={formData?.services}
-                          handleServiceChange={handleServiceChange}
-                          handleRateChange={handleRateChange}
-                          errors={errors}
-                          loading={loading}
+                      <div
+                        className="password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <FontAwesomeIcon
+                          icon={showPassword ? faEye : faEyeSlash}
+                          className="password-icon pe-4"
                         />
-                      )}
-                    </FormGroup>
-                  </Col>
-                  <Col className="text-center mt-3">
-                    {formData.services.length === 5 && !errors.services ? (
-                      <span className="text-info fw-semibold">
-                        {RegisterPage.SERVICES_INFO.SERVICES_SELECTION_LIMIT}
+                      </div>
+                    </div>
+                    {passwordInfo && passwordValid && !errors.password ? (
+                      <span className="text-success fw-bold">
+                        <FaCheckCircle /> {passwordInfo}
                       </span>
                     ) : (
-                      <span className="text-danger">{errors.services}</span>
+                      <span
+                        className={`fw-bold ${
+                          errors.password ? "text-danger" : "text-info"
+                        }`}
+                      >
+                        {passwordInfo}
+                      </span>
                     )}
-                  </Col>
-                </Row>
-              </>
-            )}
-            <Row>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="address">
-                    {RegisterPage.LABELS.ADDRESS}
-                  </Label>
-                  <Input
-                    type="text"
-                    placeholder="Enter your address(Optional)."
-                    value={formData.optionalAddress}
-                    onChange={handleOptionalAddress}
-                    disabled={loading}
-                  />
-                </FormGroup>
-              </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label className="fw-semibold" for="profilePicture">
-                    Profile Picture{" "}
-                    <span className="text-danger fw-bold fs-5">
-                      {RegisterPage.FORM_FIELDS.REQUIRED}
-                    </span>
-                  </Label>
-                  <Input
-                    invalid={errors.profilePicture ? true : false}
-                    type="file"
-                    id="profilePicture"
-                    accept="image/*"
-                    onChange={handleProfilePictureChange}
-                    multiple={false}
-                    required
-                    disabled={loading}
-                  />
-                  {errors.profilePicture && (
-                    <span className="text-danger">{errors.profilePicture}</span>
-                  )}
-                </FormGroup>
-              </Col>
-              <Col md={12}>
-                <FormGroup>
-                  <Dropdowns
-                    setFormData={setFormData}
-                    errors={errors}
-                    setErrors={setErrors}
-                    loading={loading}
-                  />
-                </FormGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <FormGroup>
-                  <Map
-                    setFormData={setFormData}
-                    errors={errors}
-                    setErrors={setErrors}
-                    loading={loading}
-                  />
-                </FormGroup>
-              </Col>
-            </Row>
-
-            <div className="text-center mb-3">
-              {errors.allField && (
-                <span className="text-danger">{errors.allField}</span>
+                    {errors?.password && !passwordInfo && (
+                      <span className="text-danger">{errors?.password}</span>
+                    )}
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="confirmPassword">
+                      {RegisterPage.LABELS.CONFIRM_PASSWORD}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
+                    <div className="password-input-wrapper ">
+                      <Input
+                        invalid={errors.confirmPassword ? true : false}
+                        type={showConfirmPassword ? "text" : "password"}
+                        name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
+                        id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
+                        placeholder={
+                          RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
+                        }
+                        required
+                        disabled={loading}
+                        value={formData.confirmPassword || ""}
+                        maxLength={24}
+                        onChange={handleConfirmPasswordChange}
+                        autoComplete="new-password"
+                      />
+                      <div
+                        className="password-toggle"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        <FontAwesomeIcon
+                          icon={showConfirmPassword ? faEye : faEyeSlash}
+                          className="password-icon pe-4"
+                        />
+                      </div>
+                    </div>
+                    {confirmPasswordInfo &&
+                    !errors.confirmPassword &&
+                    confirmPasswordInfo === "Password Matched." ? (
+                      <span className=" fw-bold text-success">
+                        <FaCheckCircle /> {confirmPasswordInfo}
+                      </span>
+                    ) : (
+                      <span className="text-danger">{confirmPasswordInfo}</span>
+                    )}
+                    {errors?.confirmPassword && !confirmPasswordInfo && (
+                      <span className="text-danger">
+                        {errors?.confirmPassword}
+                      </span>
+                    )}
+                  </FormGroup>
+                </Col>
+              </Row>
+              {ShowServices && (
+                <>
+                  <Row className="my-4">
+                    <Label className="fw-semibold">
+                      {RegisterPage.LABELS.SERVICES}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
+                    <Col
+                      md={12}
+                      className="d-flex flex-row Service-overflow-y-scroll"
+                    >
+                      <FormGroup className="d-flex w-100">
+                        {listLoading && ShowServices ? (
+                          <div className="text-center w-100">
+                            <Spinner />
+                            <p>
+                              {RegisterPage.LOADER_MESSAGES.SERVICES_LOADING}
+                            </p>
+                          </div>
+                        ) : (
+                          <CustomServiceDropdown
+                            list={list}
+                            selectedServices={formData?.services}
+                            handleServiceChange={handleServiceChange}
+                            handleRateChange={handleRateChange}
+                            errors={errors}
+                            loading={loading}
+                          />
+                        )}
+                      </FormGroup>
+                    </Col>
+                    <Col className="text-center mt-3">
+                      {formData.services.length === 5 && !errors.services ? (
+                        <span className="text-info fw-semibold">
+                          {RegisterPage.SERVICES_INFO.SERVICES_SELECTION_LIMIT}
+                        </span>
+                      ) : (
+                        <span className="text-danger">{errors.services}</span>
+                      )}
+                    </Col>
+                  </Row>
+                </>
               )}
-            </div>
-            <Link id="Signup">
-              <Button
-                color="primary"
-                disabled={isSignupDisabled || loading}
-                block
-                onClick={handleSubmit}
-              >
-                {loading ? (
-                  <Spinner size="sm" color="light" />
-                ) : (
-                  RegisterPage.LABELS.SIGNUP
-                )}
-              </Button>
-            </Link>
-            <Tooltip
-              placement="top"
-              autohide={false}
-              isOpen={tooltipOpen && isSignupDisabled}
-              target="Signup"
-              toggle={toggle}
-            >
-              {RegisterPage.TOOLTIPS.ALL_FIELDS}
-            </Tooltip>
-          </Form>
+              <Row>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="address">
+                      {RegisterPage.LABELS.ADDRESS}
+                    </Label>
+                    <Input
+                      type="text"
+                      placeholder="Enter your address(Optional)."
+                      value={formData.optionalAddress}
+                      onChange={handleOptionalAddress}
+                      disabled={loading}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label className="fw-semibold" for="profilePicture">
+                      Profile Picture{" "}
+                      <span className="text-danger fw-bold fs-5">
+                        {RegisterPage.FORM_FIELDS.REQUIRED}
+                      </span>
+                    </Label>
+                    <Input
+                      invalid={errors.profilePicture ? true : false}
+                      type="file"
+                      id="profilePicture"
+                      accept="image/*"
+                      onChange={handleProfilePictureChange}
+                      multiple={false}
+                      required
+                      disabled={loading}
+                    />
+                    {errors.profilePicture && (
+                      <span className="text-danger">
+                        {errors.profilePicture}
+                      </span>
+                    )}
+                  </FormGroup>
+                </Col>
+                <Col md={12}>
+                  <FormGroup>
+                    <Dropdowns
+                      setFormData={setFormData}
+                      errors={errors}
+                      setErrors={setErrors}
+                      loading={loading}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormGroup>
+                    <Map
+                      setFormData={setFormData}
+                      errors={errors}
+                      setErrors={setErrors}
+                      loading={loading}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
 
-          <Col className="mt-4 text-center fw-medium">
-            {RegisterPage.LABELS.MEMBER}
-            <Link
-              className="fw-bold links-hover"
-              to={RegisterPage.ROUTES.LOGIN}
-            >
-              {RegisterPage.LABELS.ACCOUNT}
-            </Link>
+              <div className="text-center mb-3">
+                {errors.allField && (
+                  <span className="text-danger">{errors.allField}</span>
+                )}
+              </div>
+              <Link id="Signup">
+                <Button
+                  color="primary"
+                  disabled={isSignupDisabled || loading}
+                  block
+                  onClick={handleSubmit}
+                >
+                  {loading ? (
+                    <Spinner size="sm" color="light" />
+                  ) : (
+                    RegisterPage.LABELS.SIGNUP
+                  )}
+                </Button>
+              </Link>
+              <Tooltip
+                placement="top"
+                autohide={false}
+                isOpen={tooltipOpen && isSignupDisabled}
+                target="Signup"
+                toggle={toggle}
+              >
+                {RegisterPage.TOOLTIPS.ALL_FIELDS}
+              </Tooltip>
+            </Form>
+
+            <Col className="mt-4 text-center fw-medium">
+              {RegisterPage.LABELS.MEMBER}
+              <Link
+                className="fw-bold links-hover"
+                to={RegisterPage.ROUTES.LOGIN}
+              >
+                {RegisterPage.LABELS.ACCOUNT}
+              </Link>
+            </Col>
           </Col>
-        </Col>
-      </Row>
+        </Row>
+      )}
+
+      {OtpSent && (
+        <SignUpOtpVerify formData={formData} setFormData={setFormData} />
+      )}
     </Container>
   );
 };

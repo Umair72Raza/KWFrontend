@@ -358,7 +358,7 @@ const authSlice = createSlice({
       })
       .addCase(OTPverifyAsync.fulfilled, (state, action) => {
         state.otpStatus = "succeeded";
-        state.signupOTP = action.payload;
+        state.signupOTP = action.payload.otp;
       })
       .addCase(OTPverifyAsync.rejected, (state, action) => {
         state.otpStatus = "failed";

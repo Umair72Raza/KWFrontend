@@ -15,7 +15,7 @@ const OTPVerification = () => {
   const email = location?.state?.email;
   const newMail = location?.state?.newMail;
   const newPhone = location?.state?.newPhone;
-  const formData = location?.state?.formData;
+
   console.log(newMail)
   console.log(newPhone)
 
@@ -32,8 +32,6 @@ const OTPVerification = () => {
     else if(newPhone === undefined)
     {
       VerifyOTPandChangeMail();
-    } else if (newMail=== undefined && newPhone === undefined && signupOTP){
-      VerifyOTPandCreateAccount();
     }
   }
   const VerifyOTPandChangePhone = async () => {
