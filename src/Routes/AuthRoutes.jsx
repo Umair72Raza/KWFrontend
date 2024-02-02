@@ -1,4 +1,5 @@
 import OTPVerification from "../Components/OTPVerification/OTPVerification";
+import SignUpOtpVerify from "../Components/SingUpOtpVerify/SignUpOtpVerify";
 import ForgetPassword from "../Views/ForgetPassword/ForgetPassword";
 import Login from "../Views/Login/Login";
 import NewPassword from "../Views/NewPassword/NewPassword";
@@ -37,9 +38,9 @@ const AuthRoutes = [
     layout: "/auth",
   },
   {
-    path:"/otpVerification",
+    path:"/verify-email/:encrptedEmail",
     name:"OTPVerification",
-    component:<OTPVerification />,
+    component:<SignUpOtpVerify />,
     layout:"/auth"
   }
 ]

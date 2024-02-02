@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { Button, Card, CardBody, Col, Container, Input, Row } from 'reactstrap';
 import { RegisterPage } from '../../Constants/Constants';
 import { failureToast, successToast } from '../../utils';
-import { signUpUserAsync } from '../../Redux/Slices/AuthSlice';
+import { changeEmailStatus, signUpUserAsync } from '../../Redux/Slices/AuthSlice';
+import { jwtDecode } from 'jwt-decode';
 
 const SignUpOtpVerify = ({formData,setFormData}) => {
     const navigate = useNavigate();
@@ -12,14 +13,27 @@ const SignUpOtpVerify = ({formData,setFormData}) => {
     const [otpVisible, setOtpVisible] = useState(false);
     const [disabledOTP, setDisabledOTP] = useState(false);
     const [otp, setOtp] = useState("");
-    const { signupOTP } = useSelector((state) => state.auth);
+    const [decodedData,setDecodedData] = useState(""); 
+
+    const { encrptedEmail } = useParams();
+
+    useEffect(() => {
+        if (!encrptedEmail) {
+          navigate(RegisterPage.ROUTES.LOGIN);
+        } else {
+            const decodedEmail = jwtDecode(encrptedEmail);
+            console.log(decodedEmail,"decodedEmail")
+            setDecodedData(decodedEmail);
+        }
+      }, [encrptedEmail, navigate]);
+
 
 
     const handleChange = (e) => {
         setOtp(e.target.value);
       };
-console.log(signupOTP,"opt")
-      const VerifyOTPandCreateAccount = async () => {
+
+      const VerifyOTP = async () => {
         // Validate OTP
         if (!/^\d{4}$/.test(otp)) {
           failureToast("OTP must be a valid 4-digit number!");
@@ -27,7 +41,7 @@ console.log(signupOTP,"opt")
         }
       
         // Check OTP
-        if (signupOTP != otp) {
+        if (decodedData.otp != otp) {
           failureToast("Invalid OTP");
           return;
         }
@@ -36,27 +50,19 @@ console.log(signupOTP,"opt")
         setDisabledOTP(true);
       
         try {
-          const result = await dispatch(signUpUserAsync(formData));
-      
-          if (result.type === "auth/signup/fulfilled") {
-            console.log("Sign up successful!", formData);
-      
-            // Display success message
-            const successMessage = ShowServices
-              ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
-              : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
-      
-            successToast(successMessage);
-      
-            // Navigate to login page after successful signup
-            navigate("/auth/login");
-          } else if (result.type === "auth/signup/rejected") {
-            // Display error message if signup is rejected
-            failureToast(result.payload);
-          }
+            const email =decodedData.email;
+               console.log(email,"email")
+            
+            dispatch(changeEmailStatus({email})).then((result)=>{
+                if(result.type === "auth/changeEmailStatus/fulfilled")
+                {
+                    successToast("Email verified successfully.");
+                    navigate(RegisterPage.ROUTES.LOGIN);
+                }
+            })
         } catch (error) {
           // Display error message if an error occurs during signup process
-          failureToast("An error occurred while signing up");
+          failureToast("An error occurred during email verification! Please try again.");
         } finally {
           // Re-enable OTP input
           setDisabledOTP(false);
@@ -71,7 +77,7 @@ console.log(signupOTP,"opt")
             <Card>
               <CardBody className='d-flex flex-column'>
                 <h2 className="text-center mb-4">OTP Verification</h2>
-                <div className="text-center mb-4">Email is sent to:<span className=' fw-semibold' >{formData?.email}</span></div>
+                <div className="text-center mb-4">Email is sent to:<span className=' fw-semibold' ></span></div>
                 <Input
                   type="text"
                   placeholder={otpVisible ? "" : "****"}
@@ -86,7 +92,7 @@ console.log(signupOTP,"opt")
                 <Button
                   color="primary"
                   className="mb-3 text-center align-self-center"
-                  onClick={VerifyOTPandCreateAccount}
+                  onClick={VerifyOTP}
                   disabled={disabledOTP}
                 >
                   Verify OTP

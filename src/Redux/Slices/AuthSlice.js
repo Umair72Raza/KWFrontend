@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  EmailVerification,
   OTPverify,
   OTPverifyforEmail,
   OTPverifyforPhone,
   loginUser,
   newPasswordSetter,
-  optVerificationAtSingUp,
+  optSentAtSingUp,
   sendOTP,
   sendOTPforEmail,
   sendOTPforPhone,
@@ -36,10 +37,10 @@ export const logoutAsync = createAsyncThunk("auth/logout", async () => {
   Logout();
 });
 
-export const OTPverifyAsync = createAsyncThunk("auth/otpverifySignUp", async (credentials) => {
+export const OTPverifyAsync = createAsyncThunk("auth/otpSentAtSignUp", async (credentials) => {
   try {
     const { email } = credentials;
-    const response = await optVerificationAtSingUp(email);
+    const response = await optSentAtSingUp(email);
     return response;
   } catch (error) {
     return error;
@@ -109,6 +110,18 @@ export const signUpUserAsync = createAsyncThunk(
     }
   }
 );
+
+// change the email verification status
+export const changeEmailStatus = createAsyncThunk( "auth/changeEmailStatus", async (data) => {
+  try{
+const {email} = data;
+const response = await EmailVerification(email);
+return response;
+  }catch(error){
+    console.log(error)
+    return error;
+  }
+});
 
 export const requestOTPAsync = createAsyncThunk(
   "auth/requestOTPAsync",
@@ -261,6 +274,7 @@ const authSlice = createSlice({
     signupStatus: "idle",
     signupWorkerStatus: "idle",
     signupOTP: null,
+    emailVerification:"idle",
     emailOTP: null,
     emailOTPError: null,
     otpStatus: "idle",
@@ -363,6 +377,15 @@ const authSlice = createSlice({
       .addCase(OTPverifyAsync.rejected, (state, action) => {
         state.otpStatus = "failed";
         state.otpError = action.error.message;
+      }) .addCase(changeEmailStatus.pending, (state) => {
+        state.emailVerification = "loading";
+      })
+      .addCase(changeEmailStatus.fulfilled, (state, action) => {
+        state.emailVerification = "succeeded";
+      })
+      .addCase(changeEmailStatus.rejected, (state, action) => {
+        state.emailVerification = "failed";
+
       })
   },
 });

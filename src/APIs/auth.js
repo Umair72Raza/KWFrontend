@@ -3,15 +3,24 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT,
 });
 
-export const optVerificationAtSingUp = async (email) => {
+export const optSentAtSingUp = async (email) => {
   try {
     
-    const response = await API.post(`user/otpVerification`, { email: email });
+    const response = await API.post(`user/otp_Sent`, { email: email });
     return response.data;
   } catch (error) {
     return error.response.data;
   }
 };
+
+export const EmailVerification = async(email)=>{
+  try{
+const response = await API.put(`user/verifyEmail`, { email: email });
+return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
 
 export const sendOTP = async (email) => {
   try {
