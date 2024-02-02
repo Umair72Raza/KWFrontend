@@ -134,6 +134,7 @@ const Login = () => {
                 id={LoginPage.FORM_FIELDS.EMAIL}
                 placeholder={LoginPage.PLACEHOLDERS.EMAIL}
                 maxLength={70}
+                disabled={loading}
                 value={formData[LoginPage.FORM_FIELDS.EMAIL]}
                 onChange={handleEmailChange}
                 onKeyDown={(event) => {
@@ -163,12 +164,13 @@ const Login = () => {
                   id={LoginPage.FORM_FIELDS.PASSWORD}
                   placeholder={LoginPage.PLACEHOLDERS.PASSWORD}
                   maxLength={12}
+                  disabled={loading}
                   value={formData[LoginPage.FORM_FIELDS.PASSWORD]}
                   onChange={handleChange}
                   required
                   autoComplete="new-password"
                 />
-                <div
+                {formData.password && formData.password.length > 0 && ( <div
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -176,7 +178,7 @@ const Login = () => {
                     icon={showPassword ? faEye : faEyeSlash}
                     className="password-icon"
                   />
-                </div>
+                </div>) }
               </div>
             </FormGroup>
             <Link id="Login" style={{ textDecoration: "none" }}>

@@ -3,6 +3,25 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT,
 });
 
+export const optSentAtSingUp = async (email) => {
+  try {
+    
+    const response = await API.post(`user/otp_Sent`, { email: email });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export const EmailVerification = async(email)=>{
+  try{
+const response = await API.put(`user/verifyEmail`, { email: email });
+return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+}
+
 export const sendOTP = async (email) => {
   try {
     const response = await API.post(`user/forgot-password`, { email: email });
@@ -136,12 +155,16 @@ export const signUpUser = async (
   lastName,
   email,
   password,
+  profilePicture,
   phoneNumber,
   location,
   // longitude,
   // latitude,
   address,
+  optionalAddress,
   country,
+  region_state,
+  city,
   services
 ) => {
   try {
@@ -150,13 +173,21 @@ export const signUpUser = async (
       lastName,
       email,
       password,
+      profilePicture,
       phoneNumber,
       location,
       // longitude,
       // latitude,
       address,
+      optionalAddress,
       country,
+      region_state,
+      city,
       services,
+    },{
+      headers: {
+        "Content-Type":  "multipart/form-data",
+      },
     });
     return response.data;
   } catch (error) {

@@ -7,7 +7,8 @@ const CustomServiceDropdown = ({
   selectedServices,
   handleServiceChange,
   handleRateChange,
-  errors
+  errors,
+  loading
 
 }) => {
   const handleInputKeyDown = (e) => {
@@ -41,8 +42,9 @@ const CustomServiceDropdown = ({
                   )}
                   onChange={handleServiceChange}
                   disabled={
+                     loading ||
                     selectedServices.length >= 5 &&
-                    !selectedServices.some((s) => s?.name === service?.name)
+                    !selectedServices.some((s) => s?.name === service?.name )
                   }
                 />
               </Label>
@@ -69,6 +71,7 @@ const CustomServiceDropdown = ({
                   }
                   onChange={(e) => handleRateChange(e, service?.name)}
                   onKeyDown={handleInputKeyDown}
+                  disabled={loading}
                   style={{ height: "25px", width:"100px" }}
                 />
                 <span className="align-self-center fw-bold">{RegisterPage.INPUT_FIELDS.SERVICES.rate}</span>

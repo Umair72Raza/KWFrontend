@@ -9,7 +9,7 @@ const OTPVerification = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, token } = useSelector((state) => state.auth);
+  const { user, token,signupOTP } = useSelector((state) => state.auth);
   const [otpVisible, setOtpVisible] = useState(false);
   const [disabledOTP, setDisabledOTP] = useState(false);
   const email = location?.state?.email;
@@ -125,6 +125,51 @@ const OTPVerification = () => {
     }
   };
 
+  const VerifyOTPandCreateAccount = async () => {
+    // Validate OTP
+    if (!/^\d{4}$/.test(otp)) {
+      failureToast("OTP must be a valid 4-digit number!");
+      return;
+    }
+  
+    // Check OTP
+    if (signupOTP !== otp) {
+      failureToast("Invalid OTP");
+      return;
+    }
+  
+    // Disable OTP input during sign-up process
+    setDisabledOTP(true);
+  
+    try {
+      const result = await dispatch(signUpUserAsync(formData));
+  
+      if (result.type === "auth/signup/fulfilled") {
+        console.log("Sign up successful!", formData);
+  
+        // Display success message
+        const successMessage = ShowServices
+          ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
+          : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
+  
+        successToast(successMessage);
+  
+        // Navigate to login page after successful signup
+        navigate("/auth/login");
+      } else if (result.type === "auth/signup/rejected") {
+        // Display error message if signup is rejected
+        failureToast(result.payload);
+      }
+    } catch (error) {
+      // Display error message if an error occurs during signup process
+      failureToast("An error occurred while signing up");
+    } finally {
+      // Re-enable OTP input
+      setDisabledOTP(false);
+    }
+  };
+  
+
   return (
     <div>
       <div className="pt-4">
@@ -145,6 +190,8 @@ const OTPVerification = () => {
               onBlur={() => setOtpVisible(false)}
               onChange={handleChange}
               className="mb-3 text-center"
+              maxLength={4} // Restrict input to maximum 4 characters
+              pattern="\d*" // Only allow digits
             />
             <Button
               color="primary"

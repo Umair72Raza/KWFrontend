@@ -23,10 +23,14 @@ import {
   validateServices,
   validatePhoneNumber,
   passwordPattern,
+  infoToast,
 } from "../../utils";
 import { RegisterPage } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { signUpUserAsync } from "../../Redux/Slices/AuthSlice.js";
+import {
+  OTPverifyAsync,
+  signUpUserAsync,
+} from "../../Redux/Slices/AuthSlice.js";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -39,6 +43,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { set } from "lodash";
 import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
 import { City } from "country-state-city";
+import SignUpOtpVerify from "../../Components/SingUpOtpVerify/SignUpOtpVerify.jsx";
 
 const UserRegister = ({ ShowServices }) => {
   let list = useSelector((state) => state?.admin?.services);
@@ -49,6 +54,7 @@ const UserRegister = ({ ShowServices }) => {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
+    profilePicture: null,
     location: {},
     // latitude: "",
     // longitude: "",
@@ -70,7 +76,7 @@ const UserRegister = ({ ShowServices }) => {
   const [passwordInfo, setPasswordInfo] = useState("");
   const [confirmPasswordInfo, setConfirmPasswordInfo] = useState("");
   const [passwordValid, setPasswordValid] = useState(false);
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePicture, setProfilePicture] = useState("");
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const toggle = () => setTooltipOpen(!tooltipOpen);
@@ -81,6 +87,7 @@ const UserRegister = ({ ShowServices }) => {
       "phone",
       "password",
       "confirmPassword",
+      "profilePicture",
       "allField",
       "address",
       "firstName",
@@ -102,9 +109,9 @@ const UserRegister = ({ ShowServices }) => {
     ];
 
     const isErrorsEmpty = errorFields.every((field) => !errors[field]);
-    const isFormDataValid = formDataFields.every(
-      (field) => !hasOnlyWhiteSpace(formData[field])
-    );
+    const isFormDataValid = formDataFields.every((field) => {
+      (field) => !hasOnlyWhiteSpace(formData[field]);
+    });
     const isServicesValid = ShowServices ? formData.services.length > 0 : true;
 
     return isErrorsEmpty && isFormDataValid && isServicesValid;
@@ -224,24 +231,50 @@ const UserRegister = ({ ShowServices }) => {
       optionalAddress: value,
     });
   };
+
+  const clearFileInput = () => {
+    const fileInput = document.getElementById("profilePicture");
+    if (fileInput) {
+      fileInput.value = ""; // Reset the value to clear the selection
+    }
+  };
   const handleProfilePictureChange = (event) => {
     const file = event.target.files[0];
-    const isValidImage = ["image/jpeg", "image/png", "image/gif"].includes(
-      file.type
-    );
 
-    if (!isValidImage) {
+    // Define file size limit and accepted file types
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const acceptedTypes = ["image/jpeg", "image/png", "image/gif"];
+
+    // Check if file size exceeds limit
+    if (file.size > maxSize) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        profilePicture: "Select a file with size equal to or smaller than 5Mb.",
+      }));
+      clearFileInput();
+      return;
+    }
+
+    // Check if file type is valid
+    if (!acceptedTypes.includes(file.type)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
       }));
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        profilePicture: null,
-      }));
-      setProfilePicture(file);
+      clearFileInput();
+      return;
     }
+
+    // If file passes validation, update state
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      profilePicture: null,
+    }));
+    setProfilePicture(file);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      profilePicture: file,
+    }));
   };
 
   const FormValidation = (formData) => {
@@ -269,20 +302,18 @@ const UserRegister = ({ ShowServices }) => {
       RegisterPage.ERROR_MESSAGES.invalidAddress,
       errors
     );
-
-    errors.country = !formData.country ? "Country is required" : "";
-    errors.region_state = !formData.region_state
-      ? "Region/State is required"
-      : "";
-
+    if (!formData.country) {
+      errors.country = "Country is required";
+    }
+    if (!formData.region_state) {
+      errors.region_state = "Region/State is required";
+    }
     if (
       formData.region &&
-      City.getCitiesOfState(formData.country, formData.region_state).length ===
+      !City.getCitiesOfState(formData.country, formData.region_state).length ===
         0
     ) {
-      errors.city = "";
-    } else {
-      errors.city = !formData.city ? "City is required" : "";
+      errors.city = "City is required";
     }
 
     if (!profilePicture) {
@@ -298,18 +329,26 @@ const UserRegister = ({ ShowServices }) => {
     // Start loading spinner
     setLoading(true);
 
-    // Perform form validation
-    const validationErrors = FormValidation(formData);
-    setErrors(validationErrors);
+    try {
+      // Perform form validation
+      const validationErrors = FormValidation(formData);
+      setErrors(validationErrors);
 
-    // Check if there are validation errors
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        console.log("Form data", formData);
+      // Check if there are validation errors
+      if (Object.keys(validationErrors).length === 0) {
         // Dispatch the signup action
         const result = await dispatch(signUpUserAsync(formData));
 
         if (result.type === "auth/signup/fulfilled") {
+          const email = formData.email;
+          const otpResult = await dispatch(OTPverifyAsync({ email }));
+
+          if (otpResult.type === "auth/otpSentAtSignUp/fulfilled") {
+            infoToast(
+              "OTP sent to your email. Please verify your email to Login!"
+            );
+            navigate("/auth/login");
+          }
           console.log("Sign up successful!", formData);
           // Reset form data on successful signup
           setFormData({
@@ -319,9 +358,8 @@ const UserRegister = ({ ShowServices }) => {
             phoneNumber: "",
             password: "",
             confirmPassword: "",
+            profilePicture: null,
             location: {},
-            // latitude: "",
-            // longitude: "",
             address: "",
             optionalAddress: "",
             country: "",
@@ -329,25 +367,15 @@ const UserRegister = ({ ShowServices }) => {
             city: "",
             services: [],
           });
-          const successMessage = ShowServices
-            ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
-            : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
-
-          successToast(successMessage);
-
-          navigate("/auth/login");
         } else if (result.type === "auth/signup/rejected") {
           setIsSignupDisabled(true);
           failureToast(result.payload);
         }
-      } catch (error) {
-        console.log("Error in sign up!", error);
-      } finally {
-        // Stop loading spinner
-        setLoading(false);
       }
-    } else {
-      // Stop loading spinner if there are validation errors
+    } catch (error) {
+      console.log("Error in sign up!", error);
+    } finally {
+      // Stop loading spinner
       setLoading(false);
     }
   };
@@ -383,6 +411,7 @@ const UserRegister = ({ ShowServices }) => {
                       RegisterPage.INPUT_FIELDS.FIRST_NAME.placeholder
                     }
                     required
+                    disabled={loading}
                     maxLength={12}
                     value={formData.firstName || ""}
                     onChange={(e) =>
@@ -417,6 +446,7 @@ const UserRegister = ({ ShowServices }) => {
                     placeholder={
                       RegisterPage.INPUT_FIELDS.LAST_NAME.placeholder
                     }
+                    disabled={loading}
                     required
                     maxLength={12}
                     value={formData.lastName || ""}
@@ -455,6 +485,7 @@ const UserRegister = ({ ShowServices }) => {
                     value={formData.email || ""}
                     maxLength={70}
                     required
+                    disabled={loading}
                     onChange={handleEmailChange}
                     autoComplete="new-email"
                     onKeyDown={(event) => {
@@ -484,6 +515,7 @@ const UserRegister = ({ ShowServices }) => {
                     value={formData.phoneNumber || ""}
                     maxLength={20}
                     required
+                    disabled={loading}
                     onChange={handlePhoneChange}
                     international
                     countryCallingCodeEditable={false}
@@ -513,22 +545,25 @@ const UserRegister = ({ ShowServices }) => {
                         RegisterPage.INPUT_FIELDS.PASSWORD.placeholder
                       }
                       required
+                      disabled={loading}
                       maxLength={24}
                       value={formData.password}
                       onChange={handlePasswordChange}
                       autoComplete="new-password"
                     />
-                    <div
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
-                        className="password-icon pe-4"
-                      />
-                    </div>
+                    {formData.password && formData.password.length > 0 && (
+                      <div
+                        className="password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <FontAwesomeIcon
+                          icon={showPassword ? faEye : faEyeSlash}
+                          className="password-icon pe-4"
+                        />
+                      </div>
+                    )}
                   </div>
-                  {passwordInfo && passwordValid ? (
+                  {passwordInfo && passwordValid && !errors.password ? (
                     <span className="text-success fw-bold">
                       <FaCheckCircle /> {passwordInfo}
                     </span>
@@ -540,6 +575,9 @@ const UserRegister = ({ ShowServices }) => {
                     >
                       {passwordInfo}
                     </span>
+                  )}
+                  {errors?.password && !passwordInfo && (
+                    <span className="text-danger">{errors?.password}</span>
                   )}
                 </FormGroup>
               </Col>
@@ -561,12 +599,13 @@ const UserRegister = ({ ShowServices }) => {
                         RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.placeholder
                       }
                       required
+                      disabled={loading}
                       value={formData.confirmPassword || ""}
                       maxLength={24}
                       onChange={handleConfirmPasswordChange}
                       autoComplete="new-password"
                     />
-                    <div
+                    {formData.confirmPassword && formData.confirmPassword.length >0 && (   <div
                       className="password-toggle"
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
@@ -576,9 +615,11 @@ const UserRegister = ({ ShowServices }) => {
                         icon={showConfirmPassword ? faEye : faEyeSlash}
                         className="password-icon pe-4"
                       />
-                    </div>
+                    </div>)}
+                  
                   </div>
                   {confirmPasswordInfo &&
+                  !errors.confirmPassword &&
                   confirmPasswordInfo === "Password Matched." ? (
                     <span className=" fw-bold text-success">
                       <FaCheckCircle /> {confirmPasswordInfo}
@@ -586,7 +627,11 @@ const UserRegister = ({ ShowServices }) => {
                   ) : (
                     <span className="text-danger">{confirmPasswordInfo}</span>
                   )}
-                  {/* {errors?.confirmPassword && (<span className="text-danger">{errors?.confirmPassword}</span>)} */}
+                  {errors?.confirmPassword && !confirmPasswordInfo && (
+                    <span className="text-danger">
+                      {errors?.confirmPassword}
+                    </span>
+                  )}
                 </FormGroup>
               </Col>
             </Row>
@@ -616,6 +661,7 @@ const UserRegister = ({ ShowServices }) => {
                           handleServiceChange={handleServiceChange}
                           handleRateChange={handleRateChange}
                           errors={errors}
+                          loading={loading}
                         />
                       )}
                     </FormGroup>
@@ -643,6 +689,7 @@ const UserRegister = ({ ShowServices }) => {
                     placeholder="Enter your address(Optional)."
                     value={formData.optionalAddress}
                     onChange={handleOptionalAddress}
+                    disabled={loading}
                   />
                 </FormGroup>
               </Col>
@@ -660,7 +707,9 @@ const UserRegister = ({ ShowServices }) => {
                     id="profilePicture"
                     accept="image/*"
                     onChange={handleProfilePictureChange}
+                    multiple={false}
                     required
+                    disabled={loading}
                   />
                   {errors.profilePicture && (
                     <span className="text-danger">{errors.profilePicture}</span>
@@ -668,11 +717,14 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={12}>
-                <Dropdowns
-                  setFormData={setFormData}
-                  errors={errors}
-                  setErrors={setErrors}
-                />
+                <FormGroup>
+                  <Dropdowns
+                    setFormData={setFormData}
+                    errors={errors}
+                    setErrors={setErrors}
+                    loading={loading}
+                  />
+                </FormGroup>
               </Col>
             </Row>
             <Row>
@@ -682,6 +734,7 @@ const UserRegister = ({ ShowServices }) => {
                     setFormData={setFormData}
                     errors={errors}
                     setErrors={setErrors}
+                    loading={loading}
                   />
                 </FormGroup>
               </Col>
@@ -692,10 +745,11 @@ const UserRegister = ({ ShowServices }) => {
                 <span className="text-danger">{errors.allField}</span>
               )}
             </div>
-            <Link id="Signup">
+            <Link id="Signup" style={{ textDecoration: "none" }}>
               <Button
                 color="primary"
                 disabled={isSignupDisabled || loading}
+                className="w-25 hover-pointer"
                 block
                 onClick={handleSubmit}
               >
