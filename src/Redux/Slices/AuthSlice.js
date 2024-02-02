@@ -50,6 +50,26 @@ export const OTPverifyAsync = createAsyncThunk(
     }
   }
 );
+export const updatePfpAsync = createAsyncThunk(
+  "auth/setnewpfp",
+  async (data,{rejectWithValue}) => {
+    try {
+      //console.log("Data in thunk:", [...data.entries()]);
+      const {email,profilePicture}  = data;
+      const result = await updatePfp(email, profilePicture);
+      console.log("update pfp response", result);
+      return result.data;
+    } catch (error) {
+      if(error)
+      {
+        return rejectWithValue(
+          "Error Occured!"
+        );
+      }
+      console.log(error);
+    }
+  }
+);
 
 export const signUpUserAsync = createAsyncThunk(
   "auth/signup",
@@ -256,19 +276,7 @@ export const setNewPassAsync = createAsyncThunk(
   }
 );
 
-export const updatePfpAsync = createAsyncThunk(
-  "auth/setnewpfp",
-  async (data) => {
-    try {
-      console.log(data,"data")
-      const result = await updatePfp(data);
-      console.log("update pfp response", result);
-      return result.data;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-);
+
 
 export const toggleStatusAsync = createAsyncThunk(
   "/auth/toggleStatus",

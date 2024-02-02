@@ -88,21 +88,6 @@ export const newPasswordSetter = async (email, newPass) => {
   }
 };
 
-export const updatePfp = async (data) => {
-  try {
-    console.log(data, "data in api");
-    const response = await API.put(`user/updatePfp`, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    console.log(response, " update pfp response in api");
-    return response;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
-
 export const OTPverify = async (otp) => {
   try {
     const response = await API.put(`user/reset-password/${otp}`);
@@ -157,6 +142,26 @@ export const loginUser = async (email, password) => {
       email: email,
       password: password,
     });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const updatePfp = async (email, profilePicture) => {
+  try {
+    //console.log(data, "data in api");
+    //email, profilePicture;
+    console.log(email,profilePicture);
+    const response = await API.put(
+      "user/updatePfp",
+      { email, profilePicture },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log(response.data, " update pfp response in api");
     return response.data;
   } catch (error) {
     throw error.response.data;

@@ -47,6 +47,7 @@ import {
   updatePfpAsync,
 } from "../../Redux/Slices/AuthSlice";
 import personPNG from "../../assets/images/dummyProfile/user.png";
+import { unwrapResult } from "@reduxjs/toolkit";
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
   const { UsersData } = useSelector((state) => state.editProfile);
@@ -54,6 +55,10 @@ const EditProfilePage = ({ ShowServices }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
+  const [profileImgData, setProfileImgData] = useState({
+    email: "",
+    profilePicture: "",
+  });
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -549,26 +554,34 @@ const EditProfilePage = ({ ShowServices }) => {
       ...prevErrors,
       profilePicture: null,
     }));
-    setPfp(file);
+
     // setFormData((prevFormData) => ({
     //   ...prevFormData,
     //   profilePicture: file,
     // }));
+    setProfileImgData((prevProfileData) => ({
+      ...prevProfileData,
+      profilePicture: file,
+    }));
+    setProfileImgData((prevProfileData) => ({
+      ...prevProfileData,
+      email: UsersData?.email,
+    }));
+
+    setPfp(file);
   };
 
   const updateProfileImage = async () => {
     try {
-      console.log(pfp);
-      const data = new FormData();
-      data.append("email", UsersData?.email);
-      data.append("profilePicture", pfp);
-      const response = await dispatch(updatePfpAsync(data));
-      if ("auth/setnewpfp/fulfilled") {
+      
+      const response = await dispatch(updatePfpAsync(profileImgData));
+      if (response.meta.requestStatus === "fulfilled") {
         console.log(response);
       }
     } catch (error) {
       console.log(error, "error");
     } finally {
+      // Any cleanup or additional logic
     }
   };
 
@@ -879,9 +892,18 @@ const EditProfilePage = ({ ShowServices }) => {
                           </>
                         ) : (
                           <>
+                            {console.log(
+                              UsersData?.profilePicture
+                                // ? `/profile-pictures/${UsersData.profilePicture}`
+                                // : personPNG
+                            )}
                             <Col className="text-center">
                               <img
-                                src={personPNG} // Replace with the actual path
+                                src={
+                                  UsersData?.profilePicture
+                                    ? `/profile-pictures/${UsersData.profilePicture}`
+                                    : personPNG
+                                }
                                 alt="Profile"
                                 style={{
                                   width: "100px",
