@@ -49,6 +49,53 @@ const ScheduledOrdersCardWorker = ({
   const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
     useState(false);
 
+  const [formattedAddress, setFormattedAddress] = useState(null);
+  const loc = {
+    type: "Point",
+    coordinates: [74.24510699999999, 31.4717778],
+    address: "", // Add an empty address property
+  };
+
+  const fetchAddressFromCoordinates = (coordinates) => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode(
+      { location: { lat: coordinates[1], lng: coordinates[0] } },
+      (results, status) => {
+        if (status === "OK") {
+          if (results && results.length > 0) {
+            const address = results[0].formatted_address;
+            setFormattedAddress(address);
+
+            // Update the loc object with the address
+            loc.address = address;
+          } else {
+            console.error("No results found");
+          }
+        } else {
+          console.error("Geocoder failed due to:", status);
+        }
+      }
+    );
+  };
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_API
+    }&libraries=${import.meta.env.VITE_GOOGLE_API_LIBARARY}`;
+    script.async = true;
+    script.defer = true;
+    script.addEventListener("load", () => {
+      // Initialize the fetchAddressFromCoordinates function here
+      fetchAddressFromCoordinates(loc.coordinates);
+    });
+    document.head.appendChild(script);
+
+    return () => {
+      // Remove the script when the component unmounts
+      document.head.removeChild(script);
+    };
+  }, [loc.coordinates]);
+
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
       ...prevMap,
@@ -157,15 +204,22 @@ const ScheduledOrdersCardWorker = ({
       : truncateText(transformedDetails, 30);
   };
 
+  const openGoogleMaps = () => {
+    const url = `https://www.google.com/maps?q=${loc.coordinates[1]},${loc.coordinates[0]}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <>
       <Container>
+
         {spinnerVisible ? (
           <div style={{ textAlign: "center" }}>
             <Spinner />
           </div>
         ) : scheduledOrdersObject.length > 0 ? (
           <>
+          {console.log(scheduledOrdersObject)}
             <Row>
               {scheduledOrdersObject?.map((order) => (
                 <Col
@@ -281,6 +335,19 @@ const ScheduledOrdersCardWorker = ({
                       <CardText>
                         <b>Order By:</b>{" "}
                         {order.users.length > 0 && order.users[0].firstName}
+                      </CardText>
+                      <CardText>
+                        <b>Formatted Address:</b>{" "}
+                        {formattedAddress ? (
+                          <>
+                            <p>{formattedAddress}</p>
+                            <Button onClick={openGoogleMaps} color="primary">
+                              Open in Google Maps
+                            </Button>
+                          </>
+                        ) : (
+                          <p>Loading address...</p>
+                        )}
                       </CardText>
                       <Row>
                         <Col style={{ margin: "2%" }} xs="12" md="5">

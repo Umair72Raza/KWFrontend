@@ -15,8 +15,9 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
 } from "reactstrap";
+import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
+import { City } from "country-state-city";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
@@ -44,7 +45,7 @@ import {
   requestOTPforEmailAsync,
   requestOTPforPhoneAsync,
 } from "../../Redux/Slices/AuthSlice";
-
+import personPNG from "../../assets/images/dummyProfile/user.png";
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
   const { UsersData } = useSelector((state) => state.editProfile);
@@ -63,6 +64,9 @@ const EditProfilePage = ({ ShowServices }) => {
     country: "",
     address: "",
     services: [],
+    country: "",
+    region_state: "",
+    city: "",
   });
   const [phoneEdit, setPhoneEdit] = useState(false);
   const [newPhone, setNewPhone] = useState("");
@@ -80,6 +84,9 @@ const EditProfilePage = ({ ShowServices }) => {
   const [UserInfo, setUserInfo] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
+  // const [country, setCountry] = useState(formData.country || "");
+  // const [region_state, setRegionState] = useState(formData.region_state || "");
+  // const [city, setCity] = useState(formData.city || "");
 
   useEffect(() => {
     if (UsersData) {
@@ -229,6 +236,7 @@ const EditProfilePage = ({ ShowServices }) => {
     setLoading(true);
 
     try {
+      console.log(formData,"formData");
       const data = { id: UsersData?._id, token, formData };
       const result = await dispatch(updateProfileAsync(data));
       if (result.type === "/UpdateProfile/fulfilled") {
@@ -255,7 +263,7 @@ const EditProfilePage = ({ ShowServices }) => {
           // latitude,
           // longitude,
           country,
-          address,
+          address, 
           services: services || [],
         });
         setEditMode(false);
@@ -507,6 +515,7 @@ const EditProfilePage = ({ ShowServices }) => {
             )}
             <Col className="fw-bold fs-3">{EDITPROFILE_PAGE.LABELS.TITLE}</Col>
           </Row>
+
           {userDataLoading ? (
             <div className="d-flex justify-content-center">
               <Spinner color="primary" />
@@ -577,6 +586,17 @@ const EditProfilePage = ({ ShowServices }) => {
                       </FormGroup>
                     </Col>
                   </Row>
+
+ 
+                  <Row md={12}>
+                <Dropdowns
+                  setFormData={setFormData}
+                  errors={errors}
+                  setErrors={setErrors}
+                />
+              </Row>
+
+
                   {/*   <Row>
                     <Col md={6}>
                       <FormGroup>
@@ -710,6 +730,19 @@ const EditProfilePage = ({ ShowServices }) => {
                   style={{ boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}
                 >
                   <CardBody>
+                    <Row className="my-4">
+                      <Col xs={12} className="text-center">
+                        <img
+                          src={personPNG} // Replace with the actual path
+                          alt="Profile"
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </Col>
+                    </Row>
                     <Row>
                       <Col xs={6}>
                         <p className="fw-semibold">

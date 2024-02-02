@@ -35,6 +35,7 @@ const ActiveOrders = ({
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {
+        setDisableFinishButton(false)
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -48,6 +49,7 @@ const ActiveOrders = ({
         // Add the removed order to the past orders
         setPastOrders((prevPastOrders) => [...prevPastOrders, data.order]);
       } else if (data.result === "false") {
+        setDisableFinishButton(false)
         SetConfirm("false");
         SetOrder(data.order);
         setFinishJobVerified(true);
