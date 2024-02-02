@@ -44,6 +44,7 @@ import { hideSpinner, showSpinner } from "../../Redux/Slices/LoaderSlice";
 import {
   requestOTPforEmailAsync,
   requestOTPforPhoneAsync,
+  updatePfpAsync,
 } from "../../Redux/Slices/AuthSlice";
 import personPNG from "../../assets/images/dummyProfile/user.png";
 const EditProfilePage = ({ ShowServices }) => {
@@ -62,6 +63,7 @@ const EditProfilePage = ({ ShowServices }) => {
     // latitude:"",
     // longitude:"",
     address: "",
+    optionalAddress: "",
     services: [],
     country: "",
     region_state: "",
@@ -84,6 +86,7 @@ const EditProfilePage = ({ ShowServices }) => {
   const [UserInfo, setUserInfo] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
+  const [pfp, setPfp] = useState("");
   useEffect(() => {
     if (UsersData) {
       const isFormValid =
@@ -204,6 +207,9 @@ const EditProfilePage = ({ ShowServices }) => {
     if (!areObjectsDifferent) {
       errors.noChanges = "No Changes Made";
     }
+    if (!profilePicture) {
+      errors.profilePicture = "Profile picture is required";
+    }
 
     return errors;
   };
@@ -218,7 +224,9 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (!formData.optionalAddress.trim()) {
+      setFormData({ ...formData, optionalAddress: formData.address });
+    }
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
 
@@ -248,6 +256,7 @@ const EditProfilePage = ({ ShowServices }) => {
           // longitude,
           country,
           address,
+          optionalAddress,
           services,
         } = result.payload || {};
         successToast("Profile Updated Successfully!");
@@ -261,8 +270,10 @@ const EditProfilePage = ({ ShowServices }) => {
           // longitude,
           country,
           address,
+          optionalAddress,
           services: services || [],
         });
+        console.log(optionalAddress, "optional");
         setEditMode(false);
       } else if (result.type === "/UpdateProfile/rejected") {
         failureToast(result.payload);
@@ -509,41 +520,64 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const handleProfilePictureChange = (event) => {
     const file = event.target.files[0];
-
     // Define file size limit and accepted file types
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     const acceptedTypes = ["image/jpeg", "image/png", "image/gif"];
 
     // Check if file size exceeds limit
     if (file.size > maxSize) {
-      // setErrors((prevErrors) => ({
-      //   ...prevErrors,
-      //   profilePicture: "Select a file with size equal to or smaller than 5Mb.",
-      // }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        profilePicture: "Select a file with size equal to or smaller than 5Mb.",
+      }));
       clearFileInput();
       return;
     }
 
     // Check if file type is valid
     if (!acceptedTypes.includes(file.type)) {
-      // setErrors((prevErrors) => ({
-      //   ...prevErrors,
-      //   profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
-      // }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
+      }));
       clearFileInput();
       return;
     }
 
     // If file passes validation, update state
-    // setErrors((prevErrors) => ({
-    //   ...prevErrors,
-    //   profilePicture: null,
-    // }));
-    setProfilePicture(file);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      profilePicture: null,
+    }));
+    setPfp(file);
     // setFormData((prevFormData) => ({
     //   ...prevFormData,
     //   profilePicture: file,
     // }));
+  };
+
+  const updateProfileImage = async () => {
+    try {
+      console.log(pfp);
+      const data = new FormData();
+      data.append("email", UsersData?.email);
+      data.append("profilePicture", pfp);
+      const response = await dispatch(updatePfpAsync(data));
+      if ("auth/setnewpfp/fulfilled") {
+        console.log(response);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    } finally {
+    }
+  };
+
+  const handleOptionalAddress = (e) => {
+    const value = e.target.value.trimStart().replace(/\s{2,}/g, " ");
+    setFormData({
+      ...formData,
+      optionalAddress: value,
+    });
   };
 
   return (
@@ -633,17 +667,28 @@ const EditProfilePage = ({ ShowServices }) => {
                       </FormGroup>
                     </Col>
                   </Row>
-                  <Row>
-                    <Input
-                      
-                    />
-                  </Row>
+
                   <Row md={12}>
                     <Dropdowns
                       setFormData={setFormData}
                       errors={errors}
                       setErrors={setErrors}
                     />
+                  </Row>
+                  <Row md={11}>
+                    <Col>
+                      <Label>
+                        Address
+                        <span style={{ fontSize: "11px" }}> (Optional)</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder="Enter your address(Optional)."
+                        value={formData.optionalAddress}
+                        onChange={handleOptionalAddress}
+                        disabled={loading}
+                      />
+                    </Col>
                   </Row>
 
                   {/*   <Row>
@@ -780,56 +825,79 @@ const EditProfilePage = ({ ShowServices }) => {
                 >
                   <CardBody>
                     <Row className="my-4">
-                      <Col xs={12} className="text-center">
+                      <Col xs={12}>
                         {editProfile ? (
                           <>
                             <FormGroup>
-                              <Label
-                                className="fw-semibold"
-                                for="profilePicture"
-                              >
-                                Profile Picture{" "}
-                                <span className="text-danger fw-bold fs-5">
-                                  {RegisterPage.FORM_FIELDS.REQUIRED}
-                                </span>
-                              </Label>
-                              <Input
-                                // invalid={errors.profilePicture ? true : false}
-                                type="file"
-                                id="profilePicture"
-                                accept="image/*"
-                                onChange={handleProfilePictureChange}
-                                multiple={false}
-                                required
-                                disabled={loading}
-                              />
-                              {/* {errors.profilePicture && (
-                                <span className="text-danger">
-                                  {errors.profilePicture}
-                                </span>
-                              )} */}
+                              <Row>
+                                <Col></Col>
+                                <Col className="text-center">
+                                  <Label
+                                    className="fw-semibold"
+                                    for="profilePicture"
+                                  >
+                                    Profile Picture{" "}
+                                    <span className="text-danger fw-bold fs-5">
+                                      {RegisterPage.FORM_FIELDS.REQUIRED}
+                                    </span>
+                                  </Label>
+                                  <Input
+                                    invalid={
+                                      errors.profilePicture ? true : false
+                                    }
+                                    type="file"
+                                    id="profilePicture"
+                                    accept="image/*"
+                                    onChange={handleProfilePictureChange}
+                                    multiple={false}
+                                    required
+                                    disabled={loading}
+                                  />
+                                  {errors.profilePicture && (
+                                    <span className="text-danger">
+                                      {errors.profilePicture}
+                                    </span>
+                                  )}
+                                </Col>
+                                <Col></Col>
+                              </Row>
                             </FormGroup>
-                            <Button onClick={toggleEditProfile}>Cancel</Button>
+                            <Row>
+                              <Col className="text-center">
+                                <Button
+                                  onClick={updateProfileImage}
+                                  className="m-2"
+                                  color="success"
+                                >
+                                  Update
+                                </Button>
+                                <Button onClick={toggleEditProfile}>
+                                  Cancel
+                                </Button>
+                              </Col>
+                            </Row>
                           </>
                         ) : (
                           <>
-                            {" "}
-                            <img
-                              src={personPNG} // Replace with the actual path
-                              alt="Profile"
-                              style={{
-                                width: "100px",
-                                height: "100px",
-                                borderRadius: "50%",
-                              }}
-                            />
-                            <Button
-                              className="mt-5"
-                              color="primary"
-                              onClick={toggleEditProfile}
-                            >
-                              Edit
-                            </Button>
+                            <Col className="text-center">
+                              <img
+                                src={personPNG} // Replace with the actual path
+                                alt="Profile"
+                                style={{
+                                  width: "100px",
+                                  height: "100px",
+                                  borderRadius: "50%",
+                                }}
+                              />
+
+                              <Button
+                                className="mt-5"
+                                color="primary"
+                                onClick={toggleEditProfile}
+                              >
+                                Edit
+                              </Button>
+                            </Col>
                           </>
                         )}
                       </Col>
@@ -982,6 +1050,20 @@ const EditProfilePage = ({ ShowServices }) => {
                           {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
                         </p>
                         <p className="w-100">{UsersData?.address}</p>
+                        <p className="fw-semibold">
+                          Optional{EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
+                        </p>
+                        {!UsersData?.optionalAddress?.trim() ? (
+                          <>
+                            <p>No optional address added.</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="w-100">
+                              {UsersData?.optionalAddress}
+                            </p>
+                          </>
+                        )}
                       </Col>
                     </Row>
                     {/* ${edit ?"d-none" :""} */}
@@ -1000,7 +1082,7 @@ const EditProfilePage = ({ ShowServices }) => {
             backdrop="static"
             centered
           >
-            <ModalHeader>Popup Title</ModalHeader>
+            <ModalHeader>Wait</ModalHeader>
             <ModalBody>
               <p>{modalContent}</p>
             </ModalBody>

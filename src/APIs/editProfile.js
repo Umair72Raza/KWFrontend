@@ -28,6 +28,7 @@ export const updateProfile = async (id, token, formData) => {
       // longitude,
       country,
       address,
+      optionalAddress,
       services,
     } = formData;
     const response = await API.put(
@@ -42,6 +43,7 @@ export const updateProfile = async (id, token, formData) => {
         // longitude,
         country,
         address,
+        optionalAddress,
         services,
       },
       {
