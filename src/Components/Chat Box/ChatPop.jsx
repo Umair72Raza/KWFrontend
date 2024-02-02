@@ -243,57 +243,58 @@ const ChatPopup = () => {
     setModal(!modal);
   };
 
+  const handleMessageInputChange = (e) => {
+    const inputValue = e.target.value;
+    if (hasOnlyWhiteSpace(inputValue)) {
+      setSendButtonDisabled(true);
+    } else {
+      setSendButtonDisabled(false);
+    }
+    setNewMessageText(inputValue);
+  }
+
   const sendMessage = async (e) => {
     e.preventDefault();
+  
     // Add loading state until the message is sent
     setLoadingSendMessage(true);
     setSendButtonDisabled(true);
-
+  
     try {
       if (newMessageText) {
         const messageData = {
           receiverId: selectedChat._id,
-          text: newMessageText,
+          text: newMessageText.trimStart().trimEnd(),
           initiatorId: user._id,
           token,
         };
-
+  
         const result = await dispatch(SendMessageAsync(messageData));
-
+  
         if (result.type === "Chat/SendMessage/fulfilled") {
+          const { chat, message: newMessage } = result.payload;
+  
           setNewMessageText("");
           if (!chat._id) {
-            setOriginalChats((prev) => [result.payload.chat, ...prev]);
-            let dummyChats = [result.payload.chat, ...OriginalChats];
-            setCopyOfChats(dummyChats);
-            setChat(result.payload.chat);
-            setSelectedChatCompare(result.payload.chat);
-            setSelectedChat(() => SelectChat(result.payload.chat));
-          }
-          if (
+            const updatedOriginalChats = [chat, ...originalChats];
+            setOriginalChats(updatedOriginalChats);
+            setCopyOfChats(updatedOriginalChats);
+            setSelectedChat(chat);
+            setSelectedChatCompare(chat);
+            setSelectedChat(() => SelectChat(chat));
+          } else if (
             chat._id &&
             copyOfChats.length > 1 &&
-            copyOfChats[0]._id !== result.payload.chat._id
+            copyOfChats[0]._id !== chat._id
           ) {
-            // Move the chat to the top
-            let updatedChats = copyOfChats.filter(
-              (chat) => chat._id !== result.payload.chat._id
-            );
-            updatedChats.unshift(result.payload.chat);
+            const updatedChats = [chat, ...copyOfChats.filter(c => c._id !== chat._id)];
             setCopyOfChats(updatedChats);
             setOriginalChats(updatedChats);
           }
-          setMessages([...messages, result.payload.message]);
-          const NewMessageAndUserId = {
-            newMessage: result.payload.message,
-            chat: result.payload.chat,
-          };
-          socket?.emit("new message", NewMessageAndUserId);
-          if (messages) {
-            setMessages([...messages, result.payload.message]);
-          } else {
-            setMessages([result.payload.message]);
-          }
+  
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
+          const newMessageAndUserId = { newMessage, chat };
+          socket?.emit("new message", newMessageAndUserId);
         }
       }
     } catch (error) {
@@ -304,6 +305,7 @@ const ChatPopup = () => {
       setSendButtonDisabled(false);
     }
   };
+  
   const handleChatSelection = (chat) => {
     const data = {
       userId: user._id,
@@ -541,15 +543,7 @@ const ChatPopup = () => {
                                 type="text"
                                 placeholder="Type a message..."
                                 value={newMessageText}
-                                onChange={(e) => {
-                                  if (hasOnlyWhiteSpace(e.target.value)) {
-                                    setSendButtonDisabled(true);
-                                  } else {
-                                    setSendButtonDisabled(false);
-                                  }
-
-                                  setNewMessageText(e.target.value);
-                                }}
+                                onChange={handleMessageInputChange}
                                 disabled={loadingSendMessage || isLoading}
                               />
                               <Button
@@ -780,14 +774,7 @@ const ChatPopup = () => {
                               type="text"
                               placeholder="Type a message..."
                               value={newMessageText}
-                              onChange={(e) => {
-                                if (hasOnlyWhiteSpace(e.target.value)) {
-                                  setSendButtonDisabled(true);
-                                } else {
-                                  setSendButtonDisabled(false);
-                                }
-                                setNewMessageText(e.target.value);
-                              }}
+                              onChange={handleMessageInputChange}
                               disabled={loadingSendMessage || isLoading}
                             />
                             <Button
