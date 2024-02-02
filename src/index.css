@@ -89,14 +89,12 @@ text-decoration: underline !important;
 }
 
 .chat-list {
+  height: 465px !important;
   border-right: 1px solid #ccc !important;
-}
-
-.chat-preview {
   cursor: pointer !important;
-  padding: 10px !important;
   border-bottom: 1px solid #eee !important;
 }
+
 
 .selected-chat {
   display: flex !important;
@@ -138,7 +136,6 @@ text-decoration: underline !important;
 .message-input {
   display: flex !important;
   align-items: center !important;
-  padding: 10px !important;
 }
 
 .message-input input {
@@ -263,12 +260,5 @@ text-decoration: underline !important;
 
 .Z-index {
   z-index: 99 !important;
-}
-.custom-prev-arrow,
-.custom-next-arrow {
-  color:black;
-  background-color:#fff ;
-  border: none;
- 
 }
 
