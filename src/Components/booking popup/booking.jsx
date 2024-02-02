@@ -47,7 +47,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption]);
 
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async(e) => {
     const selectedImages = Array.from(e.target.files);
     const totalSize = selectedImages.reduce(
       (acc, image) => acc + image.size,
@@ -61,7 +61,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     } else {
       setImages(selectedImages);
       setImageError("");
-      console.log(images," images")
+      await console.log(images," images")
     }
   };
 

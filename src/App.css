@@ -52,10 +52,4 @@
   left: 50%;
   transform: translateX(-50%);
 }
-.custom-prev-arrow,
-.custom-next-arrow {
-  color: darkgrey;
-  background: none;
-  border: none;
-}
 
