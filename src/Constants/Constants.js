@@ -84,6 +84,7 @@ export const RegisterPage = {
     invalidPassword:
       "Password must contain at least one special character, one uppercase letter, one number, and atleast 8 characters long.",
     passwordsNotMatch: "Passwords do not match.",
+    emptyPassword: "Password cannot be empty",
     enterAllFields: "Enter all the fields to sign up.",
     invalidRate: "Rate is outside the valid range (10 to 999)$/hr.",
     invalidAddress: "Address cannot be empty",
@@ -273,7 +274,8 @@ export const BookingConstants = {
     taskDetail: "Task Details",
     service: "Service Type",
     datetime: "Date and Time",
-    amount: "Amount Per Hour ($)",
+    images:"Upload Images",
+    amount: "Amount Per Job ($)",
   },
 };
 export const feedbackConstants = {

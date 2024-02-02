@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Row, Col } from "reactstrap";
+import Slider from "react-slick";
 import { ChatState } from "../../Context/ChatProvider";
 import { GOTOFFER } from "../../Constants/Constants";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   const [showModal, setShowModal] = useState(true);
   const [fullDetailsModal, setFullDetailsModal] = useState(false);
-  let { setGotOffer, } = ChatState();
+  const [imageDataURL, setImageDataURL] = useState([]);
+  let { setGotOffer } = ChatState();
+
   useEffect(() => {
     const openModal = () => {
       setShowModal(true);
@@ -24,6 +29,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
       closeModal();
     };
   }, []);
+
   const closeModal = () => {
     setShowModal(false);
     document.body.style.overflow = "auto";
@@ -38,18 +44,25 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     if (onConfirm) {
       onConfirm();
     }
-    setGotOffer(false)
+    setGotOffer(false);
     closeModal();
-
   };
+
+  useEffect(() => {
+    // When the component mounts, convert the image file to a data URL
+    const blobArray = formattedOfferDetails?.images?.map((image, index) => {
+      const blob = new Blob([image], { type: "image/jpeg" });
+      return blob;
+    });
+    setImageDataURL(blobArray);
+  }, [formattedOfferDetails.images]);
 
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
     }
-    setGotOffer(false)
+    setGotOffer(false);
     closeModal();
-
   };
 
   const formattedDetails = formattedOfferDetails?.details || "";
@@ -58,13 +71,48 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
       ? formattedDetails.slice(0, 20) + "..."
       : formattedDetails;
 
+  // const CustomPrevArrow = (props) => {
+  //   const { onClick } = props;
+  //   return (
+  //     <Button
+  //       className="  custom-prev-arrow "
+  //       onClick={onClick}
+  //     >
+  //     prev
+  //     </Button>
+  //   );
+  // };
+
+  // const CustomNextArrow = (props) => {
+  //   const { onClick } = props;
+  //   return (
+  //     <div><Button
+  //       className=" custom-next-arrow  "
+  //       onClick={onClick}
+  //     >
+  //     next
+  //     </Button></div>
+  //   );
+  // };
+  const settings = {
+    mobileFirst: true,
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    //  prevArrow: <CustomPrevArrow />,
+    //  nextArrow: <CustomNextArrow />,
+     
+
+  };
+
   return (
     <div>
-      <Modal isOpen={showModal} keyboard={false} centered>
-        <ModalHeader >
-          {GOTOFFER.OFFER_HEADER}
-        </ModalHeader>
-        <ModalBody>
+      <Modal isOpen={showModal} keyboard={false} centered >
+        <ModalHeader>{GOTOFFER.OFFER_HEADER}</ModalHeader>
+        <ModalBody >
+
           <p>
             <strong>{GOTOFFER.OFFER_TITLE}</strong> {formattedOfferDetails?.Title}
           </p>
@@ -75,7 +123,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
             <strong>{GOTOFFER.OFFER_TIME}</strong> {formattedOfferDetails?.time}
           </p>
           <p>
-            <strong>{GOTOFFER.OFFER_AMOUNT}</strong> {formattedOfferDetails?.amount}
+            <strong>{GOTOFFER.OFFER_AMOUNT}</strong>${formattedOfferDetails?.amount}
           </p>
           <p>
             <strong>{GOTOFFER.OFFER_SERVICE}</strong> {formattedOfferDetails?.service}
@@ -86,6 +134,27 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
               {truncatedDetails.replace(/<br\s*\/?>/gi, "\n")}
             </div>
           </p>
+          <p>
+            <strong>Task Pictures</strong>
+
+          </p>
+          <Row className="" >
+            
+           <Col>
+              <Slider {...settings} className=" m-5">
+                {imageDataURL?.map((image, index) => (
+                  <div className="" key={index}>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={`Modal Image ${index}`}
+                      className="img-fluid thumbnail"
+                    />
+                  </div>
+                ))}
+              </Slider>
+              </Col>
+          
+          </Row>
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={handleConfirm}>

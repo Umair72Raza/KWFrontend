@@ -4,7 +4,7 @@ import { Country, State, City } from "country-state-city";
 import { RegisterPage } from "../../Constants/Constants";
 import { set } from "lodash";
 
-const Dropdowns = ({ setFormData,errors,setErrors }) => {
+const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
@@ -92,6 +92,7 @@ const Dropdowns = ({ setFormData,errors,setErrors }) => {
               className="form-select"
               required
               invalid={!!errors.country}
+              disabled={loading}
             >
               <option value="">Select Country</option>
               {Country.getAllCountries().map((country) => (
@@ -121,7 +122,7 @@ const Dropdowns = ({ setFormData,errors,setErrors }) => {
               invalid={!!errors.region_state}
               disabled={
                 !country || State.getStatesOfCountry(country).length === 0
-              }
+              || loading }
             >
               {country ? (
                 State.getStatesOfCountry(country).length > 0 ? (
@@ -169,7 +170,7 @@ const Dropdowns = ({ setFormData,errors,setErrors }) => {
               invalid={!!(region && errors.city)}
               disabled={
                 !region || City.getCitiesOfState(country, region).length === 0
-              }
+              || loading}
             >
               {region ? (
                 City.getCitiesOfState(country, region).length > 0 ? (

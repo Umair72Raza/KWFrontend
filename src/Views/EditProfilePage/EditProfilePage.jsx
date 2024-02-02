@@ -12,7 +12,12 @@ import {
   Card,
   CardBody,
   Spinner,
+  Modal,
+  ModalHeader,
+  ModalBody,
 } from "reactstrap";
+import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
+import { City } from "country-state-city";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
@@ -36,8 +41,11 @@ import CustomServiceDropdown from "../../Components/Services CheckList/CustomSer
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
 import { set } from "lodash";
 import { hideSpinner, showSpinner } from "../../Redux/Slices/LoaderSlice";
-import { requestOTPforEmailAsync } from "../../Redux/Slices/AuthSlice";
-
+import {
+  requestOTPforEmailAsync,
+  requestOTPforPhoneAsync,
+} from "../../Redux/Slices/AuthSlice";
+import personPNG from "../../assets/images/dummyProfile/user.png";
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
   const { UsersData } = useSelector((state) => state.editProfile);
@@ -53,21 +61,29 @@ const EditProfilePage = ({ ShowServices }) => {
     location: {},
     // latitude:"",
     // longitude:"",
-    country: "",
     address: "",
     services: [],
+    country: "",
+    region_state: "",
+    city: "",
   });
-
+  const [phoneEdit, setPhoneEdit] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
+  const [validnewPhone, setValidNewPhone] = useState(false);
   const [emailEdit, setEmailEdit] = useState(false);
   const [newMail, setNewMail] = useState("");
-  const [validNewMail, setValidNewMail] = useState(false);
+  const [editProfile, setEditProfile] = useState(false);
+  const [disableUpdateEmail, setDisableUpdateEmail] = useState(true);
+  const [disableUpdatePhone, setDisableUpdatePhone] = useState(true);
+  const [newMailError, setNewMailError] = useState("");
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const [userDataLoading, setUserDataLoading] = useState(true);
   const [UserInfo, setUserInfo] = useState({});
-
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState("");
   useEffect(() => {
     if (UsersData) {
       const isFormValid =
@@ -191,6 +207,7 @@ const EditProfilePage = ({ ShowServices }) => {
 
     return errors;
   };
+
   const handleKeyPress = (e) => {
     // Check if the pressed key is "Enter" (key code 13)
     if (e.key === "Enter") {
@@ -216,6 +233,7 @@ const EditProfilePage = ({ ShowServices }) => {
     setLoading(true);
 
     try {
+      console.log(formData, "formData");
       const data = { id: UsersData?._id, token, formData };
       const result = await dispatch(updateProfileAsync(data));
       if (result.type === "/UpdateProfile/fulfilled") {
@@ -334,54 +352,198 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const showEmailEdits = () => {
     setEmailEdit(true);
+    setPhoneEdit(false);
+  };
+  const showPhoneEdits = () => {
+    setEmailEdit(false);
+    setPhoneEdit(true);
   };
 
   const toggleEditEmail = () => {
     setEmailEdit(!emailEdit);
   };
 
+  const toggleEditPhone = () => {
+    setPhoneEdit(!phoneEdit);
+  };
+
   const requestOTP = async () => {
     //dispatch the api to send the otp
     const mail = UsersData?.email;
     const data = { mail, token, newMail };
-    console.log(newMail)
+    console.log(newMail);
     try {
       dispatch(showSpinner());
       const otpResp = await dispatch(requestOTPforEmailAsync(data));
       if (otpResp.type === "auth/requestOTPforEmailAsync/fulfilled") {
-        successToast("OTP sent successfully!");
-        user.role === "worker"
-          ? navigate("/worker/otpVerification", {
-              state: { email: UsersData.email, newMail: newMail },
-            })
-          : navigate("/user/otpVerification ", {
-              state: { email: UsersData.email, newMail: newMail },
-            });
+        console.log(otpResp, "response of otp[");
+        if (
+          otpResp?.payload?.data?.message ===
+          "New Email already taken by someone else."
+        ) {
+          const msg = `${newMail} is already taken by someone else.`;
+          setShowModal(false);
+          return failureToast(msg);
+        } else {
+          successToast("OTP sent successfully!");
+          setShowModal(false);
+          user.role === "worker"
+            ? navigate("/worker/otpVerification", {
+                state: { email: UsersData.email, newMail: newMail },
+              })
+            : navigate("/user/otpVerification ", {
+                state: { email: UsersData.email, newMail: newMail },
+              });
+        }
       }
     } catch (error) {
+      console.log(error);
       failureToast("Error sending OTP");
     } finally {
       dispatch(hideSpinner());
+      setDisableUpdateEmail(false);
+    }
+  };
+
+  const requestOTPforPhone = async () => {
+    //dispatch the api to send the otp
+    setDisableUpdatePhone(false);
+    const mail = UsersData?.email;
+    const data = { mail, token, newPhone };
+    console.log(newPhone);
+    try {
+      dispatch(showSpinner());
+      const otpResp = await dispatch(requestOTPforPhoneAsync(data));
+      if (otpResp.type === "auth/requestOTPforPhoneAsync/fulfilled") {
+        if (
+          otpResp?.payload?.data?.message ===
+          "New Phone already taken by someone else."
+        ) {
+          const msg = `${newPhone} is already taken by someone else.`;
+          setShowModal(false);
+          return failureToast(msg);
+        } else {
+          console.log(otpResp, "response of otp for phone");
+          successToast("OTP sent successfully!");
+          setShowModal(false);
+          user.role === "worker"
+            ? navigate("/worker/otpVerification", {
+                state: { email: UsersData.email, newPhone: newPhone },
+              })
+            : navigate("/user/otpVerification ", {
+                state: { email: UsersData.email, newPhone: newPhone },
+              });
+        }
+      } else if (otpResp.type === "auth/requestOTPforPhoneAsync/rejected") {
+        failureToast(otpResp.payload.error); // Display the error message
+      }
+    } catch (error) {
+      failureToast(error);
+    } finally {
+      dispatch(hideSpinner());
+      setDisableUpdatePhone(true);
+    }
+  };
+
+  const updatePhone = () => {
+    toggleEditPhone();
+    setModalContent("Test: Wait while you are being redirected...");
+    console.log("Before setShowModal(true):", showModal);
+    setShowModal(true);
+    requestOTPforPhone();
+  };
+
+  const handleChange = (e) => {
+    const enteredEmail = e.target.value;
+
+    setNewMail(enteredEmail);
+    //    Email validation regex
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    // Check if entered email matches the regex
+    const isValid = emailRegex.test(enteredEmail);
+    setNewMailError(isValid);
+    console.log(isValid);
+    setDisableUpdateEmail(!isValid);
+    if (!newMail.trim()) {
+      // If newMail is empty or contains only whitespaces, do not dispatch the request
+      setDisableUpdateEmail(true);
+      return;
     }
   };
 
   const updateEmail = () => {
     toggleEditEmail();
+    if (disableUpdateEmail || !newMail.trim()) {
+      // If newMail is empty or contains only whitespaces, do not dispatch the request
+      setDisableUpdateEmail(true);
+      return;
+    }
+    setModalContent("Test: Wait while you are being redirected...");
+    console.log("Before setShowModal(true):", showModal);
+    setShowModal(true);
     requestOTP();
-
-    // send the old email
   };
 
-  const handleChange = (e) => {
-    const enteredEmail = e.target.value;
-    setNewMail(enteredEmail);
-    // Email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Check if entered email matches the regex
-    const isValid = emailRegex.test(enteredEmail);
-    setValidNewMail(isValid);
-    // setIsValidEmail(isValid);
-    // setEnableButton(isValid);
+  const handlePhoneChange = (value) => {
+    setValidNewPhone(true);
+    setNewPhone(value);
+    if (!isValidPhoneNumber(value)) {
+      setValidNewPhone(false);
+      setDisableUpdatePhone(true);
+    } else {
+      setDisableUpdatePhone(false);
+    }
+  };
+
+  const clearFileInput = () => {
+    const fileInput = document.getElementById("profilePicture");
+    if (fileInput) {
+      fileInput.value = ""; // Reset the value to clear the selection
+    }
+  };
+
+  const toggleEditProfile = () => {
+    setEditProfile(!editProfile);
+  };
+
+  const handleProfilePictureChange = (event) => {
+    const file = event.target.files[0];
+
+    // Define file size limit and accepted file types
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const acceptedTypes = ["image/jpeg", "image/png", "image/gif"];
+
+    // Check if file size exceeds limit
+    if (file.size > maxSize) {
+      // setErrors((prevErrors) => ({
+      //   ...prevErrors,
+      //   profilePicture: "Select a file with size equal to or smaller than 5Mb.",
+      // }));
+      clearFileInput();
+      return;
+    }
+
+    // Check if file type is valid
+    if (!acceptedTypes.includes(file.type)) {
+      // setErrors((prevErrors) => ({
+      //   ...prevErrors,
+      //   profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
+      // }));
+      clearFileInput();
+      return;
+    }
+
+    // If file passes validation, update state
+    // setErrors((prevErrors) => ({
+    //   ...prevErrors,
+    //   profilePicture: null,
+    // }));
+    setProfilePicture(file);
+    // setFormData((prevFormData) => ({
+    //   ...prevFormData,
+    //   profilePicture: file,
+    // }));
   };
 
   return (
@@ -400,6 +562,7 @@ const EditProfilePage = ({ ShowServices }) => {
             )}
             <Col className="fw-bold fs-3">{EDITPROFILE_PAGE.LABELS.TITLE}</Col>
           </Row>
+
           {userDataLoading ? (
             <div className="d-flex justify-content-center">
               <Spinner color="primary" />
@@ -470,6 +633,19 @@ const EditProfilePage = ({ ShowServices }) => {
                       </FormGroup>
                     </Col>
                   </Row>
+                  <Row>
+                    <Input
+                      
+                    />
+                  </Row>
+                  <Row md={12}>
+                    <Dropdowns
+                      setFormData={setFormData}
+                      errors={errors}
+                      setErrors={setErrors}
+                    />
+                  </Row>
+
                   {/*   <Row>
                     <Col md={6}>
                       <FormGroup>
@@ -603,6 +779,61 @@ const EditProfilePage = ({ ShowServices }) => {
                   style={{ boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}
                 >
                   <CardBody>
+                    <Row className="my-4">
+                      <Col xs={12} className="text-center">
+                        {editProfile ? (
+                          <>
+                            <FormGroup>
+                              <Label
+                                className="fw-semibold"
+                                for="profilePicture"
+                              >
+                                Profile Picture{" "}
+                                <span className="text-danger fw-bold fs-5">
+                                  {RegisterPage.FORM_FIELDS.REQUIRED}
+                                </span>
+                              </Label>
+                              <Input
+                                // invalid={errors.profilePicture ? true : false}
+                                type="file"
+                                id="profilePicture"
+                                accept="image/*"
+                                onChange={handleProfilePictureChange}
+                                multiple={false}
+                                required
+                                disabled={loading}
+                              />
+                              {/* {errors.profilePicture && (
+                                <span className="text-danger">
+                                  {errors.profilePicture}
+                                </span>
+                              )} */}
+                            </FormGroup>
+                            <Button onClick={toggleEditProfile}>Cancel</Button>
+                          </>
+                        ) : (
+                          <>
+                            {" "}
+                            <img
+                              src={personPNG} // Replace with the actual path
+                              alt="Profile"
+                              style={{
+                                width: "100px",
+                                height: "100px",
+                                borderRadius: "50%",
+                              }}
+                            />
+                            <Button
+                              className="mt-5"
+                              color="primary"
+                              onClick={toggleEditProfile}
+                            >
+                              Edit
+                            </Button>
+                          </>
+                        )}
+                      </Col>
+                    </Row>
                     <Row>
                       <Col xs={6}>
                         <p className="fw-semibold">
@@ -629,6 +860,7 @@ const EditProfilePage = ({ ShowServices }) => {
                               name="email"
                               placeholder="Enter the new email"
                               type="email"
+                              value={newMail}
                               onChange={handleChange}
                               style={{
                                 fontSize: "1rem",
@@ -648,7 +880,7 @@ const EditProfilePage = ({ ShowServices }) => {
                               <Col>
                                 {" "}
                                 <Button
-                                  disabled={!validNewMail}
+                                  disabled={disableUpdateEmail}
                                   onClick={updateEmail}
                                   color="success"
                                 >
@@ -677,7 +909,56 @@ const EditProfilePage = ({ ShowServices }) => {
                         <p className="fw-semibold">
                           {EDITPROFILE_PAGE.CARD_LABELS.PHONE}
                         </p>
-                        <p className="w-100">{UsersData?.phoneNumber}</p>
+                        {/* Inside the Phone section in the render */}
+                        {phoneEdit ? (
+                          <>
+                            <PhoneInput
+                              id="examplephone"
+                              name="phone"
+                              defaultCountry="PK"
+                              placeholder="Enter the new phone"
+                              type="text"
+                              international
+                              countryCallingCodeEditable={false}
+                              onChange={handlePhoneChange}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <p className="w-100">{UsersData?.phoneNumber}</p>
+                          </>
+                        )}
+                        {phoneEdit ? (
+                          <>
+                            <Row className="mt-1">
+                              <Col>
+                                <Button
+                                  disabled={
+                                    !validnewPhone || disableUpdatePhone
+                                  }
+                                  onClick={updatePhone}
+                                  color="success"
+                                >
+                                  Update
+                                </Button>
+                              </Col>
+                              <Col>
+                                <Button
+                                  onClick={toggleEditPhone}
+                                  color="danger"
+                                >
+                                  Cancel Edit
+                                </Button>
+                              </Col>
+                            </Row>
+                          </>
+                        ) : (
+                          <>
+                            <Button onClick={showPhoneEdits} color="primary">
+                              Edit
+                            </Button>
+                          </>
+                        )}
                       </Col>
                     </Row>
                     <Row>
@@ -712,6 +993,18 @@ const EditProfilePage = ({ ShowServices }) => {
               )}
             </Row>
           )}
+          <Modal
+            isOpen={showModal}
+            toggle={() => setShowModal(!showModal)}
+            keyboard={false}
+            backdrop="static"
+            centered
+          >
+            <ModalHeader>Popup Title</ModalHeader>
+            <ModalBody>
+              <p>{modalContent}</p>
+            </ModalBody>
+          </Modal>
         </Container>
       </Container>
     </>

@@ -69,7 +69,7 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
     <div>
       <Modal isOpen={modal2} centered className="" >
         {user.role == "user" ? (
-          <ModalHeader toggle={toggle} className="justify-content-center">
+          <ModalHeader toggle={toggle} className="fw-bold fs-3 justify-content-center">
             {feedbackConstants.heading.rateService}
           </ModalHeader>
         ) : (
@@ -78,9 +78,9 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
           </ModalHeader>
         )}
         <ModalBody>
-          <Container className="d-flex flex-row gap-5">
-            <div className="fw-bold fs-4">{order.service}</div>
-            <div className="pr-5">{[...Array(5)].map((item, index) => {
+          <Container className="d-flex flex-row  justify-content-around">
+            <div className="fw-bold   ">{order.service}</div>
+            {[...Array(5)].map((item, index) => {
               const givenRating = index + 1;
               return (
                 <label>
@@ -101,21 +101,21 @@ const feedback = ({ flag, order, setFinishOrderReq, SetConfirm}) => {
                   />
                 </label>
               );
-            })}</div>
+            })}
           </Container>
         </ModalBody>
         <ModalFooter className="">
           <div className="d-flex flex-row w-100 gap-2">
             <Input
               type="text"
-              className="px-sm-5 text-contain"
+              className=" text-contain"
               placeholder="Add a comment "
               value={comment}
               onChange={(e) => {
                 setComment(e.target.value);
               }}
             />
-            <Button color="primary" disabled={disableSend} onClick={send}>
+            <Button className="ml-2" color="primary" disabled={disableSend} onClick={send}>
               Send
             </Button>
           </div>

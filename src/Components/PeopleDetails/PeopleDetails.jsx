@@ -19,81 +19,56 @@ import { capitalizeFirstLetter } from "../../utils";
 
 const PeopleDetails = ({
   person,
-  setNewFilPerson,
   setHuman,
   setFeedbacks,
   setOrders,
   setShowFeedbacksState,
   setShowDetailsCard,
-  confirmationPopUp
+  setShowBlock
 }) => {
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [disableFeedbackButton, setDisableFeedbackButton] = useState(false);
+  const [disableDetailsButton, setDisableDetailsButton] = useState(false);
+  const [disableBlockButton,setDisableBlockButton] = useState(false)
 
-  // const confirmationPopUp = async (person) => {
-  //   let newAccess;
-  //   person.access === "accepted"
-  //     ? (newAccess = "Blocked")
-  //     : (newAccess = "Unblocked");
-  //   try {
-  //     const result = await Swal.fire({
-  //       title: "Are you sure?",
-  //       text: `${person.firstName} will be ${newAccess}`,
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Yes",
-  //     });
 
-  //     if (result.isConfirmed) {
-  //       await toggleAccess();
-  //       Swal.fire({
-  //         title: `${newAccess}`,
-  //         icon: "success",
-  //       });
-  //     }
-  //   } finally {
-  //   }
-  // };
-  // const showConfirmation = () =>{
-  //   setHuman(person);
-  //   confirmationPopUp()
-  // }
+  const showConfirmation = () =>{
+    setHuman(person);
+    setDisableBlockButton(true);
+    setShowDetailsCard(false);
+    setShowFeedbacksState(false);
+    setShowBlock(true);
+    setDisableBlockButton(false);
+  }
 
-  const toggleAccess = async () => {
-    let access;
-    person.access === "accepted" ? (access = "denied") : (access = "accepted");
-    const id = person._id;
-    const data = { token, id, access };
-    const result = await dispatch(togglePersonAccessAsync(data));
-    if (result.type === "/admin/toggleAccess/fulfilled") {
-      setNewFilPerson(person);
-    }
-  };
 
   const getOrders = async (person) => {
     setHuman(person);
-    setShowDetailsCard(true);
+    setDisableDetailsButton(true);
     setShowFeedbacksState(false);
-
+    setShowBlock(false);
     const id = person._id;
     const data = { token, id };
     try {
       const result = await dispatch(ordersOfUserByUid(data));
       if (result.type === "/admin/getOrdersofUsers/fulfilled") {
         setOrders(result.payload);
+        setDisableDetailsButton(true);
+        setShowFeedbacksState(false);
+        setShowBlock(false);
         setShowDetailsCard(true);
       }
     } finally {
+      setDisableDetailsButton(false)
     }
   };
 
   const seeFeedbacks = async (person) => {
     setHuman(person);
-    setShowFeedbacksState(true);
+    setShowBlock(false);
     setShowDetailsCard(false);
+    //setShowFeedbacksState(true);
     setDisableFeedbackButton(true);
     const _id = person._id;
     const data = { token, _id };
@@ -101,6 +76,8 @@ const PeopleDetails = ({
       const result = await dispatch(fetchFeedbacksAsync(data));
       if (result.type === "/admin/getFeedbacks/fulfilled") {
         setFeedbacks(result.payload);
+        setShowBlock(false);
+        setShowDetailsCard(false);
         setShowFeedbacksState(true);
       }
     } finally {
@@ -143,8 +120,8 @@ const PeopleDetails = ({
                 <Col className="d-flex flex-column gap-2 flex-sm-column flex-md-column flex-lg-row">
                   <Button
                     color={person.access === "accepted" ? "danger" : "success"}
-                    // onClick={() => confirmationPopUp(person)}
                     onClick={() => showConfirmation(person)}
+                    disabled={disableBlockButton}
                   >
                     {person.access === "accepted" ? "Block" : "Unblock"}
                   </Button>
@@ -152,6 +129,7 @@ const PeopleDetails = ({
                   <Button
                     style={{ backgroundColor: "#5d12cf", border: "none" }}
                     onClick={() => getOrders(person)}
+                    disabled={disableDetailsButton}
                   >
                     See More Details
                   </Button>

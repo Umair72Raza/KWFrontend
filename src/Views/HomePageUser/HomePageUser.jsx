@@ -248,12 +248,12 @@ const HomePageUser = () => {
   return (
     <>
       <Navbar />
-      <Container className="px-3">
+      <Container className="px-md-3 fluid">
         {/* First Row */}
-        <Row className="px-3">
-          <Col className="px-3">
-            <Row className="mb-1 mt-1 px-3">
-              <Col className="text-start  " xs={3}>
+        <Row className="px-md-3">
+          <Col className="px-md-3">
+            <Row className="d-flex flex-row justify-content-xs-between mt-1 px-md-3 pl-1 pr-1">
+              <Col className="  " xs={3}>
                 <Button
                   onClick={() => navigate("/user/Orders")}
                   color="primary"
@@ -262,8 +262,8 @@ const HomePageUser = () => {
                   {HomePageUserConst.button.orders}
                 </Button>
               </Col>
-              <Col className="   d-flex flex-column py-0" xs={6}>
-                <div className="d-flex gap-1 ">
+              <Col className="  " xs={6}>
+                <div className="d-flex  gap-1">
                   <Input
                     type="text"
                     className="search-border"
@@ -276,26 +276,11 @@ const HomePageUser = () => {
                   />
                   <Button
                     color="primary"
-                    className="py-1 rounded text-white"
+                    className=" rounded text-white"
                     onClick={handleSearch}
                   >
                     <FaSearch />
                   </Button>
-                </div>
-                <div className="w-75">
-                  {/* {debouncedsearch && memoizedSuggestions.length > 0 && show == true && (
-                <ul className=" ">
-                  {memoizedSuggestions.map((suggestion, index) => (
-                    <li
-                      key={index}
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className="ps-2 mb-1  text-start border rounded "
-                    >
-                      {suggestion}
-                    </li>
-                  ))}
-                </ul>
-              )} */}
                 </div>
               </Col>
               <Col className="text-end d-md-none" xs={3}>

@@ -99,13 +99,11 @@ text-decoration: underline !important;
 }
 
 .selected-chat {
-  height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
 }
 
 .chat-header {
-  padding: 10px !important;
   border-bottom: 1px solid #eee !important;
 }
 
@@ -264,3 +262,11 @@ text-decoration: underline !important;
 .Z-index {
   z-index: 99 !important;
 }
+.custom-prev-arrow,
+.custom-next-arrow {
+  color:black;
+  background-color:#fff ;
+  border: none;
+ 
+}
+

@@ -18,7 +18,7 @@ const FinishJob = ({ confirmed, SetConfirm, order, setFinishJobVerified }) => {
       });
     } else if (confirmed === "false") {
       Swal.fire({
-        title: "Finish was not Confirmed!",
+        title: "Finish not Confirmed!",
         icon: "error",
       }).then((result) => {
         if (result.isConfirmed) {

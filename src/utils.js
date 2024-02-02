@@ -123,6 +123,7 @@ export const handleNameChange = (
   }
 };
 export  const validateEmail = (email, errors) => {
+  console.log(email)
   if (!email || !email.includes('@') || !email.includes('.com')) {
     errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
   } else if(hasOnlyWhiteSpace(email)){
@@ -159,8 +160,13 @@ export  const validatePassword = (password, confirmPassword, errors) => {
   if (!passwordPattern(password)) {
     errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
   }
-
-  if (confirmPassword !== password) {
+if(hasOnlyWhiteSpace(confirmPassword) ){ 
+    errors.confirmPassword = RegisterPage.ERROR_MESSAGES.emptyPassword;
+}
+ if(hasOnlyWhiteSpace(password) ){ 
+  errors.password = RegisterPage.ERROR_MESSAGES.emptyPassword;
+}
+  if (!hasOnlyWhiteSpace(confirmPassword)  && confirmPassword !== password) {
     errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
     errors.password = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
   }

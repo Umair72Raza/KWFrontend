@@ -45,6 +45,63 @@ const ScheduledOrdersCardWorker = ({
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
+  const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
+    useState(false);
+
+  const [formattedAddress, setFormattedAddress] = useState(null);
+
+  const fetchAddressFromCoordinates = (coordinates, orderId) => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode(
+      { location: { lat: coordinates[1], lng: coordinates[0] } },
+      (results, status) => {
+        if (status === "OK") {
+          if (results && results.length > 0) {
+            const address = results[0].formatted_address;
+            setFormattedAddress(address);
+
+            // Update the loc object within the order with the address
+            setScheduledOrders((prevScheduledOrders) =>
+              prevScheduledOrders.map((scheduledOrder) =>
+                scheduledOrder._id === orderId
+                  ? {
+                      ...scheduledOrder,
+                      loc: { ...scheduledOrder.loc, address },
+                    }
+                  : scheduledOrder
+              )
+            );
+          } else {
+            console.error("No results found");
+          }
+        } else {
+          console.error("Geocoder failed due to:", status);
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_API
+    }&libraries=${import.meta.env.VITE_GOOGLE_API_LIBARARY}`;
+    script.async = true;
+    script.defer = true;
+    script.addEventListener("load", () => {
+      // Initialize the fetchAddressFromCoordinates function here
+      scheduledOrdersObject.forEach((order) => {
+        fetchAddressFromCoordinates(order.loc.coordinates, order._id);
+      });
+    });
+    document.head.appendChild(script);
+
+    return () => {
+      // Remove the script when the component unmounts
+      document.head.removeChild(script);
+    };
+  }, [scheduledOrdersObject]);
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -103,10 +160,32 @@ const ScheduledOrdersCardWorker = ({
 
   const sendStartRequest = async (order, Uid) => {
     //  emit socket event to show Worker wants to start the job modal.
+
+    if (user.status !== "online") {
+      return Swal.fire({
+        title: "You are not online",
+        icon: "error",
+      });
+    }
+    setGlobalStartButtonDisabled(true);
+    setStartButtonDisabledMap((prevMap) => ({
+      ...prevMap,
+      [order._id]: true,
+    }));
+
     const data = {
       order,
       Uid,
     };
+
+    setTimeout(() => {
+      setGlobalStartButtonDisabled(false);
+      setStartButtonDisabledMap((prevMap) => ({
+        ...prevMap,
+        [order._id]: false,
+      }));
+    }, 60000); // 1 minute
+
     socket.emit("startJob-accept-reject", data);
     Swal.fire({
       title: "Start Job request sent!",
@@ -129,7 +208,12 @@ const ScheduledOrdersCardWorker = ({
 
     return showFullDetailsMap[order._id]
       ? order.details
-      : truncateText(transformedDetails, 25);
+      : truncateText(transformedDetails, 30);
+  };
+
+  const openGoogleMaps = (loc) => {
+    const url = `https://www.google.com/maps?q=${loc.coordinates[1]},${loc.coordinates[0]}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -141,6 +225,7 @@ const ScheduledOrdersCardWorker = ({
           </div>
         ) : scheduledOrdersObject.length > 0 ? (
           <>
+            {console.log(scheduledOrdersObject)}
             <Row>
               {scheduledOrdersObject?.map((order) => (
                 <Col
@@ -197,7 +282,8 @@ const ScheduledOrdersCardWorker = ({
                             <span
                               style={{ marginTop: "10px", marginRight: "1%" }}
                             >
-                              Status: {order.Status}
+                              <b>Status: </b>
+                              {order.Status}
                             </span>
                             <img
                               src={activeOrderspng}
@@ -213,10 +299,17 @@ const ScheduledOrdersCardWorker = ({
                           </div>
                         </Col>
                       </CardText>
-                      <CardText>Time: {order.time}</CardText>
-                      <CardText>Date: {order.date}</CardText>
                       <CardText>
-                        Details:{" "}
+                        <b>Time:</b> {order.time}
+                      </CardText>
+                      <CardText>
+                        <b>Date:</b> {order.date}
+                      </CardText>
+                      <CardText>
+                        <b>Amount:</b> ${order.amount}
+                      </CardText>
+                      <CardText>
+                        <b>Details:</b>{" "}
                         <div
                           style={{
                             maxHeight: "100px",
@@ -232,7 +325,7 @@ const ScheduledOrdersCardWorker = ({
                           ) : (
                             transformOrderDetails(order)
                           )}
-                          {order.details.length > 5 && (
+                          {order.details.length > 30 && (
                             <Button
                               style={{ marginTop: "-5px" }}
                               color="link"
@@ -246,8 +339,23 @@ const ScheduledOrdersCardWorker = ({
                         </div>
                       </CardText>
                       <CardText>
-                        Order By:{" "}
+                        <b>Order By:</b>{" "}
                         {order.users.length > 0 && order.users[0].firstName}
+                      </CardText>
+                      <CardText>
+                        <b>Address</b>
+                        {order.users[0].address}
+                      </CardText>
+                      <CardText>
+                        <p>{formattedAddress}</p>
+                        <Button
+                          onClick={() =>
+                            openGoogleMaps(order?.users[0]?.location)
+                          }
+                          color="primary"
+                        >
+                          Open in Google Maps
+                        </Button>
                       </CardText>
                       <Row>
                         <Col style={{ margin: "2%" }} xs="12" md="5">
@@ -274,7 +382,11 @@ const ScheduledOrdersCardWorker = ({
                                 }
                                 color="success"
                                 className={
-                                  activeOrder.length > 0 ? "disabled" : ""
+                                  globalStartButtonDisabled ||
+                                  startButtonDisabledMap[order._id] ||
+                                  activeOrder.length > 0
+                                    ? "disabled"
+                                    : ""
                                 }
                               >
                                 Start Job

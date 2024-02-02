@@ -1,11 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  EmailVerification,
   OTPverify,
   OTPverifyforEmail,
+  OTPverifyforPhone,
   loginUser,
   newPasswordSetter,
+  optSentAtSingUp,
   sendOTP,
   sendOTPforEmail,
+  sendOTPforPhone,
   signUpUser,
   toggleStatus,
 } from "../../APIs/auth";
@@ -33,6 +37,16 @@ export const logoutAsync = createAsyncThunk("auth/logout", async () => {
   Logout();
 });
 
+export const OTPverifyAsync = createAsyncThunk("auth/otpSentAtSignUp", async (credentials) => {
+  try {
+    const { email } = credentials;
+    const response = await optSentAtSingUp(email);
+    return response;
+  } catch (error) {
+    return error;
+  }
+});
+
 export const signUpUserAsync = createAsyncThunk(
   "auth/signup",
   async (credentials, { rejectWithValue }) => {
@@ -42,12 +56,16 @@ export const signUpUserAsync = createAsyncThunk(
         lastName,
         email,
         password,
+        profilePicture,
         phoneNumber,
         location,
         // longitude,
         // latitude,
         address,
+        optionalAddress,
         country,
+        region_state,
+        city,
         services,
       } = credentials;
       const response = await signUpUser(
@@ -55,12 +73,16 @@ export const signUpUserAsync = createAsyncThunk(
         lastName,
         email,
         password,
+        profilePicture,
         phoneNumber,
         location,
         // longitude,
         // latitude,
         address,
+        optionalAddress,
         country,
+        region_state,
+        city,
         services
       );
       console.log(response);
@@ -89,14 +111,26 @@ export const signUpUserAsync = createAsyncThunk(
   }
 );
 
+// change the email verification status
+export const changeEmailStatus = createAsyncThunk( "auth/changeEmailStatus", async (data) => {
+  try{
+const {email} = data;
+const response = await EmailVerification(email);
+return response;
+  }catch(error){
+    console.log(error)
+    return error;
+  }
+});
+
 export const requestOTPAsync = createAsyncThunk(
   "auth/requestOTPAsync",
   async (email) => {
     try {
       console.log(email, "email in async");
       const response = await sendOTP(email);
-      // console.log(response,"send otp resp")
-      // return response;
+      console.log(response.data);
+      console.log(response.status);
 
       const serializableResponse = {
         data: response.data,
@@ -105,7 +139,8 @@ export const requestOTPAsync = createAsyncThunk(
       };
       return serializableResponse;
     } catch (error) {
-      failureToast("Couldn't send OTP");
+      throw error
+      //failureToast("Email not Registered!");
     }
   }
 );
@@ -114,7 +149,7 @@ export const requestOTPforEmailAsync = createAsyncThunk(
   "auth/requestOTPforEmailAsync",
   async (data) => {
     try {
-      console.log(data, "data in thunk")
+      console.log(data, "data in thunk");
       const response = await sendOTPforEmail(data);
       // console.log(response,"send otp resp")
       // return response;
@@ -126,7 +161,28 @@ export const requestOTPforEmailAsync = createAsyncThunk(
       };
       return serializableResponse;
     } catch (error) {
-      failureToast("Couldn't send OTP");
+      console.log(error)
+      //failureToast("Couldn't send OTP");
+    }
+  }
+);
+
+export const requestOTPforPhoneAsync = createAsyncThunk(
+  "auth/requestOTPforPhoneAsync",
+  async (data) => {
+    try {
+      console.log(data, "data in thunk")
+      const response = await sendOTPforPhone(data);
+      const serializableResponse = {
+        data: response.data,
+        status: response.status,
+        // other serializable properties
+      };
+      console.log(serializableResponse, 'serialized response')
+      return serializableResponse;
+    } catch (error) {
+      console.log(error)
+      //failureToast("couldnt send otp");
     }
   }
 );
@@ -150,8 +206,22 @@ export const changeEmail = createAsyncThunk(
   "auth/otpverifyEmail",
   async (data) => {
     try {
-      console.log(data,"data in thunk")
+      console.log(data, "data in thunk");
       const response = await OTPverifyforEmail(data);
+      console.log("otp verify response", response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+export const changePhone = createAsyncThunk(
+  "auth/otpverifyPhone",
+  async (data) => {
+    try {
+      console.log(data,"data in thunk")
+      const response = await OTPverifyforPhone(data);
       console.log("otp verify response", response);
       return response.data;
     } catch (error) {
@@ -203,7 +273,8 @@ const authSlice = createSlice({
     loginStatus: "idle",
     signupStatus: "idle",
     signupWorkerStatus: "idle",
-    otp: null,
+    signupOTP: null,
+    emailVerification:"idle",
     emailOTP: null,
     emailOTPError: null,
     otpStatus: "idle",
@@ -290,12 +361,31 @@ const authSlice = createSlice({
         state.emailOTP = "loading";
       })
       .addCase(requestOTPforEmailAsync.fulfilled, (state, action) => {
-        state.emailOTP = action.payload.updatedStatus;
+        state.emailOTP = action.payload;
         state.emailOTPError = null;
       })
       .addCase(requestOTPforEmailAsync.rejected, (state, action) => {
         state.emailOTP = "failed";
         state.emailOTPError = action.error.message;
+      }).addCase(OTPverifyAsync.pending, (state) => {
+        state.otpStatus = "loading";
+      })
+      .addCase(OTPverifyAsync.fulfilled, (state, action) => {
+        state.otpStatus = "succeeded";
+        state.signupOTP = action.payload.otp;
+      })
+      .addCase(OTPverifyAsync.rejected, (state, action) => {
+        state.otpStatus = "failed";
+        state.otpError = action.error.message;
+      }) .addCase(changeEmailStatus.pending, (state) => {
+        state.emailVerification = "loading";
+      })
+      .addCase(changeEmailStatus.fulfilled, (state, action) => {
+        state.emailVerification = "succeeded";
+      })
+      .addCase(changeEmailStatus.rejected, (state, action) => {
+        state.emailVerification = "failed";
+
       })
   },
 });

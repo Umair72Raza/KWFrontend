@@ -29,11 +29,13 @@ const ActiveOrders = ({
 
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [finishJobVerified, setFinishJobVerified] = useState(false);
+  const [disableFinishButton,setDisableFinishButton] = useState(false)
   const [confirmed, SetConfirm] = useState("");
   const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {
+        setDisableFinishButton(false)
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -47,6 +49,7 @@ const ActiveOrders = ({
         // Add the removed order to the past orders
         setPastOrders((prevPastOrders) => [...prevPastOrders, data.order]);
       } else if (data.result === "false") {
+        setDisableFinishButton(false)
         SetConfirm("false");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -62,6 +65,10 @@ const ActiveOrders = ({
 
   const sendFinishRequest = (order, UserId) => {
     //send event to finish the job
+    setDisableFinishButton(true);
+    setTimeout(() => {
+      setDisableFinishButton(false); // Enable the button after 1 minute
+    }, 60000);
     const data = {
       order,
       Uid: UserId,
@@ -78,7 +85,7 @@ const ActiveOrders = ({
 
     return showFullDetailsMap[order._id]
       ? order.details
-      : truncateText(transformedDetails, 5);
+      : truncateText(transformedDetails, 30);
   };
 
   const toggleDetails = (orderId) => {
@@ -137,12 +144,21 @@ const ActiveOrders = ({
                       }}
                     >
                       {" "}
-                      <span style={{ marginTop: "10px" }}>Status: Active</span>
+                      <span style={{ marginTop: "10px" }}>
+                        <b>Status: Active</b>
+                      </span>
                     </CardText>
-                    <CardText>Time: {order.Time}</CardText>
-                    <CardText>Date: {order.date}</CardText>
                     <CardText>
-                      Details:{" "}
+                      <b>Time:</b> {order.time}
+                    </CardText>
+                    <CardText>
+                      <b>Date:</b> {order.date}
+                    </CardText>
+                    <CardText>
+                      <b>Amount:</b> ${order.amount}
+                    </CardText>
+                    <CardText>
+                      <b>Details:</b>{" "}
                       <div
                         style={{
                           maxHeight: "100px",
@@ -158,7 +174,7 @@ const ActiveOrders = ({
                         ) : (
                           transformOrderDetails(order)
                         )}
-                        {order.details.length > 5 && (
+                        {order.details.length > 30 && (
                           <Button
                             style={{ marginTop: "-5px" }}
                             color="link"
@@ -173,9 +189,15 @@ const ActiveOrders = ({
                     </CardText>
                     <CardText>
                       {" "}
-                      {isUser
-                        ? `Worker: ${order.users[1].firstName}`
-                        : `User: ${order.users[0].firstName}`}
+                      {isUser ? (
+                        <>
+                          <b>Worker:</b> {order.users[1].firstName}{order.users[1]?.lastName}
+                        </>
+                      ) : (
+                        <>
+                          <b>User:</b> {order.users[0].firstName}{order.users[0]?.lastName}
+                        </>
+                      )}
                     </CardText>
                     <Col style={{ margin: "2%" }} xs="12" md="3">
                       {" "}
@@ -184,9 +206,10 @@ const ActiveOrders = ({
                           <>
                             <Button
                               style={{
-                                backgroundColor: "#48c8ef",
+                                backgroundColor: "#48a8ef",
                                 border: "2px solid #24aed8",
                               }}
+                              disabled={disableFinishButton}
                               onClick={() =>
                                 sendFinishRequest(order, order.users[0])
                               }

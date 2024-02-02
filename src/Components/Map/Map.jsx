@@ -55,7 +55,7 @@ GoogleMapContainer.propTypes = {
 };
 
 const Map = React.memo(
-  ({ setFormData, formData, editMode, errors, setErrors }) => {
+  ({ setFormData, formData, editMode, errors, setErrors,loading }) => {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [newInput, setNewInput] = useState(formData?.address);
@@ -331,7 +331,7 @@ const Map = React.memo(
             setFormData((prev) => ({ ...prev, address: e.target.value }));
           }}
           onDoubleClick={(e) => e.target.select()}
-          disabled={!isInputEnabled}
+          disabled={!isInputEnabled || loading}
         />
         {errors.address && (
           <span className="text-danger">{errors.address}</span>
@@ -358,6 +358,7 @@ const Map = React.memo(
               currentLocation={currentLocation}
               selectedLocation={selectedLocation}
               onMapClick={handleMapClick}
+              disabled={loading}
             />
           ) : (
             <div>Map is not loaded yet.</div>
