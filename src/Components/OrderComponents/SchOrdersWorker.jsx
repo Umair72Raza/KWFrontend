@@ -50,13 +50,9 @@ const ScheduledOrdersCardWorker = ({
     useState(false);
 
   const [formattedAddress, setFormattedAddress] = useState(null);
-  const loc = {
-    type: "Point",
-    coordinates: [74.24510699999999, 31.4717778],
-    address: "", // Add an empty address property
-  };
 
-  const fetchAddressFromCoordinates = (coordinates) => {
+
+  const fetchAddressFromCoordinates = (coordinates, orderId) => {
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode(
       { location: { lat: coordinates[1], lng: coordinates[0] } },
@@ -66,8 +62,17 @@ const ScheduledOrdersCardWorker = ({
             const address = results[0].formatted_address;
             setFormattedAddress(address);
 
-            // Update the loc object with the address
-            loc.address = address;
+            // Update the loc object within the order with the address
+            setScheduledOrders((prevScheduledOrders) =>
+              prevScheduledOrders.map((scheduledOrder) =>
+                scheduledOrder._id === orderId
+                  ? {
+                      ...scheduledOrder,
+                      loc: { ...scheduledOrder.loc, address },
+                    }
+                  : scheduledOrder
+              )
+            );
           } else {
             console.error("No results found");
           }
@@ -77,6 +82,7 @@ const ScheduledOrdersCardWorker = ({
       }
     );
   };
+
   useEffect(() => {
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${
@@ -86,7 +92,9 @@ const ScheduledOrdersCardWorker = ({
     script.defer = true;
     script.addEventListener("load", () => {
       // Initialize the fetchAddressFromCoordinates function here
-      fetchAddressFromCoordinates(loc.coordinates);
+      scheduledOrdersObject.forEach((order) => {
+        fetchAddressFromCoordinates(order.loc.coordinates, order._id);
+      });
     });
     document.head.appendChild(script);
 
@@ -94,7 +102,8 @@ const ScheduledOrdersCardWorker = ({
       // Remove the script when the component unmounts
       document.head.removeChild(script);
     };
-  }, [loc.coordinates]);
+  }, [scheduledOrdersObject]);
+
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -204,7 +213,7 @@ const ScheduledOrdersCardWorker = ({
       : truncateText(transformedDetails, 30);
   };
 
-  const openGoogleMaps = () => {
+  const openGoogleMaps = (loc) => {
     const url = `https://www.google.com/maps?q=${loc.coordinates[1]},${loc.coordinates[0]}`;
     window.open(url, "_blank");
   };
@@ -337,17 +346,21 @@ const ScheduledOrdersCardWorker = ({
                         {order.users.length > 0 && order.users[0].firstName}
                       </CardText>
                       <CardText>
+                        <b>Address</b> 
+                        {order.users[0].address}
+                      </CardText>
+                      <CardText>
                         <b>Formatted Address:</b>{" "}
-                        {formattedAddress ? (
-                          <>
+                        {/* {formattedAddress ? (
+                          <> */}
                             <p>{formattedAddress}</p>
-                            <Button onClick={openGoogleMaps} color="primary">
+                            <Button onClick={()=>openGoogleMaps(order?.users[0]?.location)} color="primary">
                               Open in Google Maps
                             </Button>
-                          </>
+                          {/* </>
                         ) : (
                           <p>Loading address...</p>
-                        )}
+                        )} */}
                       </CardText>
                       <Row>
                         <Col style={{ margin: "2%" }} xs="12" md="5">
