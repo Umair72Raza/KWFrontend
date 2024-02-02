@@ -27,7 +27,10 @@ import {
 } from "../../utils";
 import { RegisterPage } from "../../Constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { OTPverifyAsync, signUpUserAsync } from "../../Redux/Slices/AuthSlice.js";
+import {
+  OTPverifyAsync,
+  signUpUserAsync,
+} from "../../Redux/Slices/AuthSlice.js";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -320,65 +323,59 @@ const UserRegister = ({ ShowServices }) => {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Start loading spinner
     setLoading(true);
-    // Perform form validation
-    const validationErrors = FormValidation(formData);
-    setErrors(validationErrors);
 
-    // Check if there are validation errors
-    if (Object.keys(validationErrors).length === 0) {
-      try {
+    try {
+      // Perform form validation
+      const validationErrors = FormValidation(formData);
+      setErrors(validationErrors);
+
+      // Check if there are validation errors
+      if (Object.keys(validationErrors).length === 0) {
         // Dispatch the signup action
-        dispatch(signUpUserAsync(formData)).then((result) => {
-          if (result.type === "auth/signup/fulfilled") {
-            
-            const email = formData.email;
-            dispatch(OTPverifyAsync({ email })).then((result) => {
-              if (result.type === "auth/otpSentAtSignUp/fulfilled") {
-                infoToast(
-                  "OTP sent to your email. Please verify you email to Login!"
-                );
-                navigate("/auth/login");
-              }
-            });
-            console.log("Sign up successful!", formData);
-            // Reset form data on successful signup
-            setFormData({
-              firstName: "",
-              lastName: "",
-              email: "",
-              phoneNumber: "",
-              password: "",
-              confirmPassword: "",
-              profilePicture: null,
-              location: {},
-              // latitude: "",
-              // longitude: "",
-              address: "",
-              optionalAddress: "",
-              country: "",
-              region_state: "",
-              city: "",
-              services: [],
-            });
-          
-          } else if (result.type === "auth/signup/rejected") {
-            setIsSignupDisabled(true);
-            failureToast(result.payload);
+        const result = await dispatch(signUpUserAsync(formData));
+
+        if (result.type === "auth/signup/fulfilled") {
+          const email = formData.email;
+          const otpResult = await dispatch(OTPverifyAsync({ email }));
+
+          if (otpResult.type === "auth/otpSentAtSignUp/fulfilled") {
+            infoToast(
+              "OTP sent to your email. Please verify your email to Login!"
+            );
+            navigate("/auth/login");
           }
-        });
-      } catch (error) {
-        console.log("Error in sign up!", error);
-      } finally {
-        // Stop loading spinner
-        setLoading(false);
+          console.log("Sign up successful!", formData);
+          // Reset form data on successful signup
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            phoneNumber: "",
+            password: "",
+            confirmPassword: "",
+            profilePicture: null,
+            location: {},
+            address: "",
+            optionalAddress: "",
+            country: "",
+            region_state: "",
+            city: "",
+            services: [],
+          });
+        } else if (result.type === "auth/signup/rejected") {
+          setIsSignupDisabled(true);
+          failureToast(result.payload);
+        }
       }
-    } else {
-      // Stop loading spinner if there are validation errors
+    } catch (error) {
+      console.log("Error in sign up!", error);
+    } finally {
+      // Stop loading spinner
       setLoading(false);
     }
   };
@@ -554,15 +551,17 @@ const UserRegister = ({ ShowServices }) => {
                       onChange={handlePasswordChange}
                       autoComplete="new-password"
                     />
-                    <div
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
-                        className="password-icon pe-4"
-                      />
-                    </div>
+                    {formData.password && formData.password.length > 0 && (
+                      <div
+                        className="password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <FontAwesomeIcon
+                          icon={showPassword ? faEye : faEyeSlash}
+                          className="password-icon pe-4"
+                        />
+                      </div>
+                    )}
                   </div>
                   {passwordInfo && passwordValid && !errors.password ? (
                     <span className="text-success fw-bold">
@@ -606,7 +605,7 @@ const UserRegister = ({ ShowServices }) => {
                       onChange={handleConfirmPasswordChange}
                       autoComplete="new-password"
                     />
-                    <div
+                    {formData.confirmPassword && formData.confirmPassword.length >0 && (   <div
                       className="password-toggle"
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
@@ -616,7 +615,8 @@ const UserRegister = ({ ShowServices }) => {
                         icon={showConfirmPassword ? faEye : faEyeSlash}
                         className="password-icon pe-4"
                       />
-                    </div>
+                    </div>)}
+                  
                   </div>
                   {confirmPasswordInfo &&
                   !errors.confirmPassword &&
@@ -745,10 +745,11 @@ const UserRegister = ({ ShowServices }) => {
                 <span className="text-danger">{errors.allField}</span>
               )}
             </div>
-            <Link id="Signup">
+            <Link id="Signup" style={{ textDecoration: "none" }}>
               <Button
                 color="primary"
                 disabled={isSignupDisabled || loading}
+                className="w-25 hover-pointer"
                 block
                 onClick={handleSubmit}
               >
