@@ -51,7 +51,6 @@ const ScheduledOrdersCardWorker = ({
 
   const [formattedAddress, setFormattedAddress] = useState(null);
 
-
   const fetchAddressFromCoordinates = (coordinates, orderId) => {
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode(
@@ -103,7 +102,6 @@ const ScheduledOrdersCardWorker = ({
       document.head.removeChild(script);
     };
   }, [scheduledOrdersObject]);
-
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -221,14 +219,13 @@ const ScheduledOrdersCardWorker = ({
   return (
     <>
       <Container>
-
         {spinnerVisible ? (
           <div style={{ textAlign: "center" }}>
             <Spinner />
           </div>
         ) : scheduledOrdersObject.length > 0 ? (
           <>
-          {console.log(scheduledOrdersObject)}
+            {console.log(scheduledOrdersObject)}
             <Row>
               {scheduledOrdersObject?.map((order) => (
                 <Col
@@ -346,21 +343,19 @@ const ScheduledOrdersCardWorker = ({
                         {order.users.length > 0 && order.users[0].firstName}
                       </CardText>
                       <CardText>
-                        <b>Address</b> 
+                        <b>Address</b>
                         {order.users[0].address}
                       </CardText>
                       <CardText>
-                        <b>Formatted Address:</b>{" "}
-                        {/* {formattedAddress ? (
-                          <> */}
-                            <p>{formattedAddress}</p>
-                            <Button onClick={()=>openGoogleMaps(order?.users[0]?.location)} color="primary">
-                              Open in Google Maps
-                            </Button>
-                          {/* </>
-                        ) : (
-                          <p>Loading address...</p>
-                        )} */}
+                        <p>{formattedAddress}</p>
+                        <Button
+                          onClick={() =>
+                            openGoogleMaps(order?.users[0]?.location)
+                          }
+                          color="primary"
+                        >
+                          Open in Google Maps
+                        </Button>
                       </CardText>
                       <Row>
                         <Col style={{ margin: "2%" }} xs="12" md="5">
