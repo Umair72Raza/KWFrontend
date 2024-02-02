@@ -101,9 +101,11 @@ text-decoration: underline !important;
 .selected-chat {
   display: flex !important;
   flex-direction: column !important;
+  height: 460px !important;
 }
 
 .chat-header {
+  flex-grow: 0 !important;
   border-bottom: 1px solid #eee !important;
 }
 
