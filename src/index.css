@@ -264,3 +264,11 @@ text-decoration: underline !important;
 .Z-index {
   z-index: 99 !important;
 }
+.custom-prev-arrow,
+.custom-next-arrow {
+  color:black;
+  background-color:#fff ;
+  border: none;
+ 
+}
+

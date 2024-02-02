@@ -29,11 +29,13 @@ const ActiveOrders = ({
 
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [finishJobVerified, setFinishJobVerified] = useState(false);
+  const [disableFinishButton,setDisableFinishButton] = useState(false)
   const [confirmed, SetConfirm] = useState("");
   const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       if (data.result === "true") {
+        setDisableFinishButton(false)
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -47,6 +49,7 @@ const ActiveOrders = ({
         // Add the removed order to the past orders
         setPastOrders((prevPastOrders) => [...prevPastOrders, data.order]);
       } else if (data.result === "false") {
+        setDisableFinishButton(false)
         SetConfirm("false");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -62,6 +65,10 @@ const ActiveOrders = ({
 
   const sendFinishRequest = (order, UserId) => {
     //send event to finish the job
+    setDisableFinishButton(true);
+    setTimeout(() => {
+      setDisableFinishButton(false); // Enable the button after 1 minute
+    }, 60000);
     const data = {
       order,
       Uid: UserId,
@@ -199,9 +206,10 @@ const ActiveOrders = ({
                           <>
                             <Button
                               style={{
-                                backgroundColor: "#48c8ef",
+                                backgroundColor: "#48a8ef",
                                 border: "2px solid #24aed8",
                               }}
+                              disabled={disableFinishButton}
                               onClick={() =>
                                 sendFinishRequest(order, order.users[0])
                               }

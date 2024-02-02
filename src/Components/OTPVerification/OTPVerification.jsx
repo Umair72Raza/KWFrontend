@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Input, Button, Container, Row, Col } from "reactstrap";
 import { failureToast, successToast } from "../../utils";
@@ -16,8 +16,21 @@ const OTPVerification = () => {
   const newMail = location?.state?.newMail;
   const newPhone = location?.state?.newPhone;
 
-  console.log(newMail)
-  console.log(newPhone)
+  useEffect(()=>{
+    if(!email)
+    {
+      if(user.role==="worker")
+      {
+        navigate('/worker/homepage')
+      }
+      else if (user.role==="user")
+      {
+        navigate("/user/homepage")
+      }
+      
+    }
+
+  },[email])
 
   const [otp, setOtp] = useState("");
 

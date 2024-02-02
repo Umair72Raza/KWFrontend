@@ -49,6 +49,60 @@ const ScheduledOrdersCardWorker = ({
   const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
     useState(false);
 
+  const [formattedAddress, setFormattedAddress] = useState(null);
+
+  const fetchAddressFromCoordinates = (coordinates, orderId) => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode(
+      { location: { lat: coordinates[1], lng: coordinates[0] } },
+      (results, status) => {
+        if (status === "OK") {
+          if (results && results.length > 0) {
+            const address = results[0].formatted_address;
+            setFormattedAddress(address);
+
+            // Update the loc object within the order with the address
+            setScheduledOrders((prevScheduledOrders) =>
+              prevScheduledOrders.map((scheduledOrder) =>
+                scheduledOrder._id === orderId
+                  ? {
+                      ...scheduledOrder,
+                      loc: { ...scheduledOrder.loc, address },
+                    }
+                  : scheduledOrder
+              )
+            );
+          } else {
+            console.error("No results found");
+          }
+        } else {
+          console.error("Geocoder failed due to:", status);
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_API
+    }&libraries=${import.meta.env.VITE_GOOGLE_API_LIBARARY}`;
+    script.async = true;
+    script.defer = true;
+    script.addEventListener("load", () => {
+      // Initialize the fetchAddressFromCoordinates function here
+      scheduledOrdersObject.forEach((order) => {
+        fetchAddressFromCoordinates(order.loc.coordinates, order._id);
+      });
+    });
+    document.head.appendChild(script);
+
+    return () => {
+      // Remove the script when the component unmounts
+      document.head.removeChild(script);
+    };
+  }, [scheduledOrdersObject]);
+
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
       ...prevMap,
@@ -157,6 +211,11 @@ const ScheduledOrdersCardWorker = ({
       : truncateText(transformedDetails, 30);
   };
 
+  const openGoogleMaps = (loc) => {
+    const url = `https://www.google.com/maps?q=${loc.coordinates[1]},${loc.coordinates[0]}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <>
       <Container>
@@ -166,6 +225,7 @@ const ScheduledOrdersCardWorker = ({
           </div>
         ) : scheduledOrdersObject.length > 0 ? (
           <>
+            {console.log(scheduledOrdersObject)}
             <Row>
               {scheduledOrdersObject?.map((order) => (
                 <Col
@@ -281,6 +341,21 @@ const ScheduledOrdersCardWorker = ({
                       <CardText>
                         <b>Order By:</b>{" "}
                         {order.users.length > 0 && order.users[0].firstName}
+                      </CardText>
+                      <CardText>
+                        <b>Address</b>
+                        {order.users[0].address}
+                      </CardText>
+                      <CardText>
+                        <p>{formattedAddress}</p>
+                        <Button
+                          onClick={() =>
+                            openGoogleMaps(order?.users[0]?.location)
+                          }
+                          color="primary"
+                        >
+                          Open in Google Maps
+                        </Button>
                       </CardText>
                       <Row>
                         <Col style={{ margin: "2%" }} xs="12" md="5">

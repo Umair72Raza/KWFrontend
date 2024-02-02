@@ -16,7 +16,7 @@ const ChatProvider = ({ children }) => {
   const [unreadMessages, setUnreadMessages] = useState({});
   const [offerNotification,SetONotification]=useState([])
   const [selectedChatCompare,setSelectedChatCompare] =useState(null);
-  const [receiveMessage, setReceiveMessage] = useState(null);
+  const [receiveMessage, setReceiveMessage] = useState({});
   const [gotOffer, setGotOffer] = useState(false);
   const [userOffering, setUserOffering] = useState([]);
   const [chatFromWorkerCard,setChatFromWorkerCard] = useState(null);

@@ -89,7 +89,7 @@ const Login = () => {
               const data = { id, status: "online", token: result.payload.token };
               const Result = await dispatch(toggleStatusAsync(data));
               console.log(Result)
-              //await socket?.emit("online-offline", Result.payload.updatedStatus);
+              await socket?.emit("online-offline", Result.payload.updatedStatus);
               await setIsOn(true)
               navigate("/worker/workerHomepage");
             }
