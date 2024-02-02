@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { useDispatch } from "react-redux";
-import { Button, Modal, ModalHeader, ModalBody, Spinner } from "reactstrap";
+import { Button, Modal, ModalHeader, ModalBody, Spinner, Row, Col, Container, FormGroup, Form, Input } from "reactstrap";
 import {
   SendMessageAsync,
   ToggleChatSeen,
@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import Booking from "../booking popup/booking";
 import { ChatPopUpPage } from "../../Constants/Constants";
 import { useTransition, animated } from "@react-spring/web";
+import personPNG from "../../assets/images/dummyProfile/user.png";
 import { is } from "@react-spring/shared";
 import { set } from "lodash";
 
@@ -251,15 +252,15 @@ const ChatPopup = () => {
       setSendButtonDisabled(false);
     }
     setNewMessageText(inputValue);
-  }
+  };
 
   const sendMessage = async (e) => {
     e.preventDefault();
-  
+
     // Add loading state until the message is sent
     setLoadingSendMessage(true);
     setSendButtonDisabled(true);
-  
+
     try {
       if (newMessageText) {
         const messageData = {
@@ -268,12 +269,12 @@ const ChatPopup = () => {
           initiatorId: user._id,
           token,
         };
-  
+
         const result = await dispatch(SendMessageAsync(messageData));
-  
+
         if (result.type === "Chat/SendMessage/fulfilled") {
           const { chat, message: newMessage } = result.payload;
-  
+
           setNewMessageText("");
           if (!chat._id) {
             const updatedOriginalChats = [chat, ...originalChats];
@@ -287,11 +288,14 @@ const ChatPopup = () => {
             copyOfChats.length > 1 &&
             copyOfChats[0]._id !== chat._id
           ) {
-            const updatedChats = [chat, ...copyOfChats.filter(c => c._id !== chat._id)];
+            const updatedChats = [
+              chat,
+              ...copyOfChats.filter((c) => c._id !== chat._id),
+            ];
             setCopyOfChats(updatedChats);
             setOriginalChats(updatedChats);
           }
-  
+
           setMessages((prevMessages) => [...prevMessages, newMessage]);
           const newMessageAndUserId = { newMessage, chat };
           socket?.emit("new message", newMessageAndUserId);
@@ -305,7 +309,7 @@ const ChatPopup = () => {
       setSendButtonDisabled(false);
     }
   };
-  
+
   const handleChatSelection = (chat) => {
     const data = {
       userId: user._id,
@@ -492,244 +496,13 @@ const ChatPopup = () => {
               <h5 className="ms-3 fw-bold">{ChatPopUpPage.CHAT_TITLE}</h5>
             </ModalHeader>
             <ModalBody className="" style={{ overflowY: "auto" }}>
-                {/* // For mobile devices, display only chats initially */}
-                <div className="container-fluid d-lg-none d-block">
-                  <div className="row">
-                    <div className="col-12">
-                      <div className="chat-preview overflow-y-auto max-height-chat-users">
-                        {selectedChat ? (
-                          // Display messages if a chat is selected
-                          <div className="selected-chat">
-                            <div className="chat-header d-flex flex-row align-items-center">
-                              {!chatFromWorkerCard && (
-                                <div>
-                                  <FiArrowLeft
-                                    className="fs-4 me-3 hover-pointer"
-                                    onClick={handleBack}
-                                  />
-                                </div>
-                              )}
-                              <div className="d-flex flex-row justify-content-between w-100">
-                                <div>
-                                  <h5 className="ms-1 mt-2">
-                                    {selectedChat.firstName}{" "}
-                                    {selectedChat.lastName}
-                                  </h5>
-                                </div>{" "}
-                                {user.role === "user" ? (
-                                  <div>
-                                    {" "}
-                                    <Button
-                                      color={ChatPopUpPage.BOOK_BUTTON_COLOR}
-                                      onClick={() => book(selectedChat)}
-                                    >
-                                      {ChatPopUpPage.BOOK_BUTTON_LABEL}
-                                    </Button>
-                                  </div>
-                                ) : null}
-                              </div>
-                            </div>
-                            <div
-                              className="messages d-flex flex-column overflow-y-auto max-height-message"
-                              ref={messagesContainerRef}
-                            >
-                              {renderMessages()}
-                            </div>
-                            <form
-                              onSubmit={sendMessage}
-                              className="message-input"
-                            >
-                              <input
-                                type="text"
-                                placeholder="Type a message..."
-                                value={newMessageText}
-                                onChange={handleMessageInputChange}
-                                disabled={loadingSendMessage || isLoading}
-                              />
-                              <Button
-                                disabled={
-                                  sendButtonDisabled ||
-                                  loadingSendMessage ||
-                                  isLoading
-                                }
-                                color={ChatPopUpPage.SEND_BUTTON_COLOR}
-                                outline
-                              >
-                                {loadingSendMessage ? (
-                                  <Spinner size="sm" className="p-2" />
-                                ) : (
-                                  ChatPopUpPage.SEND_BUTTON_LABEL
-                                )}
-                              </Button>
-                            </form>
-                          </div>
-                        ) : copyOfChats?.length > 0 ? (
-                          chatTransitions(
-                            (style, item) =>
-                              item && (
-                                <animated.div style={style}>
-                                  <React.Fragment key={item._id}>
-                                    <div
-                                      className={`d-flex flex-row align-items-center my-2`}
-                                    >
-                                      <div className="d-flex flex-column w-100">
-                                        {item.users.map((chatUser) => {
-                                          if (
-                                            chatUser &&
-                                            chatUser._id &&
-                                            String(chatUser._id) !==
-                                              String(user._id)
-                                          ) {
-                                            const isBlockedByAdmin =
-                                              chatUser.access === "denied"
-                                                ? true
-                                                : false;
-                                            return (
-                                              <div
-                                                key={chatUser._id}
-                                                className={`pt-2 d-flex flex-row justify-content-between ${
-                                                  isBlockedByAdmin
-                                                    ? "blocked-user"
-                                                    : ""
-                                                }`}
-                                                onClick={() =>
-                                                  !isBlockedByAdmin &&
-                                                  handleChatSelection(item)
-                                                }
-                                              >
-                                                <h5>
-                                                  {chatUser.firstName}{" "}
-                                                  {chatUser.lastName}
-                                                </h5>
-                                                {unreadMessages[item._id] > 0 &&
-                                                  item.latestMessage?.sender !==
-                                                    user._id && (
-                                                    <div className="notification-circle rounded-circle bg-danger text-white">
-                                                      <span className="align-self-center">
-                                                        {
-                                                          unreadMessages[
-                                                            item._id
-                                                          ]
-                                                        }
-                                                      </span>
-                                                    </div>
-                                                  )}
-                                                {isBlockedByAdmin && (
-                                                  <span className="text-danger">
-                                                    {
-                                                      ChatPopUpPage.BLOCKED_BY_ADMIN
-                                                    }
-                                                  </span>
-                                                )}
-                                              </div>
-                                            );
-                                          }
-                                          return null;
-                                        })}
-                                      </div>
-                                    </div>
-                                    <hr />
-                                  </React.Fragment>
-                                </animated.div>
-                              )
-                          )
-                        ) : (
-                          // Render when no chats available
-                          <div>{ChatPopUpPage.NO_CHATS}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* // For tablet and laptop, display chat and messages side by side */}
-                <div className="container-fluid d-none d-lg-block">
-                  <div className="row">
-                    {!chatFromWorkerCard && (
-                      <div className="col-3 chat-list">
-                        <div className="chat-preview max-height-chat-users">
-                          {copyOfChats?.length === 0 ? (
-                            <div>{ChatPopUpPage.NO_CHATS}</div>
-                          ) : (
-                            chatTransitions(
-                              (style, item) =>
-                                item && (
-                                  <animated.div style={style}>
-                                    <React.Fragment key={item._id}>
-                                      <div
-                                        className={`d-flex flex-row align-items-center my-2`}
-                                      >
-                                        <div className="d-flex flex-column w-100">
-                                          {item.users.map((chatUser) => {
-                                            if (
-                                              chatUser &&
-                                              chatUser._id &&
-                                              String(chatUser._id) !==
-                                                String(user._id)
-                                            ) {
-                                              const isBlockedByAdmin =
-                                                chatUser.access === "denied"
-                                                  ? true
-                                                  : false;
-                                              return (
-                                                <div
-                                                  key={chatUser._id}
-                                                  className={`pt-2 d-flex flex-row justify-content-between ${
-                                                    isBlockedByAdmin
-                                                      ? "blocked-user"
-                                                      : ""
-                                                  }`}
-                                                  onClick={() =>
-                                                    !isBlockedByAdmin &&
-                                                    handleChatSelection(item)
-                                                  }
-                                                >
-                                                  <h5>
-                                                    {chatUser.firstName}{" "}
-                                                    {chatUser.lastName}
-                                                  </h5>
-                                                  {unreadMessages[item._id] >
-                                                    0 &&
-                                                    item.latestMessage
-                                                      ?.sender !== user._id && (
-                                                      <div className="notification-circle rounded-circle bg-danger text-white">
-                                                        <span className="align-self-center">
-                                                          {
-                                                            unreadMessages[
-                                                              item._id
-                                                            ]
-                                                          }
-                                                        </span>
-                                                      </div>
-                                                    )}
-                                                  {isBlockedByAdmin && (
-                                                    <span className="text-danger">
-                                                      {
-                                                        ChatPopUpPage.BLOCKED_BY_ADMIN
-                                                      }
-                                                    </span>
-                                                  )}
-                                                </div>
-                                              );
-                                            }
-                                            return null;
-                                          })}
-                                        </div>
-                                      </div>
-                                      <hr />
-                                    </React.Fragment>
-                                  </animated.div>
-                                )
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    <div
-                      className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}
-                    >
+              {/* // For mobile devices, display only chats initially */}
+              <div className="container-fluid d-lg-none d-block">
+                <div className="row">
+                  <div className="col-12">
+                    <div className="chat-preview overflow-y-auto max-height-chat-users">
                       {selectedChat ? (
+                        // Display messages if a chat is selected
                         <div className="selected-chat">
                           <div className="chat-header d-flex flex-row align-items-center">
                             {!chatFromWorkerCard && (
@@ -761,7 +534,7 @@ const ChatPopup = () => {
                             </div>
                           </div>
                           <div
-                            className="messages d-flex flex-column  max-height-message"
+                            className="messages d-flex flex-column overflow-y-auto max-height-message"
                             ref={messagesContainerRef}
                           >
                             {renderMessages()}
@@ -794,15 +567,259 @@ const ChatPopup = () => {
                             </Button>
                           </form>
                         </div>
+                      ) : copyOfChats?.length > 0 ? (
+                        chatTransitions(
+                          (style, item) =>
+                            item && (
+                              <animated.div style={style}>
+                                <React.Fragment key={item._id}>
+                                  <div
+                                    className={`d-flex flex-row align-items-center my-2`}
+                                  >
+                                    <div className="d-flex flex-column w-100">
+                                      {item.users.map((chatUser) => {
+                                        if (
+                                          chatUser &&
+                                          chatUser._id &&
+                                          String(chatUser._id) !==
+                                            String(user._id)
+                                        ) {
+                                          const isBlockedByAdmin =
+                                            chatUser.access === "denied"
+                                              ? true
+                                              : false;
+                                          return (
+                                            <Row
+                                              key={chatUser._id}
+                                              className={`pt-2 d-flex flex-row justify-content-between ${
+                                                isBlockedByAdmin
+                                                  ? "blocked-user"
+                                                  : ""
+                                              }`}
+                                              onClick={() =>
+                                                !isBlockedByAdmin &&
+                                                handleChatSelection(item)
+                                              }
+                                            >
+                                              <Col className="d-flex flex-row">
+                                                <img
+                                                  src={personPNG} // Replace with the actual path
+                                                  alt="Profile"
+                                                  style={{
+                                                    width: "50px",
+                                                    height: "50px",
+                                                    borderRadius: "50%",
+                                                  }}
+                                                />
+                                                <h5 className="align-self-center ms-3">
+                                                  {chatUser.firstName}{" "}
+                                                  {chatUser.lastName}
+                                                </h5>
+                                              </Col>
+                                              {unreadMessages[item._id] > 0 &&
+                                                item.latestMessage?.sender !==
+                                                  user._id && (
+                                                  <Col className="notification-circle rounded-circle bg-danger text-white">
+                                                    <span className="align-self-center">
+                                                      {unreadMessages[item._id]}
+                                                    </span>
+                                                  </Col>
+                                                )}
+                                              {isBlockedByAdmin && (
+                                                <span className="text-danger">
+                                                  {
+                                                    ChatPopUpPage.BLOCKED_BY_ADMIN
+                                                  }
+                                                </span>
+                                              )}
+                                            </Row>
+                                          );
+                                        }
+                                        return null;
+                                      })}
+                                    </div>
+                                  </div>
+                                  <hr />
+                                </React.Fragment>
+                              </animated.div>
+                            )
+                        )
                       ) : (
-                        <div className="no-chat-selected">
-                          {/* Empty div when no chat is selected */}
-                          {ChatPopUpPage.SELECT_CHAT_LABEL}
-                        </div>
+                        // Render when no chats available
+                        <div>{ChatPopUpPage.NO_CHATS}</div>
                       )}
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* // For tablet and laptop, display chat and messages side by side */}
+              <Container className=" d-none d-lg-block">
+                <Row className="row">
+                  {!chatFromWorkerCard && (
+                    <Col className="col-3 chat-list">
+                      <Row className="chat-preview max-height-chat-users">
+                        {copyOfChats?.length === 0 ? (
+                          <div>{ChatPopUpPage.NO_CHATS}</div>
+                        ) : (
+                          chatTransitions(
+                            (style, item) =>
+                              item && (
+                                <animated.div style={style}>
+                                  <React.Fragment key={item._id}>
+                                    <Row
+                                      className={`d-flex flex-row align-items-center my-2`}
+                                    >
+                                      <Col className="d-flex flex-column w-100">
+                                        {item.users.map((chatUser) => {
+                                          if (
+                                            chatUser &&
+                                            chatUser._id &&
+                                            String(chatUser._id) !==
+                                              String(user._id)
+                                          ) {
+                                            const isBlockedByAdmin =
+                                              chatUser.access === "denied"
+                                                ? true
+                                                : false;
+                                            return (
+                                              <Row
+                                                key={chatUser._id}
+                                                className={`pt-2 d-flex flex-row justify-content-between ${
+                                                  isBlockedByAdmin
+                                                    ? "blocked-user"
+                                                    : ""
+                                                }`}
+                                                onClick={() =>
+                                                  !isBlockedByAdmin &&
+                                                  handleChatSelection(item)
+                                                }
+                                              >
+                                                <Col className="d-flex flex-row">
+                                                <img
+                                                  src={personPNG} // Replace with the actual path
+                                                  alt="Profile"
+                                                  style={{
+                                                    width: "50px",
+                                                    height: "50px",
+                                                    borderRadius: "50%",
+                                                  }}
+                                                />
+                                                <h5 className="align-self-center ms-3">
+                                                  {chatUser.firstName}{" "}
+                                                  {chatUser.lastName}
+                                                </h5>
+                                              </Col>
+                                                {unreadMessages[item._id] > 0 &&
+                                                  item.latestMessage?.sender !==
+                                                    user._id && (
+                                                    <Col className="notification-circle rounded-circle bg-danger text-white">
+                                                      <span className="align-self-center">
+                                                        {
+                                                          unreadMessages[
+                                                            item._id
+                                                          ]
+                                                        }
+                                                      </span>
+                                                    </Col>
+                                                  )}
+                                                {isBlockedByAdmin && (
+                                                  <span className="text-danger">
+                                                    {
+                                                      ChatPopUpPage.BLOCKED_BY_ADMIN
+                                                    }
+                                                  </span>
+                                                )}
+                                              </Row>
+                                            );
+                                          }
+                                          return null;
+                                        })}
+                                      </Col>
+                                    </Row>
+                                    <hr />
+                                  </React.Fragment>
+                                </animated.div>
+                              )
+                          )
+                        )}
+                      </Row>
+                    </Col>
+                  )}
+
+                  <Row className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}>
+                    {selectedChat ? (
+                      <Col  className="selected-chat">
+                        <Col  className="chat-header d-flex flex-row align-items-center">
+                          {!chatFromWorkerCard && (
+                            <Col>
+                              <FiArrowLeft
+                                className="fs-4 me-3 hover-pointer"
+                                onClick={handleBack}
+                              />
+                            </Col>
+                          )}
+                          <Row className="d-flex flex-row justify-content-between w-100">
+                            <Col>
+                              <h5 className="ms-1 mt-2">
+                                {selectedChat.firstName} {selectedChat.lastName}
+                              </h5>
+                            </Col>{" "}
+                            {user.role === "user" ? (
+                              <Col>
+                                {" "}
+                                <Button
+                                  color={ChatPopUpPage.BOOK_BUTTON_COLOR}
+                                  onClick={() => book(selectedChat)}
+                                >
+                                  {ChatPopUpPage.BOOK_BUTTON_LABEL}
+                                </Button>
+                              </Col>
+                            ) : null}
+                          </Row>
+                        </Col>
+                        <Col
+                          className="messages d-flex flex-column  max-height-message"
+                          ref={messagesContainerRef}
+                        >
+                          {renderMessages()}
+                        </Col>
+                        <Form onSubmit={sendMessage} className="message-input">
+                          <FormGroup className="d-flex flex-row w-100">
+                          <Input
+                            type="text"
+                            placeholder="Type a message..."
+                            value={newMessageText}
+                            onChange={handleMessageInputChange}
+                            disabled={loadingSendMessage || isLoading}
+                          />
+                          <Button
+                            disabled={
+                              sendButtonDisabled ||
+                              loadingSendMessage ||
+                              isLoading
+                            }
+                            color={ChatPopUpPage.SEND_BUTTON_COLOR}
+                            outline
+                          >
+                            {loadingSendMessage ? (
+                              <Spinner size="sm" className="p-2" />
+                            ) : (
+                              ChatPopUpPage.SEND_BUTTON_LABEL
+                            )}
+                          </Button>
+                          </FormGroup>
+                        </Form>
+                      </Col>
+                    ) : (
+                      <Col className="no-chat-selected">
+                        {/* Empty div when no chat is selected */}
+                        {ChatPopUpPage.SELECT_CHAT_LABEL}
+                      </Col>
+                    )}
+                  </Row>
+                </Row>
+              </Container>
             </ModalBody>
             <Booking
               modal={modal}
