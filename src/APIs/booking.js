@@ -5,7 +5,7 @@ export const createOrder = async (data) => {
   try {
     const response = await API.post(`order/postanOrder`, data.params, {
       headers: {
-        Authorization: `Bearer ${data.token}`
+        Authorization: `Bearer ${data.token}`, "Content-Type":  "multipart/form-data",
       }
     });
     return response.data;

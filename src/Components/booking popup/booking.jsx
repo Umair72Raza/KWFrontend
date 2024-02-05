@@ -81,11 +81,12 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const handleSend = () => {
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
+    const Users=[user._id, worker._id]
     if (selectedDate > currentDate) {
       const data = {
         Title: taskTitle,
         Status: "Scheduled",
-        users: [user._id, worker._id],
+        users:Users,
         date: datePart,
         time: timePart,
         details: taskDetails.replace(/\n/g, "<br>"),
@@ -95,7 +96,25 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         tasktime: taskTime
         ,images
       };
-      SetParams(data);
+      const formData = new FormData();
+
+    
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        formData.append(key, data[key]);
+      }
+    }
+    
+    
+    images.forEach((image, index) => {
+      formData.append(`images`, image);
+    });
+    Users.forEach((user, index) => {
+      if(user!='/n'){
+      formData.append(`users`, user);}
+    });
+
+    SetParams(formData);
 
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
