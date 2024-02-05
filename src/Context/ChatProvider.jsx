@@ -20,6 +20,11 @@ const ChatProvider = ({ children }) => {
   const [gotOffer, setGotOffer] = useState(false);
   const [userOffering, setUserOffering] = useState([]);
   const [chatFromWorkerCard,setChatFromWorkerCard] = useState(null);
+  const [notificationTimeouts, setNotificationTimeouts] = useState([]);
+
+
+  
+
   return (
     <ChatContext.Provider
       value={{
@@ -54,7 +59,8 @@ const ChatProvider = ({ children }) => {
          setUnreadMessages,
          unreadMessages,
          setChatFromWorkerCard,
-          chatFromWorkerCard
+          chatFromWorkerCard,
+          notificationTimeouts, setNotificationTimeouts
       }}
     >
       {children}

@@ -8,12 +8,15 @@ import {
   Input,
   Label,
   FormGroup,
+  Progress,
+  Col,
 } from "reactstrap";
 import Swal from "sweetalert2";
 import { BookingConstants } from "../../Constants/Constants.js";
 import { useDispatch, useSelector } from "react-redux";
 import { failureToast } from "../../utils.js";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
+import { MdCancelPresentation } from "react-icons/md";
 
 const Booking = ({ modal, toggle, worker, chat }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -31,7 +34,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const [dateTimeError, setDateTimeError] = useState("");
   const [amountError, setAmountError] = useState("");
   let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-  let { SetParams, clear, setClear } = PopUpState()
+  let { SetParam, clear, setClear, SetParams } = PopUpState()
   const [taskTime, setTaskTime] = useState(1)
   const [clicked, setClicked] = useState(true)
   const [imageError, setImageError] = useState("")
@@ -41,13 +44,13 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       taskTitle.trim() !== "" &&
       taskDetails.trim() !== `` &&
       dateTime !== "" &&
-      amountPerHour !== "" &&
-      serviceOption !== "none" && images.length > 0
+      amountPerHour >= 5 && amountPerHour <= 100000 &&
+      serviceOption !== 'none' && images.length > 0 && taskTime >= 1 && taskTime <= 9
     );
-  }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption]);
+  }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption, images, taskTime]);
 
 
-  const handleImageChange = async(e) => {
+  const handleImageChange = async (e) => {
     const selectedImages = Array.from(e.target.files);
     const totalSize = selectedImages.reduce(
       (acc, image) => acc + image.size,
@@ -61,7 +64,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     } else {
       setImages(selectedImages);
       setImageError("");
-      await console.log(images," images")
+      await console.log(images, " images")
     }
   };
 
@@ -81,11 +84,13 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const handleSend = () => {
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
+    const Users = [user._id, worker._id]
+    let status = "Scheduled"
     if (selectedDate > currentDate) {
       const data = {
         Title: taskTitle,
-        Status: "Scheduled",
-        users: [user._id, worker._id],
+        Status: status,
+        users: Users,
         date: datePart,
         time: timePart,
         details: taskDetails.replace(/\n/g, "<br>"),
@@ -95,8 +100,31 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         tasktime: taskTime
         ,images
       };
-      SetParams(data);
+      const formData = new FormData();
 
+
+      for (const key in data) {
+        if (data.hasOwnProperty(key) && key != 'users') {
+          formData.append(key, data[key]);
+        }
+        else {
+          Users.forEach((u, index) => {
+            formData.append(`users`, u);
+          })
+        }
+      }
+
+
+      images.forEach((image, index) => {
+        formData.append(`images`, image);
+      });
+      // Users.forEach((user, index) => {
+      //   if(user!='/n'){
+      //   formData.append(`users`, user);}
+      // });
+
+      SetParam(formData);
+      SetParams(data)
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         if (removedUsers) {
@@ -188,9 +216,11 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     setTaskTitle("");
     setTaskDetails(``);
     setDateTime("");
-    setAmountPerHour("");
-    setServiceOption("none");
+    setAmountPerHour(5);
+    setServiceOption([]);
     setDateTimeError("");
+    setTaskTime(1)
+    setImages([])
     setFormComplete(false);
   };
   const getCurrentDateTime = () => {
@@ -209,9 +239,14 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       setAmountError("");
     } else {
       setAmountError("Enter amount in range 5-100000")
+      //setAmountPerHour()
     }
   };
-
+  const handleDeleteImage = (index) => {
+    const updatedImages = [...images];
+    updatedImages.splice(index, 1);
+    setImages(updatedImages);
+  };
 
   return (
     <div >
@@ -379,11 +414,20 @@ const Booking = ({ modal, toggle, worker, chat }) => {
               <div style={{ color: "red" }}>{imageError}</div>
             )}
             {images.length > 0 && (
-
               <div>
                 <p>Selected Images:</p>
                 {images.map((image, index) => (
-                  <img key={index} src={URL.createObjectURL(image)} alt={`Image ${index}`} className="img-fluid" />
+                  <div key={index} className="d-flex flex-row gap-2 ">
+                     
+                     <Progress value={100} max={100} className="w-50 mb-2">{image.name} </Progress>
+                      {/* <Button
+                        type="button"
+                        className="px-0 pt"
+                        onClick={() => handleDeleteImage(index)}> */}
+                        <MdCancelPresentation  onClick={() => handleDeleteImage(index) } text='dark'> </MdCancelPresentation>
+                      {/* </Button> */}
+                    
+                  </div>
                 ))}
               </div>
             )}

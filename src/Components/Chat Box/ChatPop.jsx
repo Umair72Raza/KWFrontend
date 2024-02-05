@@ -1,7 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
+import { FaCamera } from "react-icons/fa";
 import { useDispatch } from "react-redux";
-import { Button, Modal, ModalHeader, ModalBody, Spinner, Row, Col, Container, FormGroup, Form, Input } from "reactstrap";
+import {
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  Spinner,
+  Row,
+  Col,
+  Container,
+  FormGroup,
+  Form,
+  Input,
+} from "reactstrap";
 import {
   SendMessageAsync,
   ToggleChatSeen,
@@ -55,6 +68,8 @@ const ChatPopup = () => {
   const [isLoading, setLoading] = useState(true);
   const [loadingSendMessage, setLoadingSendMessage] = useState(false);
   const [chatAndUserId, setChatAndUserId] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [pictureError, setPictureError] = useState("");
 
   const chatTransitions = useTransition(copyOfChats, {
     from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
@@ -277,7 +292,7 @@ const ChatPopup = () => {
 
           setNewMessageText("");
           if (!chat._id) {
-            const updatedOriginalChats = [chat, ...originalChats];
+            const updatedOriginalChats = [chat, ...OriginalChats];
             setOriginalChats(updatedOriginalChats);
             setCopyOfChats(updatedOriginalChats);
             setSelectedChat(chat);
@@ -330,6 +345,33 @@ const ChatPopup = () => {
         ...prevCount,
         [chat._id]: 0,
       }));
+    }
+  };
+
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    let errorMessage = "";
+
+    // Check if more than 5 files are selected
+    if (files.length > 5) {
+      errorMessage = "Please select up to 5 files only.";
+    } else {
+      // Check each file's size
+      files.forEach((file) => {
+        if (file.size > 5 * 1024 * 1024) {
+          // 5 MB limit
+          errorMessage = "File size exceeds the limit of 5 MB.";
+        }
+      });
+    }
+
+    if (errorMessage) {
+      setSendButtonDisabled(true);
+      setPictureError(errorMessage);
+      setTimeout(() => setPictureError(''), 5000);
+      event.target.value = null; // Reset file input
+    } else {
+      setSelectedFiles(files);
     }
   };
 
@@ -495,102 +537,135 @@ const ChatPopup = () => {
             >
               <h5 className="ms-3 fw-bold">{ChatPopUpPage.CHAT_TITLE}</h5>
             </ModalHeader>
-            <ModalBody className="" style={{ overflowY: "auto" }}>
+            <ModalBody
+              className=""
+              style={{ overflowY: "auto", height: "500px" }}
+            >
               {/* // For mobile devices, display only chats initially */}
-              <div className="container-fluid d-lg-none d-block">
-                <div className="row">
-                  <div className="col-12">
-                    <div className="chat-preview overflow-y-auto max-height-chat-users">
+              <Container className=" d-xl-none d-block">
+                <Row>
+                  <Col className="col-12">
+                    <Row className="chat-preview overflow-y-auto  p-0">
                       {selectedChat ? (
                         // Display messages if a chat is selected
-                        <div className="selected-chat">
-                          <div className="chat-header d-flex flex-row align-items-center">
+                        <Col className="selected-chat">
+                          <Col className="chat-header d-flex flex-row align-items-center">
                             {!chatFromWorkerCard && (
-                              <div>
+                              <Col>
                                 <FiArrowLeft
                                   className="fs-4 me-3 hover-pointer"
                                   onClick={handleBack}
                                 />
-                              </div>
+                              </Col>
                             )}
-                            <div className="d-flex flex-row justify-content-between w-100">
-                              <div>
-                                <h5 className="ms-1 mt-2">
+                            <Row className=" w-100">
+                              <Col className="d-flex flex-row">
+                                <img
+                                  src={
+                                    selectedChat?.profilePicture
+                                      ? `${
+                                          import.meta.env
+                                            .VITE_LOCAL_BACKEND_ENDPOINT
+                                        }${selectedChat?.profilePicture}`
+                                      : personPNG
+                                  }
+                                  alt="Profile"
+                                  style={{
+                                    width: "50px",
+                                    height: "50px",
+                                    borderRadius: "50%",
+                                  }}
+                                />
+
+                                <h5 className="ms-3 mt-2">
                                   {selectedChat.firstName}{" "}
                                   {selectedChat.lastName}
                                 </h5>
-                              </div>{" "}
+                              </Col>{" "}
                               {user.role === "user" ? (
-                                <div>
+                                <Col className="d-flex justify-content-end">
                                   {" "}
                                   <Button
+                                    style={{ height: "45px", width: "60px" }}
+                                    className="align-self-center"
                                     color={ChatPopUpPage.BOOK_BUTTON_COLOR}
                                     onClick={() => book(selectedChat)}
                                   >
                                     {ChatPopUpPage.BOOK_BUTTON_LABEL}
                                   </Button>
-                                </div>
+                                </Col>
                               ) : null}
-                            </div>
-                          </div>
-                          <div
+                            </Row>
+                          </Col>
+                          <Col
                             className="messages d-flex flex-column overflow-y-auto max-height-message"
                             ref={messagesContainerRef}
                           >
                             {renderMessages()}
-                          </div>
-                          <form
+                          </Col>
+                          <Form
                             onSubmit={sendMessage}
                             className="message-input"
                           >
-                            <input
-                              type="text"
-                              placeholder="Type a message..."
-                              value={newMessageText}
-                              onChange={handleMessageInputChange}
-                              disabled={loadingSendMessage || isLoading}
-                            />
-                            <Button
-                              disabled={
-                                sendButtonDisabled ||
-                                loadingSendMessage ||
-                                isLoading
-                              }
-                              color={ChatPopUpPage.SEND_BUTTON_COLOR}
-                              outline
-                            >
-                              {loadingSendMessage ? (
-                                <Spinner size="sm" className="p-2" />
-                              ) : (
-                                ChatPopUpPage.SEND_BUTTON_LABEL
-                              )}
-                            </Button>
-                          </form>
-                        </div>
+                            <FormGroup className="d-flex flex-row w-100">
+                              <div className="position-relative w-100">
+                                {" "}
+                                {/* Wrap input and icon */}
+                                <Input
+                                  type="text"
+                                  placeholder="Type a message..."
+                                  value={newMessageText}
+                                  onChange={handleMessageInputChange}
+                                  disabled={loadingSendMessage || isLoading}
+                                />
+                                <FaCamera className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2" />{" "}
+                                {/* Use position-absolute and position classes to position the icon */}
+                              </div>
+                              <Button
+                                className="ms-3"
+                                disabled={
+                                  sendButtonDisabled ||
+                                  loadingSendMessage ||
+                                  isLoading
+                                }
+                                color={ChatPopUpPage.SEND_BUTTON_COLOR}
+                                outline
+                              >
+                                {loadingSendMessage ? (
+                                  <Spinner size="sm" className="p-2" />
+                                ) : (
+                                  ChatPopUpPage.SEND_BUTTON_LABEL
+                                )}
+                              </Button>
+                            </FormGroup>
+                          </Form>
+                        </Col>
                       ) : copyOfChats?.length > 0 ? (
                         chatTransitions(
                           (style, item) =>
                             item && (
-                              <animated.div style={style}>
+                              <animated.div
+                                style={{ ...style, marginBottom: "0px" }}
+                              >
                                 <React.Fragment key={item._id}>
-                                  <div
+                                  <Row
                                     className={`d-flex flex-row align-items-center my-2`}
                                   >
-                                    <div className="d-flex flex-column w-100">
+                                    <Col className="d-flex flex-column w-100">
                                       {item.users.map((chatUser) => {
                                         if (
                                           chatUser &&
-                                          chatUser._id &&
-                                          String(chatUser._id) !==
-                                            String(user._id)
+                                          chatUser?._id &&
+                                          String(chatUser?._id) !==
+                                            String(user?._id)
                                         ) {
                                           const isBlockedByAdmin =
-                                            chatUser.access === "denied"
+                                            chatUser?.access === "denied"
                                               ? true
                                               : false;
                                           return (
                                             <Row
-                                              key={chatUser._id}
+                                              key={chatUser?._id}
                                               className={`pt-2 d-flex flex-row justify-content-between ${
                                                 isBlockedByAdmin
                                                   ? "blocked-user"
@@ -603,7 +678,16 @@ const ChatPopup = () => {
                                             >
                                               <Col className="d-flex flex-row">
                                                 <img
-                                                  src={personPNG} // Replace with the actual path
+                                                  src={
+                                                    chatUser?.profilePicture
+                                                      ? `${
+                                                          import.meta.env
+                                                            .VITE_LOCAL_BACKEND_ENDPOINT
+                                                        }${
+                                                          chatUser?.profilePicture
+                                                        }`
+                                                      : personPNG
+                                                  }
                                                   alt="Profile"
                                                   style={{
                                                     width: "50px",
@@ -637,8 +721,8 @@ const ChatPopup = () => {
                                         }
                                         return null;
                                       })}
-                                    </div>
-                                  </div>
+                                    </Col>
+                                  </Row>
                                   <hr />
                                 </React.Fragment>
                               </animated.div>
@@ -648,56 +732,66 @@ const ChatPopup = () => {
                         // Render when no chats available
                         <div>{ChatPopUpPage.NO_CHATS}</div>
                       )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </Row>
+                  </Col>
+                </Row>
+              </Container>
 
               {/* // For tablet and laptop, display chat and messages side by side */}
-              <Container className=" d-none d-lg-block">
-                <Row className="row">
+              <Container className=" d-none d-xl-block">
+                <Row>
                   {!chatFromWorkerCard && (
-                    <Col className="col-3 chat-list">
-                      <Row className="chat-preview max-height-chat-users">
-                        {copyOfChats?.length === 0 ? (
-                          <div>{ChatPopUpPage.NO_CHATS}</div>
-                        ) : (
-                          chatTransitions(
-                            (style, item) =>
-                              item && (
-                                <animated.div style={style}>
-                                  <React.Fragment key={item._id}>
-                                    <Row
-                                      className={`d-flex flex-row align-items-center my-2`}
-                                    >
-                                      <Col className="d-flex flex-column w-100">
-                                        {item.users.map((chatUser) => {
-                                          if (
-                                            chatUser &&
-                                            chatUser._id &&
-                                            String(chatUser._id) !==
-                                              String(user._id)
-                                          ) {
-                                            const isBlockedByAdmin =
-                                              chatUser.access === "denied"
-                                                ? true
-                                                : false;
-                                            return (
-                                              <Row
-                                                key={chatUser._id}
-                                                className={`pt-2 d-flex flex-row justify-content-between ${
-                                                  isBlockedByAdmin
-                                                    ? "blocked-user"
-                                                    : ""
-                                                }`}
-                                                onClick={() =>
-                                                  !isBlockedByAdmin &&
-                                                  handleChatSelection(item)
-                                                }
-                                              >
-                                                <Col className="d-flex flex-row">
+                    <Col className=" chat-list overflow-y-auto">
+                      {copyOfChats?.length === 0 ? (
+                        <div>{ChatPopUpPage.NO_CHATS}</div>
+                      ) : (
+                        chatTransitions(
+                          (style, item) =>
+                            item && (
+                              <animated.div
+                                style={{ ...style, height: "auto" }}
+                              >
+                                <React.Fragment key={item._id}>
+                                  <Row
+                                    className={`d-flex flex-row align-items-center my-2`}
+                                  >
+                                    <Col className="d-flex flex-column w-100">
+                                      {item.users.map((chatUser) => {
+                                        if (
+                                          chatUser &&
+                                          chatUser?._id &&
+                                          String(chatUser?._id) !==
+                                            String(user?._id)
+                                        ) {
+                                          const isBlockedByAdmin =
+                                            chatUser?.access === "denied"
+                                              ? true
+                                              : false;
+                                          return (
+                                            <Row
+                                              key={chatUser?._id}
+                                              className={`pt-2 d-flex flex-row justify-content-between ${
+                                                isBlockedByAdmin
+                                                  ? "blocked-user"
+                                                  : ""
+                                              }`}
+                                              onClick={() =>
+                                                !isBlockedByAdmin &&
+                                                handleChatSelection(item)
+                                              }
+                                            >
+                                              <Col className="d-flex flex-row">
                                                 <img
-                                                  src={personPNG} // Replace with the actual path
+                                                  src={
+                                                    chatUser?.profilePicture
+                                                      ? `${
+                                                          import.meta.env
+                                                            .VITE_LOCAL_BACKEND_ENDPOINT
+                                                        }${
+                                                          chatUser?.profilePicture
+                                                        }`
+                                                      : personPNG
+                                                  }
                                                   alt="Profile"
                                                   style={{
                                                     width: "50px",
@@ -710,47 +804,42 @@ const ChatPopup = () => {
                                                   {chatUser.lastName}
                                                 </h5>
                                               </Col>
-                                                {unreadMessages[item._id] > 0 &&
-                                                  item.latestMessage?.sender !==
-                                                    user._id && (
-                                                    <Col className="notification-circle rounded-circle bg-danger text-white">
-                                                      <span className="align-self-center">
-                                                        {
-                                                          unreadMessages[
-                                                            item._id
-                                                          ]
-                                                        }
-                                                      </span>
-                                                    </Col>
-                                                  )}
-                                                {isBlockedByAdmin && (
-                                                  <span className="text-danger">
-                                                    {
-                                                      ChatPopUpPage.BLOCKED_BY_ADMIN
-                                                    }
-                                                  </span>
+                                              {unreadMessages[item._id] > 0 &&
+                                                item.latestMessage?.sender !==
+                                                  user._id && (
+                                                  <Col className="notification-circle rounded-circle bg-danger text-white">
+                                                    <span className="align-self-center">
+                                                      {unreadMessages[item._id]}
+                                                    </span>
+                                                  </Col>
                                                 )}
-                                              </Row>
-                                            );
-                                          }
-                                          return null;
-                                        })}
-                                      </Col>
-                                    </Row>
-                                    <hr />
-                                  </React.Fragment>
-                                </animated.div>
-                              )
-                          )
-                        )}
-                      </Row>
+                                              {isBlockedByAdmin && (
+                                                <span className="text-danger">
+                                                  {
+                                                    ChatPopUpPage.BLOCKED_BY_ADMIN
+                                                  }
+                                                </span>
+                                              )}
+                                            </Row>
+                                          );
+                                        }
+                                        return null;
+                                      })}
+                                    </Col>
+                                  </Row>
+                                  <hr />
+                                </React.Fragment>
+                              </animated.div>
+                            )
+                        )
+                      )}
                     </Col>
                   )}
 
                   <Row className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}>
                     {selectedChat ? (
-                      <Col  className="selected-chat">
-                        <Col  className="chat-header d-flex flex-row align-items-center">
+                      <Col className="selected-chat">
+                        <Col className="chat-header d-flex flex-row align-items-center">
                           {!chatFromWorkerCard && (
                             <Col>
                               <FiArrowLeft
@@ -759,16 +848,34 @@ const ChatPopup = () => {
                               />
                             </Col>
                           )}
-                          <Row className="d-flex flex-row justify-content-between w-100">
-                            <Col>
-                              <h5 className="ms-1 mt-2">
+                          <Row className="w-100">
+                            <Col className="d-flex flex-row">
+                              <img
+                                src={
+                                  selectedChat?.profilePicture
+                                    ? `${
+                                        import.meta.env
+                                          .VITE_LOCAL_BACKEND_ENDPOINT
+                                      }${selectedChat?.profilePicture}`
+                                    : personPNG
+                                }
+                                alt="Profile"
+                                style={{
+                                  width: "50px",
+                                  height: "50px",
+                                  borderRadius: "50%",
+                                }}
+                              />
+                              <h5 className="ms-3 mt-2">
                                 {selectedChat.firstName} {selectedChat.lastName}
                               </h5>
                             </Col>{" "}
                             {user.role === "user" ? (
-                              <Col>
+                              <Col className="d-flex justify-content-end">
                                 {" "}
                                 <Button
+                                  style={{ height: "45px", width: "60px" }}
+                                  className="align-self-center"
                                   color={ChatPopUpPage.BOOK_BUTTON_COLOR}
                                   onClick={() => book(selectedChat)}
                                 >
@@ -784,35 +891,63 @@ const ChatPopup = () => {
                         >
                           {renderMessages()}
                         </Col>
-                        <Form onSubmit={sendMessage} className="message-input">
+                        <Form
+                          onSubmit={sendMessage}
+                          className="message-input d-flex flex-column "
+                        >
                           <FormGroup className="d-flex flex-row w-100">
-                          <Input
-                            type="text"
-                            placeholder="Type a message..."
-                            value={newMessageText}
-                            onChange={handleMessageInputChange}
-                            disabled={loadingSendMessage || isLoading}
-                          />
-                          <Button
-                            disabled={
-                              sendButtonDisabled ||
-                              loadingSendMessage ||
-                              isLoading
-                            }
-                            color={ChatPopUpPage.SEND_BUTTON_COLOR}
-                            outline
-                          >
-                            {loadingSendMessage ? (
-                              <Spinner size="sm" className="p-2" />
-                            ) : (
-                              ChatPopUpPage.SEND_BUTTON_LABEL
-                            )}
-                          </Button>
+                            <div className="position-relative w-100">
+                              {" "}
+                              {/* Wrap input and icon */}
+                              <Input
+                                type="text"
+                                placeholder="Type a message..."
+                                value={newMessageText}
+                                onChange={handleMessageInputChange}
+                                disabled={loadingSendMessage || isLoading}
+                              />
+                              <Input
+                                id="fileInput"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                style={{ display: "none" }}
+                                multiple={selectedFiles.length < 5}
+                              />
+                              <FaCamera
+                                className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2 hover-pointer"
+                                onClick={() =>
+                                  document.getElementById("fileInput").click()
+                                }
+                              />{" "}
+                              {/* Use position-absolute and position classes to position the icon */}
+                            </div>
+                            <Button
+                              className="ms-2"
+                              disabled={
+                                sendButtonDisabled ||
+                                loadingSendMessage ||
+                                isLoading
+                              }
+                              color={ChatPopUpPage.SEND_BUTTON_COLOR}
+                              outline
+                            >
+                              {loadingSendMessage ? (
+                                <Spinner size="sm" className="p-2" />
+                              ) : (
+                                ChatPopUpPage.SEND_BUTTON_LABEL
+                              )}
+                            </Button>
                           </FormGroup>
+                          {pictureError && (
+                            <span className={`position-absolute pictureError bg-danger text-white px-2 py-1 rounded ${pictureError ? 'active' : ''}`}>
+                           {pictureError}
+                            </span>
+                          )}
                         </Form>
                       </Col>
                     ) : (
-                      <Col className="no-chat-selected">
+                      <Col>
                         {/* Empty div when no chat is selected */}
                         {ChatPopUpPage.SELECT_CHAT_LABEL}
                       </Col>

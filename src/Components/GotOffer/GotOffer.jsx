@@ -168,8 +168,10 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
           <p>
             <strong>Task Pictures</strong>
           </p>
-          <Row className="">
-            <Col>
+          <Row className="" >
+            
+           <Col>
+              { imageDataURL?.length>2 ? 
               <Slider {...settings} className=" m-5">
                 {imageDataURL?.map((image, index) => (
                   <div className="" key={index}>
@@ -180,8 +182,20 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
                     />
                   </div>
                 ))}
-              </Slider>
-            </Col>
+              </Slider> : 
+               <><div className="d-flex">
+                {imageDataURL?.map((image, index) => (
+                <div className="border" key={index}>
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt={`Modal Image ${index}`}
+                    className="img-fluid thumbnail"
+                  />
+                </div>
+              ))}
+              </div></>} 
+              </Col>
+          
           </Row>
         </ModalBody>
         <ModalFooter>
