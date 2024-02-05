@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
 import { FaCamera } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import {
@@ -29,6 +30,7 @@ import { useTransition, animated } from "@react-spring/web";
 import personPNG from "../../assets/images/dummyProfile/user.png";
 import { is } from "@react-spring/shared";
 import { set } from "lodash";
+import MessageImagesCarousel from "../MessageImageCarsousel/MessageImagesCarousel";
 
 const ChatPopup = () => {
   let {
@@ -59,8 +61,9 @@ const ChatPopup = () => {
 
   const { user, token } = useSelector((state) => state.auth);
   const socket = useSelector((state) => state?.socket?.socket);
+  const messagesContainerRefLaptop = useRef(null);
+  const messagesContainerRefTabletAndMobile = useRef(null);
 
-  const messagesContainerRef = useRef(null);
   const dispatch = useDispatch();
   const [modal, setModal] = useState(false);
   const [worker, SetWorker] = useState({});
@@ -70,6 +73,13 @@ const ChatPopup = () => {
   const [chatAndUserId, setChatAndUserId] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [pictureError, setPictureError] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [images, setImages] = useState([]);
+
+  const toggleCarousel = (images) => {
+    setImages(images);
+    setIsOpen(!isOpen);
+  };
 
   const chatTransitions = useTransition(copyOfChats, {
     from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
@@ -275,22 +285,25 @@ const ChatPopup = () => {
     // Add loading state until the message is sent
     setLoadingSendMessage(true);
     setSendButtonDisabled(true);
-
+    // Create a new FormData object to send data to the server
+    const formData = new FormData();
     try {
-      if (newMessageText) {
-        const messageData = {
-          receiverId: selectedChat._id,
-          text: newMessageText.trimStart().trimEnd(),
-          initiatorId: user._id,
-          token,
-        };
-
-        const result = await dispatch(SendMessageAsync(messageData));
+      if (newMessageText || selectedFiles.length > 0) {
+        formData.append("receiverId", selectedChat._id);
+        formData.append("text", newMessageText.trimStart().trimEnd());
+        formData.append("initiatorId", user._id);
+        formData.append("token", token); // Include the token
+        selectedFiles.forEach((image, index) => {
+          formData.append(`images`, image);
+        });
+        const result = await dispatch(SendMessageAsync(formData));
 
         if (result.type === "Chat/SendMessage/fulfilled") {
           const { chat, message: newMessage } = result.payload;
 
           setNewMessageText("");
+          setSelectedFiles([]);
+          document.getElementById("fileInput").value = null;
           if (!chat._id) {
             const updatedOriginalChats = [chat, ...OriginalChats];
             setOriginalChats(updatedOriginalChats);
@@ -332,6 +345,8 @@ const ChatPopup = () => {
     };
 
     setNewMessageText("");
+    setSelectedFiles([]);
+    // document.getElementById("fileInput").value = "";
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
@@ -350,29 +365,52 @@ const ChatPopup = () => {
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
-    let errorMessage = "";
-
-    // Check if more than 5 files are selected
-    if (files.length > 5) {
-      errorMessage = "Please select up to 5 files only.";
-    } else {
-      // Check each file's size
-      files.forEach((file) => {
-        if (file.size > 5 * 1024 * 1024) {
-          // 5 MB limit
-          errorMessage = "File size exceeds the limit of 5 MB.";
-        }
-      });
-    }
+    const errorMessage = validateFiles(files);
 
     if (errorMessage) {
-      setSendButtonDisabled(true);
-      setPictureError(errorMessage);
-      setTimeout(() => setPictureError(''), 5000);
-      event.target.value = null; // Reset file input
+      handleFileError(errorMessage, event.target);
     } else {
-      setSelectedFiles(files);
+      setSelectedFiles((prevSelectedFiles) => [...prevSelectedFiles, ...files]);
     }
+  };
+
+  const validateFiles = (files) => {
+    if (files.length > 5) {
+      return "Please select up to 5 files only.";
+    }
+
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) {
+        return "File size exceeds the limit of 5 MB.";
+      }
+      if (selectedFiles.some((selectedFile) => selectedFile === file)) {
+        return "File already selected.";
+      }
+    }
+
+    return "";
+  };
+
+  const handleFileError = (errorMessage, inputElement) => {
+    setSendButtonDisabled(true);
+    setPictureError(errorMessage);
+    setTimeout(() => setPictureError(""), 5000);
+    inputElement.value = null;
+  };
+
+  useEffect(() => {
+    console.log(selectedFiles, "selectedFiles");
+  }, [selectedFiles]);
+
+  const handleRemovePicture = (indexToRemove) => {
+    setSelectedFiles((prevFiles) => {
+      const updatedFiles = prevFiles.filter(
+        (_, index) => index !== indexToRemove
+      );
+      // Clear the input value
+      document.getElementById("fileInput").value = null;
+      return updatedFiles;
+    });
   };
 
   const handleBack = () => {
@@ -385,6 +423,8 @@ const ChatPopup = () => {
     setSelectedChat(null);
     setChat(null);
     setNewMessageText("");
+    setSelectedFiles([]);
+    document.getElementById("fileInput").value = "";
   };
 
   const Toggler = () => {
@@ -399,37 +439,30 @@ const ChatPopup = () => {
     setSelectedChat(null);
     setChat(null);
     setNewMessageText("");
+    setSelectedFiles([]);
+    document.getElementById("fileInput").value = null;
   };
 
-  // const Toggler = () => {
-  //   setShowModal(!showModal);
-  //   setChatFromWorkerCard(false);
-  //   document.body.style.overflow = showModal ? "hidden" : "auto";
-  //   const updatedChats = copyOfChats.filter(
-  //     (chat) => chat.chatName !== "fakeChat"
-  //   );
-  //   setCopyOfChats(updatedChats);
-  //   setOriginalChats(updatedChats);
-  //   setSelectedChatCompare(null);
-  //   setSelectedChat(null);
-  //   setChat(null);
-  //   setNewMessageText("");
-  // };
-
   const scrollToBottom = () => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
+    if (messagesContainerRefTabletAndMobile.current) {
+      const messagesContainer = messagesContainerRefTabletAndMobile.current;
+      const lastMessage = messagesContainer.lastElementChild;
+      if (lastMessage) {
+        lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
+    }
+    if (messagesContainerRefLaptop.current) {
+      const messagesContainer = messagesContainerRefLaptop.current;
+      const lastMessage = messagesContainer.lastElementChild;
+      if (lastMessage) {
+        lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
     }
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, []);
-
-  useEffect(() => {
     scrollToBottom(); // Scroll to bottom when messages change
-  }, [messages]);
+  }, [messages, selectedChat]);
 
   const formatTime = (timestamp) => {
     const messageDate = new Date(timestamp);
@@ -500,8 +533,42 @@ const ChatPopup = () => {
                 wordWrap: "break-word",
                 maxWidth: "100%",
               }}
+              onClick={() => toggleCarousel(message.images)}
             >
-              {message.content}
+              {message?.images?.length === 1 ? (
+                <img
+                  src={`${import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT}${
+                    message.images[0]
+                  }`}
+                  alt={`Image 0`}
+                  className="message-image"
+                />
+              ) : (
+                <div
+                  className={
+                    message?.images?.length > 2
+                      ? "image-grid hover-pointer"
+                      : "message-images"
+                  }
+                >
+                  {message?.images?.slice(0, 2)?.map((image, index) => (
+                    <img
+                      key={index}
+                      src={`${
+                        import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT
+                      }${image}`}
+                      alt={`Image ${index}`}
+                      className="message-image"
+                    />
+                  ))}
+                  {message?.images?.length > 2 && (
+                    <div className="more-images">
+                      +{message?.images?.length - 2} more
+                    </div>
+                  )}
+                </div>
+              )}
+              {message?.content}
             </div>
             <div
               className={
@@ -537,15 +604,12 @@ const ChatPopup = () => {
             >
               <h5 className="ms-3 fw-bold">{ChatPopUpPage.CHAT_TITLE}</h5>
             </ModalHeader>
-            <ModalBody
-              className=""
-              style={{ overflowY: "auto", height: "500px" }}
-            >
+            <ModalBody style={{ height: "500px" }}>
               {/* // For mobile devices, display only chats initially */}
               <Container className=" d-xl-none d-block">
                 <Row>
                   <Col className="col-12">
-                    <Row className="chat-preview overflow-y-auto  p-0">
+                    <Row className=" p-0">
                       {selectedChat ? (
                         // Display messages if a chat is selected
                         <Col className="selected-chat">
@@ -597,15 +661,17 @@ const ChatPopup = () => {
                               ) : null}
                             </Row>
                           </Col>
-                          <Col
-                            className="messages d-flex flex-column overflow-y-auto max-height-message"
-                            ref={messagesContainerRef}
+                          <div
+                            className=" max-height-message messages d-flex flex-column h-100 "
+                            ref={messagesContainerRefTabletAndMobile}
                           >
+                            {" "}
                             {renderMessages()}
-                          </Col>
+                          </div>
+
                           <Form
                             onSubmit={sendMessage}
-                            className="message-input"
+                            className="message-input d-flex flex-column "
                           >
                             <FormGroup className="d-flex flex-row w-100">
                               <div className="position-relative w-100">
@@ -618,11 +684,24 @@ const ChatPopup = () => {
                                   onChange={handleMessageInputChange}
                                   disabled={loadingSendMessage || isLoading}
                                 />
-                                <FaCamera className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2" />{" "}
+                                <Input
+                                  id="fileInput"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleFileChange}
+                                  style={{ display: "none" }}
+                                  multiple={selectedFiles.length <= 5}
+                                />
+                                <FaCamera
+                                  className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2 hover-pointer"
+                                  onClick={() =>
+                                    document.getElementById("fileInput").click()
+                                  }
+                                />{" "}
                                 {/* Use position-absolute and position classes to position the icon */}
                               </div>
                               <Button
-                                className="ms-3"
+                                className="ms-2"
                                 disabled={
                                   sendButtonDisabled ||
                                   loadingSendMessage ||
@@ -638,6 +717,46 @@ const ChatPopup = () => {
                                 )}
                               </Button>
                             </FormGroup>
+                            {!loadingSendMessage &&
+                              selectedFiles &&
+                              selectedFiles.length > 0 && (
+                                <div className="z-3 position-absolute imagesDiv ">
+                                  {/* Display previously selected pictures */}
+                                  {selectedFiles.map((file, index) => (
+                                    <div
+                                      key={index}
+                                      className="position-relative d-flex align-items-start "
+                                    >
+                                      <img
+                                        src={URL.createObjectURL(file)}
+                                        alt="file"
+                                        style={{
+                                          width: "100px",
+                                          height: "100px",
+                                        }}
+                                      />
+                                      {/* Close button for each picture */}
+                                      <div
+                                        className="closeButtonForPictureInchat hover-pointer"
+                                        onClick={() =>
+                                          handleRemovePicture(index)
+                                        }
+                                      >
+                                        <IoClose />
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            {pictureError && (
+                              <span
+                                className={`position-absolute pictureError bg-danger translate-middle-x text-white px-2 py-1 rounded ${
+                                  pictureError ? "active" : ""
+                                }`}
+                              >
+                                {pictureError}
+                              </span>
+                            )}
                           </Form>
                         </Col>
                       ) : copyOfChats?.length > 0 ? (
@@ -837,125 +956,176 @@ const ChatPopup = () => {
                   )}
 
                   <Row className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}>
-                    {selectedChat ? (
-                      <Col className="selected-chat">
-                        <Col className="chat-header d-flex flex-row align-items-center">
-                          {!chatFromWorkerCard && (
-                            <Col>
-                              <FiArrowLeft
-                                className="fs-4 me-3 hover-pointer"
-                                onClick={handleBack}
-                              />
-                            </Col>
-                          )}
-                          <Row className="w-100">
-                            <Col className="d-flex flex-row">
-                              <img
-                                src={
-                                  selectedChat?.profilePicture
-                                    ? `${
-                                        import.meta.env
-                                          .VITE_LOCAL_BACKEND_ENDPOINT
-                                      }${selectedChat?.profilePicture}`
-                                    : personPNG
-                                }
-                                alt="Profile"
-                                style={{
-                                  width: "50px",
-                                  height: "50px",
-                                  borderRadius: "50%",
-                                }}
-                              />
-                              <h5 className="ms-3 mt-2">
-                                {selectedChat.firstName} {selectedChat.lastName}
-                              </h5>
-                            </Col>{" "}
-                            {user.role === "user" ? (
-                              <Col className="d-flex justify-content-end">
-                                {" "}
-                                <Button
-                                  style={{ height: "45px", width: "60px" }}
-                                  className="align-self-center"
-                                  color={ChatPopUpPage.BOOK_BUTTON_COLOR}
-                                  onClick={() => book(selectedChat)}
-                                >
-                                  {ChatPopUpPage.BOOK_BUTTON_LABEL}
-                                </Button>
-                              </Col>
-                            ) : null}
-                          </Row>
-                        </Col>
-                        <Col
-                          className="messages d-flex flex-column  max-height-message"
-                          ref={messagesContainerRef}
-                        >
-                          {renderMessages()}
-                        </Col>
-                        <Form
-                          onSubmit={sendMessage}
-                          className="message-input d-flex flex-column "
-                        >
-                          <FormGroup className="d-flex flex-row w-100">
-                            <div className="position-relative w-100">
-                              {" "}
-                              {/* Wrap input and icon */}
-                              <Input
-                                type="text"
-                                placeholder="Type a message..."
-                                value={newMessageText}
-                                onChange={handleMessageInputChange}
-                                disabled={loadingSendMessage || isLoading}
-                              />
-                              <Input
-                                id="fileInput"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                style={{ display: "none" }}
-                                multiple={selectedFiles.length < 5}
-                              />
-                              <FaCamera
-                                className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2 hover-pointer"
-                                onClick={() =>
-                                  document.getElementById("fileInput").click()
-                                }
-                              />{" "}
-                              {/* Use position-absolute and position classes to position the icon */}
-                            </div>
-                            <Button
-                              className="ms-2"
-                              disabled={
-                                sendButtonDisabled ||
-                                loadingSendMessage ||
-                                isLoading
-                              }
-                              color={ChatPopUpPage.SEND_BUTTON_COLOR}
-                              outline
-                            >
-                              {loadingSendMessage ? (
-                                <Spinner size="sm" className="p-2" />
-                              ) : (
-                                ChatPopUpPage.SEND_BUTTON_LABEL
-                              )}
-                            </Button>
-                          </FormGroup>
-                          {pictureError && (
-                            <span className={`position-absolute pictureError bg-danger text-white px-2 py-1 rounded ${pictureError ? 'active' : ''}`}>
-                           {pictureError}
-                            </span>
-                          )}
-                        </Form>
-                      </Col>
+                    {isOpen ? (
+                      <MessageImagesCarousel
+                        images={images}
+                        isOpen={isOpen}
+                        toggle={toggleCarousel}
+                      />
                     ) : (
-                      <Col>
-                        {/* Empty div when no chat is selected */}
-                        {ChatPopUpPage.SELECT_CHAT_LABEL}
-                      </Col>
+                      <>
+                        {" "}
+                        {selectedChat ? (
+                          <Col className="selected-chat">
+                            <Col className="chat-header d-flex flex-row align-items-center">
+                              {!chatFromWorkerCard && (
+                                <Col>
+                                  <FiArrowLeft
+                                    className="fs-4 me-3 hover-pointer"
+                                    onClick={handleBack}
+                                  />
+                                </Col>
+                              )}
+                              <Row className="w-100">
+                                <Col className="d-flex flex-row">
+                                  <img
+                                    src={
+                                      selectedChat?.profilePicture
+                                        ? `${
+                                            import.meta.env
+                                              .VITE_LOCAL_BACKEND_ENDPOINT
+                                          }${selectedChat?.profilePicture}`
+                                        : personPNG
+                                    }
+                                    alt="Profile"
+                                    style={{
+                                      width: "50px",
+                                      height: "50px",
+                                      borderRadius: "50%",
+                                    }}
+                                  />
+                                  <h5 className="ms-3 mt-2">
+                                    {selectedChat.firstName}{" "}
+                                    {selectedChat.lastName}
+                                  </h5>
+                                </Col>{" "}
+                                {user.role === "user" ? (
+                                  <Col className="d-flex justify-content-end">
+                                    {" "}
+                                    <Button
+                                      style={{ height: "45px", width: "60px" }}
+                                      className="align-self-center"
+                                      color={ChatPopUpPage.BOOK_BUTTON_COLOR}
+                                      onClick={() => book(selectedChat)}
+                                    >
+                                      {ChatPopUpPage.BOOK_BUTTON_LABEL}
+                                    </Button>
+                                  </Col>
+                                ) : null}
+                              </Row>
+                            </Col>
+
+                            <div
+                              className="messages d-flex flex-column h-100 max-height-message "
+                              ref={messagesContainerRefLaptop}
+                            >
+                              {" "}
+                              {renderMessages()}
+                            </div>
+
+                            <Form
+                              onSubmit={sendMessage}
+                              className="message-input d-flex flex-column "
+                            >
+                              <FormGroup className="d-flex flex-row w-100">
+                                <div className="position-relative w-100">
+                                  {" "}
+                                  {/* Wrap input and icon */}
+                                  <Input
+                                    type="text"
+                                    placeholder="Type a message..."
+                                    value={newMessageText}
+                                    onChange={handleMessageInputChange}
+                                    disabled={loadingSendMessage || isLoading}
+                                  />
+                                  <Input
+                                    id="fileInput"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    style={{ display: "none" }}
+                                    multiple={selectedFiles.length < 5}
+                                  />
+                                  <FaCamera
+                                    className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2 hover-pointer"
+                                    onClick={() =>
+                                      document
+                                        .getElementById("fileInput")
+                                        .click()
+                                    }
+                                  />{" "}
+                                  {/* Use position-absolute and position classes to position the icon */}
+                                </div>
+                                <Button
+                                  className="ms-2"
+                                  disabled={
+                                    sendButtonDisabled ||
+                                    loadingSendMessage ||
+                                    isLoading
+                                  }
+                                  color={ChatPopUpPage.SEND_BUTTON_COLOR}
+                                  outline
+                                >
+                                  {loadingSendMessage ? (
+                                    <Spinner size="sm" className="p-2" />
+                                  ) : (
+                                    ChatPopUpPage.SEND_BUTTON_LABEL
+                                  )}
+                                </Button>
+                              </FormGroup>
+                              {selectedFiles && selectedFiles.length > 0 && (
+                                <div className="z-3 position-absolute imagesDiv">
+                                  {/* Display previously selected pictures */}
+                                  {selectedFiles.map((file, index) => (
+                                    <div
+                                      key={index}
+                                      className="position-relative d-flex align-items-start"
+                                    >
+                                      <img
+                                        src={URL.createObjectURL(file)}
+                                        alt="file"
+                                        style={{
+                                          width: "100px",
+                                          height: "100px",
+                                        }}
+                                      />
+                                      {/* Close button for each picture */}
+                                      <div
+                                        className="closeButtonForPictureInchat hover-pointer"
+                                        onClick={() =>
+                                          handleRemovePicture(index)
+                                        }
+                                      >
+                                        <IoClose />
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {pictureError && (
+                                <span
+                                  className={`position-absolute pictureError bg-danger text-white px-2 py-1 rounded ${
+                                    pictureError ? "active" : ""
+                                  }`}
+                                >
+                                  {pictureError}
+                                </span>
+                              )}
+                            </Form>
+                          </Col>
+                        ) : (
+                          <Col>
+                            {/* Empty div when no chat is selected */}
+                            {ChatPopUpPage.SELECT_CHAT_LABEL}
+                          </Col>
+                        )}
+                      </>
                     )}
                   </Row>
                 </Row>
               </Container>
             </ModalBody>
+
             <Booking
               modal={modal}
               toggle={toggleModal}
