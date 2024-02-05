@@ -21,10 +21,12 @@ const PopUpContext = ({ children }) => {
   const [showInput, setShowInput] = useState(false);
   const [cancelStart, setCancelStart] = useState(false);
   const [cancelledOrders, setCancelledOrders] = useState([]);
+  const [param, SetParam] = useState({});
   const [params, SetParams] = useState({});
   const [scheduledOrders, setScheduledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const [pastOrders, setPastOrders] = useState([]);
+  
   const [isOn, setIsOn] = useState(false);
   const cancel = () => {
     setOrderToCancel(null);
@@ -79,7 +81,7 @@ const PopUpContext = ({ children }) => {
         activeOrder,
         setActiveOrder,
         pastOrders,
-        setPastOrders,finishConfirmed, setFinishConfirmed,clear,setClear,isOn, setIsOn
+        setPastOrders,finishConfirmed, setFinishConfirmed,clear,setClear,isOn, setIsOn,param, SetParam
       }}
     >
       {children}

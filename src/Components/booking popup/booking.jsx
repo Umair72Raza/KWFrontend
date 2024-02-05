@@ -31,7 +31,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
   const [dateTimeError, setDateTimeError] = useState("");
   const [amountError, setAmountError] = useState("");
   let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-  let { SetParams, clear, setClear } = PopUpState()
+  let { SetParam, clear, setClear,SetParams } = PopUpState()
   const [taskTime, setTaskTime] = useState(1)
   const [clicked, setClicked] = useState(true)
   const [imageError, setImageError] = useState("")
@@ -41,10 +41,10 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       taskTitle.trim() !== "" &&
       taskDetails.trim() !== `` &&
       dateTime !== "" &&
-      amountPerHour !== "" &&
-      serviceOption !== "none" && images.length > 0
+      amountPerHour >=5 && amountPerHour<=100000 &&
+      serviceOption !== 'none' && images.length > 0 && taskTime>=1 && taskTime<=9
     );
-  }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption]);
+  }, [taskTitle, taskDetails, dateTime, amountPerHour, serviceOption ,images,taskTime]);
 
 
   const handleImageChange = async(e) => {
@@ -100,8 +100,13 @@ const Booking = ({ modal, toggle, worker, chat }) => {
 
     
     for (const key in data) {
-      if (data.hasOwnProperty(key)) {
+      if (data.hasOwnProperty(key) && key != 'users') {
         formData.append(key, data[key]);
+      }
+      else{
+        Users.forEach((u,index)=>{
+          formData.append(`users`, u);
+        })
       }
     }
     
@@ -109,13 +114,13 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     images.forEach((image, index) => {
       formData.append(`images`, image);
     });
-    Users.forEach((user, index) => {
-      if(user!='/n'){
-      formData.append(`users`, user);}
-    });
+    // Users.forEach((user, index) => {
+    //   if(user!='/n'){
+    //   formData.append(`users`, user);}
+    // });
 
-    SetParams(formData);
-
+    SetParam(formData);
+    SetParams(data)
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         if (removedUsers) {
@@ -207,9 +212,11 @@ const Booking = ({ modal, toggle, worker, chat }) => {
     setTaskTitle("");
     setTaskDetails(``);
     setDateTime("");
-    setAmountPerHour("");
-    setServiceOption("none");
+    setAmountPerHour(5);
+    setServiceOption([]);
     setDateTimeError("");
+    setTaskTime(1)
+    setImages([])
     setFormComplete(false);
   };
   const getCurrentDateTime = () => {
@@ -228,6 +235,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       setAmountError("");
     } else {
       setAmountError("Enter amount in range 5-100000")
+      //setAmountPerHour()
     }
   };
 
