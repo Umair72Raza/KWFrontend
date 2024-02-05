@@ -23,6 +23,7 @@ import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
 import {
   fetchUsersDataAsync,
+  updatePfpAsync,
   updateProfileAsync,
 } from "../../Redux/Slices/EditProfileSlice";
 import { EDITPROFILE_PAGE, RegisterPage } from "../../Constants/Constants";
@@ -39,15 +40,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import CustomServiceDropdown from "../../Components/Services CheckList/CustomServicesDropdown";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice";
-import { set } from "lodash";
 import { hideSpinner, showSpinner } from "../../Redux/Slices/LoaderSlice";
 import {
   requestOTPforEmailAsync,
   requestOTPforPhoneAsync,
-  updatePfpAsync,
 } from "../../Redux/Slices/AuthSlice";
 import personPNG from "../../assets/images/dummyProfile/user.png";
-import { unwrapResult } from "@reduxjs/toolkit";
+
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
   const { UsersData } = useSelector((state) => state.editProfile);
@@ -82,6 +81,7 @@ const EditProfilePage = ({ ShowServices }) => {
   const [editProfile, setEditProfile] = useState(false);
   const [disableUpdateEmail, setDisableUpdateEmail] = useState(true);
   const [disableUpdatePhone, setDisableUpdatePhone] = useState(true);
+  const [disableUpdateProfilePic, setDisableUpdateProfilePic] = useState(false);
   const [newMailError, setNewMailError] = useState("");
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [errors, setErrors] = useState("");
@@ -91,7 +91,7 @@ const EditProfilePage = ({ ShowServices }) => {
   const [UserInfo, setUserInfo] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
-  const [pfp, setPfp] = useState("");
+
   useEffect(() => {
     if (UsersData) {
       const isFormValid =
@@ -368,10 +368,12 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const showEmailEdits = () => {
     setEmailEdit(true);
+    setEditProfile(false);
     setPhoneEdit(false);
   };
   const showPhoneEdits = () => {
     setEmailEdit(false);
+    setEditProfile(false);
     setPhoneEdit(true);
   };
 
@@ -426,7 +428,6 @@ const EditProfilePage = ({ ShowServices }) => {
     setDisableUpdatePhone(false);
     const mail = UsersData?.email;
     const data = { mail, token, newPhone };
-    console.log(newPhone);
     try {
       dispatch(showSpinner());
       const otpResp = await dispatch(requestOTPforPhoneAsync(data));
@@ -520,6 +521,9 @@ const EditProfilePage = ({ ShowServices }) => {
   };
 
   const toggleEditProfile = () => {
+    //set other togglers false
+    setEmailEdit(false);
+    setPhoneEdit(false);
     setEditProfile(!editProfile);
   };
 
@@ -548,17 +552,11 @@ const EditProfilePage = ({ ShowServices }) => {
       clearFileInput();
       return;
     }
-
     // If file passes validation, update state
     setErrors((prevErrors) => ({
       ...prevErrors,
       profilePicture: null,
     }));
-
-    // setFormData((prevFormData) => ({
-    //   ...prevFormData,
-    //   profilePicture: file,
-    // }));
     setProfileImgData((prevProfileData) => ({
       ...prevProfileData,
       profilePicture: file,
@@ -567,21 +565,24 @@ const EditProfilePage = ({ ShowServices }) => {
       ...prevProfileData,
       email: UsersData?.email,
     }));
-
-    setPfp(file);
   };
 
   const updateProfileImage = async () => {
+    setDisableUpdateProfilePic(true);
     try {
-      
       const response = await dispatch(updatePfpAsync(profileImgData));
       if (response.meta.requestStatus === "fulfilled") {
         console.log(response);
+        setDisableUpdateProfilePic(false);
+        setProfileImgData({});
       }
     } catch (error) {
       console.log(error, "error");
     } finally {
       // Any cleanup or additional logic
+      setDisableUpdateProfilePic(false);
+      toggleEditProfile();
+      setProfileImgData({});
     }
   };
 
@@ -881,6 +882,10 @@ const EditProfilePage = ({ ShowServices }) => {
                                   onClick={updateProfileImage}
                                   className="m-2"
                                   color="success"
+                                  disabled={
+                                    !profileImgData?.profilePicture ||
+                                    disableUpdateProfilePic
+                                  }
                                 >
                                   Update
                                 </Button>
@@ -892,22 +897,20 @@ const EditProfilePage = ({ ShowServices }) => {
                           </>
                         ) : (
                           <>
-                            {console.log(
-                              UsersData?.profilePicture
-                                // ? `/profile-pictures/${UsersData.profilePicture}`
-                                // : personPNG
-                            )}
                             <Col className="text-center">
                               <img
                                 src={
                                   UsersData?.profilePicture
-                                    ? `/profile-pictures/${UsersData.profilePicture}`
+                                    ? `${
+                                        import.meta.env
+                                          .VITE_LOCAL_BACKEND_ENDPOINT
+                                      }${UsersData?.profilePicture}`
                                     : personPNG
                                 }
                                 alt="Profile"
                                 style={{
-                                  width: "100px",
-                                  height: "100px",
+                                  width: "150px",
+                                  height: "150px",
                                   borderRadius: "50%",
                                 }}
                               />
@@ -1073,7 +1076,7 @@ const EditProfilePage = ({ ShowServices }) => {
                         </p>
                         <p className="w-100">{UsersData?.address}</p>
                         <p className="fw-semibold">
-                          Optional{EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
+                          Optional {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
                         </p>
                         {!UsersData?.optionalAddress?.trim() ? (
                           <>

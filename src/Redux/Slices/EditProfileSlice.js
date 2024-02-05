@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getUsersData, updateProfile } from "../../APIs/editProfile";
+import { updatePfp } from "../../APIs/auth";
 
 export const fetchUsersDataAsync = createAsyncThunk(
   "/userData",
@@ -7,6 +8,7 @@ export const fetchUsersDataAsync = createAsyncThunk(
     try {
       const { id, token } = credentials;
       const response = await getUsersData(id, token);
+      console.log(response ,"get data")
       return response;
     } catch (error) {
       console.log(error, "error getting userData");
@@ -46,6 +48,23 @@ export const updateProfileAsync = createAsyncThunk(
     }
   }
 );
+export const updatePfpAsync = createAsyncThunk(
+  "/setnewpfp",
+  async (data, { rejectWithValue }) => {
+    try {
+      //console.log("Data in thunk:", [...data.entries()]);
+      const { email, profilePicture } = data;
+      const result = await updatePfp(email, profilePicture);
+      console.log("update pfp response", result);
+      return result;
+    } catch (error) {
+      if (error) {
+        return rejectWithValue("Error Occured!");
+      }
+      console.log(error);
+    }
+  }
+);
 
 const EditProfileSlice = createSlice({
   name: "userSlice",
@@ -71,6 +90,20 @@ const EditProfileSlice = createSlice({
           error: action.error.message,
         };
       })
+      .addCase(updatePfpAsync.pending, (state) => {
+        state.Users = { data: null, status: "loading" };
+      })
+      .addCase(updatePfpAsync.fulfilled, (state, action) => {
+        state.UsersData = action.payload.user;
+        state.status = "succeeded";
+      })
+      .addCase(updatePfpAsync.rejected, (state, action) => {
+        state.UsersData = {
+          data: null,
+          status: "failed",
+          error: action.error.message,
+        };
+      })
       .addCase(updateProfileAsync.pending, (state) => {
         state.Users = { data: null, status: "loading" };
       })
@@ -80,7 +113,6 @@ const EditProfileSlice = createSlice({
       })
       .addCase(updateProfileAsync.rejected, (state, action) => {
         state.error = action.error.message;
-
       });
   },
 });
