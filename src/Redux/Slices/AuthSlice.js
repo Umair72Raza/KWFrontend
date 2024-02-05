@@ -183,6 +183,7 @@ export const requestOTPforEmailAsync = createAsyncThunk(
         status: response.status,
         // other serializable properties
       };
+      console.log(serializableResponse,'serl response')
       return serializableResponse;
     } catch (error) {
       console.log(error);

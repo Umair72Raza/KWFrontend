@@ -46,6 +46,8 @@ import {
   requestOTPforPhoneAsync,
 } from "../../Redux/Slices/AuthSlice";
 import personPNG from "../../assets/images/dummyProfile/user.png";
+import { CiEdit } from "react-icons/ci";
+import { FcEditImage } from "react-icons/fc";
 
 const EditProfilePage = ({ ShowServices }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -212,7 +214,8 @@ const EditProfilePage = ({ ShowServices }) => {
     if (!areObjectsDifferent) {
       errors.noChanges = "No Changes Made";
     }
-    if (!profilePicture) {
+    if (!formData?.profilePicture) {
+      //setFormData({ ...formData, profilePicture: UsersData?.profilePicture });
       errors.profilePicture = "Profile picture is required";
     }
 
@@ -229,8 +232,14 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.optionalAddress.trim()) {
-      setFormData({ ...formData, optionalAddress: formData.address });
+    setEmailEdit(false);
+    setEditProfile(false);
+    setPhoneEdit(false);
+    if (!formData?.optionalAddress?.trim()) {
+      setFormData({ ...formData, optionalAddress: formData?.address });
+    }
+    if (!formData?.profilePicture) {
+      setFormData({ ...formData, profilePicture: UsersData?.profilePicture });
     }
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
@@ -260,7 +269,9 @@ const EditProfilePage = ({ ShowServices }) => {
           // latitude,
           // longitude,
           country,
+          city,
           address,
+          region_state,
           optionalAddress,
           services,
         } = result.payload || {};
@@ -274,6 +285,8 @@ const EditProfilePage = ({ ShowServices }) => {
           // latitude,
           // longitude,
           country,
+          city,
+          region_state,
           address,
           optionalAddress,
           services: services || [],
@@ -343,6 +356,9 @@ const EditProfilePage = ({ ShowServices }) => {
   };
 
   const handleCancelEdit = () => {
+    setEmailEdit(false);
+    setEditProfile(false);
+    setPhoneEdit(false);
     setFormData({
       firstName: UsersData?.firstName,
       lastName: UsersData?.lastName,
@@ -389,9 +405,7 @@ const EditProfilePage = ({ ShowServices }) => {
     //dispatch the api to send the otp
     const mail = UsersData?.email;
     const data = { mail, token, newMail };
-    console.log(newMail);
     try {
-      dispatch(showSpinner());
       const otpResp = await dispatch(requestOTPforEmailAsync(data));
       if (otpResp.type === "auth/requestOTPforEmailAsync/fulfilled") {
         console.log(otpResp, "response of otp[");
@@ -418,7 +432,6 @@ const EditProfilePage = ({ ShowServices }) => {
       console.log(error);
       failureToast("Error sending OTP");
     } finally {
-      dispatch(hideSpinner());
       setDisableUpdateEmail(false);
     }
   };
@@ -496,20 +509,26 @@ const EditProfilePage = ({ ShowServices }) => {
       setDisableUpdateEmail(true);
       return;
     }
-    setModalContent("Test: Wait while you are being redirected...");
+    setModalContent("Wait while you are being redirected...");
     console.log("Before setShowModal(true):", showModal);
     setShowModal(true);
     requestOTP();
   };
 
   const handlePhoneChange = (value) => {
+    setErrors({ ...errors, phone: "" });
     setValidNewPhone(true);
     setNewPhone(value);
-    if (!isValidPhoneNumber(value)) {
+    if (value) {
+      if (!isValidPhoneNumber(value)) {
+        setValidNewPhone(false);
+        setDisableUpdatePhone(true);
+      } else {
+        setDisableUpdatePhone(false);
+      }
+    } else {
       setValidNewPhone(false);
       setDisableUpdatePhone(true);
-    } else {
-      setDisableUpdatePhone(false);
     }
   };
 
@@ -917,10 +936,10 @@ const EditProfilePage = ({ ShowServices }) => {
 
                               <Button
                                 className="mt-5"
-                                color="primary"
+                                color=""
                                 onClick={toggleEditProfile}
                               >
-                                Edit
+                                <FcEditImage className="fs-2" />
                               </Button>
                             </Col>
                           </>
@@ -942,7 +961,7 @@ const EditProfilePage = ({ ShowServices }) => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col xs={6}>
+                      <Col xs={12} md={6}>
                         <p className="fw-semibold">
                           {EDITPROFILE_PAGE.CARD_LABELS.EMAIL}
                         </p>
@@ -985,7 +1004,7 @@ const EditProfilePage = ({ ShowServices }) => {
                                   onClick={toggleEditEmail}
                                   color="danger"
                                 >
-                                  Cancel Edit
+                                  Cancel
                                 </Button>
                               </Col>
                             </Row>
@@ -993,12 +1012,12 @@ const EditProfilePage = ({ ShowServices }) => {
                         ) : (
                           <>
                             <Button onClick={showEmailEdits} color="primary">
-                              Edit
+                              <CiEdit />
                             </Button>
                           </>
                         )}
                       </Col>
-                      <Col xs={6}>
+                      <Col xs={12} md={6}>
                         <p className="fw-semibold">
                           {EDITPROFILE_PAGE.CARD_LABELS.PHONE}
                         </p>
@@ -1006,15 +1025,22 @@ const EditProfilePage = ({ ShowServices }) => {
                         {phoneEdit ? (
                           <>
                             <PhoneInput
+                              invalid={errors.phone ? true : false}
                               id="examplephone"
                               name="phone"
                               defaultCountry="PK"
                               placeholder="Enter the new phone"
                               type="text"
+                              value={newPhone}
                               international
                               countryCallingCodeEditable={false}
                               onChange={handlePhoneChange}
                             />
+                            {errors.phone && (
+                              <span className="text-danger">
+                                {errors.phone}
+                              </span>
+                            )}
                           </>
                         ) : (
                           <>
@@ -1040,7 +1066,7 @@ const EditProfilePage = ({ ShowServices }) => {
                                   onClick={toggleEditPhone}
                                   color="danger"
                                 >
-                                  Cancel Edit
+                                  Cancel
                                 </Button>
                               </Col>
                             </Row>
@@ -1048,7 +1074,7 @@ const EditProfilePage = ({ ShowServices }) => {
                         ) : (
                           <>
                             <Button onClick={showPhoneEdits} color="primary">
-                              Edit
+                              <CiEdit />
                             </Button>
                           </>
                         )}
@@ -1070,28 +1096,63 @@ const EditProfilePage = ({ ShowServices }) => {
                           </ol>
                         </Col>
                       )}
-                      <Col>
-                        <p className="fw-semibold">
-                          {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
-                        </p>
-                        <p className="w-100">{UsersData?.address}</p>
-                        <p className="fw-semibold">
-                          Optional {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
-                        </p>
-                        {!UsersData?.optionalAddress?.trim() ? (
-                          <>
-                            <p>No optional address added.</p>
-                          </>
-                        ) : (
-                          <>
-                            <p className="w-100">
-                              {UsersData?.optionalAddress}
-                            </p>
-                          </>
-                        )}
-                      </Col>
+                      <Row className="mt-4" >
+                        <Col xs={12} md={4}>
+                          <p className="fw-semibold">
+                            {EDITPROFILE_PAGE.CARD_LABELS.COUNTRY}
+                          </p>
+                          <p className="w-100">{UsersData?.country}</p>
+                        </Col>
+
+                        <Col  xs={12} md={4}>
+                          <p className="fw-semibold">
+                            {EDITPROFILE_PAGE.CARD_LABELS.REGION_STATE}
+                          </p>
+                          {!UsersData?.region_state?.trim() ? (
+                            <p>Region/State not set.</p>
+                          ) : (
+                            <>
+                              <p className="w-100">{UsersData?.region_state}</p>
+                            </>
+                          )}
+                        </Col>
+
+                        <Col  xs={12} md={4}>
+                          <p className="fw-semibold">
+                            {EDITPROFILE_PAGE.CARD_LABELS.CITY}
+                          </p>
+                          {!UsersData?.city ? (
+                            <p>City not set.</p>
+                          ) : (
+                            <>
+                              <p className="w-100">{UsersData?.city}</p>
+                            </>
+                          )}
+                        </Col>
+
+                        <Col xs={12} md={6}>
+                          <p className="fw-semibold">
+                            {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
+                          </p>
+                          <p className="w-100">{UsersData?.address}</p>
+                        </Col>
+                        <Col xs={12} md={6}>
+                          <p className="fw-semibold">
+                            {EDITPROFILE_PAGE.CARD_LABELS.OPTIONAL}{" "}
+                            {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
+                          </p>
+                          {!UsersData?.optionalAddress?.trim() ? (
+                              <p>
+                                {EDITPROFILE_PAGE.CARD_LABELS.NO_OPT_ADDRESS}
+                              </p>
+                          ) : (
+                              <p className="w-100">
+                                {UsersData?.optionalAddress}
+                              </p>
+                          )}
+                        </Col>
+                      </Row>
                     </Row>
-                    {/* ${edit ?"d-none" :""} */}
                     <Button color={`primary`} onClick={handleEditModeToggle}>
                       {EDITPROFILE_PAGE.BUTTONS.EDIT}
                     </Button>

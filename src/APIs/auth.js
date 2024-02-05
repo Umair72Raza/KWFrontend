@@ -37,8 +37,8 @@ export const sendOTP = async (email) => {
 
 export const sendOTPforEmail = async (data) => {
   try {
-    const { mail, token, newMail } = data;
-    console.log(newMail, token, "new mail and token in api");
+    const { mail, token, newMail,region_state } = data;
+    console.log(newMail, token,  "new mail and token in api");
     const response = await API.put(
       `user/newMailOTP`,
       { email: mail, newMail: newMail },
@@ -48,6 +48,7 @@ export const sendOTPforEmail = async (data) => {
         },
       }
     );
+    console.log(response,"reponse in api")
     return response;
   } catch (error) {
     throw error.response.data;

@@ -8,7 +8,7 @@ export const fetchUsersDataAsync = createAsyncThunk(
     try {
       const { id, token } = credentials;
       const response = await getUsersData(id, token);
-      console.log(response ,"get data")
+      console.log(response,"repon")
       return response;
     } catch (error) {
       console.log(error, "error getting userData");
@@ -55,7 +55,6 @@ export const updatePfpAsync = createAsyncThunk(
       //console.log("Data in thunk:", [...data.entries()]);
       const { email, profilePicture } = data;
       const result = await updatePfp(email, profilePicture);
-      console.log("update pfp response", result);
       return result;
     } catch (error) {
       if (error) {
