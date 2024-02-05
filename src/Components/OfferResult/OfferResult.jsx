@@ -96,7 +96,7 @@ const OfferResult = () => {
   };
 
   useEffect(() => {
-    if (newOrder !== null) {
+    if (newOrder !== null && newOrder.Status !== "Pending" ) {
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
 
       socket?.emit("new-order-created", data);
