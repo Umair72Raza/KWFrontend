@@ -5,7 +5,6 @@ const API = axios.create({
 
 export const optSentAtSingUp = async (email) => {
   try {
-    
     const response = await API.post(`user/otp_Sent`, { email: email });
     return response.data;
   } catch (error) {
@@ -13,23 +12,22 @@ export const optSentAtSingUp = async (email) => {
   }
 };
 
-export const EmailVerification = async(email)=>{
-  try{
-const response = await API.put(`user/verifyEmail`, { email: email });
-return response.data;
+export const EmailVerification = async (email) => {
+  try {
+    const response = await API.put(`user/verifyEmail`, { email: email });
+    return response.data;
   } catch (error) {
     return error.response.data;
   }
-}
+};
 
 export const sendOTP = async (email) => {
   try {
     const response = await API.post(`user/forgot-password`, { email: email });
-    console.log(response.data)
+    console.log(response.data);
     return response;
-
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return error;
     //throw error.response.data;
   }
@@ -39,8 +37,8 @@ export const sendOTP = async (email) => {
 
 export const sendOTPforEmail = async (data) => {
   try {
-    const { mail, token, newMail } = data;
-    console.log(newMail, token, "new mail and token in api");
+    const { mail, token, newMail,region_state } = data;
+    console.log(newMail, token,  "new mail and token in api");
     const response = await API.put(
       `user/newMailOTP`,
       { email: mail, newMail: newMail },
@@ -50,6 +48,7 @@ export const sendOTPforEmail = async (data) => {
         },
       }
     );
+    console.log(response,"reponse in api")
     return response;
   } catch (error) {
     throw error.response.data;
@@ -69,11 +68,11 @@ export const sendOTPforPhone = async (data) => {
         },
       }
     );
-    console.log(response, "response in api")
+    console.log(response, "response in api");
     return response;
   } catch (error) {
     console.log(error.response.data);
-    return error.response.data
+    return error.response.data;
     //throw error.response.data;
   }
 };
@@ -149,6 +148,26 @@ export const loginUser = async (email, password) => {
     throw error.response.data;
   }
 };
+export const updatePfp = async (email, profilePicture) => {
+  try {
+    //console.log(data, "data in api");
+    //email, profilePicture;
+    console.log(email,profilePicture);
+    const response = await API.put(
+      "user/updatePfp",
+      { email, profilePicture },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log(response.data, " update pfp response in api");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
 
 export const signUpUser = async (
   firstName,
@@ -168,27 +187,31 @@ export const signUpUser = async (
   services
 ) => {
   try {
-    const response = await API.post(`user/signUp`, {
-      firstName,
-      lastName,
-      email,
-      password,
-      profilePicture,
-      phoneNumber,
-      location,
-      // longitude,
-      // latitude,
-      address,
-      optionalAddress,
-      country,
-      region_state,
-      city,
-      services,
-    },{
-      headers: {
-        "Content-Type":  "multipart/form-data",
+    const response = await API.post(
+      `user/signUp`,
+      {
+        firstName,
+        lastName,
+        email,
+        password,
+        profilePicture,
+        phoneNumber,
+        location,
+        // longitude,
+        // latitude,
+        address,
+        optionalAddress,
+        country,
+        region_state,
+        city,
+        services,
       },
-    });
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     throw error.response.data;

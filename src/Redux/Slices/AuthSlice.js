@@ -12,6 +12,7 @@ import {
   sendOTPforPhone,
   signUpUser,
   toggleStatus,
+  updatePfp,
 } from "../../APIs/auth";
 import { Logout, failureToast } from "../../utils";
 
@@ -37,15 +38,35 @@ export const logoutAsync = createAsyncThunk("auth/logout", async () => {
   Logout();
 });
 
-export const OTPverifyAsync = createAsyncThunk("auth/otpSentAtSignUp", async (credentials) => {
-  try {
-    const { email } = credentials;
-    const response = await optSentAtSingUp(email);
-    return response;
-  } catch (error) {
-    return error;
+export const OTPverifyAsync = createAsyncThunk(
+  "auth/otpSentAtSignUp",
+  async (credentials) => {
+    try {
+      const { email } = credentials;
+      const response = await optSentAtSingUp(email);
+      return response;
+    } catch (error) {
+      return error;
+    }
   }
-});
+);
+// export const updatePfpAsync = createAsyncThunk(
+//   "auth/setnewpfp",
+//   async (data, { rejectWithValue }) => {
+//     try {
+//       //console.log("Data in thunk:", [...data.entries()]);
+//       const { email, profilePicture } = data;
+//       const result = await updatePfp(email, profilePicture);
+//       console.log("update pfp response", result);
+//       return result;
+//     } catch (error) {
+//       if (error) {
+//         return rejectWithValue("Error Occured!");
+//       }
+//       console.log(error);
+//     }
+//   }
+// );
 
 export const signUpUserAsync = createAsyncThunk(
   "auth/signup",
@@ -112,16 +133,19 @@ export const signUpUserAsync = createAsyncThunk(
 );
 
 // change the email verification status
-export const changeEmailStatus = createAsyncThunk( "auth/changeEmailStatus", async (data) => {
-  try{
-const {email} = data;
-const response = await EmailVerification(email);
-return response;
-  }catch(error){
-    console.log(error)
-    return error;
+export const changeEmailStatus = createAsyncThunk(
+  "auth/changeEmailStatus",
+  async (data) => {
+    try {
+      const { email } = data;
+      const response = await EmailVerification(email);
+      return response;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
-});
+);
 
 export const requestOTPAsync = createAsyncThunk(
   "auth/requestOTPAsync",
@@ -139,7 +163,7 @@ export const requestOTPAsync = createAsyncThunk(
       };
       return serializableResponse;
     } catch (error) {
-      throw error
+      throw error;
       //failureToast("Email not Registered!");
     }
   }
@@ -159,9 +183,10 @@ export const requestOTPforEmailAsync = createAsyncThunk(
         status: response.status,
         // other serializable properties
       };
+      console.log(serializableResponse,'serl response')
       return serializableResponse;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       //failureToast("Couldn't send OTP");
     }
   }
@@ -171,17 +196,17 @@ export const requestOTPforPhoneAsync = createAsyncThunk(
   "auth/requestOTPforPhoneAsync",
   async (data) => {
     try {
-      console.log(data, "data in thunk")
+      console.log(data, "data in thunk");
       const response = await sendOTPforPhone(data);
       const serializableResponse = {
         data: response.data,
         status: response.status,
         // other serializable properties
       };
-      console.log(serializableResponse, 'serialized response')
+      console.log(serializableResponse, "serialized response");
       return serializableResponse;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       //failureToast("couldnt send otp");
     }
   }
@@ -220,7 +245,7 @@ export const changePhone = createAsyncThunk(
   "auth/otpverifyPhone",
   async (data) => {
     try {
-      console.log(data,"data in thunk")
+      console.log(data, "data in thunk");
       const response = await OTPverifyforPhone(data);
       console.log("otp verify response", response);
       return response.data;
@@ -274,7 +299,7 @@ const authSlice = createSlice({
     signupStatus: "idle",
     signupWorkerStatus: "idle",
     signupOTP: null,
-    emailVerification:"idle",
+    emailVerification: "idle",
     emailOTP: null,
     emailOTPError: null,
     otpStatus: "idle",
@@ -367,7 +392,8 @@ const authSlice = createSlice({
       .addCase(requestOTPforEmailAsync.rejected, (state, action) => {
         state.emailOTP = "failed";
         state.emailOTPError = action.error.message;
-      }).addCase(OTPverifyAsync.pending, (state) => {
+      })
+      .addCase(OTPverifyAsync.pending, (state) => {
         state.otpStatus = "loading";
       })
       .addCase(OTPverifyAsync.fulfilled, (state, action) => {
@@ -377,7 +403,8 @@ const authSlice = createSlice({
       .addCase(OTPverifyAsync.rejected, (state, action) => {
         state.otpStatus = "failed";
         state.otpError = action.error.message;
-      }) .addCase(changeEmailStatus.pending, (state) => {
+      })
+      .addCase(changeEmailStatus.pending, (state) => {
         state.emailVerification = "loading";
       })
       .addCase(changeEmailStatus.fulfilled, (state, action) => {
@@ -385,8 +412,7 @@ const authSlice = createSlice({
       })
       .addCase(changeEmailStatus.rejected, (state, action) => {
         state.emailVerification = "failed";
-
-      })
+      });
   },
 });
 export const { updateOtpStatus } = authSlice.actions;
