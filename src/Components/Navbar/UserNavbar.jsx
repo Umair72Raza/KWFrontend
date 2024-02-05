@@ -120,7 +120,7 @@ const UserNavbar = () => {
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
     setGotOffer(true);
-    setReceiveMessage(notify.params);
+    setReceiveMessage(notify);
     SetShowOffer(!offer);
   };
 
