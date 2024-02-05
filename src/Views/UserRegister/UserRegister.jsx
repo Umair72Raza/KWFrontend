@@ -243,7 +243,7 @@ const UserRegister = ({ ShowServices }) => {
 
     // Define file size limit and accepted file types
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    const acceptedTypes = ["image/jpeg", "image/png", "image/gif"];
+    const acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
 
     // Check if file size exceeds limit
     if (file.size > maxSize) {
@@ -259,7 +259,8 @@ const UserRegister = ({ ShowServices }) => {
     if (!acceptedTypes.includes(file.type)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
+        profilePicture:
+          "Please select a valid image file (JPEG, JPG, PNG, or GIF).",
       }));
       clearFileInput();
       return;
@@ -605,18 +606,20 @@ const UserRegister = ({ ShowServices }) => {
                       onChange={handleConfirmPasswordChange}
                       autoComplete="new-password"
                     />
-                    {formData.confirmPassword && formData.confirmPassword.length >0 && (   <div
-                      className="password-toggle"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                    >
-                      <FontAwesomeIcon
-                        icon={showConfirmPassword ? faEye : faEyeSlash}
-                        className="password-icon pe-4"
-                      />
-                    </div>)}
-                  
+                    {formData.confirmPassword &&
+                      formData.confirmPassword.length > 0 && (
+                        <div
+                          className="password-toggle"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                        >
+                          <FontAwesomeIcon
+                            icon={showConfirmPassword ? faEye : faEyeSlash}
+                            className="password-icon pe-4"
+                          />
+                        </div>
+                      )}
                   </div>
                   {confirmPasswordInfo &&
                   !errors.confirmPassword &&

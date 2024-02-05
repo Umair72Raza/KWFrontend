@@ -550,7 +550,7 @@ const EditProfilePage = ({ ShowServices }) => {
     const file = event.target.files[0];
     // Define file size limit and accepted file types
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    const acceptedTypes = ["image/jpeg", "image/png", "image/gif"];
+    const acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
 
     // Check if file size exceeds limit
     if (file.size > maxSize) {
@@ -566,7 +566,8 @@ const EditProfilePage = ({ ShowServices }) => {
     if (!acceptedTypes.includes(file.type)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        profilePicture: "Please select a valid image file (JPEG, PNG, or GIF).",
+        profilePicture:
+          "Please select a valid image file (JPEG,JPG, PNG, or GIF).",
       }));
       clearFileInput();
       return;
@@ -1096,7 +1097,7 @@ const EditProfilePage = ({ ShowServices }) => {
                           </ol>
                         </Col>
                       )}
-                      <Row className="mt-4" >
+                      <Row className="mt-4">
                         <Col xs={12} md={4}>
                           <p className="fw-semibold">
                             {EDITPROFILE_PAGE.CARD_LABELS.COUNTRY}
@@ -1104,7 +1105,7 @@ const EditProfilePage = ({ ShowServices }) => {
                           <p className="w-100">{UsersData?.country}</p>
                         </Col>
 
-                        <Col  xs={12} md={4}>
+                        <Col xs={12} md={4}>
                           <p className="fw-semibold">
                             {EDITPROFILE_PAGE.CARD_LABELS.REGION_STATE}
                           </p>
@@ -1117,7 +1118,7 @@ const EditProfilePage = ({ ShowServices }) => {
                           )}
                         </Col>
 
-                        <Col  xs={12} md={4}>
+                        <Col xs={12} md={4}>
                           <p className="fw-semibold">
                             {EDITPROFILE_PAGE.CARD_LABELS.CITY}
                           </p>
@@ -1142,13 +1143,11 @@ const EditProfilePage = ({ ShowServices }) => {
                             {EDITPROFILE_PAGE.CARD_LABELS.ADDRESS}
                           </p>
                           {!UsersData?.optionalAddress?.trim() ? (
-                              <p>
-                                {EDITPROFILE_PAGE.CARD_LABELS.NO_OPT_ADDRESS}
-                              </p>
+                            <p>{EDITPROFILE_PAGE.CARD_LABELS.NO_OPT_ADDRESS}</p>
                           ) : (
-                              <p className="w-100">
-                                {UsersData?.optionalAddress}
-                              </p>
+                            <p className="w-100">
+                              {UsersData?.optionalAddress}
+                            </p>
                           )}
                         </Col>
                       </Row>
