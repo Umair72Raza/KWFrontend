@@ -59,8 +59,6 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     document.body.style.overflow = "auto";
   };
 
-
-
   const handleConfirm = () => {
     if (onConfirm) {
       onConfirm();
@@ -156,7 +154,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
             </div>
             {truncatedDetails.length > 30 && (
               <Button
-              color="primary"
+                color="link"
                 onClick={toggleShowMore}
                 style={{ cursor: "pointer", marginTop: "5px" }}
               >
@@ -168,34 +166,36 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
           <p>
             <strong>Task Pictures</strong>
           </p>
-          <Row className="" >
-            
-           <Col>
-              { imageDataURL?.length>2 ? 
-              <Slider {...settings} className=" m-5">
-                {imageDataURL?.map((image, index) => (
-                  <div className="" key={index}>
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt={`Modal Image ${index}`}
-                      className="img-fluid thumbnail"
-                    />
+          <Row className="">
+            <Col>
+              {imageDataURL?.length > 2 ? (
+                <Slider {...settings} className=" m-5">
+                  {imageDataURL?.map((image, index) => (
+                    <div className="" key={index}>
+                      <img
+                        src={URL.createObjectURL(image)}
+                        alt={`Modal Image ${index}`}
+                        className="img-fluid thumbnail"
+                      />
+                    </div>
+                  ))}
+                </Slider>
+              ) : (
+                <>
+                  <div className="d-flex">
+                    {imageDataURL?.map((image, index) => (
+                      <div className="border" key={index}>
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt={`Modal Image ${index}`}
+                          className="img-fluid thumbnail"
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </Slider> : 
-               <><div className="d-flex">
-                {imageDataURL?.map((image, index) => (
-                <div className="border" key={index}>
-                  <img
-                    src={URL.createObjectURL(image)}
-                    alt={`Modal Image ${index}`}
-                    className="img-fluid thumbnail"
-                  />
-                </div>
-              ))}
-              </div></>} 
-              </Col>
-          
+                </>
+              )}
+            </Col>
           </Row>
         </ModalBody>
         <ModalFooter>
@@ -207,7 +207,6 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
           </Button>{" "}
         </ModalFooter>
       </Modal>
-
     </div>
   );
 };
