@@ -80,6 +80,10 @@ const HomePageWorker = () => {
     setActiveOrder,
     pastOrders,
     setPastOrders,
+    startButtonDisabledMap,
+    setStartButtonDisabledMap,
+    globalStartButtonDisabled,
+    setGlobalStartButtonDisabled,
   } = PopUpState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
@@ -160,6 +164,11 @@ const HomePageWorker = () => {
       } else if (data.result == "false") {
         setStartJobStatus("false");
         setStartJobVerified(true);
+        setGlobalStartButtonDisabled(false);
+        setStartButtonDisabledMap((prevMap) => ({
+          ...prevMap,
+          [data.order._id]: false,
+        }));
       }
     });
     return () => {

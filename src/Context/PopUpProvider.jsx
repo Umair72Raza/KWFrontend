@@ -15,7 +15,7 @@ const PopUpContext = ({ children }) => {
   const [inputLabel, setInputLabel] = useState("");
   const [modalInputValue, setModalInputValue] = useState("");
   const [finalizeFunction, setFinalizeFunction] = useState(false);
-  const [clear,setClear] = useState(false);
+  const [clear, setClear] = useState(false);
   const [cancelButtonLabel, setCancelButtonLabel] = useState("");
   const [finalizeButtonLabel, setFinalizeButtonLabel] = useState("");
   const [showInput, setShowInput] = useState(false);
@@ -26,7 +26,11 @@ const PopUpContext = ({ children }) => {
   const [scheduledOrders, setScheduledOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const [pastOrders, setPastOrders] = useState([]);
-  
+
+  const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
+  const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
+    useState(false);
+
   const [isOn, setIsOn] = useState(false);
   const cancel = () => {
     setOrderToCancel(null);
@@ -81,7 +85,19 @@ const PopUpContext = ({ children }) => {
         activeOrder,
         setActiveOrder,
         pastOrders,
-        setPastOrders,finishConfirmed, setFinishConfirmed,clear,setClear,isOn, setIsOn,param, SetParam
+        setPastOrders,
+        finishConfirmed,
+        setFinishConfirmed,
+        clear,
+        setClear,
+        isOn,
+        setIsOn,
+        param,
+        SetParam,
+        startButtonDisabledMap,
+        setStartButtonDisabledMap,
+        globalStartButtonDisabled,
+        setGlobalStartButtonDisabled,
       }}
     >
       {children}
