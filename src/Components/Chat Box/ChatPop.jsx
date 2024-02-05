@@ -68,6 +68,8 @@ const ChatPopup = () => {
   const [isLoading, setLoading] = useState(true);
   const [loadingSendMessage, setLoadingSendMessage] = useState(false);
   const [chatAndUserId, setChatAndUserId] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [pictureError, setPictureError] = useState("");
 
   const chatTransitions = useTransition(copyOfChats, {
     from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
@@ -343,6 +345,33 @@ const ChatPopup = () => {
         ...prevCount,
         [chat._id]: 0,
       }));
+    }
+  };
+
+  const handleFileChange = (event) => {
+    const files = Array.from(event.target.files);
+    let errorMessage = "";
+
+    // Check if more than 5 files are selected
+    if (files.length > 5) {
+      errorMessage = "Please select up to 5 files only.";
+    } else {
+      // Check each file's size
+      files.forEach((file) => {
+        if (file.size > 5 * 1024 * 1024) {
+          // 5 MB limit
+          errorMessage = "File size exceeds the limit of 5 MB.";
+        }
+      });
+    }
+
+    if (errorMessage) {
+      setSendButtonDisabled(true);
+      setPictureError(errorMessage);
+      setTimeout(() => setPictureError(''), 5000);
+      event.target.value = null; // Reset file input
+    } else {
+      setSelectedFiles(files);
     }
   };
 
@@ -862,7 +891,10 @@ const ChatPopup = () => {
                         >
                           {renderMessages()}
                         </Col>
-                        <Form onSubmit={sendMessage} className="message-input">
+                        <Form
+                          onSubmit={sendMessage}
+                          className="message-input d-flex flex-column "
+                        >
                           <FormGroup className="d-flex flex-row w-100">
                             <div className="position-relative w-100">
                               {" "}
@@ -874,7 +906,20 @@ const ChatPopup = () => {
                                 onChange={handleMessageInputChange}
                                 disabled={loadingSendMessage || isLoading}
                               />
-                              <FaCamera className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2" />{" "}
+                              <Input
+                                id="fileInput"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                style={{ display: "none" }}
+                                multiple={selectedFiles.length < 5}
+                              />
+                              <FaCamera
+                                className="fs-4 position-absolute end-0 top-50 translate-middle-y me-2 hover-pointer"
+                                onClick={() =>
+                                  document.getElementById("fileInput").click()
+                                }
+                              />{" "}
                               {/* Use position-absolute and position classes to position the icon */}
                             </div>
                             <Button
@@ -894,6 +939,11 @@ const ChatPopup = () => {
                               )}
                             </Button>
                           </FormGroup>
+                          {pictureError && (
+                            <span className={`position-absolute pictureError bg-danger text-white px-2 py-1 rounded ${pictureError ? 'active' : ''}`}>
+                           {pictureError}
+                            </span>
+                          )}
                         </Form>
                       </Col>
                     ) : (
