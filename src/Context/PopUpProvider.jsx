@@ -43,6 +43,8 @@ const PopUpContext = ({ children }) => {
     toggleModal();
   };
   const [order, setOrder] = useState("");
+  const [fromAvailableJobs, setFromAvailableJobs] = useState(false);
+ 
   return (
     <PopupContext.Provider
       value={{
@@ -98,6 +100,8 @@ const PopUpContext = ({ children }) => {
         setStartButtonDisabledMap,
         globalStartButtonDisabled,
         setGlobalStartButtonDisabled,
+        setFromAvailableJobs,
+        fromAvailableJobs,
       }}
     >
       {children}
