@@ -888,8 +888,8 @@ const ChatPopup = () => {
                                                   0 &&
                                                   item.latestMessage
                                                     ?.sender !== user._id && (
-                                                      <Col className="notification-circle rounded-circle bg-danger text-white">
-                                                        <span className="align-self-center">
+                                                      <Col className="d-flex justify-content-end align-items-center">
+                                                        <span className="notification-circle">
                                                           {
                                                             unreadMessages[
                                                               item._id
@@ -998,10 +998,10 @@ const ChatPopup = () => {
                                               {unreadMessages[item._id] > 0 &&
                                                 item.latestMessage?.sender !==
                                                   user._id && (
-                                                  <Col className="notification-circle rounded-circle bg-danger text-white">
-                                                    <span className="align-self-center">
+                                                  <Col className="d-flex justify-content-end align-items-center ">
+                                                    <div className=" notification-circle">
                                                       {unreadMessages[item._id]}
-                                                    </span>
+                                                    </div>
                                                   </Col>
                                                 )}
                                               {isBlockedByAdmin && (
