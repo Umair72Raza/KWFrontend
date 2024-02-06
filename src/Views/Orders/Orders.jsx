@@ -203,9 +203,17 @@ const Orders = () => {
         <Row>
           <UserNavbar />
         </Row>
-        <Button color="danger" className="mt-2" onClick={goBack}>
+        <Row className="d-flex justify-content-between mt-2">
+      <Col>
+        <Button color="danger" onClick={goBack}>
           Back
         </Button>
+      </Col>
+      <Col className="d-flex justify-content-end">
+        <Button color="primary">Post a Job</Button>
+      </Col>
+    </Row>
+
         <Row></Row>
         <Row style={{ marginTop: "0.5%" }}>
           <Nav tabs style={{ cursor: "pointer" }}>
