@@ -64,19 +64,20 @@ const OfferResult = () => {
       const data = params
       const param = new FormData();
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key != 'users' && key!= 'Status') {
+        if (data.hasOwnProperty(key) && key != 'users' && key!= 'Status' && key!='service') {
           param.append(key, data[key]);
         }
-        else {
-          data.users.forEach((u, index) => {
-            param.append(`users`, u);
-          })
-        }
       }
-      param.append(`Status`, 'Pending');
-      data.images.forEach((image, index) => {
+      param?.append(`Status`, 'Pending');
+      data?.images?.forEach((image, index) => {
         param.append(`images`, image);
       });
+      data.users.forEach((u, index) => {
+        param.append(`users`, u);
+      })
+      data.service.forEach((s,index)=>{
+        param.append(`service`, s);
+      })
       
 
       //SetParam(formData);

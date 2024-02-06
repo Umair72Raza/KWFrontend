@@ -8,6 +8,7 @@ import {
   changeToPast,
   fetchAllOrders,
   fetchActiveOrders,
+  fetchPendingOrders
 } from "../../APIs/orders";
 
 export const getAllTheOrders = createAsyncThunk(
@@ -47,6 +48,17 @@ export const fetchCancelledOrdersAsync = createAsyncThunk(
     const userId = user._id;
     const data = { token: token, users: userId, status: "Cancelled" };
     const response = await fetchCancOrders(data);
+    return response;
+  }
+);
+
+export const fetchPendingOrdersAsync = createAsyncThunk(
+  "orders/fetchPendingOrders",
+  async (token) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user._id;
+    const data = { token: token, users: userId, status: "Pending" };
+    const response = await fetchPendingOrders(data);
     return response;
   }
 );
@@ -93,6 +105,7 @@ const orderSlice = createSlice({
     pastOrders: null,
     cancelledOrders: null,
     activeOrders: null,
+    pendingOrders:null,
     orderCancelledBool: null,
     orderActivated: false,
     data: null,
@@ -138,6 +151,22 @@ const orderSlice = createSlice({
       })
       .addCase(fetchCancelledOrdersAsync.rejected, (state, action) => {
         state.cancelledOrders = {
+          data: null,
+          status: "failed",
+          error: action.error.message,
+        };
+      })
+
+
+      .addCase(fetchPendingOrdersAsync.pending, (state) => {
+        state.pendingOrders = { data: null, status: "loading" };
+      })
+      .addCase(fetchPendingOrdersAsync.fulfilled, (state, action) => {
+        state.pendingOrders = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(fetchPendingOrdersAsync.rejected, (state, action) => {
+        state.pendingOrders = {
           data: null,
           status: "failed",
           error: action.error.message,

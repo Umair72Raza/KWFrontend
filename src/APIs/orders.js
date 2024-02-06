@@ -74,6 +74,19 @@ export const fetchActiveOrders = async (data) => {
     throw error.response.data;
   }
 };
+export const fetchPendingOrders = async (data) => {
+  try {
+    const { users, status, token } = data;
+    const response = await API.get(`order/getPendingOrder/${users}/${status}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
 
 export const cancelOrder = async (dataWithToken) => {
   try {
