@@ -66,6 +66,7 @@ const ChatPopup = () => {
   const [scrollPositionForLaptop, setScrollPositionForLaptop] = useState(0);
   const [scrollPositionForMobile, setScrollPositionForMobile] = useState(0);
   const [imagesLoading, setImagesLoading] = useState(true);
+  const [profilePicImageLoaded, setProfilePicImageLoaded] = useState(false);
  
 
   const dispatch = useDispatch();
@@ -353,7 +354,10 @@ const ChatPopup = () => {
     if (selectedFiles.length > 0) {
       setSelectedFiles([]);
     }
-  
+  //Reset The profile Pic Image Loaded if mobile 
+  if(screen.width <= 1024){
+    setProfilePicImageLoaded(false);
+    }
     // Reset newMessageText
     setNewMessageText("");
   
@@ -416,6 +420,9 @@ const ChatPopup = () => {
 
     return "";
   };
+  const handleProfileImageLoadedEnd = () => {
+    setProfilePicImageLoaded(true);
+  };
 
   const handleImageLoadEnd = () => {
     setImagesLoading(false); // Set imagesLoading to false once image is loaded
@@ -449,7 +456,9 @@ const ChatPopup = () => {
     setNewMessageText("");
     setSelectedFiles([]);
     setImagesLoading(false);
-  
+    if(screen.width <= 1024){
+      setProfilePicImageLoaded(false);
+      }
     // Reset file input value if there are selected files
     if (selectedFiles.length > 0) {
       document.getElementById("fileInput").value = null;
@@ -469,6 +478,10 @@ const ChatPopup = () => {
     setChat(null);
     setNewMessageText("");
     setSelectedFiles([]);
+    setImagesLoading(false);
+    if(screen.width <= 1024){
+    setProfilePicImageLoaded(false);
+    }
   
     // Reset file input value if there are selected files
     if (selectedFiles.length > 0) {
@@ -483,7 +496,7 @@ const ChatPopup = () => {
         const messagesContainer = messagesContainerRef.current;
         const lastMessage = messagesContainer.lastElementChild;
         if (lastMessage) {
-          lastMessage.scrollIntoView({ behavior: "smooth", block: "end" });
+          lastMessage.scrollIntoView({  block: "end" });
         }
       }
     };
@@ -684,6 +697,7 @@ const ChatPopup = () => {
                               )}
                               <Row className=" w-100">
                                 <Col className="d-flex flex-row">
+                                {!profilePicImageLoaded && <Spinner size="sm" animation="border" color="primary" />}
                                   <img
                                     src={
                                       selectedChat?.profilePicture
@@ -699,6 +713,8 @@ const ChatPopup = () => {
                                       height: "50px",
                                       borderRadius: "50%",
                                     }}
+                                    onLoad={handleProfileImageLoadedEnd}
+                                    onError={handleProfileImageLoadedEnd}
                                   />
 
                                   <h5 className="ms-3 mt-2">
@@ -861,6 +877,7 @@ const ChatPopup = () => {
                                                 }
                                               >
                                                 <Col className="d-flex flex-row">
+                                                {!profilePicImageLoaded && <Spinner size="sm" animation="border" color="primary" />}
                                                   <img
                                                     src={
                                                       chatUser?.profilePicture
@@ -878,6 +895,8 @@ const ChatPopup = () => {
                                                       height: "50px",
                                                       borderRadius: "50%",
                                                     }}
+                                                    onLoad={handleProfileImageLoadedEnd}
+                                                    onError={handleProfileImageLoadedEnd}
                                                   />
                                                   <h5 className="align-self-center ms-3">
                                                     {chatUser.firstName}{" "}
@@ -972,6 +991,7 @@ const ChatPopup = () => {
                                               }
                                             >
                                               <Col className="d-flex flex-row">
+                                              {!profilePicImageLoaded && <Spinner size="sm" animation="border" color="primary" />}
                                                 <img
                                                   src={
                                                     chatUser?.profilePicture
@@ -989,6 +1009,8 @@ const ChatPopup = () => {
                                                     height: "50px",
                                                     borderRadius: "50%",
                                                   }}
+                                                  onLoad={handleProfileImageLoadedEnd}
+                                                  onError={handleProfileImageLoadedEnd}
                                                 />
                                                 <h5 className="align-self-center ms-3">
                                                   {chatUser.firstName}{" "}
@@ -1032,7 +1054,7 @@ const ChatPopup = () => {
                       <MessageImagesCarousel
                         images={images}
                         isOpen={isOpen}
-                        toggle={exitCarousel}
+                        exitCarousel={exitCarousel}
                       />
                     ) : (
                       <>
@@ -1050,6 +1072,7 @@ const ChatPopup = () => {
                               )}
                               <Row className="w-100">
                                 <Col className="d-flex flex-row">
+                                {!profilePicImageLoaded && <Spinner size="sm" animation="border" color="primary" />}
                                   <img
                                     src={
                                       selectedChat?.profilePicture
@@ -1065,6 +1088,8 @@ const ChatPopup = () => {
                                       height: "50px",
                                       borderRadius: "50%",
                                     }}
+                                    onLoad={handleProfileImageLoadedEnd}
+                                    onError={handleProfileImageLoadedEnd}
                                   />
                                   <h5 className="ms-3 mt-2">
                                     {selectedChat.firstName}{" "}
