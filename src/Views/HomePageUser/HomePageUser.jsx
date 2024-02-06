@@ -58,6 +58,8 @@ const HomePageUser = () => {
           await dispatch(fetchChatsAsync({ user, token }));
           await dispatch(allServicesAsync());
           await setSearchWorker(users)
+       
+          
         } else {
           console.error("User object or _id is missing");
         }
@@ -101,6 +103,7 @@ const HomePageUser = () => {
 
   useEffect(() => {
     socket?.on("status-change", (User) => {
+      console.log(User,"user")
       if (users && User.status === "offline") {
         let remove = [];
         const userIndexRemoved = users.findIndex((u) => u._id === User._id);
@@ -116,7 +119,11 @@ const HomePageUser = () => {
           (u) => u._id === User._id
         );
         if (userIndexInRemoved !== -1) {
-          worker = [removedUsers[userIndexInRemoved], ...worker];
+          let userToUpdate = removedUsers[userIndexInRemoved];
+
+  // Update the status field
+  userToUpdate = { ...userToUpdate, status: "online" };
+          worker = [userToUpdate, ...worker];
           const remove = removedUsers.filter((u) => u._id !== User._id);
           dispatch(updateWorkers(worker));
           dispatch(updateRemoveWorker(remove));

@@ -566,6 +566,7 @@ const HomePageWorker = () => {
         <>
           <GotOffer
             formattedOfferDetails={receiveMessage.params}
+            User={receiveMessage.user}
             onConfirm={handleConfirm}
             onCancel={handleCancel}
           />

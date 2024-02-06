@@ -27,8 +27,7 @@ export const fetchMessages = createAsyncThunk(
 export const SendMessageAsync = createAsyncThunk(
   "Chat/SendMessage",
   async (credentials) => {
-    const { receiverId, text, initiatorId, token } = credentials;
-    const response = await SendMessage(receiverId, text, initiatorId, token);
+    const response = await SendMessage(credentials);
     return response.data;
   }
 );
