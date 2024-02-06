@@ -59,8 +59,8 @@ const HomePageUser = () => {
           await dispatch(fetchChatsAsync({ user, token }));
           await dispatch(allServicesAsync());
           await setSearchWorker(users)
-       
-          setServiceList(list)
+          const nameValues = list?.map((service) => service.name); 
+          setServiceList(nameValues)
         } else {
           console.error("User object or _id is missing");
         }

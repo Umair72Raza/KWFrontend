@@ -17,17 +17,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { failureToast } from "../../utils.js";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { MdCancelPresentation } from "react-icons/md";
-//import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
+import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
 
 const EditOffer = ({ modal, toggle, order }) => {
+    
     const { user, token } = useSelector((state) => state.auth);
+    
     const dispatch = useDispatch();
     let { SetParam, clear, setClear, SetParams,servicelist } = PopUpState()
     const [taskTitle, setTaskTitle] = useState("");
     const [taskDetails, setTaskDetails] = useState(``);
     const [dateTime, setDateTime] = useState("");
     const [amountPerHour, setAmountPerHour] = useState(5);
-    const [serviceOption, setServiceOption] = useState(servicelist);
+    
     const dateTimeObject = new Date(dateTime);
     const datePart = dateTimeObject.toLocaleDateString();
     const timePart = dateTimeObject.toLocaleTimeString();
@@ -40,27 +42,14 @@ const EditOffer = ({ modal, toggle, order }) => {
     const [clicked, setClicked] = useState(true)
     const [imageError, setImageError] = useState("")
     const [images, setImages] = useState([]);
-    
-    useEffect(()=>
-    {
-        console.log(modal,"modal value")
-    },[modal])
-    useEffect(() => {
-        
-        const fetchData = async () => {
-            try {
-              if (user && user._id && token) {
-                await dispatch(allServicesAsync());
-              } else {
-                console.error("User object or _id is missing");
-              }
-            }catch{
 
-            }
-          };
-      
-          fetchData();
-    }, []);
+    useEffect(()=>{
+        dispatch(allServicesAsync())
+    },[])
+    const list = useSelector((state) => state?.admin?.services); 
+    const [serviceOption, setServiceOption] = useState([]);
+    
+    
 
     useEffect(() => {
         if (order) {
@@ -68,10 +57,10 @@ const EditOffer = ({ modal, toggle, order }) => {
             setTaskDetails(order.details);
             setDateTime("");
             setAmountPerHour(5);
-            setServiceOption(servicelist);
+            setServiceOption(order.service);
             setTaskTime(1)
             setImages(order.images)
-
+            console.log(order.service)
         }
 
     }, [order])
@@ -193,7 +182,7 @@ const EditOffer = ({ modal, toggle, order }) => {
 
     const handleServiceOptionChange = (serviceName) => {
         const isSelected = serviceOption.includes(serviceName);
-
+        
         if (isSelected) {
             setServiceOption(serviceOption.filter((service) => service !== serviceName));
         } else {
@@ -298,7 +287,7 @@ const EditOffer = ({ modal, toggle, order }) => {
                             {BookingConstants.Labels.service}
                         </Label>
 
-                        <div style={{ minHeight: '100px', maxHeight: '100px', overflowY: 'auto' }}> {serviceOption?.map((service, key) => (
+                        <div style={{ minHeight: '100px', maxHeight: '100px', overflowY: 'auto' }}> {list.length>0 ? list.map((service, key) => (
                             <div key={key} className="form-check">
                                 <Input
                                     type="checkbox"
@@ -314,7 +303,7 @@ const EditOffer = ({ modal, toggle, order }) => {
                                 </Label>
                             </div>
 
-                        ))}</div>
+                        )):[]}</div>
 
                     </FormGroup>
                     <FormGroup>
