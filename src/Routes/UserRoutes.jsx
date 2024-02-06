@@ -3,6 +3,7 @@ import OTPVerification from "../Views/OTPVerification/OTPVerification"
 import EditProfilePage from "../Views/EditProfilePage/EditProfilePage";
 import HomePageUser from "../Views/HomePageUser/HomePageUser";
 import Orders from "../Views/Orders/Orders";
+import PostedJobs from "../Views/PostedJobs/PostedJobs";
 
 const UserRoutes = [
   {
@@ -30,5 +31,12 @@ const UserRoutes = [
     component: <OTPVerification />,
     layout: "/user",
   },
+  {
+    path: "/postedJobs",
+    name: "postedJobs",
+    component: <PostedJobs />,
+    layout: "/user",
+  },
+
 ];
 export default UserRoutes;

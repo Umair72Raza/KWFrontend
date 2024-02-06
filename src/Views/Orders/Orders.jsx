@@ -210,7 +210,7 @@ const Orders = () => {
         </Button>
       </Col>
       <Col className="d-flex justify-content-end">
-        <Button color="primary">Post a Job</Button>
+        <Button onClick={()=>navigate("/user/postedJobs")} color="primary">Post a Job</Button>
       </Col>
     </Row>
 
