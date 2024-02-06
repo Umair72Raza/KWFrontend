@@ -26,6 +26,7 @@ import activeOrderspng from "../../assets/activestatus.png";
 import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
 import Swal from "sweetalert2";
 import { truncateText } from "../../utils";
+import { PopUpState } from "../../Context/PopUpProvider.jsx";
 
 const ScheduledOrdersCardWorker = ({
   scheduledOrdersObject,
@@ -45,9 +46,16 @@ const ScheduledOrdersCardWorker = ({
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
-  const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
-    useState(false);
+  // const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
+  // const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
+  //   useState(false);
+
+  let {
+    startButtonDisabledMap,
+    setStartButtonDisabledMap,
+    globalStartButtonDisabled,
+    setGlobalStartButtonDisabled,
+  } = PopUpState();
 
   const [formattedAddress, setFormattedAddress] = useState(null);
 
@@ -92,7 +100,7 @@ const ScheduledOrdersCardWorker = ({
     script.addEventListener("load", () => {
       // Initialize the fetchAddressFromCoordinates function here
       scheduledOrdersObject.forEach((order) => {
-        fetchAddressFromCoordinates(order.loc.coordinates, order._id);
+        fetchAddressFromCoordinates(order?.loc?.coordinates, order._id);
       });
     });
     document.head.appendChild(script);
@@ -212,7 +220,7 @@ const ScheduledOrdersCardWorker = ({
   };
 
   const openGoogleMaps = (loc) => {
-    const url = `https://www.google.com/maps?q=${loc.coordinates[1]},${loc.coordinates[0]}`;
+    const url = `https://www.google.com/maps?q=${loc?.coordinates[1]},${loc?.coordinates[0]}`;
     window.open(url, "_blank");
   };
 
@@ -343,7 +351,7 @@ const ScheduledOrdersCardWorker = ({
                         {order.users.length > 0 && order.users[0].firstName}
                       </CardText>
                       <CardText>
-                        <b>Address</b>
+                        <b>Address: </b>
                         {order.users[0].address}
                       </CardText>
                       <CardText>

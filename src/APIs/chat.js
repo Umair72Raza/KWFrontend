@@ -30,15 +30,14 @@ export const GetMessages = async (chatId, token) => {
   }
 };
 
-export const SendMessage = async (receiverId, text, initiatorId, token) => {
+export const SendMessage = async (formData) => {
   try {
-    const response = await API.post(`messages/sendMessage`, {
-      receiverId,
-      text,
-      initiatorId,
-    }, {
+    const token = formData.get('token');
+    
+    const response = await API.post(`messages/sendMessage`,formData , {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
       }
     });
     return response;

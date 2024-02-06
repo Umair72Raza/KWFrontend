@@ -22,21 +22,29 @@ const OfferResult = () => {
   const [offerResult, setOfferResult] = useState("");
   const [result, setResult] = useState("");
   const { user, token } = useSelector((state) => state.auth);
-  let { params, SetParams, clear, setClear } = PopUpState();
+  let { params, clear, setClear ,param,SetParam } = PopUpState();
   const { newOrder } = useSelector((state) => state.booking);
 
   const socket = useSelector((state) => state?.socket?.socket);
   const dispatch = useDispatch();
   useEffect(() => {
     socket?.on("offerResult", (result) => {
-      setModalOpen(true);
-      setResult(result);
+      // setModalOpen(true);
+      // setResult(result);
       if (result == "accept") {
+        setModalOpen(true);
+        setResult(result);
         setOfferResult("true");
-
         setClear(true);
       } else if (result == "cancel") {
+        setModalOpen(true);
+        setResult(result);
         setOfferResult("false");
+      }
+      else if(result == "timeup")
+      {
+        console.log("offer expired time up")
+        setOfferResult("timeup");
       }
     });
     return () => {
@@ -46,9 +54,37 @@ const OfferResult = () => {
 
   useEffect(() => {
     if (user && user._id && offerResult == "true") {
-      dispatch(CreateOrder({ params, token }));
+      dispatch(CreateOrder({ param, token }));
       setOfferResult("");
     }
+    else if(user && user._id && offerResult == "false" || offerResult == "timeup")
+    {
+      
+  
+      const data = params
+      const param = new FormData();
+      for (const key in data) {
+        if (data.hasOwnProperty(key) && key != 'users' && key!= 'Status') {
+          param.append(key, data[key]);
+        }
+        else {
+          data.users.forEach((u, index) => {
+            param.append(`users`, u);
+          })
+        }
+      }
+      param.append(`Status`, 'Pending');
+      data.images.forEach((image, index) => {
+        param.append(`images`, image);
+      });
+      
+
+      //SetParam(formData);
+      
+      dispatch(CreateOrder({ param, token }));
+      setOfferResult("");
+}
+    
   }, [offerResult]);
 
   const toggleDetails = () => {
@@ -60,7 +96,7 @@ const OfferResult = () => {
   };
 
   useEffect(() => {
-    if (newOrder !== null) {
+    if (newOrder !== null && newOrder.Status !== "Pending" ) {
       const data = { newOrder: newOrder, Uid: newOrder.users[1]._id };
 
       socket?.emit("new-order-created", data);
