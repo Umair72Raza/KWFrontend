@@ -1,7 +1,7 @@
-import OTPVerification from "../Components/OTPVerification/OTPVerification";
+
 import EditProfilePage from "../Views/EditProfilePage/EditProfilePage";
 import HomePageWorker from "../Views/HomePageWorker/HomePageWorker";
-
+import OTPVerification from "../Views/OTPVerification/OTPVerification"
 const WorkerRoutes = [
   {
     path: "/workerHomepage",

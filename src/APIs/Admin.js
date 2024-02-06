@@ -85,11 +85,11 @@ export const deleteAService = async (token, id, serviceName) => {
   }
 };
 
-export const editNewService = async (token, name, id) => {
+export const editNewService = async (token, name, id, servName) => {
   try {
     const response = await API.put(
       `admin/updateService/${id}`,
-      { name },
+      { name, servName },
       {
         headers: {
           Authorization: `Bearer ${token}`,

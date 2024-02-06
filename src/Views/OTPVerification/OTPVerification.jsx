@@ -35,7 +35,11 @@ const OTPVerification = () => {
   const [otp, setOtp] = useState("");
 
   const handleChange = (e) => {
-    setOtp(e.target.value);
+    const inputValue = e.target.value.replace(
+      /\D/g,
+      ""
+    ); // Remove non-numeric characters
+    setOtp(inputValue);
   };
 
   const verifyandChange = async() => {
@@ -192,6 +196,21 @@ const OTPVerification = () => {
               className="mb-3 text-center"
               maxLength={4} // Restrict input to maximum 4 characters
               pattern="\d*" // Only allow digits
+              onPaste={(e) => {
+                e.preventDefault();
+                const pastedText =
+                  e.clipboardData.getData("text/plain");
+                const numericValue = pastedText.replace(
+                  /\D/g,
+                  ""
+                ); // Remove non-numeric characters
+                document.execCommand(
+                  "insertText",
+                  false,
+                  numericValue
+                );
+                setOtp(numericValue);
+              }}
             />
             <Button
               color="primary"

@@ -432,10 +432,10 @@ const ScheduledOrdersCardWorker = ({
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={toggleModal}>
-            Cancel Order Cancellation
+            Cancel
           </Button>
           <Button color="danger" onClick={cancelingOrder}>
-            Finalize Order Cancellation
+            Finalize 
           </Button>
         </ModalFooter>
       </Modal>

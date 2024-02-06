@@ -1,5 +1,5 @@
 
-import OTPVerification from "../Components/OTPVerification/OTPVerification";
+import OTPVerification from "../Views/OTPVerification/OTPVerification"
 import EditProfilePage from "../Views/EditProfilePage/EditProfilePage";
 import HomePageUser from "../Views/HomePageUser/HomePageUser";
 import Orders from "../Views/Orders/Orders";

@@ -44,6 +44,7 @@ import { hideSpinner, showSpinner } from "../../Redux/Slices/LoaderSlice";
 import {
   requestOTPforEmailAsync,
   requestOTPforPhoneAsync,
+  updateUser,
 } from "../../Redux/Slices/AuthSlice";
 import personPNG from "../../assets/images/dummyProfile/user.png";
 import { CiEdit } from "react-icons/ci";
@@ -259,6 +260,7 @@ const EditProfilePage = ({ ShowServices }) => {
       const data = { id: UsersData?._id, token, formData };
       const result = await dispatch(updateProfileAsync(data));
       if (result.type === "/UpdateProfile/fulfilled") {
+        dispatch(updateUser(result.payload));
         console.log("result.payload", result.payload);
         const {
           firstName,

@@ -66,8 +66,8 @@ const OrderCard = ({
     setModalHeader("Order Cancellation");
     setInputLabel("Reason for Cancellation");
     setShowInput(true);
-    setFinalizeButtonLabel("Finalize Order Cancellation");
-    setCancelButtonLabel("Cancel Order Cancellation");
+    setFinalizeButtonLabel("Finalize");
+    setCancelButtonLabel("Cancel");
     toggleModal();
   };
   const Clear = () => {

@@ -52,7 +52,7 @@ const UserNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [offer, SetShowOffer] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const { user, token } = useSelector((state) => state.auth);
+  let { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggle = () => setIsOpen(!isOpen);
