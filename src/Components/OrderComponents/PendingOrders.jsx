@@ -46,9 +46,9 @@ const PendingOrders = ({ pendingOrders }) => {
     } = PopUpState();
 
     const [modal, setModal] = useState(false);
-    const Post = async (order) => {
-        await setOrder(order)
-        await toggleModal()
+    const Post =  (order) => {
+         setOrder(order)
+         toggleModal()
 
     }
     const toggleModal = () => {
@@ -232,11 +232,11 @@ const PendingOrders = ({ pendingOrders }) => {
                                     </Card>
                                 </Col>
                             ))}
-                            {modal == true ? <EditOffer>
-                            modal={modal}
+                            {modal == true ? <EditOffer  modal={modal}
                             toggle={toggleModal}
-                            order={order}
-                        </EditOffer> : []}
+                            order={order} />
+                           
+                         : []}
                         </Row>
                         
                     </>

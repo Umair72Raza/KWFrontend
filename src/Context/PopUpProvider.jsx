@@ -27,7 +27,7 @@ const PopUpContext = ({ children }) => {
   const [activeOrder, setActiveOrder] = useState([]);
   const [pastOrders, setPastOrders] = useState([]);
   const [pendingOrders, setPendingOrders] = useState([]);
-
+  const [servicelist ,setServiceList]=useState([])
   const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
   const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
     useState(false);
@@ -98,7 +98,7 @@ const PopUpContext = ({ children }) => {
         startButtonDisabledMap,
         setStartButtonDisabledMap,
         globalStartButtonDisabled,
-        setGlobalStartButtonDisabled,pendingOrders, setPendingOrders
+        setGlobalStartButtonDisabled,pendingOrders, setPendingOrders,servicelist ,setServiceList
       }}
     >
       {children}

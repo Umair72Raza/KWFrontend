@@ -22,51 +22,53 @@ import { MdCancelPresentation } from "react-icons/md";
 const EditOffer = ({ modal, toggle, order }) => {
     const { user, token } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+    let { SetParam, clear, setClear, SetParams,servicelist } = PopUpState()
     const [taskTitle, setTaskTitle] = useState("");
     const [taskDetails, setTaskDetails] = useState(``);
     const [dateTime, setDateTime] = useState("");
     const [amountPerHour, setAmountPerHour] = useState(5);
-    const [serviceOption, setServiceOption] = useState([]);
+    const [serviceOption, setServiceOption] = useState(servicelist);
     const dateTimeObject = new Date(dateTime);
     const datePart = dateTimeObject.toLocaleDateString();
     const timePart = dateTimeObject.toLocaleTimeString();
     const [formComplete, setFormComplete] = useState(false);
     const [dateTimeError, setDateTimeError] = useState("");
     const [amountError, setAmountError] = useState("");
-    let list = useSelector((state) => state?.admin?.services);
-    let { SetParam, clear, setClear, SetParams } = PopUpState()
+    
+   
     const [taskTime, setTaskTime] = useState(1)
     const [clicked, setClicked] = useState(true)
     const [imageError, setImageError] = useState("")
     const [images, setImages] = useState([]);
+    
     useEffect(()=>
     {
         console.log(modal,"modal value")
     },[modal])
-    // useEffect(() => {
+    useEffect(() => {
         
-    //     const fetchData = async () => {
-    //         try {
-    //           if (user && user._id && token) {
-    //             await dispatch(allServicesAsync());
-    //           } else {
-    //             console.error("User object or _id is missing");
-    //           }
-    //         }catch{
+        const fetchData = async () => {
+            try {
+              if (user && user._id && token) {
+                await dispatch(allServicesAsync());
+              } else {
+                console.error("User object or _id is missing");
+              }
+            }catch{
 
-    //         }
-    //       };
+            }
+          };
       
-    //       fetchData();
-    // }, []);
+          fetchData();
+    }, []);
 
     useEffect(() => {
         if (order) {
-            setTaskTitle(order.title);
+            setTaskTitle(order.Title);
             setTaskDetails(order.details);
             setDateTime("");
             setAmountPerHour(5);
-            setServiceOption(list);
+            setServiceOption(servicelist);
             setTaskTime(1)
             setImages(order.images)
 
@@ -76,8 +78,8 @@ const EditOffer = ({ modal, toggle, order }) => {
 
     useEffect(() => {
         const isFormComplete =
-            taskTitle.trim() !== "" &&
-            taskDetails.trim() !== "" &&
+            taskTitle?.trim() !== "" &&
+            taskDetails?.trim() !== "" &&
             dateTime !== "" &&
             amountPerHour >= 5 &&
             amountPerHour <= 100000 &&
@@ -263,14 +265,14 @@ const EditOffer = ({ modal, toggle, order }) => {
                             onChange={(e) => setTaskTitle(e.target.value)}
                             maxLength={50}
                         />
-                        {taskTitle.length >= 50 && (
+                        {taskTitle?.length >= 50 && (
                             <div style={{ color: "red" }}>Cannot exceed 50 characters</div>
                         )}
                     </FormGroup>
 
                     <FormGroup>
                         <Label className="fw-bold">Address</Label>
-                        <div>{user.address}</div>
+                        <div>{user?.address}</div>
                     </FormGroup>
                     <FormGroup>
                         <Label for="taskDetails" className="fw-bold ">
@@ -296,7 +298,7 @@ const EditOffer = ({ modal, toggle, order }) => {
                             {BookingConstants.Labels.service}
                         </Label>
 
-                        <div style={{ minHeight: '100px', maxHeight: '100px', overflowY: 'auto' }}> {list?.map((service, key) => (
+                        <div style={{ minHeight: '100px', maxHeight: '100px', overflowY: 'auto' }}> {serviceOption?.map((service, key) => (
                             <div key={key} className="form-check">
                                 <Input
                                     type="checkbox"
