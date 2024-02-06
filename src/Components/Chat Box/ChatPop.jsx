@@ -479,9 +479,9 @@ const ChatPopup = () => {
     setNewMessageText("");
     setSelectedFiles([]);
     setImagesLoading(false);
-    if(screen.width <= 1024){
+   if(profilePicImageLoaded === true){
     setProfilePicImageLoaded(false);
-    }
+   }
   
     // Reset file input value if there are selected files
     if (selectedFiles.length > 0) {
