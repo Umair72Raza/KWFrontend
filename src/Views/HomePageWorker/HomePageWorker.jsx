@@ -35,6 +35,7 @@ import {
 } from "../../Redux/Slices/LoaderSlice";
 import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
 import { PopUpState } from "../../Context/PopUpProvider";
+import { failureToast } from "../../utils";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
@@ -67,7 +68,7 @@ const HomePageWorker = () => {
     setGotOffer,
     setUserOffering,
     setUnreadMessages,
-    unreadMessages,
+    unreadMessages,notificationTimeouts, setNotificationTimeouts
   } = ChatState();
 
   let {
@@ -83,22 +84,59 @@ const HomePageWorker = () => {
 
   const [startJobStatus, setStartJobStatus] = useState("");
 
+  
+  const offerTimeUp = (data) => {
+    setGotOffer(false);
+    SetONotification((prevNotifications) =>
+      prevNotifications.filter((n) => n !== data)
+    );
+    socket?.emit("accept-reject", {
+      result: "timeup",
+      Uid: data.users[0],
+    });
+    failureToast("Offer time expired!");
+
+    const index = notificationTimeouts.findIndex(
+      (timeoutData) => timeoutData.notification === data
+    );
+
+    if (index !== -1) {
+      clearTimeout(notificationTimeouts[index].timeoutId);
+      setNotificationTimeouts((prevTimeouts) =>
+        prevTimeouts.filter((_, i) => i !== index)
+      );
+    }
+  };
+
+  const addNotificationTimeout = (notification, timeoutId) => {
+    setNotificationTimeouts((prevTimeouts) => [
+      ...prevTimeouts,
+      { notification, timeoutId },
+    ]);
+  };
   useEffect(() => {
     if (!socket) return;
     socket?.on("gotNewOffer", (data) => {
+      
+
       if (!chat || !data.chat || chat._id !== data.chat._id) {
         const alreadyPresent = offerNotification.some((obj) => {
           return obj.params.users[0] === data.params.users[0];
         });
         if (!alreadyPresent) {
           SetONotification([data, ...offerNotification]);
+          addNotificationTimeout(
+            data,
+            setTimeout(() => offerTimeUp(data.params), 1 * 60 * 1000)
+          );
         }
       } else {
         setGotOffer(true);
-        setReceiveMessage(data.params);
+        setReceiveMessage(data);
         setUserOffering(data.user);
       }
     });
+
     return () => {
       socket?.off("gotNewOffer");
     };
@@ -192,10 +230,20 @@ const HomePageWorker = () => {
   const handleConfirm = async () => {
     setGotOffer(false);
     // send true to the event to socket
+    const index = notificationTimeouts.findIndex(
+      (timeoutData) => timeoutData.notification == receiveMessage
+    );
 
+    if (index !== -1) {
+      clearTimeout(notificationTimeouts[index].timeoutId);
+      setNotificationTimeouts((prevTimeouts) =>
+        prevTimeouts.filter((_, i) => i !== index)
+      );
+      console.log(index,"offer expire deleted")
+    }
     socket?.emit("accept-reject", {
       result: "accept",
-      Uid: receiveMessage.users[0],
+      Uid: receiveMessage.params.users[0],
     });
     document.body.style.overflow = "auto";
   };
@@ -205,7 +253,7 @@ const HomePageWorker = () => {
     setGotOffer(false);
     socket?.emit("accept-reject", {
       result: "cancel",
-      Uid: receiveMessage.users[0],
+      Uid: receiveMessage.params.users[0],
     });
     document.body.style.overflow = "auto";
   };
@@ -508,7 +556,8 @@ const HomePageWorker = () => {
       {gotOffer ? (
         <>
           <GotOffer
-            formattedOfferDetails={receiveMessage}
+            formattedOfferDetails={receiveMessage.params}
+            User={receiveMessage.user}
             onConfirm={handleConfirm}
             onCancel={handleCancel}
           />

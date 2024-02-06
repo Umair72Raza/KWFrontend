@@ -236,6 +236,11 @@ export const EDITPROFILE_PAGE = {
     ADDRESS: "Address:",
     SERVICES: "Services:",
     RATE: "$/hr",
+    COUNTRY: "Country:",
+    CITY: "City:",
+    REGION_STATE: "Region/State:",
+    OPTIONAL: "Optional",
+    NO_OPT_ADDRESS: "No optional address added."
   },
   ROUTES:{
     BACK_USER:"/user/homepage",
