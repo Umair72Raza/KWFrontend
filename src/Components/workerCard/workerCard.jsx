@@ -136,6 +136,7 @@ const WorkerCard = ({ worker }) => {
     SetBookingWorker(worker);
     toggleModal();
   };
+  
 
   return (
     <Container className="mt-2 ">
@@ -192,7 +193,7 @@ const WorkerCard = ({ worker }) => {
               </Card>
             </>
           ) : (
-            {}
+            []
           )}
       </Row>
       <Booking

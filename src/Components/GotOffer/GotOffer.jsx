@@ -13,13 +13,26 @@ import { ChatState } from "../../Context/ChatProvider";
 import { GOTOFFER } from "../../Constants/Constants";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { SelectChat } from "../../utils";
+import { useSelector } from "react-redux";
 
-const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
-  const [showModal, setShowModal] = useState(true);
+const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
+  const [showModal, setshowModal] = useState(true);
   const [fullDetailsModal, setFullDetailsModal] = useState(false);
   const [imageDataURL, setImageDataURL] = useState([]);
-
+  const { user, token } = useSelector((state) => state.auth);
   const [showMore, setShowMore] = useState(false);
+  const {
+    copyOfChats,
+    setCopyOfChats,
+    setShowModal,
+    chat,
+    setSelectedChat,
+    setSelectedChatCompare,
+    setChat,
+    chatFromWorkerCard,
+    setChatFromWorkerCard,
+  } = ChatState();
 
   const formattedDetails = formattedOfferDetails?.details || "";
   const truncatedDetails =
@@ -38,12 +51,12 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
 
   useEffect(() => {
     const openModal = () => {
-      setShowModal(true);
+      setshowModal(true);
       document.body.style.overflow = "hidden";
     };
 
     const closeModal = () => {
-      setShowModal(false);
+      setshowModal(false);
       document.body.style.overflow = "";
     };
 
@@ -55,7 +68,7 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
   }, []);
 
   const closeModal = () => {
-    setShowModal(false);
+    setshowModal(false);
     document.body.style.overflow = "auto";
   };
 
@@ -116,6 +129,49 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
     slidesToScroll: 1,
     //  prevArrow: <CustomPrevArrow />,
     //  nextArrow: <CustomNextArrow />,
+  };
+  const HandleChat = () => {
+    setShowModal(true);
+    setChatFromWorkerCard(true);
+  
+    const isWorkerInChats = copyOfChats?.some(
+      (chat) => chat?.users?.some((chatUser) => chatUser?._id === formattedOfferDetails?.users[0]?._id)
+    );
+    console.log(
+      isWorkerInChats,"isWorkerInChats"
+    )
+    if (!isWorkerInChats) {
+      // Create a fake chat
+      const fakeChat = {
+        _id: "",
+        chatName: "fakeChat",
+        users: [User, user],
+        latestMessage: null,
+        seen: true,
+      };
+  
+      setCopyOfChats((prevCopyOfChats) => {
+        const updatedChats = prevCopyOfChats.length > 0
+          ? [fakeChat, ...prevCopyOfChats]
+          : [fakeChat];
+        
+        setChat(fakeChat);
+        setSelectedChatCompare(fakeChat);
+        setSelectedChat(() => SelectChat(fakeChat));
+  
+        return updatedChats;
+      });
+    } else {
+      const workerChat = copyOfChats.find(
+        (chat) => chat?.users?.some((chatUser) => chatUser?._id === formattedOfferDetails?.users[0]?._id)
+      );
+  
+      
+        setChat(workerChat);
+        setSelectedChatCompare(workerChat);
+        setSelectedChat(() => SelectChat(workerChat));
+     
+    }
   };
 
   return (
@@ -204,6 +260,9 @@ const GotOffer = ({ formattedOfferDetails, onConfirm, onCancel }) => {
           </Button>{" "}
           <Button color="danger" onClick={handleCancel}>
             {GOTOFFER.REJECT_BUTTON}
+          </Button>{" "}
+          <Button color="success" onClick={HandleChat}>
+            Chat
           </Button>{" "}
         </ModalFooter>
       </Modal>
