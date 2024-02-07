@@ -12,8 +12,25 @@ import {
 import Slider from "react-slick";
 import { truncateText } from "../../utils";
 import { FiMessageCircle } from "react-icons/fi";
+import { ChatState } from "../../Context/ChatProvider";
+import { PopUpState } from "../../Context/PopUpProvider";
+import { useSelector } from "react-redux";
+import { SelectChat } from "../../utils";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
+  const {
+    setShowModal,
+    setNotification,
+    setSelectedChat,
+    setChat,
+    setSelectedChatCompare,
+    copyOfChats,
+    setUnreadMessages,
+    setCopyOfChats,
+    unreadMessages,
+  } = ChatState();
+  const { setFromAvailableJobs } = PopUpState();
+  const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
 
@@ -71,6 +88,58 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     return "placeholder_image_url.jpg"; // Replace "placeholder_image_url.jpg" with your desired fallback image URL
   };
 
+  const handleMessageIconClick = (order) => {
+    setShowModal(true);
+    setFromAvailableJobs(true);
+    const isUserInChats = copyOfChats?.some((chat) =>
+      chat?.users?.some((chatUser) => chatUser?._id === order?.user?._id)
+    );
+    const worker = user;
+    if (!isUserInChats) {
+      // Create a fake chat
+      console.log("order", order);
+      const fakeChat = {
+        _id: "",
+        chatName: "fakeChat",
+        users: [order?.user, worker],
+        latestMessage: null,
+        seen: true,
+      };
+
+      setCopyOfChats((prevCopyOfChats) => {
+        const updatedChats =
+          prevCopyOfChats.length > 0
+            ? [fakeChat, ...prevCopyOfChats]
+            : [fakeChat];
+
+        setChat(fakeChat);
+        setSelectedChatCompare(fakeChat);
+        setSelectedChat(() => SelectChat(fakeChat));
+
+        return updatedChats;
+      });
+    } else {
+      const userChat = copyOfChats.find((chat) =>
+        chat?.users?.some((chatUser) => chatUser?._id === order?.user?._id)
+      );
+
+      if (userChat?.access === "accepted") {
+        setChat(userChat);
+        setSelectedChatCompare(userChat);
+        setSelectedChat(() => SelectChat(userChat));
+        setNotification((prevNotifications) =>
+          prevNotifications.filter((n) => n?.chat?._id !== userChat?._id)
+        );
+        if (unreadMessages[userChat?._id]) {
+          setUnreadMessages((prevCount) => ({
+            ...prevCount,
+            [userChat._id]: 0,
+          }));
+        }
+      }
+    }
+  };
+
   return (
     <Container>
       {spinnerVisible ? (
@@ -80,9 +149,9 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
       ) : (
         <>
           <Row>
-            {scheduledOrdersObject.map((order) => (
+            {scheduledOrdersObject?.map((order, index) => (
               <Col
-                key={order.id}
+                key={index}
                 sm="6"
                 md="4"
                 lg="4"
@@ -103,23 +172,23 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         maxWidth: "100%",
                       }}
                     >
-                      {order.Title}
+                      {order?.Title}
                     </h5>
                     <CardText>
-                      <b>Posted by:</b> {order.user.firstName}{" "}
-                      {order.user.lastName}
+                      <b>Posted by:</b> {order?.user?.firstName}{" "}
+                      {order?.user?.lastName}
                     </CardText>
                     <CardText>
-                      <b>Time:</b> {order.time}
+                      <b>Time:</b> {order?.time}
                     </CardText>
                     <CardText>
-                      <b>Date:</b> {order.date}
+                      <b>Date:</b> {order?.date}
                     </CardText>
                     <CardText>
-                      <b>Amount:</b> ${order.amount}
+                      <b>Amount:</b> ${order?.amount}
                     </CardText>
                     <CardText>
-                      <b>Address:</b> {order.Address}
+                      <b>Address:</b> {order?.Address}
                     </CardText>
                     <div style={{ maxHeight: "100px", overflowY: "auto" }}>
                       {order.service && order.service.length > 0 && (
@@ -150,19 +219,19 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         {showFullDetailsMap[order.id] ? (
                           <div
                             dangerouslySetInnerHTML={{
-                              __html: order.details,
+                              __html: order?.details,
                             }}
                           />
                         ) : (
                           transformOrderDetails(order)
                         )}
-                        {order.details?.length > 30 && (
+                        {order?.details?.length > 30 && (
                           <Button
                             style={{ marginTop: "-5px" }}
                             color="link"
-                            onClick={() => toggleDetails(order.id)}
+                            onClick={() => toggleDetails(order?.id)}
                           >
-                            {showFullDetailsMap[order.id]
+                            {showFullDetailsMap[order?.id]
                               ? "Show Less"
                               : "Show More"}
                           </Button>
@@ -192,11 +261,13 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                     )}
                     <CardText className="d-flex justify-content-around align-items-center">
                       <Button color="primary">Accept</Button>
-
-                      <FiMessageCircle
-                        className="fs-3 hover-pointer"
-                        // onClick={handleMessageIconClick}
-                      />
+                      <span className="fw-bold">
+                        <FiMessageCircle
+                          className="fs-2 hover-pointer"
+                          onClick={()=> handleMessageIconClick(order)}
+                        />{" "}
+                        Chat{" "}
+                      </span>
                     </CardText>
                   </CardBody>
                 </Card>
