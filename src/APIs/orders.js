@@ -61,10 +61,44 @@ export const fetchCancOrders = async (data) => {
   }
 };
 
+//fetchOpenOrders
+export const fetchOpenOrders = async (data) => {
+  try {
+    const { userId, token } = data;
+    const response = await API.get(
+      `order/getOpenOrder/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response,"reponse in api")
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+
+
 export const fetchActiveOrders = async (data) => {
   try {
     const { users, status, token } = data;
     const response = await API.get(`order/getActiveOrder/${users}/${status}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const fetchPendingOrders = async (data) => {
+  try {
+    const { users, status, token } = data;
+    const response = await API.get(`order/getPendingOrder/${users}/${status}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

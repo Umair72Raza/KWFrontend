@@ -48,6 +48,9 @@ text-decoration: underline !important;
 }
 
 .notification-circle {
+  background-color: rgb(232, 6, 6) !important;
+  color: white !important;
+  border-radius: 50% !important;
   width: 25px !important;
   height: 25px !important;
   display: flex !important;
@@ -121,7 +124,7 @@ text-decoration: underline !important;
   align-self: flex-start !important;
   max-width: 50% !important;
  min-width:10% !important;
- max-height: 500px !important;
+
 }
 
 .sent-message {
@@ -132,7 +135,6 @@ text-decoration: underline !important;
   align-self: flex-end !important;
   max-width: 50% !important;
   min-width: 10% !important;
-  max-height: 500px !important;
 }
 
 .message-input {
@@ -185,8 +187,7 @@ text-decoration: underline !important;
 }
 
 .pictureError {
-  top: 70px !important;
-  left:50vw !important;
+  top: 80px !important;
   opacity: 0 !important;
   transition: opacity 0.7s ease-in !important;
 }
@@ -194,22 +195,6 @@ text-decoration: underline !important;
 .pictureError.active {
   opacity: 1 !important;
 }
-
-@media  screen and (min-width: 768px) {
-  .pictureError {
-    top: 100px !important;
-    left: 150px !important;
-  }
-  
-} 
-
-@media  screen and ( max-width: 1024px) {
-  .pictureError {
-    top: 70px !important;
-    left: 400px !important;
-  }
-  
-} 
 
 .message-image{
   width: 100% !important;

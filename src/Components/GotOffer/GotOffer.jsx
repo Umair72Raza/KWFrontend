@@ -31,9 +31,9 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
     setSelectedChatCompare,
     setChat,
     chatFromWorkerCard,
-    setChatFromWorkerCard,
+    setChatFromWorkerCard,setNotification,setNewMessageText,setSelectedFiles,setUnreadMessages,unreadMessages
   } = ChatState();
-
+  const socket = useSelector((state) => state?.socket?.socket);
   const formattedDetails = formattedOfferDetails?.details || "";
   const truncatedDetails =
     formattedDetails?.length > 30
@@ -130,15 +130,16 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
     //  prevArrow: <CustomPrevArrow />,
     //  nextArrow: <CustomNextArrow />,
   };
+
   const HandleChat = () => {
     setShowModal(true);
     setChatFromWorkerCard(true);
   
     const isWorkerInChats = copyOfChats?.some(
-      (chat) => chat?.users?.some((chatUser) => chatUser?._id === formattedOfferDetails?.users[0]?._id)
+      (chat) => chat?.users?.some((chatUser) =>  formattedOfferDetails?.users[0] === chatUser?._id )
     );
     console.log(
-      isWorkerInChats,"isWorkerInChats"
+      copyOfChats,"isWorkerInChats"
     )
     if (!isWorkerInChats) {
       // Create a fake chat
@@ -163,13 +164,28 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
       });
     } else {
       const workerChat = copyOfChats.find(
-        (chat) => chat?.users?.some((chatUser) => chatUser?._id === formattedOfferDetails?.users[0]?._id)
+        (chat) => chat?.users?.some((chatUser) => chatUser?._id === formattedOfferDetails?.users[0])
       );
   
-      
+      const data = {
+        userId: user._id,
+        chatId: workerChat._id,
+      };
+    //   setNewMessageText("");
+    // setSelectedFiles([]);
         setChat(workerChat);
         setSelectedChatCompare(workerChat);
         setSelectedChat(() => SelectChat(workerChat));
+        setNotification((prevNotifications) =>
+        prevNotifications.filter((n) => n?.chat?._id !== workerChat?._id)
+      );
+      socket?.emit("chat read", data);
+        if (unreadMessages[workerChat._id]) {
+          setUnreadMessages((prevCount) => ({
+            ...prevCount,
+            [workerChat._id]: 0,
+          }));
+        }
      
     }
   };

@@ -28,6 +28,7 @@ import {
 import { ChatState } from "../../Context/ChatProvider.jsx";
 import ModalComponent from "../../Components/ModalComponent/ModalComponent.jsx";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
+import { PopUpState } from "../../Context/PopUpProvider.jsx";
 const HomePageUser = () => {
   let list = useSelector((state) => state?.admin?.services);
   const socket = useSelector((state) => state?.socket?.socket);
@@ -37,7 +38,7 @@ const HomePageUser = () => {
   const { user, token } = useSelector((state) => state.auth);
   let users = useSelector((state) => state?.homepage?.workers);
   const chats = useSelector((state) => state?.chat?.ChatsWithWorkers);
-
+   let {servicelist ,setServiceList}=PopUpState()
   const [showFilters, setShowFilters] = useState(false);
   const [show, setShow] = useState(true)
   const [sortOption, setSortOption] = useState("none");
@@ -58,8 +59,8 @@ const HomePageUser = () => {
           await dispatch(fetchChatsAsync({ user, token }));
           await dispatch(allServicesAsync());
           await setSearchWorker(users)
-       
-          
+          const nameValues = list?.map((service) => service.name); 
+          setServiceList(nameValues)
         } else {
           console.error("User object or _id is missing");
         }

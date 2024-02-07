@@ -1,3 +1,4 @@
+//cards for Scheduled Orders
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -9,136 +10,73 @@ import {
   CardTitle,
   CardText,
   Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Spinner,
 } from "reactstrap";
+
 import completedtask from "../../assets/completedtask.png";
-import activeOrder from "../../assets/activestatus.png";
+import activeOrderspng from "../../assets/activestatus.png";
 import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
+import Swal from "sweetalert2";
 import { truncateText } from "../../utils";
-import { PopUpState } from "../../Context/PopUpProvider";
-const OrderCard = ({
-  scheduledOrdersObject,
-  toggleCancel,
-  setToggleCancel,
-  setScheduledOrders,
-  setCancelledOrders,
-}) => {
-  const socket = useSelector((state) => state?.socket?.socket);
-  //get these from local storage
+import { PopUpState } from "../../Context/PopUpProvider.jsx";
+import { selectSpinnerVisibility } from "../../Redux/Slices/LoaderSlice";
+import EditOffer from "./EditOffer.jsx";
+
+const PendingOrders = ({ pendingOrders }) => {
   const { user, token } = useSelector((state) => state.auth);
-  const userId = user._id;
+  const [order, setOrder] = useState(null);
+  const socket = useSelector((state) => state?.socket?.socket);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
 
-  let {
-    setModalHeader,
-    setIsModalOpen,
-    setInputLabel,
-    modalInputValue,
-    setModalInputValue,
-    setCancelButtonLabel,
-    setFinalizeButtonLabel,
-    setShowInput,
-    toggleModal,
-    orderToCancel,
-    setOrderToCancel,
-    finalizeFunction,
-    setFinalizeFunction,scheduledOrders
-  } = PopUpState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const spinnerVisible = useSelector(selectSpinnerVisibility);
+  let {} = PopUpState();
 
+  const [modal, setModal] = useState(false);
+  const Post = (order) => {
+    setOrder(order);
+    toggleModal();
+  };
+  const toggleModal = () => {
+    setModal(!modal);
+  };
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
       ...prevMap,
       [orderId]: !prevMap[orderId],
     }));
   };
+  //const user = localStorage.getItem('user')
+  const dispatch = useDispatch();
 
   const transformOrderDetails = (order) => {
     let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
 
     return showFullDetailsMap[order._id]
       ? order.details
-      : truncateText(transformedDetails, 25);
-  };
-
-  const dispatch = useDispatch();
-
-  const CancelOrder = (Order) => {
-    setOrderToCancel(Order);
-    setModalHeader("Order Cancellation");
-    setInputLabel("Reason for Cancellation");
-    setShowInput(true);
-    setFinalizeButtonLabel("Finalize");
-    setCancelButtonLabel("Cancel");
-    toggleModal();
-  };
-  const Clear = () => {
-    setOrderToCancel(null);
-    setModalHeader("");
-    setInputLabel("");
-    setShowInput(false);
-    setFinalizeButtonLabel("");
-    setCancelButtonLabel("");
-    setFinalizeFunction(false);
-  };
-
-  useEffect(() => {
-    if (finalizeFunction == true) {
-      cancelingOrder();
-    }
-  }, [finalizeFunction]);
-
-  const cancelingOrder = () => {
-    //dispatch cancel order
-    console.log(scheduledOrders,"all orders")
-    console.log(orderToCancel,"order to cancel")
-    const order = orderToCancel;
-    const data = {
-      userId: userId,
-      orderId: order._id,
-      cancelReason: modalInputValue,
-      Status: "Cancelled",
-    };
-
-    const resonWithOrdertoCancel = {
-      reason: modalInputValue,
-      order: order,
-    };
-    console.log(resonWithOrdertoCancel, "cancel order");
-
-    const cancelOrderSocketEvent = () => {
-      if (!socket) return;
-      socket?.emit("cancel-order-user", resonWithOrdertoCancel);
-      return () => {
-        socket?.off("cancel-order-user");
-      };
-    };
-    const dataWithToken = { token: token, data: data };
-    dispatch(cancelOrderAsync(dataWithToken));
-    cancelOrderSocketEvent();
-
-    setModalInputValue("");
-    setIsModalOpen(false);
-
-    setScheduledOrders((prevScheduledOrders) =>
-      prevScheduledOrders.filter(
-        (scheduledOrder) => scheduledOrder._id !== order._id
-      )
-    );
-
-    setCancelledOrders((prevCancelledOrders) => [
-      ...prevCancelledOrders,
-      order,
-    ]);
-    Clear();
-    setToggleCancel(!toggleCancel);
+      : truncateText(transformedDetails, 30);
   };
 
   return (
     <>
       <Container>
-        {scheduledOrdersObject.length > 0 ? (
+        {spinnerVisible ? (
+          <div style={{ textAlign: "center" }}>
+            <Spinner />
+          </div>
+        ) : pendingOrders.length > 0 ? (
           <>
+            {console.log(pendingOrders)}
             <Row>
-              {scheduledOrdersObject?.map((order) => (
+              {pendingOrders?.map((order) => (
                 <Col
                   key={order._id}
                   sm="6"
@@ -149,11 +87,7 @@ const OrderCard = ({
                 >
                   <Card
                     className="shadow"
-                    style={{
-                      backgroundColor: "#f6f8fc",
-                      color: "",
-                      height: "100%",
-                    }}
+                    style={{ backgroundColor: "#f6f8fc", height: "100%" }}
                   >
                     <CardBody>
                       <CardTitle>
@@ -197,10 +131,11 @@ const OrderCard = ({
                             <span
                               style={{ marginTop: "10px", marginRight: "1%" }}
                             >
-                              <b>Status:</b> {order.Status}
+                              <b>Status: </b>
+                              {order.Status}
                             </span>
                             <img
-                              src={activeOrder}
+                              src={activeOrderspng}
                               alt="schTask"
                               style={{
                                 height: "12px",
@@ -213,9 +148,15 @@ const OrderCard = ({
                           </div>
                         </Col>
                       </CardText>
-                      <CardText><b>Time:</b> {order.time}</CardText>
-                      <CardText><b>Date:</b> {order.date}</CardText>
-                      <CardText><b>Amount:</b> ${order.amount}</CardText>
+                      <CardText>
+                        <b>Time:</b> {order.time}
+                      </CardText>
+                      <CardText>
+                        <b>Date:</b> {order.date}
+                      </CardText>
+                      <CardText>
+                        <b>Amount:</b> ${order.amount}
+                      </CardText>
                       <CardText>
                         <b>Details:</b>{" "}
                         <div
@@ -233,7 +174,7 @@ const OrderCard = ({
                           ) : (
                             transformOrderDetails(order)
                           )}
-                          {order.details.length > 5 && (
+                          {order.details.length > 30 && (
                             <Button
                               style={{ marginTop: "-5px" }}
                               color="link"
@@ -246,45 +187,85 @@ const OrderCard = ({
                           )}
                         </div>
                       </CardText>
-                      {/* <CardText>OrderId: {order._id}</CardText> */}
-                      <CardText>
-                        <b>Worker:</b>{" "}
-                        {order?.users?.length > 0 && order?.users[1]?.firstName}
-                      </CardText>
+
                       <Row>
-                        <Col></Col>
-                        <Col>
+                        <Col style={{ margin: "2%" }} xs="12" md="5">
                           {" "}
                           {/* Full width on small screens, half width on medium and larger screens */}
                           <CardText>
                             <Button
-                              onClick={() => {
-                                //setOrderToCancel(order)
-                                CancelOrder(order);
-                              }}
+                              onClick={() => Delete(order)}
                               color="danger"
                             >
-                              Cancel Order
+                              Delete
                             </Button>
                           </CardText>
                         </Col>
-                        <Col></Col>
+
+                        <>
+                          <Col style={{ margin: "2%" }} xs="12" md="5">
+                            {" "}
+                            {/* Half width on small screens, one-third width on medium and larger screens */}
+                            <CardText>
+                              <Button
+                                onClick={() => Post(order)}
+                                color="success"
+                              >
+                                Post Job
+                              </Button>
+                            </CardText>
+                          </Col>
+                        </>
                       </Row>
                     </CardBody>
                   </Card>
                 </Col>
               ))}
+              {modal == true ? (
+                <EditOffer modal={modal} toggle={toggleModal} order={order} />
+              ) : (
+                []
+              )}
             </Row>
           </>
         ) : (
-          <>No Scheduled Orders</>
+          <div>No Pending Orders</div>
         )}
       </Container>
-      {/* <ModalComponent
-       
+
+      {/* <Booking
+        modal={modal}
+        toggle={toggleModal}
+        worker={bookingWorker}
+        chat={chat}
       /> */}
+      {/* <Modal isOpen={isModalOpen} toggle={toggleModal} centered>
+        <ModalHeader toggle={toggleModal}>Order Cancellation</ModalHeader>
+        <ModalBody>
+          <Form>
+            <FormGroup>
+              <Label for="cancelReason">Reason for Cancellation</Label>
+              <Input
+                type="text"
+                id="cancelReason"
+                placeholder="Enter reason"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+              />
+            </FormGroup>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={toggleModal}>
+            Cancel Order Cancellation
+          </Button>
+          <Button color="danger" onClick={cancelingOrder}>
+            Finalize Order Cancellation
+          </Button>
+        </ModalFooter>
+      </Modal> */}
     </>
   );
 };
 
-export default OrderCard;
+export default PendingOrders;

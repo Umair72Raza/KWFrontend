@@ -196,6 +196,7 @@ export const TABS = {
   NO_CANC_ORDERS: "No Cancelled Orders",
   ACTIVE_ORDERS: "Active Orders",
   NO_ACTIVE_ORDERS: "No Active Orders!",
+  Pending:"Pending Orders"
 };
 
 export const GOTOFFER = {

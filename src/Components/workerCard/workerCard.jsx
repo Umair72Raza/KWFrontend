@@ -29,7 +29,7 @@ const WorkerCard = ({ worker }) => {
     setSelectedChatCompare,
     setChat,
     chatFromWorkerCard,
-    setChatFromWorkerCard,
+    setChatFromWorkerCard,setNotification
   } = ChatState();
   const [modal, setModal] = useState(false);
   const [bookingWorker, SetBookingWorker] = useState();
@@ -84,6 +84,15 @@ const WorkerCard = ({ worker }) => {
         setChat(workerChat);
         setSelectedChatCompare(workerChat);
         setSelectedChat(() => SelectChat(workerChat));
+        setNotification((prevNotifications) =>
+        prevNotifications.filter((n) => n?.chat?._id !== workerChat?._id)
+      );
+      if (unreadMessages[workerChat._id]) {
+        setUnreadMessages((prevCount) => ({
+          ...prevCount,
+          [workerChat._id]: 0,
+        }));
+      }
       }
     }
   };

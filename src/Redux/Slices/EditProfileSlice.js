@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getUsersData, updateProfile } from "../../APIs/editProfile";
 import { updatePfp } from "../../APIs/auth";
+import { updateUser } from "./AuthSlice";
 
 export const fetchUsersDataAsync = createAsyncThunk(
   "/userData",
@@ -23,7 +24,11 @@ export const updateProfileAsync = createAsyncThunk(
     try {
       const { id, token, formData } = credentials;
       const response = await updateProfile(id, token, formData);
-
+      // const user = JSON.parse(localStorage.getItem("user"));
+      // user.firstName = response.data;
+      localStorage.setItem("user", JSON.stringify(response));
+      console.log(response,"response")
+      
       return response;
     } catch (error) {
       if (

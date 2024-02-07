@@ -66,6 +66,17 @@ const Services = () => {
       icon: "error",
     });
   };
+  const displayEditErrorMessage = (reason) => {
+    return new Promise((resolve) => {
+      Swal.fire({
+        title: `${reason}!`,
+        allowOutsideClick: false,
+        icon: "error",
+      }).then(() => {
+        resolve();
+      });
+    });
+  };
 
   const handleAddService = async () => {
     setShowEditors(false);
@@ -164,8 +175,10 @@ const Services = () => {
     setShowEditButton(!showEditButtons);
   };
 
-  const handleEditService = async () => {
+  
+  const handleEditService = async (service) => {
     setUpdateButtonDisabled(true);
+    const servName = service.name;
     const normalizeServiceName = (serviceName) => {
       // Remove extra spaces, convert to lowercase, and remove spaces between characters
       return serviceName
@@ -199,11 +212,30 @@ const Services = () => {
             token,
             name: trimmedEditedService,
             id: editedService.id,
+            servName: servName,
           };
           const result = await dispatch(updateServiceAsync(data));
-
           if (result.type === "/admin/updateService/fulfilled") {
-            setServices((prevServices) =>
+            console.log(result.payload, 'payload')
+            if (result.payload.message === "Required") {
+              setEditedService({ id: null, name: "" });
+              console.log("name is reqrd")
+              await displayEditErrorMessage(
+                "Name is required for updating a service"
+              );
+              return
+            } else if (
+              result.payload.message === "taken"
+            ) {
+              console.log("service taken")
+              setEditedService({ id: null, name: "" });
+              await displayEditErrorMessage(
+                "Service is taken by a worker. Cannot Update"
+              );
+              return
+            }
+            else {
+              setServices((prevServices) =>
               prevServices.map((s) =>
                 s._id === editedService.id
                   ? { ...s, name: trimmedEditedService }
@@ -211,6 +243,8 @@ const Services = () => {
               )
             );
             setEditedService({ id: null, name: "" });
+            }
+           
           } else {
             displayErrorMessage("Failed to update the service!");
           }

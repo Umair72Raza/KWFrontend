@@ -95,8 +95,8 @@ export const updateServiceAsync = createAsyncThunk(
   "/admin/updateService",
   async (data) => {
     try {
-      const { token, name, id } = data;
-      const response = await editNewService(token, name, id);
+      const { token, name, id,   servName } = data;
+      const response = await editNewService(token, name, id, servName);
       return response;
     } catch (error) {
       console.log(error, "error editing service");

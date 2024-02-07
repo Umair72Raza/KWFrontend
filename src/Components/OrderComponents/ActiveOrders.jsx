@@ -145,7 +145,7 @@ const ActiveOrders = ({
                     >
                       {" "}
                       <span style={{ marginTop: "10px" }}>
-                        <b>Status: Active</b>
+                        <b>Status:</b>  Active
                       </span>
                     </CardText>
                     <CardText>
