@@ -11,6 +11,7 @@ import {
 } from "reactstrap";
 import Slider from "react-slick";
 import { truncateText } from "../../utils";
+import { FiMessageCircle } from "react-icons/fi";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
@@ -84,7 +85,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                 key={order.id}
                 sm="6"
                 md="4"
-                lg="3"
+                lg="4"
                 style={{ marginTop: "10px" }}
               >
                 <Card
@@ -105,7 +106,8 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       {order.Title}
                     </h5>
                     <CardText>
-                      <b>Status:</b> Open Job
+                      <b>Posted by:</b> {order.user.firstName}{" "}
+                      {order.user.lastName}
                     </CardText>
                     <CardText>
                       <b>Time:</b> {order.time}
@@ -131,7 +133,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                             }}
                           >
                             {order.service.map((s, index) => (
-                              <li key={index}>{s.name}</li>
+                              <li key={index}>{s}</li>
                             ))}
                           </ul>
                         </CardText>
@@ -167,24 +169,34 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         )}
                       </div>
                     </CardText>
-                    <CardText className="mb-3">
+                    {order.images.length > 0 && (
+                      <CardText className="mb-3">
                         <b>Images:</b>
-                      {order.images?.length > 0 && (
-                        <Row>
-                          <Slider {...settings} className="">
-                            {order.images?.map((image, index) => (
-                              <div key={index}>
-                                <img
-                                  key={index}
-                                  src={getCorrectImageUrl(image)}
-                                  alt={`Modal Image ${index}`}
-                                  className="img-fluid "
-                                />
-                              </div>
-                            ))}
-                          </Slider>
-                        </Row>
-                      )}
+                        {order.images?.length > 0 && (
+                          <Row>
+                            <Slider {...settings} className="">
+                              {order.images?.map((image, index) => (
+                                <div key={index}>
+                                  <img
+                                    key={index}
+                                    src={getCorrectImageUrl(image)}
+                                    alt={`Modal Image ${index}`}
+                                    className="img-fluid "
+                                  />
+                                </div>
+                              ))}
+                            </Slider>
+                          </Row>
+                        )}
+                      </CardText>
+                    )}
+                    <CardText className="d-flex justify-content-around align-items-center">
+                      <Button color="primary">Accept</Button>
+
+                      <FiMessageCircle
+                        className="fs-3 hover-pointer"
+                        // onClick={handleMessageIconClick}
+                      />
                     </CardText>
                   </CardBody>
                 </Card>

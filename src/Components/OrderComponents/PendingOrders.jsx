@@ -74,7 +74,6 @@ const PendingOrders = ({ pendingOrders }) => {
           </div>
         ) : pendingOrders.length > 0 ? (
           <>
-            {console.log(pendingOrders)}
             <Row>
               {pendingOrders?.map((order) => (
                 <Col
