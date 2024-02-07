@@ -61,6 +61,24 @@ export const fetchCancOrders = async (data) => {
   }
 };
 
+export const fetchPostedOrders = async (data) => {
+  try {
+    const { users, status, token } = data;
+    const response = await API.get(
+      `order/getPostedOrder/${users}/${status}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log(response.data,"resp in api")
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 //fetchOpenOrders
 export const fetchOpenOrders = async (data) => {
   try {

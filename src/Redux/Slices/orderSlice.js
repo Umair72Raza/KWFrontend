@@ -10,6 +10,7 @@ import {
   fetchActiveOrders,
   fetchPendingOrders,
   fetchOpenOrders,
+  fetchPostedOrders,
 } from "../../APIs/orders";
 
 export const getAllTheOrders = createAsyncThunk(
@@ -52,7 +53,16 @@ export const fetchCancelledOrdersAsync = createAsyncThunk(
     return response;
   }
 );
-
+export const fetchPostedOrdersAsync = createAsyncThunk(
+  "orders/fetchPostedOrders",
+  async (token) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userId = user._id;
+    const data = { token: token, users: userId, status: "Posted" };
+    const response = await fetchPostedOrders(data);
+    return response;
+  }
+);
 export const fetchPendingOrdersAsync = createAsyncThunk(
   "orders/fetchPendingOrders",
   async (token) => {

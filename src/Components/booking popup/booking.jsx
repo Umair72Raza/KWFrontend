@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { failureToast } from "../../utils.js";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { MdCancelPresentation } from "react-icons/md";
+import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 
 const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -35,7 +36,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const [dateTimeError, setDateTimeError] = useState("");
   const [amountError, setAmountError] = useState("");
   let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
-  let { SetParam, clear, setClear, SetParams } = PopUpState();
+  let { SetParam, clear, setClear, SetParams, params } = PopUpState();
   const [taskTime, setTaskTime] = useState(1);
   const [clicked, setClicked] = useState(true);
   const [imageError, setImageError] = useState("");
@@ -132,7 +133,6 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       images.forEach((image, index) => {
         formData.append(`images`, image);
       });
-console.log(formData,"formdata",data,"data" )
       SetParam(formData);
       SetParams(data);
 
@@ -176,26 +176,30 @@ console.log(formData,"formdata",data,"data" )
   };
 
 
-  const handlePost = () => {
+  const handlePost = async() => {
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
-    const Users = [user._id, worker._id];
-    let status = "Scheduled";
+    const Users = [user._id];
+    let status = "Posted";
     if (selectedDate > currentDate) {
       const data = {
-        Title: taskTitle,
-        Status: status,
-        users: Users,
-        date: datePart,
-        time: timePart,
-        details: taskDetails.replace(/\n/g, "<br>"),
-        amount: amountPerHour,
-        service: serviceOption,
-        address: user.address,
-        tasktime: taskTime,
-        
-        images,
+        params: {
+          Title: taskTitle,
+          Status: status,
+          users: Users,
+          date: datePart,
+          time: timePart,
+          details: taskDetails.replace(/\n/g, "<br>"),
+          amount: amountPerHour,
+          service: serviceOption,
+          address: user.address,
+          tasktime: taskTime,
+          images,
+          location: user?.location || {}
+        },
+        token: token
       };
+      
       const formData = new FormData();
 
       for (const key in data) {
@@ -215,34 +219,20 @@ console.log(formData,"formdata",data,"data" )
         formData.append(`images`, image);
       });
 
-      SetParam(formData);
-      SetParams(data);
-
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
-        if (removedUsers) {
-          const present = removedUsers?.findIndex((u) => u._id === worker._id);
-          if (present !== -1) {
-            failureToast("Worker Gets Offline!");
-            toggle();
-          } else {
-            resetForm();
-            socket?.emit("newOffer", {
-              params: data,
-              Wid: worker._id,
-              chat: chat,
-              user,
-            });
+         {
+            
+           // console.log(params,"params")
+            const result = await dispatch(CreateOrder(data))
+            console.log(result)
             Swal.fire({
-              title: "Offer Sent",
+              title: "Job Posted",
               icon: "success",
               confirmButtonText: "OK",
             });
             toggle();
-            return () => {
-              socket?.off("newOffer");
-            };
+            resetForm();
           }
-        }
       } else {
         setAmountError("Enter amount in range 5-100000");
         setClicked(true);
@@ -257,6 +247,7 @@ console.log(formData,"formdata",data,"data" )
     }
   };
 
+  
   const starRating = (numStars) => {
     const stars = [];
     for (let i = 0; i < numStars; i++) {

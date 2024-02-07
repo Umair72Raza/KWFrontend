@@ -28,6 +28,7 @@ const PopUpContext = ({ children }) => {
   const [pastOrders, setPastOrders] = useState([]);
   const [pendingOrders, setPendingOrders] = useState([]);
   const [servicelist, setServiceList] = useState([]);
+  const [postedJobs, setPostedJobs] = useState([])
   const [openJobs, setOpenJobs] = useState([
     // {
     //   id: "dummy-id",
@@ -129,6 +130,8 @@ const PopUpContext = ({ children }) => {
         setServiceList,
         openJobs,
         setOpenJobs,
+        postedJobs,
+        setPostedJobs
       }}
     >
       {children}

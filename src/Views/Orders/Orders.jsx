@@ -19,6 +19,7 @@ import {
   fetchPastOrdersAsync,
   fetchScheduledOrdersAsync,
   fetchPendingOrdersAsync,
+  fetchPostedOrdersAsync,
 } from "../../Redux/Slices/OrderSlice";
 import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
@@ -42,6 +43,7 @@ const Orders = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
   const [cancelledClicked, setcancelledClicked] = useState(false); //checks if cancel was ever clicked
+  const [postedClicked,setPostedClicked] = useState(false)
   const dispatch = useDispatch();
   //const [pastOrders, setPastOrders] = useState([]);
   // const [activeOrder, setActiveOrder] = useState([]);
@@ -64,6 +66,8 @@ const Orders = () => {
     setPastOrders,
     pendingOrders,
     setPendingOrders,
+    postedJobs,
+    setPostedJobs
   } = PopUpState();
 
   const navigate = useNavigate();
@@ -159,9 +163,35 @@ const Orders = () => {
     toggleTab("2");
   };
 
-  const openClick = (e) => {
+
+  const postedClick = async () => {
     toggleTab("6");
-  }
+    if (postedClicked === false) {
+      setPostedClicked(true);
+      let result = await dispatch(fetchPostedOrdersAsync(token));
+      if (result.type === "orders/fetchPostedOrders/fulfilled") {
+  
+        if (postedJobs.length === 0) {
+
+          setPostedJobs(result.payload.orders);
+        } else {
+          const uniqueOrders = result.payload.orders.filter(
+            (newOrder) =>
+              !postedJobs.some(
+                (existingOrder) => existingOrder._id === newOrder._id
+              )
+          );
+
+          // Append the unique orders to pastOrders
+          setPostedJobs((prevPostedOrders) => [
+            ...prevPostedOrders,
+            ...uniqueOrders,
+          ]);
+        }
+      }
+    }
+  };
+
 
   const cancelOrders = async () => {
     toggleTab("3");
@@ -198,7 +228,7 @@ const Orders = () => {
 
   useEffect(() => {
     const newOrderFound = () => {
-      if (newOrder !== null) {
+      if (newOrder !== null && newOrder.Status === "Scheduled") {
         if (scheduledOrders.length === 0) {
           setScheduledOrders([newOrder]);
           dispatch(setnewOrderValue(null));
@@ -280,7 +310,7 @@ const Orders = () => {
             <NavItem>
               <NavLink
                 className={classnames({ active: activeTab === "6" })}
-                onClick={openClick}
+                onClick={postedClick}
               >
                 Posted Jobs
               </NavLink>
@@ -374,9 +404,9 @@ const Orders = () => {
               <Row>
                 <h2 style={{ textAlign: "center" }}>Posted Jobs</h2>
                 <Col>
-                  {pendingOrders ? (
+                  {postedJobs ? (
                     <>
-                      <PostedJobs pendingOrders={pendingOrders} />
+                      <PostedJobs postedJobs={postedJobs} />
                     </>
                   ) : (
                     <span>No Posted Jobs</span>

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { createOrder } from "../../APIs/booking";
 
 export const CreateOrder = createAsyncThunk("booking", async (data) => {
+  console.log(data)
   const response = await createOrder(data);
   return response.newOrder;
 });
