@@ -17,7 +17,7 @@ import {
   fetchActiveOrdersAsync,
   fetchCancelledOrdersAsync,
   fetchPastOrdersAsync,
-  fetchScheduledOrdersAsync,
+  fetchScheduledOrdersAsync,fetchPendingOrdersAsync
 } from "../../Redux/Slices/OrderSlice";
 import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
@@ -26,6 +26,7 @@ import { setnewOrderValue } from "../../Redux/Slices/BookingSlice";
 import OrderCard from "../../Components/OrderComponents/OrderCard";
 import { useNavigate } from "react-router-dom";
 import PastOrdersCard from "../../Components/OrderComponents/PastOrdersCard";
+import PendingOrderCard from "../../Components/OrderComponents/PendingOrders";
 import {
   hideSpinner,
   selectSpinnerVisibility,
@@ -47,6 +48,8 @@ const Orders = () => {
   const [isPastOrdersFetched, setIsPastOrdersFetched] = useState(false);
   const [isCacelledOrdersFetched, setIsCancelledOrdersFetched] =
     useState(false);
+    const [isPendingOrdersFetched, setIsPendingOrdersFetched] =
+    useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   let {
@@ -57,7 +60,7 @@ const Orders = () => {
     activeOrder,
     setActiveOrder,
     pastOrders,
-    setPastOrders,
+    setPastOrders,pendingOrders, setPendingOrders
   } = PopUpState();
 
   const navigate = useNavigate();
@@ -118,7 +121,17 @@ const Orders = () => {
           }
           dispatch(hideSpinner());
           break;
-        case "4":
+        case "5":
+          dispatch(showSpinner());
+          // Check if pendingOrders is already available locally
+          if (!isPendingOrdersFetched) {
+            result = await dispatch(fetchPendingOrdersAsync(token));
+            if (result.type === "orders/fetchPendingOrders/fulfilled") {
+              setPendingOrders(result.payload.orders);
+              setIsPendingOrdersFetched(true);
+            }
+          }
+          dispatch(hideSpinner());
           break;
         default:
           break;
@@ -171,6 +184,9 @@ const Orders = () => {
 
   const activeOrders = (e) => {
     toggleTab("4");
+  };
+  const PendingOrders = (e) => {
+    toggleTab("5");
   };
 
   useEffect(() => {
@@ -241,6 +257,14 @@ const Orders = () => {
                 {TABS.ACTIVE}
               </NavLink>
             </NavItem>
+            <NavItem>
+              <NavLink
+                className={classnames({ active: activeTab === "5" })}
+                onClick={PendingOrders}
+              >
+                {TABS.Pending}
+              </NavLink>
+            </NavItem>
           </Nav>
         </Row>
         <Row>
@@ -304,6 +328,23 @@ const Orders = () => {
                         scheduledOrdersObject={activeOrder}
                         setPastOrders={setPastOrders}
                         updateActiveOrders={setActiveOrder}
+                      />
+                    </>
+                  ) : (
+                    <span>{TABS.NO_ACTIVE_ORDERS}</span>
+                  )}
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane tabId="5">
+              <Row>
+                <h2 style={{ textAlign: "center" }}>{TABS.Pending}</h2>
+                <Col>
+                  {pendingOrders ? (
+                    <>
+                      <PendingOrderCard
+                        pendingOrders={pendingOrders}
+                        
                       />
                     </>
                   ) : (

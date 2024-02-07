@@ -260,6 +260,17 @@ const HomePageWorker = () => {
   //reject the offer
   const handleCancel = () => {
     setGotOffer(false);
+    const index = notificationTimeouts.findIndex(
+      (timeoutData) => timeoutData.notification == receiveMessage
+    );
+
+    if (index !== -1) {
+      clearTimeout(notificationTimeouts[index].timeoutId);
+      setNotificationTimeouts((prevTimeouts) =>
+        prevTimeouts.filter((_, i) => i !== index)
+      );
+      console.log(index,"offer expire deleted")
+    }
     socket?.emit("accept-reject", {
       result: "cancel",
       Uid: receiveMessage.params.users[0],
