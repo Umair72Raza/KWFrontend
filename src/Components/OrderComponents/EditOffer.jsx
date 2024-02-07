@@ -132,7 +132,8 @@ const EditOffer = ({ modal, toggle, order }) => {
                 service: serviceOption,
                 address: user.address,
                 tasktime: taskTime
-                , images
+                , images,
+                location: user.location,
             };
             const formData = new FormData();
 

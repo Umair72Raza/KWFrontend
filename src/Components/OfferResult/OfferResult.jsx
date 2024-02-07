@@ -54,7 +54,7 @@ const OfferResult = () => {
 
   useEffect(() => {
     if (user && user._id && offerResult == "true") {
-      dispatch(CreateOrder({ param, token }));
+      dispatch(CreateOrder({ params, token }));
       setOfferResult("");
     }
     else if(user && user._id && offerResult == "false" || offerResult == "timeup")
@@ -79,10 +79,9 @@ const OfferResult = () => {
         param.append(`service`, s);
       })
       
-
       //SetParam(formData);
       
-      dispatch(CreateOrder({ param, token }));
+      dispatch(CreateOrder({ params, token }));
       setOfferResult("");
 }
     

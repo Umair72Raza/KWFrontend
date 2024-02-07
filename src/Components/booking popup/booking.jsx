@@ -103,9 +103,10 @@ const Booking = ({ modal, toggle, worker, chat }) => {
         details: taskDetails.replace(/\n/g, "<br>"),
         amount: amountPerHour,
         service: serviceOption,
-        address: user.address,
+        address: user?.address,
         tasktime: taskTime
-        , images
+        , images,
+        location: user?.location || {}
       };
       const formData = new FormData();
 
@@ -127,7 +128,7 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       images.forEach((image, index) => {
         formData.append(`images`, image);
       });
-
+console.log(formData,"formdata",data,"data" )
       SetParam(formData);
       SetParams(data)
 
