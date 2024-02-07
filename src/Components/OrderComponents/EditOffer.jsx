@@ -73,11 +73,12 @@ const EditOffer = ({ modal, toggle, order }) => {
             amountPerHour >= 5 &&
             amountPerHour <= 100000 &&
             taskTime >= 1 &&
-            taskTime <= 9 &&
+            taskTime <= 9 && 
+            serviceOption.length > 0
             
 
 
-        console.log("Form Complete:", isFormComplete);
+        // console.log("Form Complete:", isFormComplete);
         setFormComplete(isFormComplete);
     }, [taskTitle, taskDetails, dateTime, amountPerHour, taskTime, serviceOption]);
 

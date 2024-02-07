@@ -2,23 +2,23 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    Container,
-    Row,
-    Col,
-    Card,
-    CardBody,
-    CardTitle,
-    CardText,
-    Button,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    Form,
-    FormGroup,
-    Label,
-    Input,
-    Spinner,
+  Container,
+  Row,
+  Col,
+  Card,
+  CardBody,
+  CardTitle,
+  CardText,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Spinner,
 } from "reactstrap";
 
 import completedtask from "../../assets/completedtask.png";
@@ -27,231 +27,219 @@ import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
 import Swal from "sweetalert2";
 import { truncateText } from "../../utils";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
-import {
-    selectSpinnerVisibility,
-
-} from "../../Redux/Slices/LoaderSlice";
+import { selectSpinnerVisibility } from "../../Redux/Slices/LoaderSlice";
 import EditOffer from "./EditOffer.jsx";
 
 const PendingOrders = ({ pendingOrders }) => {
-    const { user, token } = useSelector((state) => state.auth);
-    const [order, setOrder] = useState(null)
-    const socket = useSelector((state) => state?.socket?.socket);
-    const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
+  const { user, token } = useSelector((state) => state.auth);
+  const [order, setOrder] = useState(null);
+  const socket = useSelector((state) => state?.socket?.socket);
+  const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const spinnerVisible = useSelector(selectSpinnerVisibility)
-    let {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const spinnerVisible = useSelector(selectSpinnerVisibility);
+  let {} = PopUpState();
 
-    } = PopUpState();
+  const [modal, setModal] = useState(false);
+  const Post = (order) => {
+    setOrder(order);
+    toggleModal();
+  };
+  const toggleModal = () => {
+    setModal(!modal);
+  };
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  };
+  //const user = localStorage.getItem('user')
+  const dispatch = useDispatch();
 
-    const [modal, setModal] = useState(false);
-    const Post =  (order) => {
-         setOrder(order)
-         toggleModal()
+  const transformOrderDetails = (order) => {
+    let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
 
-    }
-    const toggleModal = () => {
-        setModal(!modal);
-    };
-    const toggleDetails = (orderId) => {
-        setShowFullDetailsMap((prevMap) => ({
-            ...prevMap,
-            [orderId]: !prevMap[orderId],
-        }));
-    };
-    //const user = localStorage.getItem('user')
-    const dispatch = useDispatch();
+    return showFullDetailsMap[order._id]
+      ? order.details
+      : truncateText(transformedDetails, 30);
+  };
 
-    const transformOrderDetails = (order) => {
-        let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
+  return (
+    <>
+      <Container>
+        {spinnerVisible ? (
+          <div style={{ textAlign: "center" }}>
+            <Spinner />
+          </div>
+        ) : pendingOrders.length > 0 ? (
+          <>
+            {console.log(pendingOrders)}
+            <Row>
+              {pendingOrders?.map((order) => (
+                <Col
+                  key={order._id}
+                  sm="6"
+                  md="4"
+                  lg="4"
+                  xl="4"
+                  style={{ marginTop: "10px" }}
+                >
+                  <Card
+                    className="shadow"
+                    style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                  >
+                    <CardBody>
+                      <CardTitle>
+                        <Col>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <img
+                              src={completedtask}
+                              alt="schTask"
+                              style={{ marginRight: "10px" }}
+                            />
+                            <h5
+                              style={{
+                                marginTop: "4%",
+                                textAlign: "center",
+                                overflow: "hidden",
+                                whiteSpace: "nowrap",
+                                textOverflow: "ellipsis",
+                                maxWidth: "100%",
+                              }}
+                            >
+                              {order.Title}
+                            </h5>
+                          </div>
+                        </Col>{" "}
+                      </CardTitle>
+                      <CardText>
+                        <Col>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <span
+                              style={{ marginTop: "10px", marginRight: "1%" }}
+                            >
+                              <b>Status: </b>
+                              {order.Status}
+                            </span>
+                            <img
+                              src={activeOrderspng}
+                              alt="schTask"
+                              style={{
+                                height: "12px",
+                                marginLeft: "-1%",
+                                zIndex: "0",
+                                marginTop: "3.75%",
+                                opacity: "90%",
+                              }}
+                            />
+                          </div>
+                        </Col>
+                      </CardText>
+                      <CardText>
+                        <b>Time:</b> {order.time}
+                      </CardText>
+                      <CardText>
+                        <b>Date:</b> {order.date}
+                      </CardText>
+                      <CardText>
+                        <b>Amount:</b> ${order.amount}
+                      </CardText>
+                      <CardText>
+                        <b>Details:</b>{" "}
+                        <div
+                          style={{
+                            maxHeight: "100px",
+                            overflowY: "auto",
+                          }}
+                        >
+                          {showFullDetailsMap[order._id] ? (
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: order.details,
+                              }}
+                            />
+                          ) : (
+                            transformOrderDetails(order)
+                          )}
+                          {order.details.length > 30 && (
+                            <Button
+                              style={{ marginTop: "-5px" }}
+                              color="link"
+                              onClick={() => toggleDetails(order._id)}
+                            >
+                              {showFullDetailsMap[order._id]
+                                ? "Show Less"
+                                : "Show More"}
+                            </Button>
+                          )}
+                        </div>
+                      </CardText>
 
-        return showFullDetailsMap[order._id]
-            ? order.details
-            : truncateText(transformedDetails, 30);
-    };
+                      <Row>
+                        <Col style={{ margin: "2%" }} xs="12" md="5">
+                          {" "}
+                          {/* Full width on small screens, half width on medium and larger screens */}
+                          <CardText>
+                            <Button
+                              onClick={() => Delete(order)}
+                              color="danger"
+                            >
+                              Delete
+                            </Button>
+                          </CardText>
+                        </Col>
 
+                        <>
+                          <Col style={{ margin: "2%" }} xs="12" md="5">
+                            {" "}
+                            {/* Half width on small screens, one-third width on medium and larger screens */}
+                            <CardText>
+                              <Button
+                                onClick={() => Post(order)}
+                                color="success"
+                              >
+                                Post Job
+                              </Button>
+                            </CardText>
+                          </Col>
+                        </>
+                      </Row>
+                    </CardBody>
+                  </Card>
+                </Col>
+              ))}
+              {modal == true ? (
+                <EditOffer modal={modal} toggle={toggleModal} order={order} />
+              ) : (
+                []
+              )}
+            </Row>
+          </>
+        ) : (
+          <div>No Pending Orders</div>
+        )}
+      </Container>
 
-
-    return (
-        <>
-            <Container>
-                {spinnerVisible ? (
-                    <div style={{ textAlign: "center" }}>
-                        <Spinner />
-                    </div>
-                ) : pendingOrders.length > 0 ? (
-                    <>
-                        {console.log(pendingOrders)}
-                        <Row>
-                            {pendingOrders?.map((order) => (
-                                <Col
-                                    key={order._id}
-                                    sm="6"
-                                    md="4"
-                                    lg="4"
-                                    xl="4"
-                                    style={{ marginTop: "10px" }}
-                                >
-                                    <Card
-                                        className="shadow"
-                                        style={{ backgroundColor: "#f6f8fc", height: "100%" }}
-                                    >
-                                        <CardBody>
-                                            <CardTitle>
-                                                <Col>
-                                                    <div
-                                                        style={{
-                                                            display: "flex",
-                                                            justifyContent: "center",
-                                                            alignItems: "center",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={completedtask}
-                                                            alt="schTask"
-                                                            style={{ marginRight: "10px" }}
-                                                        />
-                                                        <h5
-                                                            style={{
-                                                                marginTop: "4%",
-                                                                textAlign: "center",
-                                                                overflow: "hidden",
-                                                                whiteSpace: "nowrap",
-                                                                textOverflow: "ellipsis",
-                                                                maxWidth: "100%",
-                                                            }}
-                                                        >
-                                                            {order.Title}
-                                                        </h5>
-                                                    </div>
-                                                </Col>{" "}
-                                            </CardTitle>
-                                            <CardText>
-                                                <Col>
-                                                    <div
-                                                        style={{
-                                                            display: "flex",
-                                                            justifyContent: "center",
-                                                            alignItems: "center",
-                                                        }}
-                                                    >
-                                                        <span
-                                                            style={{ marginTop: "10px", marginRight: "1%" }}
-                                                        >
-                                                            <b>Status: </b>
-                                                            {order.Status}
-                                                        </span>
-                                                        <img
-                                                            src={activeOrderspng}
-                                                            alt="schTask"
-                                                            style={{
-                                                                height: "12px",
-                                                                marginLeft: "-1%",
-                                                                zIndex: "0",
-                                                                marginTop: "3.75%",
-                                                                opacity: "90%",
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </Col>
-                                            </CardText>
-                                            <CardText>
-                                                <b>Time:</b> {order.time}
-                                            </CardText>
-                                            <CardText>
-                                                <b>Date:</b> {order.date}
-                                            </CardText>
-                                            <CardText>
-                                                <b>Amount:</b> ${order.amount}
-                                            </CardText>
-                                            <CardText>
-                                                <b>Details:</b>{" "}
-                                                <div
-                                                    style={{
-                                                        maxHeight: "100px",
-                                                        overflowY: "auto",
-                                                    }}
-                                                >
-                                                    {showFullDetailsMap[order._id] ? (
-                                                        <div
-                                                            dangerouslySetInnerHTML={{
-                                                                __html: order.details,
-                                                            }}
-                                                        />
-                                                    ) : (
-                                                        transformOrderDetails(order)
-                                                    )}
-                                                    {order.details.length > 30 && (
-                                                        <Button
-                                                            style={{ marginTop: "-5px" }}
-                                                            color="link"
-                                                            onClick={() => toggleDetails(order._id)}
-                                                        >
-                                                            {showFullDetailsMap[order._id]
-                                                                ? "Show Less"
-                                                                : "Show More"}
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </CardText>
-
-
-                                            <Row>
-                                                <Col style={{ margin: "2%" }} xs="12" md="5">
-                                                    {" "}
-                                                    {/* Full width on small screens, half width on medium and larger screens */}
-                                                    <CardText>
-                                                        <Button
-                                                            onClick={() => Delete(order)}
-                                                            color="danger"
-                                                        >
-                                                            Delete
-                                                        </Button>
-                                                    </CardText>
-                                                </Col>
-
-                                                <>
-                                                    <Col style={{ margin: "2%" }} xs="12" md="5">
-                                                        {" "}
-                                                        {/* Half width on small screens, one-third width on medium and larger screens */}
-                                                        <CardText>
-                                                            <Button
-                                                                onClick={() =>
-                                                                    Post(order)
-                                                                }
-                                                                color="success"
-                                                            >
-                                                                Post Job
-                                                            </Button>
-                                                        </CardText>
-                                                    </Col>
-                                                </>
-                                            </Row>
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                            ))}
-                            {modal == true ? <EditOffer  modal={modal}
-                            toggle={toggleModal}
-                            order={order} />
-                           
-                         : []}
-                        </Row>
-                        
-                    </>
-                ) : (
-                    <div>No Pending Orders</div>
-                )}
-            </Container>
-
-            {/* <Booking
+      {/* <Booking
         modal={modal}
         toggle={toggleModal}
         worker={bookingWorker}
         chat={chat}
       /> */}
-            {/* <Modal isOpen={isModalOpen} toggle={toggleModal} centered>
+      {/* <Modal isOpen={isModalOpen} toggle={toggleModal} centered>
         <ModalHeader toggle={toggleModal}>Order Cancellation</ModalHeader>
         <ModalBody>
           <Form>
@@ -276,8 +264,8 @@ const PendingOrders = ({ pendingOrders }) => {
           </Button>
         </ModalFooter>
       </Modal> */}
-        </>
-    );
+    </>
+  );
 };
 
 export default PendingOrders;
