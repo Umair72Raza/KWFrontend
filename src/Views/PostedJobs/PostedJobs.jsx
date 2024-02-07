@@ -1,26 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Col, Container, Input, Row } from "reactstrap";
+import Booking from "../../Components/booking popup/booking";
 
 const PostedJobs = () => {
+    const [modal,setModal] = useState(false);
+    const [fromPostJob,setPostJob] = useState(true)
+    const toggleModal =() => {
+        setModal(!modal)
+    }
   return (
     <div>
       <Container>
-       
         <Row>
-          <Col></Col>
           <Col>
-            <Button color="primary">Post a new job </Button>
+            <Button onClick={()=>setModal(true)} color="primary">Post an open job </Button>
           </Col>
-          <Col></Col>
         </Row>
-        <Row>
-          <Col></Col>
-          <Col>
-            {" "}
-            <h1>Posted Jobs</h1>
-          </Col>
-          <Col></Col>
-        </Row>
+        <Booking
+        modal={modal}
+        toggle={toggleModal}
+        fromPostJob={fromPostJob}
+      />
       </Container>
     </div>
   );

@@ -17,7 +17,8 @@ import {
   fetchActiveOrdersAsync,
   fetchCancelledOrdersAsync,
   fetchPastOrdersAsync,
-  fetchScheduledOrdersAsync,fetchPendingOrdersAsync
+  fetchScheduledOrdersAsync,
+  fetchPendingOrdersAsync,
 } from "../../Redux/Slices/OrderSlice";
 import CancelledOrders from "../../Components/OrderComponents/CancelledOrders";
 import UserNavbar from "../../Components/Navbar/UserNavbar";
@@ -34,6 +35,7 @@ import {
 } from "../../Redux/Slices/LoaderSlice";
 import { TABS } from "../../Constants/Constants";
 import { PopUpState } from "../../Context/PopUpProvider";
+import PostedJobs from "../PostedJobs/PostedJobs";
 
 const Orders = () => {
   const { token } = useSelector((state) => state.auth);
@@ -48,8 +50,7 @@ const Orders = () => {
   const [isPastOrdersFetched, setIsPastOrdersFetched] = useState(false);
   const [isCacelledOrdersFetched, setIsCancelledOrdersFetched] =
     useState(false);
-    const [isPendingOrdersFetched, setIsPendingOrdersFetched] =
-    useState(false);
+  const [isPendingOrdersFetched, setIsPendingOrdersFetched] = useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   let {
@@ -60,7 +61,9 @@ const Orders = () => {
     activeOrder,
     setActiveOrder,
     pastOrders,
-    setPastOrders,pendingOrders, setPendingOrders
+    setPastOrders,
+    pendingOrders,
+    setPendingOrders,
   } = PopUpState();
 
   const navigate = useNavigate();
@@ -156,6 +159,10 @@ const Orders = () => {
     toggleTab("2");
   };
 
+  const openClick = (e) => {
+    toggleTab("6");
+  }
+
   const cancelOrders = async () => {
     toggleTab("3");
     if (cancelledClicked === false) {
@@ -220,15 +227,12 @@ const Orders = () => {
           <UserNavbar />
         </Row>
         <Row className="d-flex justify-content-between mt-2">
-      <Col>
-        <Button color="danger" onClick={goBack}>
-          Back
-        </Button>
-      </Col>
-      <Col className="d-flex justify-content-end">
-        <Button onClick={()=>navigate("/user/postedJobs")} color="primary">Post a Job</Button>
-      </Col>
-    </Row>
+          <Col>
+            <Button color="danger" onClick={goBack}>
+              Back
+            </Button>
+          </Col>
+        </Row>
 
         <Row></Row>
         <Row style={{ marginTop: "0.5%" }}>
@@ -271,6 +275,14 @@ const Orders = () => {
                 onClick={PendingOrders}
               >
                 {TABS.Pending}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={classnames({ active: activeTab === "6" })}
+                onClick={openClick}
+              >
+                Posted Jobs
               </NavLink>
             </NavItem>
           </Nav>
@@ -350,13 +362,24 @@ const Orders = () => {
                 <Col>
                   {pendingOrders ? (
                     <>
-                      <PendingOrderCard
-                        pendingOrders={pendingOrders}
-                        
-                      />
+                      <PendingOrderCard pendingOrders={pendingOrders} />
                     </>
                   ) : (
-                    <span>{TABS.NO_ACTIVE_ORDERS}</span>
+                    <span>No Pending Orders</span>
+                  )}
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane tabId="6">
+              <Row>
+                <h2 style={{ textAlign: "center" }}>Posted Jobs</h2>
+                <Col>
+                  {pendingOrders ? (
+                    <>
+                      <PostedJobs pendingOrders={pendingOrders} />
+                    </>
+                  ) : (
+                    <span>No Posted Jobs</span>
                   )}
                 </Col>
               </Row>
