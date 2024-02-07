@@ -83,12 +83,12 @@ const Login = () => {
               [LoginPage.FORM_FIELDS.PASSWORD]: "",
             });
             successToast("Login successful! Welcome back!");
-            if (result.payload.user.role == "worker") {
+            
               const id = result.payload.user._id;
               const data = { id, status: "online", token: result.payload.token };
               const Result = await dispatch(toggleStatusAsync(data));
-              console.log(Result)
               await socket?.emit("online-offline", Result.payload.updatedStatus);
+               if (result.payload.user.role == "worker") {
               await setIsOn(true)
               navigate("/worker/workerHomepage");
             }

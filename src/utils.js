@@ -230,8 +230,8 @@ export const infoToast = (message) => {
 
 export const SelectChat = (chat) => {
   const user = JSON.parse(localStorage.getItem("user"));
-  if (chat && chat.users && Array.isArray(chat.users)) {
-    const otherUser = chat.users.find((u) => u._id !== user._id);
+  if (chat && chat?.users && Array.isArray(chat?.users)) {
+    const otherUser = chat?.users.find((u) => u?._id !== user?._id);
 
     if (otherUser) {
       return otherUser;

@@ -82,7 +82,9 @@ const ChatPopup = () => {
   const [pictureError, setPictureError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [images, setImages] = useState([]);
-
+useEffect(() => { 
+  console.log("copyOfChats", copyOfChats);
+}, [copyOfChats]);
   const chatTransitions = useTransition(copyOfChats, {
     from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
     enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
@@ -1002,7 +1004,7 @@ const ChatPopup = () => {
               {/* // For tablet and laptop, display chat and messages side by side */}
               <Container className=" d-none d-xl-block">
                 <Row>
-                  {!chatFromWorkerCard && (
+                  {!chatFromWorkerCard && !fromAvailableJobs && (
                     <Col className=" chat-list overflow-y-auto">
                       {copyOfChats?.length === 0 ? (
                         <div>{ChatPopUpPage.NO_CHATS}</div>
