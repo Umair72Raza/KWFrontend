@@ -29,7 +29,7 @@ const EditOffer = ({ modal, toggle, order }) => {
     const [taskDetails, setTaskDetails] = useState(``);
     const [dateTime, setDateTime] = useState("");
     const [amountPerHour, setAmountPerHour] = useState(5);
-    
+    const [orderId,setOrderId]=userstate(null)
     const dateTimeObject = new Date(dateTime);
     const datePart = dateTimeObject.toLocaleDateString();
     const timePart = dateTimeObject.toLocaleTimeString();
@@ -60,6 +60,7 @@ const EditOffer = ({ modal, toggle, order }) => {
             setServiceOption(order.service);
             setTaskTime(1)
             setImages(order.images)
+            setOrderId(order._id)
             console.log(order.service)
         }
 
@@ -132,7 +133,8 @@ const EditOffer = ({ modal, toggle, order }) => {
                 service: serviceOption,
                 address: user.address,
                 tasktime: taskTime
-                , images
+                , images,
+                location: user.location,
             };
             const formData = new FormData();
 
@@ -159,7 +161,10 @@ const EditOffer = ({ modal, toggle, order }) => {
             SetParams(data)
 
             if (amountPerHour >= 5 && amountPerHour <= 100000) {
-
+                   if(orderId)
+                   {
+                    
+                   }
                 dispatch(CreateOrder({ param, token }));
                 resetForm();
             }

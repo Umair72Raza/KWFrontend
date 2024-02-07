@@ -112,6 +112,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         address: user.address,
         tasktime: taskTime,
         images,
+        location: user?.location || {}
       };
       const formData = new FormData();
 
@@ -131,7 +132,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       images.forEach((image, index) => {
         formData.append(`images`, image);
       });
-
+console.log(formData,"formdata",data,"data" )
       SetParam(formData);
       SetParams(data);
 
