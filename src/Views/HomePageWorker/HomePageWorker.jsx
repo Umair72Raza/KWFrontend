@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchActiveOrdersAsync,
   fetchCancelledOrdersAsync,
+  fetchOpenOrdersAsync,
   fetchPastOrdersAsync,
   fetchScheduledOrdersAsync,
 } from "../../Redux/Slices/OrderSlice";
@@ -36,11 +37,13 @@ import {
 import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
 import { PopUpState } from "../../Context/PopUpProvider";
 import { failureToast } from "../../utils";
+import OpenJobs from "../../Components/OpenJobs/OpenJobs";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
   const [pastClicked, setPastClicked] = useState(false);
   const [cancelledClicked, setCancelledClicked] = useState(false);
+  const [openJobsClicked,setOpenJobsClicked] = useState(false);
   const [isScheduledOrdersFetched, setIsScheduledOrdersFetched] =
     useState(false);
   const [isPastOrdersFetched, setIsPastOrdersFetched] = useState(false);
@@ -68,7 +71,9 @@ const HomePageWorker = () => {
     setGotOffer,
     setUserOffering,
     setUnreadMessages,
-    unreadMessages,notificationTimeouts, setNotificationTimeouts
+    unreadMessages,
+    notificationTimeouts,
+    setNotificationTimeouts,
   } = ChatState();
 
   let {
@@ -80,15 +85,14 @@ const HomePageWorker = () => {
     setActiveOrder,
     pastOrders,
     setPastOrders,
-    startButtonDisabledMap,
     setStartButtonDisabledMap,
-    globalStartButtonDisabled,
     setGlobalStartButtonDisabled,
+    openJobs,
+    setOpenJobs,
   } = PopUpState();
 
   const [startJobStatus, setStartJobStatus] = useState("");
 
-  
   const offerTimeUp = (data) => {
     setGotOffer(false);
     SetONotification((prevNotifications) =>
@@ -121,8 +125,6 @@ const HomePageWorker = () => {
   useEffect(() => {
     if (!socket) return;
     socket?.on("gotNewOffer", (data) => {
-      
-
       if (!chat || !data.chat || chat._id !== data.chat._id) {
         const alreadyPresent = offerNotification.some((obj) => {
           return obj.params.users[0] === data.params.users[0];
@@ -207,7 +209,7 @@ const HomePageWorker = () => {
           `,
           icon: "error",
           customClass: {
-            content: "swal-content-custom", // You can add a custom class for the content
+            content: "swal-content-custom", //a custom class for the content
           },
           didOpen: () => {
             document.body.style.overflow = "hidden"; // Disable scroll when SweetAlert is open
@@ -248,7 +250,7 @@ const HomePageWorker = () => {
       setNotificationTimeouts((prevTimeouts) =>
         prevTimeouts.filter((_, i) => i !== index)
       );
-      console.log(index,"offer expire deleted")
+      console.log(index, "offer expire deleted");
     }
     socket?.emit("accept-reject", {
       result: "accept",
@@ -443,8 +445,44 @@ const HomePageWorker = () => {
     }
   };
 
+
+  const openOrders = async () => {
+    toggleTab("5");
+    if (openJobsClicked=== false) {
+      setOpenJobsClicked(true);
+      let result = await dispatch(fetchOpenOrdersAsync(token));
+      console.log(result)
+      if (result.type === "orders/fetchOpenOrders/fulfilled") {
+        console.log(result.payload)
+        if (openJobs?.length === 0) {
+          console.log(result.payload)
+          setOpenJobs(result.payload.orders);
+        } else {
+          console.log(result.payload)
+          const uniqueOrders = result.payload.orders.filter(
+            (newOrder) =>
+              !openJobs.some(
+                (existingOrder) => existingOrder._id === newOrder._id
+              )
+          );
+
+          // Append the unique orders to pastOrders
+          setOpenJobs((prevOpenJobs) => [
+            ...prevOpenJobs,
+            ...uniqueOrders,
+          ]);
+        }
+      }
+    }
+  };
+
+
   const activeOrders = () => {
     toggleTab("4");
+  };
+
+  const openJobTab = () => {
+    toggleTab("5");
   };
 
   useEffect(() => {
@@ -494,6 +532,15 @@ const HomePageWorker = () => {
               setPastOrders={setPastOrders}
             >
               {TABS.ACTIVE}
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: activeTab === "5" })}
+              onClick={openOrders}
+              // setPastOrders={setPastOrders}
+            >
+              Open Jobs
             </NavLink>
           </NavItem>
         </Nav>
@@ -571,7 +618,23 @@ const HomePageWorker = () => {
               </Col>
             </Row>
           </TabPane>
+          <TabPane tabId="5">
+            <Row>
+              <h2 style={{ textAlign: "center" }}>Open Jobs</h2>
+              <Col>
+                {openJobs && (
+                  <>
+                    <OpenJobs
+                      scheduledOrdersObject={openJobs}
+                      spinnerVisible={spinnerVisible}
+                    />
+                  </>
+                )}
+              </Col>
+            </Row>
+          </TabPane>
         </TabContent>
+
       </Row>
       {gotOffer ? (
         <>

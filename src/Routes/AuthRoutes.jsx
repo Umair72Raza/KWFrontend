@@ -1,4 +1,3 @@
-import OTPVerification from "../Components/OTPVerification/OTPVerification";
 import SignUpOtpVerify from "../Components/SingUpOtpVerify/SignUpOtpVerify";
 import ForgetPassword from "../Views/ForgetPassword/ForgetPassword";
 import Login from "../Views/Login/Login";

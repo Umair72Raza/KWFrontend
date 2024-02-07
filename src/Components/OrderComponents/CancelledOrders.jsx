@@ -141,7 +141,8 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                         </div>
                       </CardText>
                       <hr />
-                      {order.cancelReason ? (
+                      
+                      {order?.cancelReason.length> 0 ? (
                         <>
                           <CardText>
                            <b>Cancellation Reason:</b> {" "}
@@ -173,7 +174,9 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                         </>
                       ) : (
                         <>
-                          <CardText>Refresh To see the detail </CardText>
+                          <CardText>
+                            <b>Cancellation Reason: </b> Not Mentioned
+                          </CardText>
                         </>
                       )}
                     </CardBody>

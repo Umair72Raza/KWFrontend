@@ -12,7 +12,6 @@ import {
   sendOTPforPhone,
   signUpUser,
   toggleStatus,
-  updatePfp,
 } from "../../APIs/auth";
 import { Logout, failureToast } from "../../utils";
 
@@ -183,7 +182,7 @@ export const requestOTPforEmailAsync = createAsyncThunk(
         status: response.status,
         // other serializable properties
       };
-      console.log(serializableResponse,'serl response')
+      console.log(serializableResponse, "serl response");
       return serializableResponse;
     } catch (error) {
       console.log(error);
@@ -316,6 +315,9 @@ const authSlice = createSlice({
     updateOtpStatus: (state, action) => {
       state.otpStatus = action.payload;
     },
+    updateUser: (state, action) => {
+      state.user = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -415,5 +417,5 @@ const authSlice = createSlice({
       });
   },
 });
-export const { updateOtpStatus } = authSlice.actions;
+export const { updateOtpStatus, updateUser } = authSlice.actions;
 export default authSlice.reducer;
