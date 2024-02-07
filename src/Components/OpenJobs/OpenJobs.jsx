@@ -80,7 +80,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
       ) : (
         <>
           <Row>
-            {scheduledOrdersObject.map((order) => (
+            {scheduledOrdersObject?.map((order) => (
               <Col
                 key={order.id}
                 sm="6"
@@ -103,26 +103,26 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         maxWidth: "100%",
                       }}
                     >
-                      {order.Title}
+                      {order?.Title}
                     </h5>
                     <CardText>
-                      <b>Posted by:</b> {order.user.firstName}{" "}
-                      {order.user.lastName}
+                      <b>Posted by:</b> {order?.user?.firstName}{" "}
+                      {order?.user?.lastName}
                     </CardText>
                     <CardText>
-                      <b>Time:</b> {order.time}
+                      <b>Time:</b> {order?.time}
                     </CardText>
                     <CardText>
-                      <b>Date:</b> {order.date}
+                      <b>Date:</b> {order?.date}
                     </CardText>
                     <CardText>
-                      <b>Amount:</b> ${order.amount}
+                      <b>Amount:</b> ${order?.amount}
                     </CardText>
                     <CardText>
-                      <b>Address:</b> {order.Address}
+                      <b>Address:</b> {order?.Address}
                     </CardText>
                     <div style={{ maxHeight: "100px", overflowY: "auto" }}>
-                      {order.service && order.service.length > 0 && (
+                      {order?.service && order.service.length > 0 && (
                         <CardText>
                           <b>Services:</b>
                           <ul
@@ -132,7 +132,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                               padding: 0,
                             }}
                           >
-                            {order.service.map((s, index) => (
+                            {order?.service?.map((s, index) => (
                               <li key={index}>{s}</li>
                             ))}
                           </ul>

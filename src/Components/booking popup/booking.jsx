@@ -113,7 +113,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         address: user.address,
         tasktime: taskTime,
         images,
-        location: user?.location || {}
+        location: user?.location || {},
       };
       const formData = new FormData();
 
@@ -175,8 +175,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     }
   };
 
-
-  const handlePost = async() => {
+  const handlePost = async () => {
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
     const Users = [user._id];
@@ -195,11 +194,11 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           address: user.address,
           tasktime: taskTime,
           images,
-          location: user?.location || {}
+          location: user?.location || {},
         },
-        token: token
+        token: token,
       };
-      
+
       const formData = new FormData();
 
       for (const key in data) {
@@ -220,19 +219,18 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       });
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
-         {
-            
-           // console.log(params,"params")
-            const result = await dispatch(CreateOrder(data))
-            console.log(result)
-            Swal.fire({
-              title: "Job Posted",
-              icon: "success",
-              confirmButtonText: "OK",
-            });
-            toggle();
-            resetForm();
-          }
+        {
+          // console.log(params,"params")
+          const result = await dispatch(CreateOrder(data));
+          console.log(result);
+          Swal.fire({
+            title: "Job Posted",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+          toggle();
+          resetForm();
+        }
       } else {
         setAmountError("Enter amount in range 5-100000");
         setClicked(true);
@@ -247,7 +245,6 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     }
   };
 
-  
   const starRating = (numStars) => {
     const stars = [];
     for (let i = 0; i < numStars; i++) {
@@ -437,7 +434,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
             </>
           ) : (
             <>
-            <FormGroup>
+              <FormGroup>
                 <Label for="serviceOption " className="fw-bold">
                   {BookingConstants.Labels.service}
                 </Label>
@@ -450,7 +447,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
                   }}
                 >
                   {" "}
-                  {list?.map((service, key) => (
+                  {/* {list?.map((service, key) => (
                     <div key={key} className="form-check">
                       <Input
                         type="checkbox"
@@ -468,7 +465,29 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
                         {service.name}
                       </Label>
                     </div>
-                  ))}
+                  ))} */}
+                  {list &&
+                    list.length > 0 &&
+                    list.map((service, key) => (
+                      <div key={key} className="form-check">
+                        <Input
+                          type="checkbox"
+                          id={`serviceCheckbox_${key}`}
+                          className="form-check-input"
+                          value={service.name}
+                          checked={serviceOption.includes(service.name)}
+                          onChange={() =>
+                            handleServiceOptionChange(service.name)
+                          }
+                        />
+                        <Label
+                          htmlFor={`serviceCheckbox_${key}`}
+                          className="form-check-label"
+                        >
+                          {service.name}
+                        </Label>
+                      </div>
+                    ))}
                 </div>
               </FormGroup>
             </>
@@ -567,31 +586,34 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           </FormGroup>
         </ModalBody>
         <ModalFooter>
-        {!fromPostJob ? <>
-          <Button
-            color="primary"
-            disabled={!formComplete}
-            onClick={() => {
-              setClicked(false);
-              handleSend();
-            }}
-          >
-            {BookingConstants.button.send}
-          </Button>{" "}
-        </>:
-        <>
-            <Button
-            color="primary"
-            disabled={!formComplete}
-            onClick={() => {
-              setClicked(false);
-              handlePost();
-            }}
-          >
-            Post
-          </Button>{" "}
-        </>}
-      
+          {!fromPostJob ? (
+            <>
+              <Button
+                color="primary"
+                disabled={!formComplete}
+                onClick={() => {
+                  setClicked(false);
+                  handleSend();
+                }}
+              >
+                {BookingConstants.button.send}
+              </Button>{" "}
+            </>
+          ) : (
+            <>
+              <Button
+                color="primary"
+                disabled={!formComplete}
+                onClick={() => {
+                  setClicked(false);
+                  handlePost();
+                }}
+              >
+                Post
+              </Button>{" "}
+            </>
+          )}
+
           <Button color="secondary" onClick={toggle}>
             {BookingConstants.button.cancel}
           </Button>

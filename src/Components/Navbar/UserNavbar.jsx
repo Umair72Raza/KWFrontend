@@ -29,7 +29,8 @@ import { CiSettings } from "react-icons/ci";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
 import Swal from "sweetalert2";
-
+// import { PopUpState } from "../../Context/PopUpProvider";
+//  const {setPostedJobs} = PopUpState();
 const UserNavbar = () => {
   const {
     setShowModal,
@@ -81,7 +82,9 @@ const UserNavbar = () => {
         await socket?.emit("online-offline", Result.payload.updatedStatus);
         const result = await dispatch(logoutAsync());
         await socket?.disconnect();
+        // setPostedJobs([]);
         if (result.type === "auth/logout/fulfilled") {
+          
           navigate("/auth/login");
         }
       }

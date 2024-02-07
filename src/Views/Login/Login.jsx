@@ -18,9 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { set } from "lodash";
 import { PopUpState } from "../../Context/PopUpProvider";
-import OnOffButton from "../../Components/OnOffButton/OnOffButton";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -40,6 +38,7 @@ const Login = () => {
   useEffect(() => {
     const isFormValid = !errors.email && formData.email && formData.password;
     setLoginDisabled(!isFormValid);
+
   }, [errors, formData]);
 
   const handleEmailChange = (e) => {

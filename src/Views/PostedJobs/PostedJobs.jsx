@@ -8,6 +8,7 @@ import completedtask from "../../assets/completedtask.png";
 
 import activeOrderspng from "../../assets/activestatus.png";
 import { truncateText } from "../../utils";
+import EditOffer from "../../Components/OrderComponents/EditOffer";
 const PostedJobs = ({postedJobs}) => {
     const [modal,setModal] = useState(false);
     const spinnerVisible = useSelector(selectSpinnerVisibility);
@@ -159,7 +160,7 @@ const PostedJobs = ({postedJobs}) => {
                           {/* Full width on small screens, half width on medium and larger screens */}
                           <CardText>
                             <Button
-                              onClick={() => Delete(order)}
+                              // onClick={() => Delete(order)}
                               color="danger"
                             >
                               Delete
@@ -173,7 +174,7 @@ const PostedJobs = ({postedJobs}) => {
                             {/* Half width on small screens, one-third width on medium and larger screens */}
                             <CardText>
                               <Button
-                                onClick={() => Post(order)}
+                                
                                 color="info"
                               >
                                 Edit
@@ -186,11 +187,11 @@ const PostedJobs = ({postedJobs}) => {
                   </Card>
                 </Col>
               ))}
-              {modal == true ? (
+              {/* {modal == true ? (
                 <EditOffer modal={modal} toggle={toggleModal} order={order} />
               ) : (
                 []
-              )}
+              )} */}
             </Row>
           </>
         ) : (

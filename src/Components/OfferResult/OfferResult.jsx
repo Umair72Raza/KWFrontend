@@ -103,6 +103,10 @@ const OfferResult = () => {
         console.log("I ran");
         socket?.emit("new-order-created", data);
       }
+      else if(newOrder.Status === "Posted")
+      {
+
+      }
     }
     return () => {
       socket?.off("new-order-created");

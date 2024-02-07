@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { RegisterPage } from "./Constants/Constants";
-import { has } from "lodash";
 
 export const Toast_Notification = (string, type) => {
   toast[type](string, {
@@ -14,6 +13,8 @@ export const Toast_Notification = (string, type) => {
 export const Logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("services")
+  
   return "200";
 };
 

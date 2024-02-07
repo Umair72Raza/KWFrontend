@@ -29,7 +29,7 @@ const EditOffer = ({ modal, toggle, order }) => {
     const [taskDetails, setTaskDetails] = useState(``);
     const [dateTime, setDateTime] = useState("");
     const [amountPerHour, setAmountPerHour] = useState(5);
-    const [orderId,setOrderId]=userstate(null)
+    const [orderId,setOrderId]=useState(null)
     const dateTimeObject = new Date(dateTime);
     const datePart = dateTimeObject.toLocaleDateString();
     const timePart = dateTimeObject.toLocaleTimeString();
