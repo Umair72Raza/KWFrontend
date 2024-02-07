@@ -48,8 +48,7 @@ const HomePageUser = () => {
   const [rateFilter, setRateFilter] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchWorker, setSearchWorker] = useState(null)
-  let removedUsers = [];
-  removedUsers = useSelector((state) => state?.homepage?.removeWorker);
+  let removedUsers = useSelector((state) => state?.homepage?.removeWorker);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -58,9 +57,8 @@ const HomePageUser = () => {
           await dispatch(getAllWorker({ userId: user._id, token }));
           await dispatch(fetchChatsAsync({ user, token }));
           await dispatch(allServicesAsync());
-          await setSearchWorker(users)
-          const nameValues = list?.map((service) => service.name); 
-          setServiceList(nameValues)
+         // await setSearchWorker(users)
+         
         } else {
           console.error("User object or _id is missing");
         }
@@ -104,8 +102,9 @@ const HomePageUser = () => {
 
   useEffect(() => {
     socket?.on("status-change", (User) => {
-      console.log(User,"user")
+      
       if (users && User.status === "offline") {
+        console.log(User,users,"user")
         let remove = [];
         const userIndexRemoved = users.findIndex((u) => u._id === User._id);
         if (userIndexRemoved !== -1) {
@@ -115,6 +114,7 @@ const HomePageUser = () => {
           dispatch(updateRemoveWorker(remove));
         }
       } else if (removedUsers && User.status === "online") {
+        console.log(User,users,"user")
         let worker = users;
         const userIndexInRemoved = removedUsers?.findIndex(
           (u) => u._id === User._id
@@ -242,6 +242,8 @@ const HomePageUser = () => {
         });
       }
     }
+
+    console.log(filteredUsers)
     return filteredUsers;
   }, [
     users,
@@ -250,7 +252,7 @@ const HomePageUser = () => {
     sortOption2,
     distanceFilter,
     rateFilter,
-    searchWorker
+    searchWorker,removedUsers
   ]);
 
   return (
