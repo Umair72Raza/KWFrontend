@@ -116,13 +116,14 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         service: serviceOption,
         address: user.address,
         tasktime: taskTime
-        , images
+        , images,
+        location: user?.location || {},
       };
       const formData = new FormData();
 
 
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key != 'users'&&key!='service') {
+        if (data.hasOwnProperty(key) && key != 'users'&&key!='service' && key != "location") {
           formData.append(key, data[key]);
         }
         else {
@@ -131,6 +132,12 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           })
         }
       }
+              // Append location coordinates to FormData
+  if (user.location && user.location.coordinates) {
+    formData.append('location[type]', 'Point');
+    formData.append('location[coordinates][]', user.location.coordinates[0]);
+    formData.append('location[coordinates][]', user.location.coordinates[1]);
+  }
 
       serviceOption.forEach((s,index)=>{
         formData.append(`service`, s);
@@ -295,6 +302,9 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     }
   }, [clear]);
   const resetForm = () => {
+    if(images?.length>0){
+      document.getElementById("OfferImages").value = null;
+    }
     setTaskTitle("");
     setTaskDetails(``);
     setDateTime("");
@@ -571,8 +581,8 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               {BookingConstants.Labels.images}
             </Label>
             <Input
+            id="OfferImages"
               type="file"
-              id="images"
               accept="image/*"
               multiple
               onChange={handleImageChange}
