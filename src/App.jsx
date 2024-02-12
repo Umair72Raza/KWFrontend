@@ -14,6 +14,7 @@ import FinishJobReq from "./Components/FinishJobReq/FinishJobReq";
 import Swal from "sweetalert2";
 import OfferResult from "./Components/OfferResult/OfferResult";
 import { PopUpState } from "./Context/PopUpProvider";
+
 function App() {
   const [authenticated, setAuthenticated] = useState();
   const [isLoading, setIsLoading] = useState(true);
@@ -22,13 +23,12 @@ function App() {
   const socket = useSelector((state) => state?.socket?.socket);
   let { setScheduledOrders, setCancelledOrders, scheduledOrders } =
     PopUpState();
+
   /// cancel order message
   useEffect(() => {
     socket?.on("order-canceled", (data) => {
       const Corder = data.order;
       let reason = data.reason;
-      console.log(scheduledOrders, "scheduled orders");
-      console.log(Corder, "order in app");
 
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {
@@ -39,35 +39,29 @@ function App() {
         Swal.fire({
           title: "Order Cancelled",
           html: `
-          <div class="custom-align-left swal-text-content">
-            <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
-          </div>
-
-          <div class="custom-align-left swal-text-content">
-            <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
-          </div>
-
-          <div class="custom-align-left swal-text-content">
-            <strong class="custom-align-left">Service:</strong> ${Corder.service}
-          </div>
-
-          <div class="custom-align-left swal-text-content">
-            <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
-          </div>
-         
-          <div class="custom-align-left swal-text-content">
-          <strong class="custom-align-left">Reasons:</strong> ${reason}
-        </div>
-        `,
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Title:</strong> ${Corder.Title}
+            </div>
+    
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Order Details:</strong> ${Corder.details}
+            </div>
+    
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Service:</strong> ${Corder.service}
+            </div>
+    
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Amount:</strong> ${Corder.amount}
+            </div>
+           
+            <div class="custom-align-left swal-text-content">
+              <strong class="custom-align-left">Reasons:</strong> ${reason}
+            </div>
+          `,
           icon: "error",
           customClass: {
             content: "swal-content-custom", // You can add a custom class for the content
-          },
-          didOpen: () => {
-            document.body.style.overflow = "hidden"; // Disable scroll when SweetAlert is open
-          },
-          willClose: () => {
-            document.body.style.overflow = ""; // Re-enable scroll when SweetAlert is closing
           },
           allowOutsideClick: false,
         });
@@ -87,7 +81,8 @@ function App() {
     return () => {
       socket?.off("order-canceled");
     };
-  });
+  }, [socket, setScheduledOrders, setCancelledOrders]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -115,49 +110,55 @@ function App() {
 
   let routes;
 
-  if (authenticated && role === "user") {
-    routes = (
-      <>
-        <Route path="/user/*" element={<UserLayout />} />
-        <Route path="*" element={<Navigate to="/user/homepage" />} />
-      </>
-    );
-  } else if (authenticated && role === "worker") {
-    routes = (
-      <>
-        <Route path="/worker/*" element={<Worker />} />
-        <Route path="*" element={<Navigate to="/worker/workerHomepage" />} />
-      </>
-    );
-  } else if (authenticated && role === "admin") {
-    routes = (
-      <>
-        <Route path="/admin/*" element={<AdminLayout />} />
-        <Route path="*" element={<Navigate to="/admin/homePageAdmin" />} />
-      </>
-    );
-  } else {
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (!authenticated) {
     routes = (
       <>
         <Route path="/auth/*" element={<AuthLayout />} />
         <Route path="*" element={<Navigate to="/auth/login" />} />
       </>
     );
+  } else if (role === "user") {
+    routes = (
+      <>
+        <Route path="/user/*" element={<UserLayout />} />
+        <Route path="*" element={<Navigate to="/user/homepage" />} />
+      </>
+    );
+  } else if (role === "worker") {
+    routes = (
+      <>
+        <Route path="/worker/*" element={<Worker />} />
+        <Route path="*" element={<Navigate to="/worker/workerHomepage" />} />
+      </>
+    );
+  } else if (role === "admin") {
+    routes = (
+      <>
+        <Route path="/admin/*" element={<AdminLayout />} />
+        <Route path="*" element={<Navigate to="/admin/homePageAdmin" />} />
+      </>
+    );
   }
 
   return (
     <>
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <BrowserRouter>
-          <ChatPopup />
-          <ModalComponent />
-          <FinishJobReq />
-          <OfferResult />
-          <Routes>{routes}</Routes>
-        </BrowserRouter>
-      )}
+      <BrowserRouter>
+        {authenticated && (
+          <>
+            {" "}
+            <ChatPopup />
+            <ModalComponent />
+            <FinishJobReq />
+            <OfferResult />
+          </>
+        )}
+
+        <Routes>{routes}</Routes>
+      </BrowserRouter>
     </>
   );
 }

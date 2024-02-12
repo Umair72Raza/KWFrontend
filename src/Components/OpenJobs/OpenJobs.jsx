@@ -10,12 +10,12 @@ import {
   Spinner,
 } from "reactstrap";
 import Slider from "react-slick";
-import { truncateText } from "../../utils";
+import { SelectChat, truncateText } from "../../utils";
 import { FiMessageCircle } from "react-icons/fi";
 import { ChatState } from "../../Context/ChatProvider";
 import { PopUpState } from "../../Context/PopUpProvider";
 import { useSelector } from "react-redux";
-import { SelectChat } from "../../utils";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const {
@@ -28,6 +28,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     setUnreadMessages,
     setCopyOfChats,
     unreadMessages,
+    setAvailableJobOffer,
   } = ChatState();
   const { setFromAvailableJobs } = PopUpState();
   const { user } = useSelector((state) => state.auth);
@@ -89,41 +90,48 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   };
 
   const handleMessageIconClick = (order) => {
-    setShowModal(true);
+    // Update available job offer and set 'from available jobs' flag
+    setAvailableJobOffer(order);
     setFromAvailableJobs(true);
+
+    // Check if the user is already in chats
     const isUserInChats = copyOfChats?.some((chat) =>
       chat?.users?.some((chatUser) => chatUser?._id === order?.user?._id)
     );
+
+    // Get the current user (worker)
     const worker = user;
+
+    // If the user is not in chats, create a fake chat
     if (!isUserInChats) {
-      // Create a fake chat
-      console.log("order", order);
       const fakeChat = {
         _id: "",
         chatName: "fakeChat",
-        users: [order?.user, worker],
+        users: [worker, order?.user],
         latestMessage: null,
         seen: true,
       };
 
+      // Update state with the fake chat
       setCopyOfChats((prevCopyOfChats) => {
         const updatedChats =
           prevCopyOfChats.length > 0
             ? [fakeChat, ...prevCopyOfChats]
             : [fakeChat];
-
         setChat(fakeChat);
         setSelectedChatCompare(fakeChat);
         setSelectedChat(() => SelectChat(fakeChat));
-
         return updatedChats;
       });
     } else {
+      // Find the chat with the user
       const userChat = copyOfChats.find((chat) =>
         chat?.users?.some((chatUser) => chatUser?._id === order?.user?._id)
       );
 
-      if (userChat?.access === "accepted") {
+      // If the order user's access is 'accepted'
+      if (order?.user?.access === "accepted") {
+        // Update selected chat, remove notifications, and reset unread messages count
         setChat(userChat);
         setSelectedChatCompare(userChat);
         setSelectedChat(() => SelectChat(userChat));
@@ -137,6 +145,19 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
           }));
         }
       }
+    }
+
+    // Show the modal
+    setShowModal(true);
+  };
+
+  const openGoogleMaps = (location) => {
+    const [longitude, latitude] = location?.coordinates || [];
+    if (latitude && longitude) {
+      const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      window.open(url, "_blank");
+    } else {
+      console.error("Invalid coordinates");
     }
   };
 
@@ -188,7 +209,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       <b>Amount:</b> ${order?.amount}
                     </CardText>
                     <CardText>
-                      <b>Address:</b> {order?.Address}
+                      <b>Address:</b> {order?.user?.address}
                     </CardText>
                     <div style={{ maxHeight: "100px", overflowY: "auto" }}>
                       {order?.service && order.service.length > 0 && (
@@ -259,15 +280,27 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         )}
                       </CardText>
                     )}
+                    <CardText>
+                      {" "}
+                      <Button
+                        onClick={() => openGoogleMaps(order?.user?.location)}
+                        color="primary"
+                      >
+                        Directions <FaMapMarkerAlt />
+                      </Button>{" "}
+                    </CardText>
                     <CardText className="d-flex justify-content-around align-items-center">
-                      <Button color="primary">Accept</Button>
-                      <span className="fw-bold">
-                        <FiMessageCircle
-                          className="fs-2 hover-pointer"
-                          onClick={()=> handleMessageIconClick(order)}
-                        />{" "}
-                        Chat{" "}
-                      </span>
+                      <Button color="success">Accept</Button>
+                      <Button
+                        color="info"
+                        className="fw-bold hover-pointer"
+                        onClick={() => handleMessageIconClick(order)}
+                        style={{
+                          color: "white",
+                        }}
+                      >
+                        <FiMessageCircle className="fs-4 " /> Chat{" "}
+                      </Button>
                     </CardText>
                   </CardBody>
                 </Card>

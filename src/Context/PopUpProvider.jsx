@@ -105,7 +105,6 @@ const PopUpContext = ({ children }) => {
         setGlobalStartButtonDisabled,
         setFromAvailableJobs,
         fromAvailableJobs,
-        setGlobalStartButtonDisabled,
         pendingOrders,
         setPendingOrders,
         servicelist,
