@@ -285,6 +285,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       <Button
                         onClick={() => openGoogleMaps(order?.user?.location)}
                         color="primary"
+                        className=" ms-2 "
                       >
                         Directions <FaMapMarkerAlt />
                       </Button>{" "}
