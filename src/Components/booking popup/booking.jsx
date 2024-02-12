@@ -64,22 +64,44 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     serviceOption,
   ]);
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const selectedImages = Array.from(e.target.files);
-    const totalSize = selectedImages.reduce(
-      (acc, image) => acc + image.size,
-      0
-    );
+    setTimeout(()=>{
+     setImageError("")
+    },3000)
 
-    if (selectedImages.length > 5) {
-      setImageError("You can upload a maximum of 5 images.");
-    } else if (totalSize > 5 * 1024 * 1024) {
-      setImageError("Total image size cannot exceed 5MB.");
-    } else {
-      setImages(selectedImages);
-      setImageError("");
+   // Filter images that are less than or equal to 1MB
+   const filteredImages = selectedImages.filter((image) => image.size <= 1024 * 1024);
+
+   // Limit the selected images to the number needed to reach 5
+   const remainingSlots = 5 - images?.length || 0;
+   const limitedFilteredImages = filteredImages.slice(0, remainingSlots);
+
+    if( remainingSlots > 0){
+      // All selected images are within the size limit, update the images state
+      setImages((prevImages) => [...prevImages, ...limitedFilteredImages]);
+      setImageError(""); // Clear any previous error message
+      e.target.value=null
+    }
+  // If there are images exceeding the size limit, set the error message
+  if (filteredImages?.length !== selectedImages?.length) {
+    setImageError("Each image must be less than 1MB.");
+    // Clear the input value
+    e.target.value = null;
+  } 
+    // Check if selecting additional images exceeds the limit after adding filtered images
+    if ( selectedImages.length > 5 || images?.length + selectedImages?.length > 5) {
+      setImageError("You can select only five images.");
+      e.target.value = null; // Clear the input value
     }
   };
+  
+  
+  
+  
+  
+  
+  
 
   useEffect(() => { 
     console.log(images,"images")
@@ -584,8 +606,8 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
             id="OfferImages"
               type="file"
               accept="image/*"
-              multiple
               onChange={handleImageChange}
+              multiple={images?.length < 5}
             />
             {imageError && <div style={{ color: "red" }}>{imageError}</div>}
             {images.length > 0 && (

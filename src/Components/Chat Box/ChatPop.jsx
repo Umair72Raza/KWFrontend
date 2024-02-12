@@ -402,41 +402,53 @@ const ChatPopup = () => {
     const errorMessage = validateFiles(files);
 
     if (errorMessage) {
-      handleFileError(errorMessage, event.target);
-    } else {
-      setSelectedFiles((prevSelectedFiles) => [...prevSelectedFiles, ...files]);
+        handleFileError(errorMessage, event.target);
     }
-  };
 
-  const validateFiles = (files) => {
-    if (files.length > 5) {
-      return "Please select up to 5 files only.";
+    const remainingSlots = 5 - (selectedFiles?.length || 0);
+    const filteredFiles = files.filter((file) => file.size <= 5 * 1024 * 1024);
+    const selectedFilesToAdd = filteredFiles.slice(0, remainingSlots);
+
+    if (remainingSlots > 0) {
+        setSelectedFiles((prevSelectedFiles) => [...prevSelectedFiles, ...selectedFilesToAdd]);
+    }
+};
+
+const validateFiles = (files) => {
+    const totalSelectedFiles = selectedFiles?.length || 0;
+
+    if (files?.length + totalSelectedFiles > 5 || selectedFiles?.length >5) {
+        return "Please select up to 5 files only.";
     }
 
     for (const file of files) {
-      if (file.size > 5 * 1024 * 1024) {
-        return "File size exceeds the limit of 5 MB.";
-      }
-      if (selectedFiles.some((selectedFile) => selectedFile === file)) {
-        return "File already selected.";
-      }
+        if (file.size > 5 * 1024 * 1024) {
+            return "File size exceeds the limit of 5 MB.";
+        }
+        if (selectedFiles.some((selectedFile) => selectedFile === file)) {
+            return "File already selected.";
+        }
     }
 
     return "";
-  };
+};
+
+const handleFileError = (errorMessage, inputElement) => {
+    setSendButtonDisabled(true);
+    setPictureError(errorMessage);
+    inputElement.value = null;
+    setTimeout(() => {
+        setPictureError("");
+    }, 5000);
+};
+
+
   const handleProfileImageLoadedEnd = () => {
     setProfilePicImageLoaded(true);
   };
 
   const handleImageLoadEnd = () => {
     setImagesLoading(false); // Set imagesLoading to false once image is loaded
-  };
-
-  const handleFileError = (errorMessage, inputElement) => {
-    setSendButtonDisabled(true);
-    setPictureError(errorMessage);
-    setTimeout(() => setPictureError(""), 5000);
-    inputElement.value = null;
   };
 
   const handleRemovePicture = (indexToRemove) => {
@@ -773,7 +785,7 @@ const ChatPopup = () => {
                                       </Button>
                                     </Col>
                                   ) : null}
-                                  {fromAvailableJobs &&
+                                  {/* {fromAvailableJobs &&
                                     user?.role === "worker" && (
                                       <Button
                                         style={{
@@ -785,7 +797,7 @@ const ChatPopup = () => {
                                       >
                                         View Offer
                                       </Button>
-                                    )}
+                                    )} */}
                                 </Row>
                               </Col>
                               <div
@@ -1189,7 +1201,7 @@ const ChatPopup = () => {
                                     </Button>
                                   </Col>
                                 ) : null}
-                                {fromAvailableJobs &&
+                                {/* {fromAvailableJobs &&
                                   user?.role === "worker" && (
                                     <Button
                                       style={{
@@ -1202,7 +1214,7 @@ const ChatPopup = () => {
                                     >
                                       View Offer
                                     </Button>
-                                  )}
+                                  )} */}
                               </Row>
                             </Col>
 
