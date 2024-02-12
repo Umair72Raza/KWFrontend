@@ -54,6 +54,7 @@ const Orders = () => {
     useState(false);
   const [isPendingOrdersFetched, setIsPendingOrdersFetched] = useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
+  const [isPostedOrdersFetched, setIsPostedOrdersFetched] = useState(false);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   let {
     cancelledOrders,
@@ -136,6 +137,18 @@ const Orders = () => {
             if (result.type === "orders/fetchPendingOrders/fulfilled") {
               setPendingOrders(result.payload.orders);
               setIsPendingOrdersFetched(true);
+            }
+          }
+          dispatch(hideSpinner());
+          break;
+          case "6":
+          dispatch(showSpinner());
+          // Check if pendingOrders is already available locally
+          if (!isPostedOrdersFetched) {
+            result = await dispatch(fetchPostedOrdersAsync(token));
+            if (result.type === "orders/fetchPostedOrders/fulfilled") {
+              setPostedJobs(result.payload.orders);
+              setIsPostedOrdersFetched(true);
             }
           }
           dispatch(hideSpinner());
@@ -239,6 +252,20 @@ const Orders = () => {
           ]);
           dispatch(setnewOrderValue(null));
         }
+      }
+      else if(newOrder !== null && newOrder.Status === "Posted")
+      {
+        if (postedJobs.length === 0) {
+          setPostedJobs([newOrder]);
+          dispatch(setnewOrderValue(null));
+        } else {
+          setPostedJobs((prevPostedOrders) => [
+            ...prevPostedOrders,
+            newOrder,
+          ]);
+          dispatch(setnewOrderValue(null));
+        }
+
       }
 
       dispatch(setnewOrderValue(null));

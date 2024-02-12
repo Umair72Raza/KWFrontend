@@ -212,7 +212,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       <b>Address:</b> {order?.user?.address}
                     </CardText>
                     <div style={{ maxHeight: "100px", overflowY: "auto" }}>
-                      {order.service && order.service.length > 0 && (
+                      {order?.service && order.service.length > 0 && (
                         <CardText>
                           <b>Services:</b>
                           <ul
@@ -222,7 +222,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                               padding: 0,
                             }}
                           >
-                            {order.service.map((s, index) => (
+                            {order?.service?.map((s, index) => (
                               <li key={index}>{s}</li>
                             ))}
                           </ul>

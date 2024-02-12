@@ -29,25 +29,7 @@ const PopUpContext = ({ children }) => {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [servicelist, setServiceList] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
-  const [openJobs, setOpenJobs] = useState([
-    // {
-    //   id: "dummy-id",
-    //   Title: "Dummy Title",
-    //   Status: "Posted",
-    //   date: "2024-02-07",
-    //   time: "12:59:00 PM",
-    //   details: "Dummy details...",
-    //   amount: 10,
-    //   Address: "Dummy Address",
-    //   taskTime: 1,
-    //   users:[{_id:"", firstName:"", status:"online", role:"user", access:"accepted"}],
-    //   service: [{ name: "Dummy Service" }],
-    //   images: [
-    //     "orderimage-65bfd3c754bf292d4a43e952-0",
-    //     "orderimage-65bfd3c754bf292d4a43e952-1",
-    //   ],
-    // },
-  ]);
+  const [openJobs, setOpenJobs] = useState([]);
   const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
   const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
     useState(false);
