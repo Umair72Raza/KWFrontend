@@ -25,7 +25,7 @@ const FinishJobReq = () => {
     setActiveOrder,
     setPastOrders,finishConfirmed, setFinishConfirmed
   } = PopUpState();
-
+  const { token } = useSelector((state) => state.auth);
   useEffect(() => {
     if (!socket) return;
     socket?.on("finishjob-request", (order) => {
@@ -52,8 +52,9 @@ const FinishJobReq = () => {
   };
 
   const handleConfirm = async () => {
+    const data = {orderId: fOrder._id, token:token}
     const result = await dispatch(
-      changeStatusToPastAsync({ orderId: fOrder._id })
+      changeStatusToPastAsync(data)
     );
 
     if (

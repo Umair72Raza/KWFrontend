@@ -53,3 +53,7 @@
   transform: translateX(-50%);
 }
 
+.disabled-input {
+  opacity: 0.5; /* Adjust opacity to make the input appear dimmed */
+  /* Add any other styles to visually indicate that the input is disabled */
+}

@@ -94,10 +94,10 @@ const Map = React.memo(
                   },
                   // latitude: results[0].geometry.location.lat(),
                   // longitude: results[0].geometry.location.lng(),
-                  country:
-                    results[0].address_components.find((component) =>
-                      component.types.includes("country")
-                    )?.short_name || "",
+                  // country:
+                  //   results[0].address_components.find((component) =>
+                  //     component.types.includes("country")
+                  //   )?.short_name || "",
                 }));
               } else {
                 setNewInput(results[0].formatted_address);
@@ -113,10 +113,10 @@ const Map = React.memo(
                   },
                   // latitude: results[0].geometry.location.lat(),
                   // longitude: results[0].geometry.location.lng(),
-                  country:
-                    results[0].address_components.find((component) =>
-                      component.types.includes("country")
-                    )?.short_name || "",
+                  // country:
+                  //   results[0].address_components.find((component) =>
+                  //     component.types.includes("country")
+                  //   )?.short_name || "",
                 }));
               }
             } else {
@@ -166,10 +166,10 @@ const Map = React.memo(
               },
               // latitude: place.geometry.location.lat(),
               // longitude: place.geometry.location.lng(),
-              country:
-                place.address_components.find((component) =>
-                  component.types.includes("country")
-                )?.short_name || "",
+              // country:
+              //   place.address_components.find((component) =>
+              //     component.types.includes("country")
+              //   )?.short_name || "",
             }));
           }
         });
@@ -203,9 +203,9 @@ const Map = React.memo(
                     setFormData((prev) => ({
                       ...prev,
                       address: results[0].formatted_address,
-                      country: countryComponent
-                        ? countryComponent.short_name
-                        : "Unknown",
+                      // country: countryComponent
+                      //   ? countryComponent.short_name
+                      //   : "Unknown",
                       location: {
                         type: "Point",
                         coordinates: [longitude, latitude],

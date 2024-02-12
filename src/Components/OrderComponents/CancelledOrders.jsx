@@ -1,5 +1,5 @@
 //cards for cancelled orders
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardBody,
@@ -52,7 +52,9 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
       [orderId]: !prevMap[orderId],
     }));
   };
-
+useEffect (() => {  
+  console.log("scheduledOrdersObject",scheduledOrdersObject)
+},[scheduledOrdersObject])
   return (
     <Container>
       {spinnerVisible ? (
@@ -60,7 +62,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
           <Spinner />
         </div>
       ) : (
-        scheduledOrdersObject.length > 0 ? (
+        scheduledOrdersObject?.length > 0 ? (
           <>
             {" "}
             <Row>
@@ -68,13 +70,13 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                 <Col
                   key={order._id}
                   sm="6"
-                  md="4"
+                  md="6"
                   lg="3"
                   style={{ marginTop: "10px" }}
                 >
                   <Card
                     className="shadow"
-                    style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                    style={{ backgroundColor: "#f6f8fc",}}
                   >
                     <CardBody>
                       <CardTitle>
@@ -142,7 +144,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                       </CardText>
                       <hr />
                       
-                      {order?.cancelReason.length> 0 ? (
+                      {order?.cancelReason?.reason?.length > 0 ? (
                         <>
                           <CardText>
                            <b>Cancellation Reason:</b> {" "}
@@ -154,11 +156,11 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                             >
                               <div>
                                 {transformCancelReason(
-                                  order.cancelReason.reason,
+                                  order?.cancelReason?.reason,
                                   order._id
                                 )}
                               </div>
-                              {order.cancelReason.reason.length > 30 && (
+                              {order?.cancelReason?.reason?.length > 30 && (
                                 <Button
                                   style={{ marginTop: "-5px" }}
                                   color="link"

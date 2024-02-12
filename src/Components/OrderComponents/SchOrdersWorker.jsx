@@ -231,7 +231,7 @@ const ScheduledOrdersCardWorker = ({
           <div style={{ textAlign: "center" }}>
             <Spinner />
           </div>
-        ) : scheduledOrdersObject.length > 0 ? (
+        ) : scheduledOrdersObject?.length > 0 ? (
           <>
             {console.log(scheduledOrdersObject)}
             <Row>
@@ -246,7 +246,7 @@ const ScheduledOrdersCardWorker = ({
                 >
                   <Card
                     className="shadow"
-                    style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                    style={{ backgroundColor: "#f6f8fc", }}
                   >
                     <CardBody>
                       <CardTitle>
@@ -291,7 +291,7 @@ const ScheduledOrdersCardWorker = ({
                               style={{ marginTop: "10px", marginRight: "1%" }}
                             >
                               <b>Status: </b>
-                              {order.Status}
+                              {order?.Status}
                             </span>
                             <img
                               src={activeOrderspng}
@@ -308,13 +308,13 @@ const ScheduledOrdersCardWorker = ({
                         </Col>
                       </CardText>
                       <CardText>
-                        <b>Time:</b> {order.time}
+                        <b>Time:</b> {order?.time}
                       </CardText>
                       <CardText>
-                        <b>Date:</b> {order.date}
+                        <b>Date:</b> {order?.date}
                       </CardText>
                       <CardText>
-                        <b>Amount:</b> ${order.amount}
+                        <b>Amount:</b> ${order?.amount}
                       </CardText>
                       <CardText>
                         <b>Details:</b>{" "}
@@ -324,10 +324,10 @@ const ScheduledOrdersCardWorker = ({
                             overflowY: "auto",
                           }}
                         >
-                          {showFullDetailsMap[order._id] ? (
+                          {showFullDetailsMap[order?._id] ? (
                             <div
                               dangerouslySetInnerHTML={{
-                                __html: order.details,
+                                __html: order?.details,
                               }}
                             />
                           ) : (
@@ -337,9 +337,9 @@ const ScheduledOrdersCardWorker = ({
                             <Button
                               style={{ marginTop: "-5px" }}
                               color="link"
-                              onClick={() => toggleDetails(order._id)}
+                              onClick={() => toggleDetails(order?._id)}
                             >
-                              {showFullDetailsMap[order._id]
+                              {showFullDetailsMap[order?._id]
                                 ? "Show Less"
                                 : "Show More"}
                             </Button>
@@ -348,11 +348,11 @@ const ScheduledOrdersCardWorker = ({
                       </CardText>
                       <CardText>
                         <b>Order By:</b>{" "}
-                        {order.users.length > 0 && order.users[0].firstName}
+                        {order.users.length > 0 && order?.users[0]?.firstName}
                       </CardText>
                       <CardText>
                         <b>Address: </b>
-                        {order.users[0].address}
+                        {order?.users[0]?.address}
                       </CardText>
                       <CardText>
                         <p>{formattedAddress}</p>
@@ -386,13 +386,13 @@ const ScheduledOrdersCardWorker = ({
                             <CardText>
                               <Button
                                 onClick={() =>
-                                  sendStartRequest(order, order.users[0]._id)
+                                  sendStartRequest(order, order?.users[0]?._id)
                                 }
                                 color="success"
                                 className={
                                   globalStartButtonDisabled ||
-                                  startButtonDisabledMap[order._id] ||
-                                  activeOrder.length > 0
+                                  startButtonDisabledMap[order?._id] ||
+                                  activeOrder?.length > 0
                                     ? "disabled"
                                     : ""
                                 }

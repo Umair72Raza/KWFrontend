@@ -690,7 +690,7 @@ const UserRegister = ({ ShowServices }) => {
                   <Input
                     type="text"
                     placeholder="Enter your address(Optional)."
-                    value={formData.optionalAddress}
+                    value={formData?.optionalAddress}
                     onChange={handleOptionalAddress}
                     disabled={loading}
                   />

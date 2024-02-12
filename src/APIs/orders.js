@@ -1,5 +1,7 @@
 import axios from "axios";
-const API = axios.create({ baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT });
+const API = axios.create({
+  baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT,
+});
 
 export const fetchOrders = async (data) => {
   try {
@@ -64,15 +66,12 @@ export const fetchCancOrders = async (data) => {
 export const fetchPostedOrders = async (data) => {
   try {
     const { users, status, token } = data;
-    const response = await API.get(
-      `order/getPostedOrder/${users}/${status}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log(response.data,"resp in api")
+    const response = await API.get(`order/getPostedOrder/${users}/${status}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data, "resp in api");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -83,22 +82,17 @@ export const fetchPostedOrders = async (data) => {
 export const fetchOpenOrders = async (data) => {
   try {
     const { userId, token } = data;
-    const response = await API.get(
-      `order/getOpenOrder/${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    console.log(response,"reponse in api")
+    const response = await API.get(`order/getOpenOrder/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response, "reponse in api");
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
-
-
 
 export const fetchActiveOrders = async (data) => {
   try {
@@ -145,7 +139,14 @@ export const cancelOrder = async (dataWithToken) => {
 
 export const activateOrder = async (data) => {
   try {
-    const response = await API.put("order/activateStatus", data);
+    const { orderId, token } = data;
+    console.log(orderId, "orderId");
+    const data1 = { orderId };
+    const response = await API.put("order/activateStatus", data1, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (response.status === 200) {
       return response.data;
     }
@@ -155,10 +156,33 @@ export const activateOrder = async (data) => {
 };
 export const changeToPast = async (data) => {
   try {
-    const response = await API.put("order/changeToPast", data);
+    const { orderId, token } = data;
+    console.log(orderId);
+    const data1 = { orderId };
+    const response = await API.put("order/changeToPast", data1, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (response.status === 200) {
       return response.data;
     }
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const deleteTheOrder = async (data) => {
+  try {
+    const { id, token } = data;
+    console.log(id,token, "id n token")
+    const response = await API.delete(`order/deleteOrder/${id}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data)
+    return response.data;
   } catch (error) {
     throw error.response.data;
   }

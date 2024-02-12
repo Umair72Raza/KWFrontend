@@ -8,36 +8,7 @@ const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
-  // const [errors, setErrors] = useState({});
 
-  // useEffect(() => {
-  //   setErrors((prevErrors) => ({
-  //     ...prevErrors,
-  //     country: !country ? "Country is required" : "",
-  //   }));
-  // }, [country]);
-
-  // useEffect(() => {
-  //   setErrors((prevErrors) => ({
-  //     ...prevErrors,
-  //     region: !region ? "Region/State is required" : "",
-  //   }));
-  // }, [region]);
-
-  // useEffect(() => {
-  //   if (region && City.getCitiesOfState(country, region).length === 0) {
-  //     setCity(""); // Reset city if the state doesn't have cities
-  //     setErrors((prevErrors) => ({
-  //       ...prevErrors,
-  //       city: "",
-  //     }));
-  //   } else {
-  //     setErrors((prevErrors) => ({
-  //       ...prevErrors,
-  //       city: !city ? "City is required" : "",
-  //     }));
-  //   }
-  // }, [region, city]);
 
   const handleCountryChange = (event) => {
     const selectedCountry = event.target.value;
