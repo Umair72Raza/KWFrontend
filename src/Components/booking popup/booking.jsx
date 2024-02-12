@@ -53,7 +53,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       taskTime <= 9 &&
       serviceOption.length > 0;
 
-    console.log("Form Complete:", isFormComplete);
+
     setFormComplete(isFormComplete);
   }, [
     taskTitle,
@@ -76,11 +76,15 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     } else if (totalSize > 5 * 1024 * 1024) {
       setImageError("Total image size cannot exceed 5MB.");
     } else {
-      setImages(selectedImages);
+      setImages([...images,...selectedImages]);
       setImageError("");
-      await console.log(images, " images");
     }
   };
+
+  useEffect(() => { 
+    console.log(images,"images")
+  }, [images]);
+
 
   const handleDateTimeChange = (e) => {
     const selectedDateTime = e.target.value;
@@ -181,8 +185,8 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     const Users = [user._id];
     let status = "Posted";
     if (selectedDate > currentDate) {
-      const data = {
-        params: {
+      const data = 
+        {
           Title: taskTitle,
           Status: status,
           users: Users,
@@ -194,11 +198,9 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           address: user.address,
           tasktime: taskTime,
           images,
-          location: user?.location || {},
-        },
-        token: token,
+          // location: user?.location || {},
+        
       };
-
       const formData = new FormData();
 
       for (const key in data) {
@@ -211,6 +213,13 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         }
       }
 
+        // Append location coordinates to FormData
+  if (user.location && user.location.coordinates) {
+    formData.append('location[type]', 'Point');
+    formData.append('location[coordinates][]', user.location.coordinates[0]);
+    formData.append('location[coordinates][]', user.location.coordinates[1]);
+  }
+
       serviceOption.forEach((s, index) => {
         formData.append(`service`, s);
       });
@@ -221,7 +230,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         {
           // console.log(params,"params")
-          const result = await dispatch(CreateOrder(data));
+          const result = await dispatch(CreateOrder({formData,token}));
           console.log(result);
           Swal.fire({
             title: "Job Posted",
