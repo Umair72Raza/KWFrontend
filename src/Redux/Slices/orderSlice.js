@@ -11,6 +11,7 @@ import {
   fetchPendingOrders,
   fetchOpenOrders,
   fetchPostedOrders,
+  deleteTheOrder,
 } from "../../APIs/orders";
 
 export const getAllTheOrders = createAsyncThunk(
@@ -79,9 +80,9 @@ export const fetchOpenOrdersAsync = createAsyncThunk(
   async (token) => {
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user._id;
-    const data = { token: token, userId: userId, };
+    const data = { token: token, userId: userId };
     const response = await fetchOpenOrders(data);
-    console.log(response,"resp in think")
+    console.log(response, "resp in think");
     return response;
   }
 );
@@ -121,6 +122,14 @@ export const changeStatusToPastAsync = createAsyncThunk(
   }
 );
 
+export const deleteTheOrderAsync = createAsyncThunk(
+  "orders/deleteOrder",
+  async (data) => {
+    const response = await deleteTheOrder(data);
+    return response;
+  }
+);
+
 const orderSlice = createSlice({
   name: "orderSlice",
   initialState: {
@@ -128,10 +137,11 @@ const orderSlice = createSlice({
     pastOrders: null,
     cancelledOrders: null,
     activeOrders: null,
-    pendingOrders:null,
+    pendingOrders: null,
     orderCancelledBool: null,
     orderActivated: false,
-    openOrders:null,
+    openOrders: null,
+    deletedOrder: null,
     data: null,
     error: null,
     status: null,
@@ -180,7 +190,6 @@ const orderSlice = createSlice({
           error: action.error.message,
         };
       })
-
 
       .addCase(fetchPendingOrdersAsync.pending, (state) => {
         state.pendingOrders = { data: null, status: "loading" };
@@ -237,6 +246,16 @@ const orderSlice = createSlice({
       .addCase(fetchOpenOrdersAsync.fulfilled, (state, action) => {
         state.status = "success";
         state.openOrders = action.payload;
+      })
+      .addCase(deleteTheOrderAsync.pending, (state) => {
+        state.deletedOrder = null;
+      })
+      .addCase(deleteTheOrderAsync.fulfilled, (state, action) => {
+        state.status = "success";
+        state.deletedOrder = action.payload;
+      })
+      .addCase(deleteTheOrderAsync.rejected, (state) => {
+        state.deletedOrder = null
       });
   },
 });

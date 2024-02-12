@@ -23,7 +23,10 @@ import {
 
 import completedtask from "../../assets/completedtask.png";
 import activeOrderspng from "../../assets/activestatus.png";
-import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
+import {
+  cancelOrderAsync,
+  deleteTheOrderAsync,
+} from "../../Redux/Slices/OrderSlice";
 import Swal from "sweetalert2";
 import { truncateText } from "../../utils";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
@@ -63,6 +66,39 @@ const PendingOrders = ({ pendingOrders }) => {
     return showFullDetailsMap[order._id]
       ? order.details
       : truncateText(transformedDetails, 30);
+  };
+  const disaptch = useDispatch();
+  const deleteAlert = async (order) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      allowOutsideClick: false,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const id = order._id;
+        const data = { id: id, token: token };
+        const result = await disaptch(deleteTheOrderAsync(data));
+        console.log(result?.type, "type");
+        if (result?.type === "orders/deleteOrder/fulfilled") {
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your Order has been deleted.",
+            icon: "success",
+          });
+        } else {
+          Swal.fire({
+            title: "Not Deleted!",
+            text: "Your Order was not deleted.",
+            icon: "error",
+          });
+        }
+      }
+    });
   };
 
   return (
@@ -193,7 +229,7 @@ const PendingOrders = ({ pendingOrders }) => {
                           {/* Full width on small screens, half width on medium and larger screens */}
                           <CardText>
                             <Button
-                              onClick={() => Delete(order)}
+                              onClick={() => deleteAlert(order)}
                               color="danger"
                             >
                               Delete

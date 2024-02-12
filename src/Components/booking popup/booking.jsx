@@ -130,6 +130,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       serviceOption.forEach((s, index) => {
         formData.append(`service`, s);
       });
+     // console.log(images,"images in FD")
       images.forEach((image, index) => {
         formData.append(`images`, image);
       });
@@ -220,7 +221,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         {
-          // console.log(params,"params")
+          console.log(params,"params")
           const result = await dispatch(CreateOrder(data));
           console.log(result);
           Swal.fire({
