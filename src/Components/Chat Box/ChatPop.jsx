@@ -58,6 +58,7 @@ const ChatPopup = () => {
     unreadMessages,
     chatFromWorkerCard,
     setChatFromWorkerCard,
+    setAvailableJobOffer,
   } = ChatState();
 
   const { fromAvailableJobs, setFromAvailableJobs } = PopUpState();
@@ -82,9 +83,7 @@ const ChatPopup = () => {
   const [pictureError, setPictureError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [images, setImages] = useState([]);
-useEffect(() => { 
-  console.log("copyOfChats", copyOfChats);
-}, [copyOfChats]);
+
   const chatTransitions = useTransition(copyOfChats, {
     from: { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
     enter: { opacity: 1, transform: "translate3d(0%, 0, 0)" },
@@ -372,6 +371,7 @@ useEffect(() => {
     setImagesLoading(true);
 
     // Update chat-related states
+    console.log("chat", chat);
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
@@ -486,8 +486,9 @@ useEffect(() => {
     setNewMessageText("");
     setSelectedFiles([]);
     setImagesLoading(false);
-    if(fromAvailableJobs){
+    if (fromAvailableJobs) {
       setFromAvailableJobs(false);
+      setAvailableJobOffer(null);
     }
     if (profilePicImageLoaded === true) {
       setProfilePicImageLoaded(false);
@@ -546,6 +547,8 @@ useEffect(() => {
   useEffect(() => {
     scrollToBottom(); // Scroll to bottom when messages change
   }, [messages, selectedChat]);
+
+  const handleViewOffer = () => {};
 
   const formatTime = (timestamp) => {
     const messageDate = new Date(timestamp);
@@ -712,7 +715,7 @@ useEffect(() => {
                           {selectedChat ? (
                             <Col className="selected-chat">
                               <Col className="chat-header d-flex flex-row align-items-center">
-                                {!chatFromWorkerCard&& !fromAvailableJobs && (
+                                {!chatFromWorkerCard && !fromAvailableJobs && (
                                   <Col>
                                     <FiArrowLeft
                                       className="fs-4 me-3 hover-pointer"
@@ -770,18 +773,19 @@ useEffect(() => {
                                       </Button>
                                     </Col>
                                   ) : null}
-                                  {fromAvailableJobs && user?.role === "worker" && (
-                                    <Button
-                                      style={{
-                                        height: "45px",
-                                        width: "105px",
-                                      }}
-                                      color="primary"
-                                      className="align-self-center"
-                                    >
-                                      View Offer
-                                    </Button>
-                                  )}
+                                  {fromAvailableJobs &&
+                                    user?.role === "worker" && (
+                                      <Button
+                                        style={{
+                                          height: "45px",
+                                          width: "105px",
+                                        }}
+                                        color="primary"
+                                        className="align-self-center"
+                                      >
+                                        View Offer
+                                      </Button>
+                                    )}
                                 </Row>
                               </Col>
                               <div
@@ -891,7 +895,7 @@ useEffect(() => {
                                   <animated.div
                                     style={{ ...style, marginBottom: "0px" }}
                                   >
-                                    <React.Fragment key={item._id} >
+                                    <React.Fragment key={item._id}>
                                       <Row
                                         className={`d-flex flex-row align-items-center my-2`}
                                       >
@@ -1113,7 +1117,13 @@ useEffect(() => {
                     </Col>
                   )}
 
-                  <Row className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}>
+                  <Row
+                    className={`${
+                      chatFromWorkerCard || fromAvailableJobs
+                        ? "col-12"
+                        : "col-9"
+                    }`}
+                  >
                     {isOpen ? (
                       <MessageImagesCarousel
                         images={images}
@@ -1179,7 +1189,8 @@ useEffect(() => {
                                     </Button>
                                   </Col>
                                 ) : null}
-                                {fromAvailableJobs && user?.role === "worker" && (
+                                {fromAvailableJobs &&
+                                  user?.role === "worker" && (
                                     <Button
                                       style={{
                                         height: "45px",
@@ -1187,6 +1198,7 @@ useEffect(() => {
                                       }}
                                       color="primary"
                                       className="align-self-center"
+                                      onClick={handleViewOffer}
                                     >
                                       View Offer
                                     </Button>

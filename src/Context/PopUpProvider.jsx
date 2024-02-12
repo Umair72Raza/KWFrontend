@@ -28,7 +28,7 @@ const PopUpContext = ({ children }) => {
   const [pastOrders, setPastOrders] = useState([]);
   const [pendingOrders, setPendingOrders] = useState([]);
   const [servicelist, setServiceList] = useState([]);
-  const [postedJobs, setPostedJobs] = useState([])
+  const [postedJobs, setPostedJobs] = useState([]);
   const [openJobs, setOpenJobs] = useState([
     // {
     //   id: "dummy-id",
@@ -123,7 +123,6 @@ const PopUpContext = ({ children }) => {
         setGlobalStartButtonDisabled,
         setFromAvailableJobs,
         fromAvailableJobs,
-        setGlobalStartButtonDisabled,
         pendingOrders,
         setPendingOrders,
         servicelist,
@@ -131,7 +130,7 @@ const PopUpContext = ({ children }) => {
         openJobs,
         setOpenJobs,
         postedJobs,
-        setPostedJobs
+        setPostedJobs,
       }}
     >
       {children}
