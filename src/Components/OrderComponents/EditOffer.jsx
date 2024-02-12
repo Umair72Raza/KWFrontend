@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
-    Button,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    Input,
-    Label,
-    FormGroup,
-    Progress,
-    Col,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Label,
+  FormGroup,
+  Progress,
+  Col,
+  Row,
 } from "reactstrap";
 
 import { BookingConstants } from "../../Constants/Constants.js";
@@ -18,70 +19,85 @@ import { failureToast } from "../../utils.js";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { MdCancelPresentation } from "react-icons/md";
 import { allServicesAsync } from "../../Redux/Slices/AdminSlice.js";
+import {
+  CreateOrder,
+  editOrderAsync,
+} from "../../Redux/Slices/BookingSlice.js";
+import Slider from "react-slick";
 
 const EditOffer = ({ modal, toggle, order }) => {
-    
-    const { user, token } = useSelector((state) => state.auth);
-    
-    const dispatch = useDispatch();
-    let { SetParam, clear, setClear, SetParams,servicelist } = PopUpState()
-    const [taskTitle, setTaskTitle] = useState("");
-    const [taskDetails, setTaskDetails] = useState(``);
-    const [dateTime, setDateTime] = useState("");
-    const [amountPerHour, setAmountPerHour] = useState(5);
-    const [orderId,setOrderId]=useState(null)
-    const dateTimeObject = new Date(dateTime);
-    const datePart = dateTimeObject.toLocaleDateString();
-    const timePart = dateTimeObject.toLocaleTimeString();
-    const [formComplete, setFormComplete] = useState(false);
-    const [dateTimeError, setDateTimeError] = useState("");
-    const [amountError, setAmountError] = useState("");
-    
-   
-    const [taskTime, setTaskTime] = useState(1)
-    const [clicked, setClicked] = useState(true)
-    const [imageError, setImageError] = useState("")
-    const [images, setImages] = useState([]);
+  const { user, token } = useSelector((state) => state.auth);
 
-    useEffect(()=>{
-        dispatch(allServicesAsync())
-    },[])
-    const list = useSelector((state) => state?.admin?.services); 
-    const [serviceOption, setServiceOption] = useState([]);
-    
-    
+  const dispatch = useDispatch();
+  let {
+    SetParam,
+    clear,
+    setClear,
+    SetParams,
+    servicelist,
+    postedJobs,
+    setPostedJobs,
+    pendingOrders,
+    setPendingOrders,
+  } = PopUpState();
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDetails, setTaskDetails] = useState(``);
+  const [dateTime, setDateTime] = useState("");
+  const [amountPerHour, setAmountPerHour] = useState(5);
+  const [orderId, setOrderId] = useState(null);
+  const dateTimeObject = new Date(dateTime);
+  const datePart = dateTimeObject.toLocaleDateString();
+  const timePart = dateTimeObject.toLocaleTimeString();
+  const [formComplete, setFormComplete] = useState(false);
+  const [dateTimeError, setDateTimeError] = useState("");
+  const [amountError, setAmountError] = useState("");
 
-    useEffect(() => {
-        if (order) {
-            setTaskTitle(order.Title);
-            setTaskDetails(order.details);
-            setDateTime("");
-            setAmountPerHour(5);
-            setServiceOption(order.service);
-            setTaskTime(1)
-            setImages(order.images)
-            setOrderId(order._id)
-            console.log(order.service)
-        }
+  const [taskTime, setTaskTime] = useState(1);
+  const [clicked, setClicked] = useState(true);
+  const [imageError, setImageError] = useState("");
+  const [images, setImages] = useState([]);
 
-    }, [order])
+  useEffect(() => {
+    dispatch(allServicesAsync());
+  }, []);
+  const list = useSelector((state) => state?.admin?.services);
+  const [serviceOption, setServiceOption] = useState([]);
 
-    useEffect(() => {
-        const isFormComplete =
-            taskTitle?.trim() !== "" &&
-            taskDetails?.trim() !== "" &&
-            dateTime !== "" &&
-            amountPerHour >= 5 &&
-            amountPerHour <= 100000 &&
-            taskTime >= 1 &&
-            taskTime <= 9 && 
-            serviceOption.length > 0
-            
+  useEffect(() => {
+    if (order) {
+      setTaskTitle(order.Title);
+      setTaskDetails(order.details);
+      setDateTime("");
+      setAmountPerHour(5);
+      setServiceOption(order.service);
+      setTaskTime(1);
+      setImages(order.images);
+      setOrderId(order._id);
+      console.log(order.service);
+    }
+  }, [order]);
 
+  useEffect(() => {
+    const isFormComplete =
+      taskTitle?.trim() !== "" &&
+      taskDetails?.trim() !== "" &&
+      dateTime !== "" &&
+      amountPerHour >= 5 &&
+      amountPerHour <= 100000 &&
+      taskTime >= 1 &&
+      taskTime <= 9 &&
+      serviceOption.length > 0;
 
-        // console.log("Form Complete:", isFormComplete);
-        setFormComplete(isFormComplete);
-    }, [taskTitle, taskDetails, dateTime, amountPerHour, taskTime, serviceOption]);
+    // console.log("Form Complete:", isFormComplete);
+    setFormComplete(isFormComplete);
+  }, [
+    taskTitle,
+    taskDetails,
+    dateTime,
+    amountPerHour,
+    taskTime,
+    serviceOption,
+  ]);
 
 
 
@@ -432,7 +448,6 @@ const EditOffer = ({ modal, toggle, order }) => {
                     </Button>
                 </ModalFooter>
             </Modal>
-
         </div>
     );
 };

@@ -23,24 +23,30 @@ import {
 
 import completedtask from "../../assets/completedtask.png";
 import activeOrderspng from "../../assets/activestatus.png";
-import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
+import {
+  cancelOrderAsync,
+  deleteTheOrderAsync,
+} from "../../Redux/Slices/OrderSlice";
 import Swal from "sweetalert2";
 import { truncateText } from "../../utils";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { selectSpinnerVisibility } from "../../Redux/Slices/LoaderSlice";
 import EditOffer from "./EditOffer.jsx";
+import Slider from "react-slick";
 
 const PendingOrders = ({ pendingOrders }) => {
+  let { setPendingOrders } = PopUpState();
   const { user, token } = useSelector((state) => state.auth);
   const [order, setOrder] = useState(null);
   const socket = useSelector((state) => state?.socket?.socket);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
-
+  const disaptch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   let {} = PopUpState();
 
   const [modal, setModal] = useState(false);
+  const [modal1, setModal1] = useState(false);
   const Post = (order) => {
     setOrder(order);
     toggleModal();
@@ -48,14 +54,15 @@ const PendingOrders = ({ pendingOrders }) => {
   const toggleModal = () => {
     setModal(!modal);
   };
+  const toggleModal1 = () => {
+    setModal1(!modal1);
+  }
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
       ...prevMap,
       [orderId]: !prevMap[orderId],
     }));
   };
-  //const user = localStorage.getItem('user')
-  const dispatch = useDispatch();
 
   const transformOrderDetails = (order) => {
     let transformedDetails = order.details.replace(/<br\s*\/?>/g, "\n");
@@ -65,6 +72,58 @@ const PendingOrders = ({ pendingOrders }) => {
       : truncateText(transformedDetails, 30);
   };
 
+  const deleteAlert = async (order) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      allowOutsideClick: false,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const id = order._id;
+        const data = { id: id, token: token };
+        const result = await disaptch(deleteTheOrderAsync(data));
+        console.log(result?.payload, "payload");
+        if (result?.type === "orders/deleteOrder/fulfilled") {
+          if (result.payload.message === "Order deleted") {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your Order has been deleted.",
+              icon: "success",
+            });
+            setPendingOrders((prevOrders) =>
+              prevOrders.filter((prevOrder) => prevOrder._id !== order._id)
+            );
+          }
+        } else {
+          Swal.fire({
+            title: "Not Deleted!",
+            text: "Your Order was not deleted.",
+            icon: "error",
+          });
+        }
+      }
+    });
+  };
+
+  const settings = {
+    dots: true,
+    infinite: false,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+     autoplaySpeed: 2000,
+  };
+
+  const editModal = (order) => {
+    setModal1(true);
+    setOrder(order)
+
+  }
   return (
     <>
       <Container>
@@ -186,6 +245,32 @@ const PendingOrders = ({ pendingOrders }) => {
                           )}
                         </div>
                       </CardText>
+                      {order?.images?.length > 0 && (
+                        <CardText className="mb-3">
+                          <b>Images:</b>
+                          <Row>
+                            <Slider {...settings} className="">
+                              {order.images?.map((image, index) => (
+                                <div className="text-center" key={index}>
+                                  <img
+                                    key={index}
+                                    src={`${
+                                      import.meta.env
+                                        .VITE_LOCAL_BACKEND_ENDPOINT
+                                    }${image}`}
+                                    alt={`Modal Image ${index}`}
+                                    className="img-fluid"
+                                    style={{
+                                      height: "100px",
+                                      textAlign: "center",
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </Slider>
+                          </Row>
+                        </CardText>
+                      )}
 
                       <Row>
                         <Col style={{ margin: "2%" }} xs="12" md="5">
@@ -193,7 +278,7 @@ const PendingOrders = ({ pendingOrders }) => {
                           {/* Full width on small screens, half width on medium and larger screens */}
                           <CardText>
                             <Button
-                              onClick={() => Delete(order)}
+                              onClick={() => deleteAlert(order)}
                               color="danger"
                             >
                               Delete
@@ -206,12 +291,7 @@ const PendingOrders = ({ pendingOrders }) => {
                             {" "}
                             {/* Half width on small screens, one-third width on medium and larger screens */}
                             <CardText>
-                              <Button
-                                onClick={() => Post(order)}
-                                color="success"
-                              >
-                                Post Job
-                              </Button>
+                            <Button onClick={()=>editModal(order)} color="info">Post</Button>
                             </CardText>
                           </Col>
                         </>
@@ -220,8 +300,8 @@ const PendingOrders = ({ pendingOrders }) => {
                   </Card>
                 </Col>
               ))}
-              {modal == true ? (
-                <EditOffer modal={modal} toggle={toggleModal} order={order} />
+              {modal1 == true ? (
+                <EditOffer modal={modal1} toggle={toggleModal1} order={order} />
               ) : (
                 []
               )}

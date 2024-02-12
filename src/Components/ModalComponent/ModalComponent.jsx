@@ -38,6 +38,7 @@ const ModalComponent = () => {
     setScheduledOrders,
     setActiveOrder
   } = PopUpState();
+  const {token} = useSelector((state)=>state.auth)
   useEffect(() => {
     socket?.on("startjob-request", (order) => {
       setOrder(order);
@@ -54,7 +55,8 @@ const ModalComponent = () => {
   });
 
   const activatingOrder = async () => {
-    const result = await dispatch(activateOrderAsync({ orderId: order._id }));
+    const data = {orderId: order._id, token:token}
+    const result = await dispatch(activateOrderAsync(data));
     if (result.type === "orders/activateOrders/fulfilled") {
       if (result.payload.Status === "Active") {
         const data = {
