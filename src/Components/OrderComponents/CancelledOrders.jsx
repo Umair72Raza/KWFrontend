@@ -74,7 +74,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                 >
                   <Card
                     className="shadow"
-                    style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                    style={{ backgroundColor: "#f6f8fc",}}
                   >
                     <CardBody>
                       <CardTitle>

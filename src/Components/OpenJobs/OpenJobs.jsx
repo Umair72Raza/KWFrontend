@@ -180,7 +180,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
               >
                 <Card
                   className="shadow"
-                  style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                  style={{ backgroundColor: "#f6f8fc", }}
                 >
                   <CardBody>
                     <h5
@@ -260,7 +260,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       </div>
                     </CardText>
                     {order?.images?.length > 0 && (
-                      <CardText className="mb-3">
+                      <CardText className="mb-5">
                         <b>Images:</b>
                         {order?.images?.length > 0 && (
                           <Row>
