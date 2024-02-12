@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { RegisterPage } from "./Constants/Constants";
-import { has } from "lodash";
 
 export const Toast_Notification = (string, type) => {
   toast[type](string, {
@@ -14,6 +13,8 @@ export const Toast_Notification = (string, type) => {
 export const Logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("services")
+  
   return "200";
 };
 
@@ -122,16 +123,16 @@ export const handleNameChange = (
     });
   }
 };
-export  const validateEmail = (email, errors) => {
-  console.log(email)
-  if (!email || !email.includes('@') || !email.includes('.com')) {
+export const validateEmail = (email, errors) => {
+  console.log(email);
+  if (!email || !email.includes("@") || !email.includes(".com")) {
     errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
-  } else if(hasOnlyWhiteSpace(email)){
+  } else if (hasOnlyWhiteSpace(email)) {
     errors.email = RegisterPage.ERROR_MESSAGES.emptyEmail;
   }
 };
 
-export  const validatePhoneNumber = (phoneNumber, errors) => {
+export const validatePhoneNumber = (phoneNumber, errors) => {
   if (phoneNumber && !isValidPhoneNumber(phoneNumber)) {
     errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber;
   }
@@ -155,18 +156,17 @@ export const validateServices = (ShowServices, services, errors) => {
   });
 };
 
-  
-export  const validatePassword = (password, confirmPassword, errors) => {
+export const validatePassword = (password, confirmPassword, errors) => {
   if (!passwordPattern(password)) {
     errors.password = RegisterPage.ERROR_MESSAGES.invalidPassword;
   }
-if(hasOnlyWhiteSpace(confirmPassword) ){ 
+  if (hasOnlyWhiteSpace(confirmPassword)) {
     errors.confirmPassword = RegisterPage.ERROR_MESSAGES.emptyPassword;
-}
- if(hasOnlyWhiteSpace(password) ){ 
-  errors.password = RegisterPage.ERROR_MESSAGES.emptyPassword;
-}
-  if (!hasOnlyWhiteSpace(confirmPassword)  && confirmPassword !== password) {
+  }
+  if (hasOnlyWhiteSpace(password)) {
+    errors.password = RegisterPage.ERROR_MESSAGES.emptyPassword;
+  }
+  if (!hasOnlyWhiteSpace(confirmPassword) && confirmPassword !== password) {
     errors.confirmPassword = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
     errors.password = RegisterPage.ERROR_MESSAGES.passwordsNotMatch;
   }
@@ -229,8 +229,8 @@ export const infoToast = (message) => {
 
 export const SelectChat = (chat) => {
   const user = JSON.parse(localStorage.getItem("user"));
-  if (chat && chat.users && Array.isArray(chat.users)) {
-    const otherUser = chat.users.find((u) => u._id !== user._id);
+  if (chat && chat?.users && Array.isArray(chat?.users)) {
+    const otherUser = chat?.users.find((u) => u?._id !== user?._id);
 
     if (otherUser) {
       return otherUser;

@@ -97,45 +97,7 @@ const WorkerCard = ({ worker }) => {
     }
   };
   
-  // const HandleChat = () => {
-  //   setShowModal(true);
-  //   setChatFromWorkerCard(true);
-  //   const isWorkerInChats = copyOfChats?.some((chat) =>
-  //     chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
-  //   );
-  //   if (!isWorkerInChats) {
-  //     // Create a fake chat
-  //     const fakeChat = {
-  //       _id: "",
-  //       chatName: "fakeChat",
-  //       users: [worker, user],
-  //       latestMessage: null,
-  //       seen: true,
-  //     };
-  //     // Add the fake chat to the chats array
-  //     if (copyOfChats?.length > 0) {
-  //       setCopyOfChats([fakeChat, ...copyOfChats]);
-  //       setChat(fakeChat);
-  //       setSelectedChatCompare(fakeChat);
-  //       setSelectedChat(() => SelectChat(fakeChat));
-  //     } else {
-  //       setCopyOfChats([fakeChat]);
-  //       setChat(fakeChat);
-  //       setSelectedChatCompare(fakeChat);
-  //       setSelectedChat(() => SelectChat(fakeChat));
-  //     }
-  //   } else {
-  //     if (worker.access === "accepted") {
-  //       const chat = copyOfChats.find((chat) =>
-  //         chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
-  //       );
-  //       setChat(chat);
-  //       setSelectedChatCompare(chat);
-  //       setSelectedChat(() => SelectChat(chat));
-  //     }
-  //   }
-  // };
-
+ 
   
   const toggleModal = () => {
     setModal(!modal);

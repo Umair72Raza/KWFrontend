@@ -12,18 +12,16 @@ const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState();
   const [socketConnected, setSocketConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [notification,setNotification] = useState([]);
+  const [notification, setNotification] = useState([]);
   const [unreadMessages, setUnreadMessages] = useState({});
-  const [offerNotification,SetONotification]=useState([])
-  const [selectedChatCompare,setSelectedChatCompare] =useState(null);
+  const [offerNotification, SetONotification] = useState([]);
+  const [selectedChatCompare, setSelectedChatCompare] = useState(null);
   const [receiveMessage, setReceiveMessage] = useState({});
   const [gotOffer, setGotOffer] = useState(false);
   const [userOffering, setUserOffering] = useState([]);
-  const [chatFromWorkerCard,setChatFromWorkerCard] = useState(null);
+  const [chatFromWorkerCard, setChatFromWorkerCard] = useState(null);
   const [notificationTimeouts, setNotificationTimeouts] = useState([]);
-
-
-  
+  const [availableJobOffer, setAvailableJobOffer] = useState(null);
 
   return (
     <ChatContext.Provider
@@ -53,14 +51,19 @@ const ChatProvider = ({ children }) => {
         selectedChatCompare,
         setSelectedChatCompare,
         receiveMessage,
-         setReceiveMessage,
-         gotOffer, setGotOffer,
-         userOffering,setUserOffering,
-         setUnreadMessages,
-         unreadMessages,
-         setChatFromWorkerCard,
-          chatFromWorkerCard,
-          notificationTimeouts, setNotificationTimeouts
+        setReceiveMessage,
+        gotOffer,
+        setGotOffer,
+        userOffering,
+        setUserOffering,
+        setUnreadMessages,
+        unreadMessages,
+        setChatFromWorkerCard,
+        chatFromWorkerCard,
+        notificationTimeouts,
+        setNotificationTimeouts,
+        setAvailableJobOffer,
+        availableJobOffer,
       }}
     >
       {children}

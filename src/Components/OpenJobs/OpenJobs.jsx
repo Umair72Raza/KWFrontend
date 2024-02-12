@@ -10,10 +10,28 @@ import {
   Spinner,
 } from "reactstrap";
 import Slider from "react-slick";
-import { truncateText } from "../../utils";
+import { SelectChat, truncateText } from "../../utils";
 import { FiMessageCircle } from "react-icons/fi";
+import { ChatState } from "../../Context/ChatProvider";
+import { PopUpState } from "../../Context/PopUpProvider";
+import { useSelector } from "react-redux";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
+  const {
+    setShowModal,
+    setNotification,
+    setSelectedChat,
+    setChat,
+    setSelectedChatCompare,
+    copyOfChats,
+    setUnreadMessages,
+    setCopyOfChats,
+    unreadMessages,
+    setAvailableJobOffer,
+  } = ChatState();
+  const { setFromAvailableJobs } = PopUpState();
+  const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
 
@@ -71,6 +89,78 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     return "placeholder_image_url.jpg"; // Replace "placeholder_image_url.jpg" with your desired fallback image URL
   };
 
+  const handleMessageIconClick = (order) => {
+    // Update available job offer and set 'from available jobs' flag
+    setAvailableJobOffer(order);
+    setFromAvailableJobs(true);
+
+    // Check if the user is already in chats
+    const isUserInChats = copyOfChats?.some((chat) =>
+      chat?.users?.some((chatUser) => chatUser?._id === order?.user?._id)
+    );
+
+    // Get the current user (worker)
+    const worker = user;
+
+    // If the user is not in chats, create a fake chat
+    if (!isUserInChats) {
+      const fakeChat = {
+        _id: "",
+        chatName: "fakeChat",
+        users: [worker, order?.user],
+        latestMessage: null,
+        seen: true,
+      };
+
+      // Update state with the fake chat
+      setCopyOfChats((prevCopyOfChats) => {
+        const updatedChats =
+          prevCopyOfChats.length > 0
+            ? [fakeChat, ...prevCopyOfChats]
+            : [fakeChat];
+        setChat(fakeChat);
+        setSelectedChatCompare(fakeChat);
+        setSelectedChat(() => SelectChat(fakeChat));
+        return updatedChats;
+      });
+    } else {
+      // Find the chat with the user
+      const userChat = copyOfChats.find((chat) =>
+        chat?.users?.some((chatUser) => chatUser?._id === order?.user?._id)
+      );
+
+      // If the order user's access is 'accepted'
+      if (order?.user?.access === "accepted") {
+        // Update selected chat, remove notifications, and reset unread messages count
+        setChat(userChat);
+        setSelectedChatCompare(userChat);
+        setSelectedChat(() => SelectChat(userChat));
+        setNotification((prevNotifications) =>
+          prevNotifications.filter((n) => n?.chat?._id !== userChat?._id)
+        );
+        if (unreadMessages[userChat?._id]) {
+          setUnreadMessages((prevCount) => ({
+            ...prevCount,
+            [userChat._id]: 0,
+          }));
+        }
+      }
+    }
+
+    // Show the modal
+    setShowModal(true);
+  };
+
+  const openGoogleMaps = (location) => {
+    const [longitude, latitude] = location?.coordinates || [];
+    if (latitude && longitude) {
+      const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      window.open(url, "_blank");
+    } else {
+      console.error("Invalid coordinates");
+    }
+  };
+
   return (
     <Container>
       {spinnerVisible ? (
@@ -80,9 +170,9 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
       ) : (
         <>
           <Row>
-            {scheduledOrdersObject.map((order) => (
+            {scheduledOrdersObject?.map((order, index) => (
               <Col
-                key={order.id}
+                key={index}
                 sm="6"
                 md="4"
                 lg="4"
@@ -103,26 +193,26 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         maxWidth: "100%",
                       }}
                     >
-                      {order.Title}
+                      {order?.Title}
                     </h5>
                     <CardText>
-                      <b>Posted by:</b> {order.user.firstName}{" "}
-                      {order.user.lastName}
+                      <b>Posted by:</b> {order?.user?.firstName}{" "}
+                      {order?.user?.lastName}
                     </CardText>
                     <CardText>
-                      <b>Time:</b> {order.time}
+                      <b>Time:</b> {order?.time}
                     </CardText>
                     <CardText>
-                      <b>Date:</b> {order.date}
+                      <b>Date:</b> {order?.date}
                     </CardText>
                     <CardText>
-                      <b>Amount:</b> ${order.amount}
+                      <b>Amount:</b> ${order?.amount}
                     </CardText>
                     <CardText>
-                      <b>Address:</b> {order.Address}
+                      <b>Address:</b> {order?.user?.address}
                     </CardText>
                     <div style={{ maxHeight: "100px", overflowY: "auto" }}>
-                      {order.service && order.service.length > 0 && (
+                      {order?.service && order.service.length > 0 && (
                         <CardText>
                           <b>Services:</b>
                           <ul
@@ -132,7 +222,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                               padding: 0,
                             }}
                           >
-                            {order.service.map((s, index) => (
+                            {order?.service?.map((s, index) => (
                               <li key={index}>{s}</li>
                             ))}
                           </ul>
@@ -150,19 +240,19 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         {showFullDetailsMap[order.id] ? (
                           <div
                             dangerouslySetInnerHTML={{
-                              __html: order.details,
+                              __html: order?.details,
                             }}
                           />
                         ) : (
                           transformOrderDetails(order)
                         )}
-                        {order.details?.length > 30 && (
+                        {order?.details?.length > 30 && (
                           <Button
                             style={{ marginTop: "-5px" }}
                             color="link"
-                            onClick={() => toggleDetails(order.id)}
+                            onClick={() => toggleDetails(order?.id)}
                           >
-                            {showFullDetailsMap[order.id]
+                            {showFullDetailsMap[order?.id]
                               ? "Show Less"
                               : "Show More"}
                           </Button>
@@ -190,13 +280,27 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         )}
                       </CardText>
                     )}
+                    <CardText>
+                      {" "}
+                      <Button
+                        onClick={() => openGoogleMaps(order?.user?.location)}
+                        color="primary"
+                      >
+                        Directions <FaMapMarkerAlt />
+                      </Button>{" "}
+                    </CardText>
                     <CardText className="d-flex justify-content-around align-items-center">
-                      <Button color="primary">Accept</Button>
-
-                      <FiMessageCircle
-                        className="fs-3 hover-pointer"
-                        // onClick={handleMessageIconClick}
-                      />
+                      <Button color="success">Accept</Button>
+                      <Button
+                        color="info"
+                        className="fw-bold hover-pointer"
+                        onClick={() => handleMessageIconClick(order)}
+                        style={{
+                          color: "white",
+                        }}
+                      >
+                        <FiMessageCircle className="fs-4 " /> Chat{" "}
+                      </Button>
                     </CardText>
                   </CardBody>
                 </Card>

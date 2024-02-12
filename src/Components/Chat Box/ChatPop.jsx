@@ -58,6 +58,7 @@ const ChatPopup = () => {
     unreadMessages,
     chatFromWorkerCard,
     setChatFromWorkerCard,
+    setAvailableJobOffer,
   } = ChatState();
 
   const { fromAvailableJobs, setFromAvailableJobs } = PopUpState();
@@ -370,6 +371,7 @@ const ChatPopup = () => {
     setImagesLoading(true);
 
     // Update chat-related states
+    console.log("chat", chat);
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));
@@ -484,8 +486,9 @@ const ChatPopup = () => {
     setNewMessageText("");
     setSelectedFiles([]);
     setImagesLoading(false);
-    if(fromAvailableJobs){
+    if (fromAvailableJobs) {
       setFromAvailableJobs(false);
+      setAvailableJobOffer(null);
     }
     if (profilePicImageLoaded === true) {
       setProfilePicImageLoaded(false);
@@ -544,6 +547,8 @@ const ChatPopup = () => {
   useEffect(() => {
     scrollToBottom(); // Scroll to bottom when messages change
   }, [messages, selectedChat]);
+
+  const handleViewOffer = () => {};
 
   const formatTime = (timestamp) => {
     const messageDate = new Date(timestamp);
@@ -710,7 +715,7 @@ const ChatPopup = () => {
                           {selectedChat ? (
                             <Col className="selected-chat">
                               <Col className="chat-header d-flex flex-row align-items-center">
-                                {!chatFromWorkerCard&& !fromAvailableJobs && (
+                                {!chatFromWorkerCard && !fromAvailableJobs && (
                                   <Col>
                                     <FiArrowLeft
                                       className="fs-4 me-3 hover-pointer"
@@ -768,18 +773,19 @@ const ChatPopup = () => {
                                       </Button>
                                     </Col>
                                   ) : null}
-                                  {fromAvailableJobs && user?.role === "worker" && (
-                                    <Button
-                                      style={{
-                                        height: "45px",
-                                        width: "105px",
-                                      }}
-                                      color="primary"
-                                      className="align-self-center"
-                                    >
-                                      View Offer
-                                    </Button>
-                                  )}
+                                  {fromAvailableJobs &&
+                                    user?.role === "worker" && (
+                                      <Button
+                                        style={{
+                                          height: "45px",
+                                          width: "105px",
+                                        }}
+                                        color="primary"
+                                        className="align-self-center"
+                                      >
+                                        View Offer
+                                      </Button>
+                                    )}
                                 </Row>
                               </Col>
                               <div
@@ -889,7 +895,7 @@ const ChatPopup = () => {
                                   <animated.div
                                     style={{ ...style, marginBottom: "0px" }}
                                   >
-                                    <React.Fragment key={item._id} >
+                                    <React.Fragment key={item._id}>
                                       <Row
                                         className={`d-flex flex-row align-items-center my-2`}
                                       >
@@ -1002,7 +1008,7 @@ const ChatPopup = () => {
               {/* // For tablet and laptop, display chat and messages side by side */}
               <Container className=" d-none d-xl-block">
                 <Row>
-                  {!chatFromWorkerCard && (
+                  {!chatFromWorkerCard && !fromAvailableJobs && (
                     <Col className=" chat-list overflow-y-auto">
                       {copyOfChats?.length === 0 ? (
                         <div>{ChatPopUpPage.NO_CHATS}</div>
@@ -1111,7 +1117,13 @@ const ChatPopup = () => {
                     </Col>
                   )}
 
-                  <Row className={`${chatFromWorkerCard ? "col-12" : "col-9"}`}>
+                  <Row
+                    className={`${
+                      chatFromWorkerCard || fromAvailableJobs
+                        ? "col-12"
+                        : "col-9"
+                    }`}
+                  >
                     {isOpen ? (
                       <MessageImagesCarousel
                         images={images}
@@ -1177,7 +1189,8 @@ const ChatPopup = () => {
                                     </Button>
                                   </Col>
                                 ) : null}
-                                {fromAvailableJobs && user?.role === "worker" && (
+                                {fromAvailableJobs &&
+                                  user?.role === "worker" && (
                                     <Button
                                       style={{
                                         height: "45px",
@@ -1185,6 +1198,7 @@ const ChatPopup = () => {
                                       }}
                                       color="primary"
                                       className="align-self-center"
+                                      onClick={handleViewOffer}
                                     >
                                       View Offer
                                     </Button>
