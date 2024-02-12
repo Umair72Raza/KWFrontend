@@ -61,7 +61,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
@@ -266,12 +266,19 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                           <Row>
                             <Slider {...settings} className="">
                               {order.images?.map((image, index) => (
-                                <div key={index}>
+                                <div className="text-center" key={index}>
                                   <img
                                     key={index}
-                                    src={getCorrectImageUrl(image)}
+                                    src={`${
+                                      import.meta.env
+                                        .VITE_LOCAL_BACKEND_ENDPOINT
+                                    }${image}`}
                                     alt={`Modal Image ${index}`}
                                     className="img-fluid "
+                                    style={{
+                                      height: "100px",
+                                      textAlign: "center",
+                                    }}
                                   />
                                 </div>
                               ))}

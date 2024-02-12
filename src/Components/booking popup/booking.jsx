@@ -220,7 +220,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       const formData = new FormData();
 
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key != "users" && key != "service") {
+        if (data.hasOwnProperty(key) && key != "users" && key != "service" ) {
           formData.append(key, data[key]);
         } else {
           Users.forEach((u, index) => {

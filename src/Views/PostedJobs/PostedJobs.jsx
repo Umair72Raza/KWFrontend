@@ -22,16 +22,23 @@ import { truncateText } from "../../utils";
 import EditOffer from "../../Components/OrderComponents/EditOffer";
 import Swal from "sweetalert2";
 import { deleteTheOrderAsync } from "../../Redux/Slices/OrderSlice";
-
-
+import Slider from "react-slick";
+import { PopUpState } from "../../Context/PopUpProvider";
 
 const PostedJobs = ({ postedJobs }) => {
+  let { setPostedJobs } = PopUpState();
   const { token } = useSelector((state) => state.auth);
   const [modal, setModal] = useState(false);
+  const [modal1,setModal1] = useState(false);
+  const [order,setOrder] = useState(null);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [fromPostJob, setPostJob] = useState(true);
-  const disaptch=  useDispatch()
+  const disaptch = useDispatch();
+
+  const toggleModal1 = () => {
+    setModal1(!modal1);
+  }
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -52,33 +59,48 @@ const PostedJobs = ({ postedJobs }) => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
-    }).then(async(result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
         const id = order._id;
-        const data = {id: id, token:token}
+        const data = { id: id, token: token };
         const result = await disaptch(deleteTheOrderAsync(data));
-        console.log(result?.type,"type")
-        if(result?.type === "orders/deleteOrder/fulfilled")
-        {
+        console.log(result?.payload, "payload");
+        if (result?.type === "orders/deleteOrder/fulfilled") {
+          if(result.payload.message === "Order deleted"){
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your Order has been deleted.",
+              icon: "success",
+            });
+            setPostedJobs(prevOrders =>
+              prevOrders.filter(prevOrder => prevOrder._id !== order._id)
+            );
+          }
          
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your Order has been deleted.",
-            icon: "success",
-          });
-        }
-        else{
+        } else {
           Swal.fire({
             title: "Not Deleted!",
             text: "Your Order was not deleted.",
             icon: "error",
           });
         }
-        
       }
     });
   };
+  const settings = {
+    dots: true,
+    infinite: false,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+     autoplaySpeed: 2000,
+  };
 
+  const editModal = (order) => {
+    setModal1(true);
+    setOrder(order)
+
+  }
   return (
     <div>
       <Container>
@@ -94,7 +116,8 @@ const PostedJobs = ({ postedJobs }) => {
             <div style={{ textAlign: "center" }}>
               <Spinner />
             </div>
-          ) : postedJobs?.length > 0 ? (
+          ) : 
+          postedJobs?.length > 0 ? (
             <>
               <Row>
                 {postedJobs?.map((order) => (
@@ -208,7 +231,29 @@ const PostedJobs = ({ postedJobs }) => {
                             )}
                           </div>
                         </CardText>
-
+                        {order?.images?.length > 0 && (
+                          <Row className="mb-5 justify-content-center">
+                            <Slider {...settings} className="">
+                              {order.images?.map((image, index) => (
+                                <div className="text-center" key={index}>
+                                  <img
+                                    key={index}
+                                    src={`${
+                                      import.meta.env
+                                        .VITE_LOCAL_BACKEND_ENDPOINT
+                                    }${image}`}
+                                    alt={`Modal Image ${index}`}
+                                    className="img-fluid "
+                                    style={{
+                                      height: "100px",
+                                      textAlign: "center",
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </Slider>
+                          </Row>
+                        )}
                         <Row>
                           <Col style={{ margin: "2%" }} xs="12" md="5">
                             {" "}
@@ -227,7 +272,7 @@ const PostedJobs = ({ postedJobs }) => {
                               {" "}
                               {/* Half width on small screens, one-third width on medium and larger screens */}
                               <CardText>
-                                <Button color="info">Edit</Button>
+                                <Button onClick={()=>editModal(order)} color="info">Edit</Button>
                               </CardText>
                             </Col>
                           </>
@@ -236,11 +281,11 @@ const PostedJobs = ({ postedJobs }) => {
                     </Card>
                   </Col>
                 ))}
-                {/* {modal == true ? (
-                <EditOffer modal={modal} toggle={toggleModal} order={order} />
+                {modal1 == true ? (
+                <EditOffer modal={modal1} toggle={toggleModal1} order={order} />
               ) : (
                 []
-              )} */}
+              )}
               </Row>
             </>
           ) : (
