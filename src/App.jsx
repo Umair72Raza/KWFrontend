@@ -14,6 +14,7 @@ import FinishJobReq from "./Components/FinishJobReq/FinishJobReq";
 import Swal from "sweetalert2";
 import OfferResult from "./Components/OfferResult/OfferResult";
 import { PopUpState } from "./Context/PopUpProvider";
+import OpenJobRqst from "./Components/OpenJobRqst/OpenJobRqst";
 
 function App() {
   const [authenticated, setAuthenticated] = useState();
@@ -154,6 +155,7 @@ function App() {
             <ModalComponent />
             <FinishJobReq />
             <OfferResult />
+            <OpenJobRqst />
           </>
         )}
 
