@@ -193,10 +193,10 @@ const Booking = ({ modal, toggle, worker, chat }) => {
       const isSelected = serviceOption.includes(serviceName);
 
       if (isSelected) {
-        setServiceOption(serviceOption.filter((service) => service !== serviceName));
+        setServiceOption( serviceOption.filter((service) => service !== serviceName));
       } else {
         if (serviceOption.length < 2) {
-          setServiceOption([...serviceOption, serviceName]);
+          setServiceOption( [...serviceOption, serviceName]);
         }
       }
     };
