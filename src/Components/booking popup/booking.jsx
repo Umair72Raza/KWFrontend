@@ -76,7 +76,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     } else if (totalSize > 5 * 1024 * 1024) {
       setImageError("Total image size cannot exceed 5MB.");
     } else {
-      setImages([...images,...selectedImages]);
+      setImages(selectedImages);
       setImageError("");
     }
   };
@@ -102,8 +102,8 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const handleSend = () => {
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
-    const Users = [user._id, worker._id];
-    let status = "Scheduled";
+    const Users = [user._id, worker._id]
+    let status = "Scheduled"
     if (selectedDate > currentDate) {
       const data = {
         Title: taskTitle,
@@ -115,36 +115,32 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         amount: amountPerHour,
         service: serviceOption,
         address: user.address,
-        tasktime: taskTime,
-        images,
-         location:  {},
+        tasktime: taskTime
+        , images
       };
       const formData = new FormData();
 
+
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key != "users" && key != "service") {
+        if (data.hasOwnProperty(key) && key != 'users'&&key!='service') {
           formData.append(key, data[key]);
-        } else {
+        }
+        else {
           Users.forEach((u, index) => {
             formData.append(`users`, u);
-          });
+          })
         }
       }
-        // Append location coordinates to FormData
-        if (user.location && user.location.coordinates) {
-          formData.append('location[type]', 'Point');
-          formData.append('location[coordinates][]', user.location.coordinates[0]);
-          formData.append('location[coordinates][]', user.location.coordinates[1]);
-        }
 
-      serviceOption.forEach((s, index) => {
+      serviceOption.forEach((s,index)=>{
         formData.append(`service`, s);
-      });
+      })
       images.forEach((image, index) => {
         formData.append(`images`, image);
       });
+
       SetParam(formData);
-      SetParams(data);
+      SetParams(data)
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         if (removedUsers) {
@@ -152,8 +148,9 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           if (present !== -1) {
             failureToast("Worker Gets Offline!");
             toggle();
-          } else {
-            resetForm();
+          } 
+          else {
+            resetForm()
             socket?.emit("newOffer", {
               params: data,
               Wid: worker._id,
@@ -170,20 +167,26 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               socket?.off("newOffer");
             };
           }
+          
         }
-      } else {
-        setAmountError("Enter amount in range 5-100000");
-        setClicked(true);
+        
       }
+      else {
 
-      //setClicked(true)
-    } else {
+        setAmountError("Enter amount in range 5-100000")
+        setClicked(true)
+      }
+     
+       //setClicked(true)
+    }
+    else {
+        
       failureToast("Time is in past! select the future time");
       setDateTime("");
-      setClicked(false);
-      setFormComplete(false);
+      setClicked(false)
+      setFormComplete(false)
     }
-  };
+    };
 
   const handlePost = async () => {
     const currentDate = new Date();
