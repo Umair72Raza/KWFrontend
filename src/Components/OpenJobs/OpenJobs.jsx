@@ -259,10 +259,10 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         )}
                       </div>
                     </CardText>
-                    {order.images.length > 0 && (
+                    {order?.images?.length > 0 && (
                       <CardText className="mb-3">
                         <b>Images:</b>
-                        {order.images?.length > 0 && (
+                        {order?.images?.length > 0 && (
                           <Row>
                             <Slider {...settings} className="">
                               {order.images?.map((image, index) => (
@@ -285,6 +285,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       <Button
                         onClick={() => openGoogleMaps(order?.user?.location)}
                         color="primary"
+                        className=" ms-2 "
                       >
                         Directions <FaMapMarkerAlt />
                       </Button>{" "}

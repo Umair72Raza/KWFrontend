@@ -83,7 +83,7 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
   useEffect(() => {
     // When the component mounts, convert the image file to a data URL
     const blobArray = formattedOfferDetails?.images?.map((image, index) => {
-      const blob = new Blob([image], { type: "image/jpeg" });
+      const blob = new Blob([image], { type: "image/*" });
       return blob;
     });
     setImageDataURL(blobArray);

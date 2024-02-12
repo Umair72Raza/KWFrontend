@@ -52,38 +52,46 @@ const OfferResult = () => {
 
   useEffect(() => {
     if (user && user._id && offerResult == "true") {
-      dispatch(CreateOrder({ params, token }));
+      const formData = param;
+      dispatch(CreateOrder({ formData, token }));
       setOfferResult("");
     } else if (
       (user && user._id && offerResult == "false") ||
       offerResult == "timeup"
     ) {
       const data = params;
-      const param = new FormData();
+      const formData = new FormData();
       for (const key in data) {
         if (
           data.hasOwnProperty(key) &&
           key != "users" &&
           key != "Status" &&
-          key != "service"
+          key != "service" &&
+          key != "location"
         ) {
-          param.append(key, data[key]);
+          formData.append(key, data[key]);
         }
       }
-      param?.append(`Status`, "Pending");
+                    // Append location coordinates to FormData
+  if (user.location && user.location.coordinates) {
+    formData.append('location[type]', 'Point');
+    formData.append('location[coordinates][]', user.location.coordinates[0]);
+    formData.append('location[coordinates][]', user.location.coordinates[1]);
+  }
+  formData?.append(`Status`, "Pending");
       data?.images?.forEach((image, index) => {
-        param.append(`images`, image);
+        formData.append(`images`, image);
       });
       data.users.forEach((u, index) => {
-        param.append(`users`, u);
+        formData.append(`users`, u);
       });
       data.service.forEach((s, index) => {
-        param.append(`service`, s);
+        formData.append(`service`, s);
       });
 
       //SetParam(formData);
 
-      dispatch(CreateOrder({ params, token }));
+      dispatch(CreateOrder({ formData, token }));
       setOfferResult("");
     }
   }, [offerResult]);
@@ -102,10 +110,7 @@ const OfferResult = () => {
       if (newOrder.Status === "Scheduled") {
         console.log("I ran");
         socket?.emit("new-order-created", data);
-      }
-      else if(newOrder.Status === "Posted")
-      {
-
+      } else if (newOrder.Status === "Posted") {
       }
     }
     return () => {
