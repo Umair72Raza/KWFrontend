@@ -68,7 +68,7 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
                 <Col
                   key={order._id}
                   sm="6"
-                  md="4"
+                  md="6"
                   lg="3"
                   style={{ marginTop: "10px" }}
                 >

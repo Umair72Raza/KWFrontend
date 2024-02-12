@@ -16,6 +16,7 @@ import { ChatState } from "../../Context/ChatProvider";
 import { PopUpState } from "../../Context/PopUpProvider";
 import { useSelector } from "react-redux";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const {
@@ -34,6 +35,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
+  const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
     // Convert image URLs to Blob objects
@@ -161,6 +163,42 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     }
   };
 
+  const sendBid = async (order, Uid) => {
+    //  emit socket event to show Worker wants to start the job modal.
+
+    if (user.status !== "online") {
+      return Swal.fire({
+        title: "You are not online",
+        icon: "error",
+      });
+    }
+   // setGlobalStartButtonDisabled(true);
+    // setStartButtonDisabledMap((prevMap) => ({
+    //   ...prevMap,
+    //   [order._id]: true,
+    // }));
+
+    const data = {
+      order,
+      Uid,
+      workerId: user._id
+    };
+
+    // setTimeout(() => {
+    //   setGlobalStartButtonDisabled(false);
+    //   setStartButtonDisabledMap((prevMap) => ({
+    //     ...prevMap,
+    //     [order._id]: false,
+    //   }));
+    // }, 60000); // 1 minute
+
+    socket.emit("startBid-accept-reject", data);
+    Swal.fire({
+      title: "Accept Job request sent!",
+      icon: "success",
+    });
+  };
+
   return (
     <Container>
       {spinnerVisible ? (
@@ -174,14 +212,11 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
               <Col
                 key={index}
                 sm="6"
-                md="4"
+                md="6"
                 lg="4"
                 style={{ marginTop: "10px" }}
               >
-                <Card
-                  className="shadow"
-                  style={{ backgroundColor: "#f6f8fc", }}
-                >
+                <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
                   <CardBody>
                     <h5
                       style={{
@@ -298,7 +333,14 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       </Button>{" "}
                     </CardText>
                     <CardText className="d-flex justify-content-around align-items-center">
-                      <Button color="success">Accept</Button>
+                      <Button
+                        onClick={() =>
+                          sendBid(order, order?.user?._id)
+                        }
+                        color="success"
+                      >
+                        Accept
+                      </Button>
                       <Button
                         color="info"
                         className="fw-bold hover-pointer"

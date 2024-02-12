@@ -179,6 +179,32 @@ const HomePageWorker = () => {
   });
 
   useEffect(() => {
+    socket?.on("startBid-result", (data) => {
+      if (data.result === "true") {
+        setStartJobStatus("true");
+        setStartJobVerified(true);
+        console.log(scheduledOrders, "all scheduled orders");
+        console.log(data.order, "order in start job data");
+        setOid(data?.order?.Title);
+
+        setScheduledOrders((prevScheduledOrders) =>
+          prevScheduledOrders.filter(
+            (scheduledOrder) => scheduledOrder._id !== data.order._id
+          )
+        );
+
+        setActiveOrder((prevActiveOrders) => [...prevActiveOrders, data.order]);
+      } else if (data.result == "false") {
+        
+      }
+    });
+    return () => {
+      socket?.off("startBid-result");
+    };
+  });
+
+
+  useEffect(() => {
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
       let reason = data.reason;

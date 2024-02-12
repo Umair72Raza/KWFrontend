@@ -1,61 +1,41 @@
-import React, { useEffect } from "react";
-import {
-  Button,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from "reactstrap";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { PopUpState } from "../../Context/PopUpProvider";
-import { activateOrderAsync } from "../../Redux/Slices/OrderSlice.js";
-import { useDispatch, useSelector } from "react-redux";
-const ModalComponent = () => {
+
+const OpenJobRqst = () => {
+  const { openJobs, setOpenJobs, postedJobs, setPostedJobs } = PopUpState();
+  const [modalHeader, setModalHeader] = useState("");
+  const [isFinalize, setIsFinalize] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cancelButtonLabel, setCancelButtonLabel] = useState("");
+  const [finalizeButtonLabel, setFinalizeButtonLabel] = useState("");
+  const [order,setOrder] = useState(null)
+  const [workerId,setWorkerId] = useState(null);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   const socket = useSelector((state) => state?.socket?.socket);
-  const dispatch = useDispatch();
-  let {
-    modalHeader,
-    isFinalize,
-    isModalOpen,
-    inputLabel,
-    modalInputValue,
-    setModalInputValue,
-    cancelButtonLabel,
-    finalizeButtonLabel,
-    showInput,
-    order,
-    toggleModal,
-    cancel,
-    setFinalizeFunction,
-    setIsFinalize,
-    setOrder,
-    setModalHeader,
-    setFinalizeButtonLabel,
-    setCancelButtonLabel,
-    setScheduledOrders,
-    setActiveOrder
-  } = PopUpState();
-  const {token} = useSelector((state)=>state.auth)
   useEffect(() => {
-    socket?.on("startjob-request", (order) => {
-      setOrder(order);
-      setModalHeader("Order Activation");
+    socket?.on("startBid-request", (data) => {
+        setWorkerId(data?.workerId)
+      setOrder(data?.order);
+      setModalHeader("Order Bid");
       setIsFinalize(true);
       setFinalizeButtonLabel("Yes");
       setCancelButtonLabel("Cancel");
       toggleModal();
-
     });
     return () => {
-      socket?.off("startjob-request");
+      socket?.off("startBid-request");
     };
   });
 
-  const activatingOrder = async () => {
-    const data = {orderId: order._id, token:token}
+  const schedulingOrder = async () => {
+    const data = { orderId: order._id, token: token };
+    // api should add the workers/ id in the users array
     const result = await dispatch(activateOrderAsync(data));
     if (result.type === "orders/activateOrders/fulfilled") {
       if (result.payload.Status === "Active") {
@@ -63,29 +43,22 @@ const ModalComponent = () => {
           order: order,
           result: "true",
         };
-        //the resulted order should have the worker id at users[1]
         const startJobSocket = () => {
           if (!socket) return;
-          socket?.emit("startjob-response", data);
+          socket?.emit("startBid-response", data);
 
           toggleModal();
           return () => {
-            socket?.off("startjob-response");
+            socket?.off("startBid-response");
           };
         };
         startJobSocket();
 
+        setPostedJobs((prevPostedJobs) =>
+          prevPostedJobs.filter((postedJob) => postedJob._id !== order._id)
+        );
 
-        setScheduledOrders((prevScheduledOrders) =>
-        prevScheduledOrders.filter(
-          (scheduledOrder) => scheduledOrder._id !== order._id
-        ));
-          
-      setActiveOrder((prevActiveOrders) => [
-        ...prevActiveOrders,
-        order,
-      ]);
-
+        setScheduledOrders((prevSchOrders) => [...prevSchOrders, order]);
 
         setIsFinalize(false);
         setOrder(null);
@@ -97,16 +70,25 @@ const ModalComponent = () => {
     const data = {
       result: "false",
       order: order,
+      workerId
     };
-    socket?.emit("startjob-response", data);
+    socket?.emit("startBid-response", data);
     setIsFinalize(false);
     setOrder(null);
     toggleModal();
     return () => {
-      socket?.off("startjob-response");
+      socket?.off("startBid-response");
     };
   };
 
+  const cancel = () => {
+    setOrderToCancel(null);
+    setModalHeader("");
+    setFinalizeButtonLabel("");
+    setCancelButtonLabel("");
+    setFinalizeFunction(false);
+    toggleModal();
+  };
   return (
     <Modal
       isOpen={isModalOpen}
@@ -120,34 +102,19 @@ const ModalComponent = () => {
         {order && (
           <>
             <div>
-              <strong>Order Title:</strong> {order.Title}
+              <strong>Order Title:</strong> {order?.Title}
             </div>
             <div>
-              <strong>Service:</strong> {order.service}
+              <strong>Service:</strong> {order?.service}
             </div>
             <div>
-              <strong>Amount:</strong> ${order.amount}
+              <strong>Amount:</strong> ${order?.amount}
             </div>
             <div>
               <strong>Order Details:</strong>{" "}
               {order.details.replace(/<br\s*\/?>/g, "\n")}
             </div>
           </>
-        )}
-
-        {showInput && (
-          <Form>
-            <FormGroup>
-              <Label for="cancelReason">{inputLabel}</Label>
-              <Input
-                type="text"
-                id="cancelReason"
-                placeholder="Enter reason"
-                value={modalInputValue}
-                onChange={(e) => setModalInputValue(e.target.value)}
-              />
-            </FormGroup>
-          </Form>
         )}
       </ModalBody>
       <ModalFooter>
@@ -169,7 +136,7 @@ const ModalComponent = () => {
           onClick={
             isFinalize
               ? () => {
-                  activatingOrder();
+                  schedulingOrder();
                   toggleModal();
                 }
               : () => {
@@ -185,4 +152,4 @@ const ModalComponent = () => {
   );
 };
 
-export default ModalComponent;
+export default OpenJobRqst;
