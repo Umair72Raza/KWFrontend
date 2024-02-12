@@ -114,7 +114,7 @@ const EditProfilePage = ({ ShowServices }) => {
       setUserDataLoading(true);
       dispatch(fetchUsersDataAsync({ id: user._id, token }))
         .then((result) => {
-          const { _id, ...userDataWithoutId } = result.payload;
+          const { _id,phoneNumber,email,profilePicture, ...userDataWithoutId } = result.payload;
           setUserInfo(userDataWithoutId);
           setUserDataLoading(false);
         })
@@ -206,19 +206,37 @@ const EditProfilePage = ({ ShowServices }) => {
       errors.services = RegisterPage.ERROR_MESSAGES.invalidService;
     }
 
+    if (!formData?.optionalAddress?.trim()) {
+      setFormData({ ...formData, optionalAddress: formData?.address });
+    }
+
     const areObjectsDifferent =
-      UserInfo &&
-      formData &&
-      Object.keys(UserInfo).some((key) => {
+    UserInfo &&
+    formData &&
+    Object.keys(UserInfo).some((key) => {
+      if (key === 'location') {
+        // Check if coordinates array is different
+        return (
+          formData[key]?.coordinates &&
+          UserInfo[key]?.coordinates &&
+          formData[key].coordinates.some(
+            (coord, index) => coord !== UserInfo[key].coordinates[index]
+          )
+        );
+      } else {
+        // Check if other keys are different
         return formData[key] !== UserInfo[key];
-      });
+      }
+    });
+  
+  
     if (!areObjectsDifferent) {
       errors.noChanges = "No Changes Made";
     }
-    if (!formData?.profilePicture) {
-      //setFormData({ ...formData, profilePicture: UsersData?.profilePicture });
-      errors.profilePicture = "Profile picture is required";
-    }
+    // if (!formData?.profilePicture) {
+    //   //setFormData({ ...formData, profilePicture: UsersData?.profilePicture });
+    //   errors.profilePicture = "Profile picture is required";
+    // }
 
     return errors;
   };
@@ -231,25 +249,37 @@ const EditProfilePage = ({ ShowServices }) => {
     }
   };
 
+  const handleOptionalAddress = (e) => {
+    const value = e.target.value.trimStart().replace(/\s{2,}/g, " ");
+    setFormData({
+      ...formData,
+      optionalAddress: value,
+    });
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+   
     setEmailEdit(false);
     setEditProfile(false);
     setPhoneEdit(false);
-    if (!formData?.optionalAddress?.trim()) {
-      setFormData({ ...formData, optionalAddress: formData?.address });
-    }
-    if (!formData?.profilePicture) {
-      setFormData({ ...formData, profilePicture: UsersData?.profilePicture });
-    }
+   
+    // if (!formData?.profilePicture) {
+    //   setFormData({ ...formData, profilePicture: UsersData?.profilePicture });
+    // }
+
+    console.log(formData, "formData");
+    console.log(UserInfo, "UsersInfo");
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
-      if (validationErrors.noChanges) {
-        infoToast(validationErrors.noChanges);
+      if (validationErrors?.noChanges) {
+        infoToast(validationErrors?.noChanges);
         setEditMode(false);
       }
+      console.log("Validation errors:", validationErrors);
       return; // Early return for validation errors
     }
 
@@ -353,6 +383,7 @@ const EditProfilePage = ({ ShowServices }) => {
       // longitude: UsersData?.longitude,
       country: UsersData?.country,
       address: UsersData?.address,
+      optionalAddress: UsersData?.optionalAddress || null,
       services: UsersData?.services || [],
     });
   };
@@ -371,6 +402,7 @@ const EditProfilePage = ({ ShowServices }) => {
       // longitude: UsersData?.longitude,
       country: UsersData?.country,
       address: UsersData?.address,
+      optionalAddress: UsersData?.optionalAddress || null,
       services: UsersData?.services || [],
     });
     setEditMode(false);
@@ -608,13 +640,6 @@ const EditProfilePage = ({ ShowServices }) => {
     }
   };
 
-  const handleOptionalAddress = (e) => {
-    const value = e.target.value.trimStart().replace(/\s{2,}/g, " ");
-    setFormData({
-      ...formData,
-      optionalAddress: value,
-    });
-  };
 
   return (
     <>
@@ -660,7 +685,7 @@ const EditProfilePage = ({ ShowServices }) => {
                           }
                           maxLength={12}
                           required
-                          value={formData.firstName}
+                          value={formData?.firstName}
                           onChange={(e) =>
                             handleNameChange(
                               formData,
@@ -688,7 +713,7 @@ const EditProfilePage = ({ ShowServices }) => {
                           }
                           maxLength={12}
                           required
-                          value={formData.lastName}
+                          value={formData?.lastName}
                           onChange={(e) =>
                             handleNameChange(
                               formData,
@@ -709,6 +734,7 @@ const EditProfilePage = ({ ShowServices }) => {
                       setFormData={setFormData}
                       errors={errors}
                       setErrors={setErrors}
+                     // UsersData={UsersData}
                     />
                   </Row>
                   <Row md={11}>
@@ -720,7 +746,7 @@ const EditProfilePage = ({ ShowServices }) => {
                       <Input
                         type="text"
                         placeholder="Enter your address(Optional)."
-                        value={formData.optionalAddress}
+                        value={formData?.optionalAddress}
                         onChange={handleOptionalAddress}
                         disabled={loading}
                       />
