@@ -117,7 +117,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         address: user.address,
         tasktime: taskTime,
         images,
-        location: user?.location || {},
+         location:  {},
       };
       const formData = new FormData();
 
@@ -130,6 +130,12 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           });
         }
       }
+        // Append location coordinates to FormData
+        if (user.location && user.location.coordinates) {
+          formData.append('location[type]', 'Point');
+          formData.append('location[coordinates][]', user.location.coordinates[0]);
+          formData.append('location[coordinates][]', user.location.coordinates[1]);
+        }
 
       serviceOption.forEach((s, index) => {
         formData.append(`service`, s);

@@ -52,7 +52,7 @@ const OfferResult = () => {
 
   useEffect(() => {
     if (user && user._id && offerResult == "true") {
-      dispatch(CreateOrder({ params, token }));
+      dispatch(CreateOrder({ param, token }));
       setOfferResult("");
     } else if (
       (user && user._id && offerResult == "false") ||
@@ -83,7 +83,7 @@ const OfferResult = () => {
 
       //SetParam(formData);
 
-      dispatch(CreateOrder({ params, token }));
+      dispatch(CreateOrder({ param, token }));
       setOfferResult("");
     }
   }, [offerResult]);
