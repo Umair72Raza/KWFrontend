@@ -131,7 +131,7 @@ const PendingOrders = ({ pendingOrders }) => {
           <div style={{ textAlign: "center" }}>
             <Spinner />
           </div>
-        ) : pendingOrders.length > 0 ? (
+        ) : pendingOrders?.length > 0 ? (
           <>
             <Row>
               {pendingOrders?.map((order) => (
@@ -145,7 +145,7 @@ const PendingOrders = ({ pendingOrders }) => {
                 >
                   <Card
                     className="shadow"
-                    style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                    style={{ backgroundColor: "#f6f8fc",  }}
                   >
                     <CardBody>
                       <CardTitle>

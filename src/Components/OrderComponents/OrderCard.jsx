@@ -152,7 +152,6 @@ const OrderCard = ({
                     style={{
                       backgroundColor: "#f6f8fc",
                       color: "",
-                      height: "100%",
                     }}
                   >
                     <CardBody>
