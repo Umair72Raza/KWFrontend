@@ -187,7 +187,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         const filteredOpenJobs = openJobs.filter(
           (order) => order !== orderIdToRemove
         );
-
+        setDisableAcceptButton(false);
         // Update state with the filtered openJobs array
         setOpenJobs(filteredOpenJobs);
         Swal.fire("This order is already accepted by another worker");
