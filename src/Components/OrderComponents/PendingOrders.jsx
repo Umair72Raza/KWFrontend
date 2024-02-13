@@ -125,13 +125,10 @@ const PendingOrders = ({ pendingOrders }) => {
 
   }
   return (
-    <>
       <Container>
-        {spinnerVisible ? (
-          <div style={{ textAlign: "center" }}>
-            <Spinner />
-          </div>
-        ) : pendingOrders?.length > 0 ? (
+        {
+      
+         pendingOrders?.length > 0 ? (
           <>
             <Row>
               {pendingOrders?.map((order) => (
@@ -307,43 +304,13 @@ const PendingOrders = ({ pendingOrders }) => {
               )}
             </Row>
           </>
-        ) : (
+        ) 
+        : (
           <div>No Pending Orders</div>
         )}
       </Container>
 
-      {/* <Booking
-        modal={modal}
-        toggle={toggleModal}
-        worker={bookingWorker}
-        chat={chat}
-      /> */}
-      {/* <Modal isOpen={isModalOpen} toggle={toggleModal} centered>
-        <ModalHeader toggle={toggleModal}>Order Cancellation</ModalHeader>
-        <ModalBody>
-          <Form>
-            <FormGroup>
-              <Label for="cancelReason">Reason for Cancellation</Label>
-              <Input
-                type="text"
-                id="cancelReason"
-                placeholder="Enter reason"
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-              />
-            </FormGroup>
-          </Form>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="secondary" onClick={toggleModal}>
-            Cancel Order Cancellation
-          </Button>
-          <Button color="danger" onClick={cancelingOrder}>
-            Finalize Order Cancellation
-          </Button>
-        </ModalFooter>
-      </Modal> */}
-    </>
+    
   );
 };
 
