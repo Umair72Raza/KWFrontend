@@ -25,7 +25,6 @@ export const GetMessages = async (chatId, token) => {
 
     return response;
   } catch (error) {
-    console.log(error.response, "getting messages")
     throw error.response.data;
   }
 };

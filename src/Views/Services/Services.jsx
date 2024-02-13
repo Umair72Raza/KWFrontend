@@ -149,7 +149,7 @@ const Services = () => {
           const removeResult = await dispatch(deleteServiceAsync(data));
 
           if (removeResult.type === "/admin/deleteService/fulfilled") {
-            console.log(removeResult, " result payload");
+          
             if (removeResult.payload === undefined) {
               Swal.fire("Cannot Remove!", "This service is taken.", "error");
             } else {
@@ -216,10 +216,10 @@ const Services = () => {
           };
           const result = await dispatch(updateServiceAsync(data));
           if (result.type === "/admin/updateService/fulfilled") {
-            console.log(result.payload, 'payload')
+       
             if (result.payload.message === "Required") {
               setEditedService({ id: null, name: "" });
-              console.log("name is reqrd")
+      
               await displayEditErrorMessage(
                 "Name is required for updating a service"
               );
@@ -227,7 +227,7 @@ const Services = () => {
             } else if (
               result.payload.message === "taken"
             ) {
-              console.log("service taken")
+           
               setEditedService({ id: null, name: "" });
               await displayEditErrorMessage(
                 "Service is taken by a worker. Cannot Update"

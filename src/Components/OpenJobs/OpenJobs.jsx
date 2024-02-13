@@ -181,7 +181,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     const creds = { id: order._id, token: token };
     const result = await dispatch(checkTheStatusAsync(creds));
     if (result.type === "orders/checkStatus/fulfilled") {
-      console.log(result)
+    
       if (result.payload.message === "false") {
         const orderIdToRemove = order;
         const filteredOpenJobs = openJobs.filter(
@@ -224,14 +224,14 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
 
   const handleRefresh = async () => {
     let result = await dispatch(fetchOpenOrdersAsync(token));
-    console.log(result);
+  
     if (result.type === "orders/fetchOpenOrders/fulfilled") {
-      console.log(result.payload);
+    
       if (openJobs?.length === 0) {
-        console.log(result.payload);
+       
         setOpenJobs(result.payload.orders);
       } else {
-        console.log(result.payload);
+      
         const uniqueOrders = result.payload.orders.filter(
           (newOrder) =>
             !openJobs.some(

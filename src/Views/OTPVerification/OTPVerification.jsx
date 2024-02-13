@@ -64,19 +64,19 @@ const OTPVerification = () => {
     }
 
     setDisabledOTP(true);
-    console.log(newPhone);
+  
     let data = { newPhone, otp ,token};
-    console.log("Verifying OTP:", data);
+  
 
     try {
       const resp = await dispatch(changePhone(data));
-      console.log(resp, "response");
+  
       if (resp.type === "auth/otpverifyPhone/fulfilled") {
         if (resp.payload === undefined) {
-          console.log(resp, "response on fail");
+        
           failureToast("Phone was not changed!");
         } else {
-          console.log(resp, "response on success");
+  
           successToast("Phone changed!");
           user.role === "worker"
           ? navigate("/worker/editprofile")
@@ -103,19 +103,19 @@ const OTPVerification = () => {
     }
 
     setDisabledOTP(true);
-    console.log(newMail);
+  
     let data = { newMail, otp ,token};
-    console.log("Verifying OTP:", data);
+  
 
     try {
       const resp = await dispatch(changeEmail(data));
-      console.log(resp, "response");
+   
       if (resp.type === "auth/otpverifyEmail/fulfilled") {
         if (resp.payload === undefined) {
-          console.log(resp, "response on fail");
+         
           failureToast("email did not changed!");
         } else {
-          console.log(resp, "response on success");
+       
           successToast("email changed!");
           user.role === "worker"
           ? navigate("/worker/editprofile")
@@ -149,7 +149,7 @@ const OTPVerification = () => {
       const result = await dispatch(signUpUserAsync(formData));
   
       if (result.type === "auth/signup/fulfilled") {
-        console.log("Sign up successful!", formData);
+    
   
         // Display success message
         const successMessage = ShowServices

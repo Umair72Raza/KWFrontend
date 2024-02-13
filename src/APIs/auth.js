@@ -24,10 +24,10 @@ export const EmailVerification = async (email) => {
 export const sendOTP = async (email) => {
   try {
     const response = await API.post(`user/forgot-password`, { email: email });
-    console.log(response.data);
+   
     return response;
   } catch (error) {
-    console.log(error);
+  
     return error;
     //throw error.response.data;
   }
@@ -38,7 +38,7 @@ export const sendOTP = async (email) => {
 export const sendOTPforEmail = async (data) => {
   try {
     const { mail, token, newMail,region_state } = data;
-    console.log(newMail, token,  "new mail and token in api");
+  
     const response = await API.put(
       `user/newMailOTP`,
       { email: mail, newMail: newMail },
@@ -48,7 +48,7 @@ export const sendOTPforEmail = async (data) => {
         },
       }
     );
-    console.log(response,"reponse in api")
+   
     return response;
   } catch (error) {
     throw error.response.data;
@@ -58,7 +58,7 @@ export const sendOTPforEmail = async (data) => {
 export const sendOTPforPhone = async (data) => {
   try {
     const { mail, token, newPhone } = data;
-    console.log(newPhone, token, "newPhone and token in api");
+
     const response = await API.put(
       `user/newPhoneOTP`,
       { email: mail, newPhone: newPhone },
@@ -68,10 +68,10 @@ export const sendOTPforPhone = async (data) => {
         },
       }
     );
-    console.log(response, "response in api");
+   
     return response;
   } catch (error) {
-    console.log(error.response.data);
+ 
     return error.response.data;
     //throw error.response.data;
   }
@@ -92,7 +92,7 @@ export const newPasswordSetter = async (email, newPass) => {
 export const OTPverify = async (otp) => {
   try {
     const response = await API.put(`user/reset-password/${otp}`);
-    console.log("OTP verify resp", response);
+
     return response;
   } catch (error) {
     throw error.response.data;
@@ -112,7 +112,7 @@ export const OTPverifyforEmail = async (data) => {
         },
       }
     );
-    console.log("new mail resp", response);
+
     return response;
   } catch (error) {
     throw error.response.data;
@@ -130,7 +130,7 @@ export const OTPverifyforPhone = async (data) => {
         },
       }
     );
-    console.log("new phone resp", response);
+  
     return response;
   } catch (error) {
     throw error.response.data;
@@ -150,9 +150,8 @@ export const loginUser = async (email, password) => {
 };
 export const updatePfp = async (email, profilePicture) => {
   try {
-    //console.log(data, "data in api");
-    //email, profilePicture;
-    console.log(email,profilePicture);
+  
+  
     const response = await API.put(
       "user/updatePfp",
       { email, profilePicture },
@@ -162,7 +161,7 @@ export const updatePfp = async (email, profilePicture) => {
         },
       }
     );
-    console.log(response.data, " update pfp response in api");
+   
     return response.data;
   } catch (error) {
     throw error.response.data;

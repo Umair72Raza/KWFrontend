@@ -23,6 +23,7 @@ export const loginAsync = createAsyncThunk(
       const response = await loginUser(email, password);
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("settings",JSON.stringify(response.settings));
       const result = response;
       return result;
     } catch (error) {
@@ -49,23 +50,6 @@ export const OTPverifyAsync = createAsyncThunk(
     }
   }
 );
-// export const updatePfpAsync = createAsyncThunk(
-//   "auth/setnewpfp",
-//   async (data, { rejectWithValue }) => {
-//     try {
-//       //console.log("Data in thunk:", [...data.entries()]);
-//       const { email, profilePicture } = data;
-//       const result = await updatePfp(email, profilePicture);
-//       console.log("update pfp response", result);
-//       return result;
-//     } catch (error) {
-//       if (error) {
-//         return rejectWithValue("Error Occured!");
-//       }
-//       console.log(error);
-//     }
-//   }
-// );
 
 export const signUpUserAsync = createAsyncThunk(
   "auth/signup",
@@ -79,8 +63,6 @@ export const signUpUserAsync = createAsyncThunk(
         profilePicture,
         phoneNumber,
         location,
-        // longitude,
-        // latitude,
         address,
         optionalAddress,
         country,
@@ -96,8 +78,6 @@ export const signUpUserAsync = createAsyncThunk(
         profilePicture,
         phoneNumber,
         location,
-        // longitude,
-        // latitude,
         address,
         optionalAddress,
         country,
@@ -105,7 +85,6 @@ export const signUpUserAsync = createAsyncThunk(
         city,
         services
       );
-      console.log(response);
       return response.data;
     } catch (error) {
       if (
@@ -150,10 +129,9 @@ export const requestOTPAsync = createAsyncThunk(
   "auth/requestOTPAsync",
   async (email) => {
     try {
-      console.log(email, "email in async");
+
       const response = await sendOTP(email);
-      console.log(response.data);
-      console.log(response.status);
+  
 
       const serializableResponse = {
         data: response.data,
@@ -172,17 +150,15 @@ export const requestOTPforEmailAsync = createAsyncThunk(
   "auth/requestOTPforEmailAsync",
   async (data) => {
     try {
-      console.log(data, "data in thunk");
       const response = await sendOTPforEmail(data);
-      // console.log(response,"send otp resp")
-      // return response;
+   
 
       const serializableResponse = {
         data: response.data,
         status: response.status,
         // other serializable properties
       };
-      console.log(serializableResponse, "serl response");
+
       return serializableResponse;
     } catch (error) {
       console.log(error);
@@ -195,14 +171,14 @@ export const requestOTPforPhoneAsync = createAsyncThunk(
   "auth/requestOTPforPhoneAsync",
   async (data) => {
     try {
-      console.log(data, "data in thunk");
+
       const response = await sendOTPforPhone(data);
       const serializableResponse = {
         data: response.data,
         status: response.status,
         // other serializable properties
       };
-      console.log(serializableResponse, "serialized response");
+   
       return serializableResponse;
     } catch (error) {
       console.log(error);
@@ -216,7 +192,7 @@ export const requestOTPverification = createAsyncThunk(
   async (otp, { rejectWithValue }) => {
     try {
       const response = await OTPverify(otp);
-      console.log("otp cerify response", response);
+     
       return response.status;
     } catch (error) {
       if (error) return rejectWithValue(error);
@@ -230,9 +206,9 @@ export const changeEmail = createAsyncThunk(
   "auth/otpverifyEmail",
   async (data) => {
     try {
-      console.log(data, "data in thunk");
+   
       const response = await OTPverifyforEmail(data);
-      console.log("otp verify response", response);
+   
       return response.data;
     } catch (error) {
       console.log(error);
@@ -244,9 +220,9 @@ export const changePhone = createAsyncThunk(
   "auth/otpverifyPhone",
   async (data) => {
     try {
-      console.log(data, "data in thunk");
+  
       const response = await OTPverifyforPhone(data);
-      console.log("otp verify response", response);
+  
       return response.data;
     } catch (error) {
       console.log(error);
@@ -261,7 +237,7 @@ export const setNewPassAsync = createAsyncThunk(
       const { email, newPassword } = data;
       const password = newPassword;
       const response = await newPasswordSetter(email, password);
-      console.log(response, "response in async");
+
       if (response.status === 200) {
         return response.status;
       } else {

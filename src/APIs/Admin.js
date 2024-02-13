@@ -148,7 +148,7 @@ export const updateSettings = async (data) => {
   try {
     const { token, newValue, propertyName } = data;
     const actualData = { propertyName, newValue };
-    console.log(propertyName, "propertyName");
+
 
     const response = await API.put(`settings/updateSettings`, actualData, {
       headers: {

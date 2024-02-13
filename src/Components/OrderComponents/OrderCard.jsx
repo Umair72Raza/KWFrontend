@@ -88,8 +88,7 @@ const OrderCard = ({
 
   const cancelingOrder = () => {
     //dispatch cancel order
-    console.log(scheduledOrders,"all orders")
-    console.log(orderToCancel,"order to cancel")
+ 
     const order = orderToCancel;
     const data = {
       userId: userId,
@@ -102,7 +101,7 @@ const OrderCard = ({
       reason: modalInputValue,
       order: order,
     };
-    console.log(resonWithOrdertoCancel, "cancel order");
+  
 
     const cancelOrderSocketEvent = () => {
       if (!socket) return;

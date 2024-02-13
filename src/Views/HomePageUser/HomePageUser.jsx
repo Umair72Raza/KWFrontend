@@ -77,7 +77,7 @@ const HomePageUser = () => {
 
       // Handling incoming chat notifications from the server
       socket?.on("chat-notifications", (chatNotifications) => {
-        // console.log(chatNotifications);
+       
         const newUnreadMessages = {};
 
         // Update the unread message count state for each chat
@@ -104,7 +104,7 @@ const HomePageUser = () => {
     socket?.on("status-change", (User) => {
       
       if (users && User.status === "offline") {
-        console.log(User,users,"user")
+   
         let remove = [];
         const userIndexRemoved = users.findIndex((u) => u._id === User._id);
         if (userIndexRemoved !== -1) {
@@ -114,7 +114,7 @@ const HomePageUser = () => {
           dispatch(updateRemoveWorker(remove));
         }
       } else if (removedUsers && User.status === "online") {
-        console.log(User,users,"user")
+      
         let worker = users;
         const userIndexInRemoved = removedUsers?.findIndex(
           (u) => u._id === User._id
@@ -171,7 +171,7 @@ const HomePageUser = () => {
         const serviceMatch = worker?.services?.some(service => service?.name?.toLowerCase()?.includes(searchInput?.toLowerCase()));
 
         // Return true if any of the conditions are met
-        console.log(fnameMatch, lnameMatch, addressMatch, serviceMatch)
+     
         return fnameMatch || lnameMatch || addressMatch || serviceMatch;
       });
       setSearchWorker(workers)
@@ -179,7 +179,7 @@ const HomePageUser = () => {
     else {
       setSearchWorker(null)
     }
-    console.log(workers, "workers")
+  
 
     // Do something with the filtered workers array
     // For example, update the state or dispatch an action
@@ -243,7 +243,7 @@ const HomePageUser = () => {
       }
     }
 
-    console.log(filteredUsers)
+   
     return filteredUsers;
   }, [
     users,

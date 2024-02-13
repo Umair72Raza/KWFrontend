@@ -265,12 +265,7 @@ const EditProfilePage = ({ ShowServices }) => {
     setEditProfile(false);
     setPhoneEdit(false);
    
-    // if (!formData?.profilePicture) {
-    //   setFormData({ ...formData, profilePicture: UsersData?.profilePicture });
-    // }
 
-    console.log(formData, "formData");
-    console.log(UserInfo, "UsersInfo");
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
 
@@ -279,27 +274,25 @@ const EditProfilePage = ({ ShowServices }) => {
         infoToast(validationErrors?.noChanges);
         setEditMode(false);
       }
-      console.log("Validation errors:", validationErrors);
+    
       return; // Early return for validation errors
     }
 
     setLoading(true);
 
     try {
-      console.log(formData, "formData");
+   
       const data = { id: UsersData?._id, token, formData };
       const result = await dispatch(updateProfileAsync(data));
       if (result.type === "/UpdateProfile/fulfilled") {
         dispatch(updateUser(result.payload));
-        console.log("result.payload", result.payload);
+     
         const {
           firstName,
           lastName,
-          // email,
-          // phoneNumber,
+    
           location,
-          // latitude,
-          // longitude,
+       
           country,
           city,
           address,
@@ -311,11 +304,9 @@ const EditProfilePage = ({ ShowServices }) => {
         setFormData({
           firstName,
           lastName,
-          // email,
-          // phoneNumber,
+        
           location,
-          // latitude,
-          // longitude,
+       
           country,
           city,
           region_state,
@@ -323,7 +314,7 @@ const EditProfilePage = ({ ShowServices }) => {
           optionalAddress,
           services: services || [],
         });
-        console.log(optionalAddress, "optional");
+       
         setEditMode(false);
       } else if (result.type === "/UpdateProfile/rejected") {
         failureToast(result.payload);
@@ -412,7 +403,7 @@ const EditProfilePage = ({ ShowServices }) => {
     try {
       const otpResp = await dispatch(requestOTPforEmailAsync(data));
       if (otpResp.type === "auth/requestOTPforEmailAsync/fulfilled") {
-        console.log(otpResp, "response of otp[");
+       
         if (
           otpResp?.payload?.data?.message ===
           "New Email already taken by someone else."
@@ -457,7 +448,7 @@ const EditProfilePage = ({ ShowServices }) => {
           setShowModal(false);
           return failureToast(msg);
         } else {
-          console.log(otpResp, "response of otp for phone");
+    
           successToast("OTP sent successfully!");
           setShowModal(false);
           user.role === "worker"
@@ -482,7 +473,7 @@ const EditProfilePage = ({ ShowServices }) => {
   const updatePhone = () => {
     toggleEditPhone();
     setModalContent("Test: Wait while you are being redirected...");
-    console.log("Before setShowModal(true):", showModal);
+  
     setShowModal(true);
     requestOTPforPhone();
   };
@@ -497,7 +488,7 @@ const EditProfilePage = ({ ShowServices }) => {
     // Check if entered email matches the regex
     const isValid = emailRegex.test(enteredEmail);
     setNewMailError(isValid);
-    console.log(isValid);
+   
     setDisableUpdateEmail(!isValid);
     if (!newMail.trim()) {
       // If newMail is empty or contains only whitespaces, do not dispatch the request
@@ -514,7 +505,7 @@ const EditProfilePage = ({ ShowServices }) => {
       return;
     }
     setModalContent("Wait while you are being redirected...");
-    console.log("Before setShowModal(true):", showModal);
+
     setShowModal(true);
     requestOTP();
   };
@@ -596,7 +587,7 @@ const EditProfilePage = ({ ShowServices }) => {
     try {
       const response = await dispatch(updatePfpAsync(profileImgData));
       if (response.meta.requestStatus === "fulfilled") {
-        console.log(response);
+      
         setDisableUpdateProfilePic(false);
         setProfileImgData({});
       }
