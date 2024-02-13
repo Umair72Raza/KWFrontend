@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 const OpenJobResult = ({ confirmed, orderId, setStartBidVerified }) => {
   if (confirmed === "true")
     Swal.fire({
-      title: "Start job Request Confirmed",
+      title: "Job is Approved!",
       text: `Great news! The user has approved your request for the job.`,
       icon: "success",
     }).then((result) => {
@@ -15,7 +15,7 @@ const OpenJobResult = ({ confirmed, orderId, setStartBidVerified }) => {
     });
   else if (confirmed === "false") {
     Swal.fire({
-      title: "Start job Request Denied",
+      title: "Job request declined!",
       text: `Unfortunately, the user has declined your job request.`,
       icon: "error",
     }).then((result) => {
