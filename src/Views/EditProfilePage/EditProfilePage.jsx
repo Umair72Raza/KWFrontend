@@ -335,41 +335,7 @@ const EditProfilePage = ({ ShowServices }) => {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const validationErrors = FormValidation(formData);
-  //   setErrors(validationErrors);
-
-  //   try {
-  //     if (Object.keys(validationErrors).length === 0) {
-  //       setLoading(true);
-  //       const data = { id: UsersData?._id, token, formData };
-  //       const result = await dispatch(updateProfileAsync(data));
-
-  //       if (result.type === "/UpdateProfile/fulfilled") {
-  //         successToast("Profile Updated Successfully!");
-  //         setFormData({
-  //           firstName: UsersData?.firstName,
-  //           lastName: result.payload?.lastName,
-  //           email: result.payload?.email,
-  //           phoneNumber: result.payload?.phoneNumber,
-  //           latitude: result.payload?.latitude,
-  //           longitude: result.payload?.longitude,
-  //           country: result.payload?.country,
-  //           address: result.payload?.address,
-  //           services: result.payload?.services || [],
-  //         });
-  //         setEditMode(false);
-  //       } else if (result.type === "/UpdateProfile/rejected") {
-  //         failureToast(result.payload);
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.log("Error updating profile:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  
 
   const handleEditModeToggle = () => {
     setEditMode(true);
@@ -382,6 +348,8 @@ const EditProfilePage = ({ ShowServices }) => {
       // latitude: UsersData?.latitude,
       // longitude: UsersData?.longitude,
       country: UsersData?.country,
+      region_state: UsersData?.region_state,
+      city: UsersData?.city,
       address: UsersData?.address,
       optionalAddress: UsersData?.optionalAddress || null,
       services: UsersData?.services || [],
@@ -401,6 +369,8 @@ const EditProfilePage = ({ ShowServices }) => {
       // latitude: UsersData?.latitude,
       // longitude: UsersData?.longitude,
       country: UsersData?.country,
+      region_state: UsersData?.region_state,
+      city: UsersData?.city,
       address: UsersData?.address,
       optionalAddress: UsersData?.optionalAddress || null,
       services: UsersData?.services || [],
@@ -734,7 +704,7 @@ const EditProfilePage = ({ ShowServices }) => {
                       setFormData={setFormData}
                       errors={errors}
                       setErrors={setErrors}
-                     // UsersData={UsersData}
+                      formData={formData}
                     />
                   </Row>
                   <Row md={11}>

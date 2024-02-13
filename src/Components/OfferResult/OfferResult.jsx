@@ -12,7 +12,7 @@ import {
 import { truncateText } from "../../utils";
 import accpetance from "../../assets/images/OfferResultpngs/acceptance.png";
 import failure from "../../assets/images/OfferResultpngs/failure.png";
-import { CreateOrder } from "../../Redux/Slices/BookingSlice";
+import { CreateOrder, setnewOrderValue } from "../../Redux/Slices/BookingSlice";
 import { PopUpState } from "../../Context/PopUpProvider";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -22,7 +22,7 @@ const OfferResult = () => {
   const [offerResult, setOfferResult] = useState("");
   const [result, setResult] = useState("");
   const { user, token } = useSelector((state) => state.auth);
-  let { params, clear, setClear, param, SetParam } = PopUpState();
+  let { params, clear, setClear, param, SetParam, scheduledOrders, setScheduledOrders } = PopUpState();
   const { newOrder } = useSelector((state) => state.booking);
 
   const socket = useSelector((state) => state?.socket?.socket);
@@ -62,14 +62,13 @@ const OfferResult = () => {
       const data = params;
       const formData = new FormData();
       for (const key in data) {
-        if (
-          data.hasOwnProperty(key) &&
-          key != "users" &&
-          key != "Status" &&
-          key != "service" &&
-          key != "location"
-        ) {
-          formData.append(key, data[key]);
+        if (data.hasOwnProperty(key) && key !== "service" && key !== "location") {
+          if (key === "users") {
+            // Append only the first user._id to formData
+            formData.append("users[]", data[key][0]);
+          } else {
+            formData.append(key, data[key]);
+          }
         }
       }
                     // Append location coordinates to FormData
@@ -78,13 +77,13 @@ const OfferResult = () => {
     formData.append('location[coordinates][]', user.location.coordinates[0]);
     formData.append('location[coordinates][]', user.location.coordinates[1]);
   }
-  formData?.append(`Status`, "Pending");
+  formData.set('Status', 'Pending');
       data?.images?.forEach((image, index) => {
         formData.append(`images`, image);
       });
-      data.users.forEach((u, index) => {
-        formData.append(`users`, u);
-      });
+      // data.users.forEach((u, index) => {
+      //   formData.append(`users`, u);
+      // });
       data.service.forEach((s, index) => {
         formData.append(`service`, s);
       });
@@ -108,7 +107,18 @@ const OfferResult = () => {
     if (newOrder !== null && newOrder.Status !== "Pending") {
       const data = { newOrder: newOrder, Uid: newOrder?.users[1]?._id };
       if (newOrder.Status === "Scheduled") {
-        console.log("I ran");
+        if (scheduledOrders?.length === 0) {
+          setScheduledOrders([newOrder]);
+          dispatch(setnewOrderValue(null));
+        } else {
+          setScheduledOrders((prevScheduledOrders) => [
+            ...prevScheduledOrders,
+            newOrder,
+          ]);
+          dispatch(setnewOrderValue(null));
+        }
+        
+
         socket?.emit("new-order-created", data);
       } else if (newOrder.Status === "Posted") {
       }

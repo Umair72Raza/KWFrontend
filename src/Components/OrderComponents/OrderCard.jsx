@@ -248,7 +248,14 @@ const OrderCard = ({
                       {/* <CardText>OrderId: {order._id}</CardText> */}
                       <CardText>
                         <b>Worker:</b>{" "}
-                        {order?.users?.length > 0 && order?.users[1]?.firstName}
+                        <CardText>
+                        {order?.users?.length > 0 ? (
+                          <>
+                            {order?.users[1]?.firstName}{" "}
+                            {order?.users[1]?.lastName}
+                          </>
+                        ) : null}
+                      </CardText>
                       </CardText>
                       <Row>
                         <Col></Col>

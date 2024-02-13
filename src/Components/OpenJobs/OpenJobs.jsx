@@ -14,9 +14,13 @@ import { SelectChat, truncateText } from "../../utils";
 import { FiMessageCircle } from "react-icons/fi";
 import { ChatState } from "../../Context/ChatProvider";
 import { PopUpState } from "../../Context/PopUpProvider";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
+import {
+  checkTheStatusAsync,
+  fetchOpenOrdersAsync,
+} from "../../Redux/Slices/OrderSlice";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const {
@@ -31,10 +35,15 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     unreadMessages,
     setAvailableJobOffer,
   } = ChatState();
+
+  const { openJobs, setOpenJobs,disableAcceptButton, setDisableAcceptButton } = PopUpState();
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
   const { setFromAvailableJobs } = PopUpState();
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
+  
   const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
@@ -164,39 +173,76 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   };
 
   const sendBid = async (order, Uid) => {
+    setDisableAcceptButton(true);
+    setTimeout(()=>{
+      setDisableAcceptButton(false);
+    },120000)
     //  emit socket event to show Worker wants to start the job modal.
-
-    if (user.status !== "online") {
-      return Swal.fire({
-        title: "You are not online",
-        icon: "error",
-      });
+    const creds = { id: order._id, token: token };
+    const result = await dispatch(checkTheStatusAsync(creds));
+    if (result.type === "orders/checkStatus/fulfilled") {
+      console.log(result)
+      if (result.payload.message === "false") {
+        const orderIdToRemove = order;
+        const filteredOpenJobs = openJobs.filter(
+          (order) => order !== orderIdToRemove
+        );
+        setDisableAcceptButton(false);
+        // Update state with the filtered openJobs array
+        setOpenJobs(filteredOpenJobs);
+        Swal.fire("This order is already accepted by another worker");
+        return;
+      } else {
+        if (user.status !== "online") {
+          return Swal.fire({
+            title: "You are not online",
+            icon: "error",
+          });
+        }
+    
+        const worker = {
+          workerId: user._id,
+          workerfirstName: user.firstName,
+          workerlastName: user.lastName,
+        };
+    
+        const data = {
+          order,
+          Uid,
+          worker,
+        };
+        socket.emit("startBid-accept-reject", data);
+        Swal.fire({
+          title: "Accept Job request sent!",
+          icon: "success",
+        });
+      }
     }
-   // setGlobalStartButtonDisabled(true);
-    // setStartButtonDisabledMap((prevMap) => ({
-    //   ...prevMap,
-    //   [order._id]: true,
-    // }));
 
-    const data = {
-      order,
-      Uid,
-      workerId: user._id
-    };
+   
+  };
 
-    // setTimeout(() => {
-    //   setGlobalStartButtonDisabled(false);
-    //   setStartButtonDisabledMap((prevMap) => ({
-    //     ...prevMap,
-    //     [order._id]: false,
-    //   }));
-    // }, 60000); // 1 minute
+  const handleRefresh = async () => {
+    let result = await dispatch(fetchOpenOrdersAsync(token));
+    console.log(result);
+    if (result.type === "orders/fetchOpenOrders/fulfilled") {
+      console.log(result.payload);
+      if (openJobs?.length === 0) {
+        console.log(result.payload);
+        setOpenJobs(result.payload.orders);
+      } else {
+        console.log(result.payload);
+        const uniqueOrders = result.payload.orders.filter(
+          (newOrder) =>
+            !openJobs.some(
+              (existingOrder) => existingOrder._id === newOrder._id
+            )
+        );
 
-    socket.emit("startBid-accept-reject", data);
-    Swal.fire({
-      title: "Accept Job request sent!",
-      icon: "success",
-    });
+        // Append the unique orders to pastOrders
+        setOpenJobs((prevOpenJobs) => [...uniqueOrders,...prevOpenJobs ]);
+      }
+    }
   };
 
   return (
@@ -207,7 +253,20 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         </div>
       ) : (
         <>
+          <Button
+            className=" fw-bold"
+            color="primary"
+            onClick={handleRefresh}
+            style={{ width: "100px" }}
+          >
+            Refresh Jobs
+          </Button>
           <Row>
+            {scheduledOrdersObject?.length === 0 && (
+              <div className="w-100 vh-100 d-flex justify-content-center mt-5">
+                <h4>No Open Jobs!</h4>
+              </div>
+            )}
             {scheduledOrdersObject?.map((order, index) => (
               <Col
                 key={index}
@@ -334,10 +393,9 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                     </CardText>
                     <CardText className="d-flex justify-content-around align-items-center">
                       <Button
-                        onClick={() =>
-                          sendBid(order, order?.user?._id)
-                        }
+                        onClick={() => sendBid(order, order?.user?._id)}
                         color="success"
+                        disabled={disableAcceptButton}
                       >
                         Accept
                       </Button>

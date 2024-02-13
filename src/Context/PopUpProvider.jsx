@@ -47,7 +47,7 @@ const PopUpContext = ({ children }) => {
   };
   const [order, setOrder] = useState("");
   const [fromAvailableJobs, setFromAvailableJobs] = useState(false);
-
+  const [disableAcceptButton, setDisableAcceptButton] = useState(false);
   return (
     <PopupContext.Provider
       value={{
@@ -113,6 +113,8 @@ const PopUpContext = ({ children }) => {
         setOpenJobs,
         postedJobs,
         setPostedJobs,
+        disableAcceptButton,
+        setDisableAcceptButton,
       }}
     >
       {children}

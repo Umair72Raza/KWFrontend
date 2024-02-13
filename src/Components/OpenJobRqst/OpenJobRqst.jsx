@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { PopUpState } from "../../Context/PopUpProvider";
+import {  schedulizeOrderAsync } from "../../Redux/Slices/OrderSlice";
+import { set } from "lodash";
 
 const OpenJobRqst = () => {
-  const { openJobs, setOpenJobs, postedJobs, setPostedJobs } = PopUpState();
+    const dispatch = useDispatch();
+  const { openJobs, setOpenJobs, postedJobs, setPostedJobs, setScheduledOrders } = PopUpState();
+  const {token} = useSelector((state)=>state.auth);
   const [modalHeader, setModalHeader] = useState("");
   const [isFinalize, setIsFinalize] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cancelButtonLabel, setCancelButtonLabel] = useState("");
   const [finalizeButtonLabel, setFinalizeButtonLabel] = useState("");
-  const [order,setOrder] = useState(null)
-  const [workerId,setWorkerId] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [workerId, setWorkerId] = useState(null);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -20,13 +24,18 @@ const OpenJobRqst = () => {
   const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     socket?.on("startBid-request", (data) => {
-        setWorkerId(data?.workerId)
+      setWorkerId(data?.worker?.workerId);
       setOrder(data?.order);
-      setModalHeader("Order Bid");
+      setModalHeader(
+        `Order Bid by ${data?.worker?.workerfirstName} ${data?.worker?.workerlastName}`
+      );
       setIsFinalize(true);
       setFinalizeButtonLabel("Yes");
       setCancelButtonLabel("Cancel");
       toggleModal();
+      setTimeout(() => {  
+        setIsModalOpen(false);
+      }, 120000);
     });
     return () => {
       socket?.off("startBid-request");
@@ -34,14 +43,15 @@ const OpenJobRqst = () => {
   });
 
   const schedulingOrder = async () => {
-    const data = { orderId: order._id, token: token };
+    const data = { orderId: order._id, token: token, workerId };
     // api should add the workers/ id in the users array
-    const result = await dispatch(activateOrderAsync(data));
-    if (result.type === "orders/activateOrders/fulfilled") {
-      if (result.payload.Status === "Active") {
+    const result = await dispatch(schedulizeOrderAsync(data));
+    if (result.type === "orders/schedulizeOrder/fulfilled") {
+      if (result.payload.Status === "Scheduled") {
         const data = {
-          order: order,
+          order: result?.payload,
           result: "true",
+          workerId: workerId
         };
         const startJobSocket = () => {
           if (!socket) return;
@@ -53,7 +63,6 @@ const OpenJobRqst = () => {
           };
         };
         startJobSocket();
-
         setPostedJobs((prevPostedJobs) =>
           prevPostedJobs.filter((postedJob) => postedJob._id !== order._id)
         );
@@ -62,6 +71,7 @@ const OpenJobRqst = () => {
 
         setIsFinalize(false);
         setOrder(null);
+        setWorkerId(null);
       }
     }
   };
@@ -70,7 +80,7 @@ const OpenJobRqst = () => {
     const data = {
       result: "false",
       order: order,
-      workerId
+      workerId,
     };
     socket?.emit("startBid-response", data);
     setIsFinalize(false);
@@ -81,14 +91,6 @@ const OpenJobRqst = () => {
     };
   };
 
-  const cancel = () => {
-    setOrderToCancel(null);
-    setModalHeader("");
-    setFinalizeButtonLabel("");
-    setCancelButtonLabel("");
-    setFinalizeFunction(false);
-    toggleModal();
-  };
   return (
     <Modal
       isOpen={isModalOpen}
@@ -120,30 +122,19 @@ const OpenJobRqst = () => {
       <ModalFooter>
         <Button
           color="secondary"
-          onClick={
-            isFinalize
-              ? () => {
-                  Cancel();
-                  toggleModal();
-                }
-              : cancel
-          }
+          onClick={() => {
+            Cancel();
+            toggleModal();
+          }}
         >
           {cancelButtonLabel}
         </Button>
         <Button
-          color={isFinalize ? "success" : "danger"}
-          onClick={
-            isFinalize
-              ? () => {
-                  schedulingOrder();
-                  toggleModal();
-                }
-              : () => {
-                  setFinalizeFunction(true);
-                  toggleModal();
-                }
-          }
+          color="danger"
+          onClick={() => {
+            schedulingOrder();
+            toggleModal();
+          }}
         >
           {finalizeButtonLabel}
         </Button>

@@ -16,7 +16,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { SelectChat } from "../../utils";
 import { useSelector } from "react-redux";
 
-const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
+const GotOffer = ({ formattedOfferDetails, User, onConfirm, onCancel }) => {
   const [showModal, setshowModal] = useState(true);
   const [fullDetailsModal, setFullDetailsModal] = useState(false);
   const [imageDataURL, setImageDataURL] = useState([]);
@@ -29,9 +29,15 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
     chat,
     setSelectedChat,
     setSelectedChatCompare,
+    selectedChatCompare,
     setChat,
     chatFromWorkerCard,
-    setChatFromWorkerCard,setNotification,setNewMessageText,setSelectedFiles,setUnreadMessages,unreadMessages
+    setChatFromWorkerCard,
+    setNotification,
+    setNewMessageText,
+    setSelectedFiles,
+    setUnreadMessages,
+    unreadMessages,
   } = ChatState();
   const socket = useSelector((state) => state?.socket?.socket);
   const formattedDetails = formattedOfferDetails?.details || "";
@@ -134,13 +140,13 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
   const HandleChat = () => {
     setShowModal(true);
     setChatFromWorkerCard(true);
-  
-    const isWorkerInChats = copyOfChats?.some(
-      (chat) => chat?.users?.some((chatUser) =>  formattedOfferDetails?.users[0] === chatUser?._id )
+
+    const isWorkerInChats = copyOfChats?.some((chat) =>
+      chat?.users?.some(
+        (chatUser) => formattedOfferDetails?.users[0] === chatUser?._id
+      )
     );
-    console.log(
-      copyOfChats,"isWorkerInChats"
-    )
+    console.log(copyOfChats, "isWorkerInChats");
     if (!isWorkerInChats) {
       // Create a fake chat
       const fakeChat = {
@@ -150,43 +156,45 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
         latestMessage: null,
         seen: true,
       };
-  
+
       setCopyOfChats((prevCopyOfChats) => {
-        const updatedChats = prevCopyOfChats.length > 0
-          ? [fakeChat, ...prevCopyOfChats]
-          : [fakeChat];
-        
+        const updatedChats =
+          prevCopyOfChats.length > 0
+            ? [fakeChat, ...prevCopyOfChats]
+            : [fakeChat];
+
         setChat(fakeChat);
         setSelectedChatCompare(fakeChat);
         setSelectedChat(() => SelectChat(fakeChat));
-  
+
         return updatedChats;
       });
     } else {
-      const workerChat = copyOfChats.find(
-        (chat) => chat?.users?.some((chatUser) => chatUser?._id === formattedOfferDetails?.users[0])
+      const workerChat = copyOfChats.find((chat) =>
+        chat?.users?.some(
+          (chatUser) => chatUser?._id === formattedOfferDetails?.users[0]
+        )
       );
-  
+
       const data = {
         userId: user._id,
         chatId: workerChat._id,
       };
-    //   setNewMessageText("");
-    // setSelectedFiles([]);
-        setChat(workerChat);
-        setSelectedChatCompare(workerChat);
-        setSelectedChat(() => SelectChat(workerChat));
-        setNotification((prevNotifications) =>
+      //   setNewMessageText("");
+      // setSelectedFiles([]);
+      setChat(workerChat);
+      setSelectedChatCompare(workerChat);
+      setSelectedChat(() => SelectChat(workerChat));
+      setNotification((prevNotifications) =>
         prevNotifications.filter((n) => n?.chat?._id !== workerChat?._id)
       );
       socket?.emit("chat read", data);
-        if (unreadMessages[workerChat._id]) {
-          setUnreadMessages((prevCount) => ({
-            ...prevCount,
-            [workerChat._id]: 0,
-          }));
-        }
-     
+      if (unreadMessages[workerChat._id]) {
+        setUnreadMessages((prevCount) => ({
+          ...prevCount,
+          [workerChat._id]: 0,
+        }));
+      }
     }
   };
 
@@ -234,10 +242,10 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
               </Button>
             )}
           </p>
-
-          <p>
+{formattedOfferDetails?.images?.length > 0 && (  <p>
             <strong>Task Pictures</strong>
-          </p>
+          </p>)}
+        
           <Row className="">
             <Col>
               {imageDataURL?.length > 2 ? (
@@ -277,9 +285,10 @@ const GotOffer = ({ formattedOfferDetails,User, onConfirm, onCancel }) => {
           <Button color="danger" onClick={handleCancel}>
             {GOTOFFER.REJECT_BUTTON}
           </Button>{" "}
-          <Button color="success" onClick={HandleChat}>
+          {!selectedChatCompare && (   <Button color="success" onClick={HandleChat}>
             Chat
-          </Button>{" "}
+          </Button>)}
+        
         </ModalFooter>
       </Modal>
     </div>

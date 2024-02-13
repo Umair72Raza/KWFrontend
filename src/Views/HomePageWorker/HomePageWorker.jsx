@@ -38,12 +38,13 @@ import { HomePageWorkerConsts, TABS } from "../../Constants/Constants";
 import { PopUpState } from "../../Context/PopUpProvider";
 import { failureToast } from "../../utils";
 import OpenJobs from "../../Components/OpenJobs/OpenJobs";
+import OpenJobResult from "../../Components/OpenJobResult/OpenJobResult";
 const HomePageWorker = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
   const [pastClicked, setPastClicked] = useState(false);
   const [cancelledClicked, setCancelledClicked] = useState(false);
-  const [openJobsClicked,setOpenJobsClicked] = useState(false);
+  const [openJobsClicked, setOpenJobsClicked] = useState(false);
   const [isScheduledOrdersFetched, setIsScheduledOrdersFetched] =
     useState(false);
   const [isPastOrdersFetched, setIsPastOrdersFetched] = useState(false);
@@ -51,6 +52,9 @@ const HomePageWorker = () => {
     useState(false);
   const [isActiveOrdersFetched, setIsActiveOrdersFetched] = useState(false);
   const [startJobVerified, setStartJobVerified] = useState(false); //make it true if the user sends back finalize order start
+  const [startBidVerified, setStartBidVerified] = useState(false);
+  const [startJobStatus, setStartJobStatus] = useState("");
+  const [startBidStatus, setBidJobStatus] = useState("");
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const [updateScheduled, setUpdateScheduled] = useState(false);
@@ -89,9 +93,8 @@ const HomePageWorker = () => {
     setGlobalStartButtonDisabled,
     openJobs,
     setOpenJobs,
+    setDisableAcceptButton,
   } = PopUpState();
-
-  const [startJobStatus, setStartJobStatus] = useState("");
 
   const offerTimeUp = (data) => {
     setGotOffer(false);
@@ -180,22 +183,29 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("startBid-result", (data) => {
+      setDisableAcceptButton(false);
       if (data.result === "true") {
-        setStartJobStatus("true");
-        setStartJobVerified(true);
-        console.log(scheduledOrders, "all scheduled orders");
-        console.log(data.order, "order in start job data");
-        setOid(data?.order?.Title);
+        setBidJobStatus("true");
+        setStartBidVerified(true);
+        console.log(data.order, "order in start bid data");
+        //setOid(data?.order?.Title);
 
-        setScheduledOrders((prevScheduledOrders) =>
-          prevScheduledOrders.filter(
-            (scheduledOrder) => scheduledOrder._id !== data.order._id
-          )
+        // setScheduledOrders((prevScheduledOrders) =>
+        //   prevScheduledOrders.filter(
+        //     (scheduledOrder) => scheduledOrder._id !== data.order._id
+        //   )
+        // );
+        setOpenJobs((prevOpenJobs) =>
+          prevOpenJobs.filter((openJob) => openJob._id !== data.order._id)
         );
-
-        setActiveOrder((prevActiveOrders) => [...prevActiveOrders, data.order]);
+        setScheduledOrders((prevScheduledOrders) => [
+          ...prevScheduledOrders,
+          data.order,
+        ]);
+        // setActiveOrder((prevActiveOrders) => [...prevActiveOrders, data.order]);
       } else if (data.result == "false") {
-        
+        setStartBidVerified(true);
+        setBidJobStatus("false");
       }
     });
     return () => {
@@ -203,10 +213,12 @@ const HomePageWorker = () => {
     };
   });
 
-
   useEffect(() => {
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
+      Corder.cancelReason={
+        reason:data.reason
+      }
       let reason = data.reason;
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {
@@ -297,7 +309,7 @@ const HomePageWorker = () => {
       setNotificationTimeouts((prevTimeouts) =>
         prevTimeouts.filter((_, i) => i !== index)
       );
-      console.log(index,"offer expire deleted")
+      console.log(index, "offer expire deleted");
     }
     socket?.emit("accept-reject", {
       result: "cancel",
@@ -471,20 +483,19 @@ const HomePageWorker = () => {
     }
   };
 
-
   const openOrders = async () => {
     toggleTab("5");
-    if (openJobsClicked=== false) {
+    if (openJobsClicked === false) {
       setOpenJobsClicked(true);
       let result = await dispatch(fetchOpenOrdersAsync(token));
-      console.log(result)
+      console.log(result);
       if (result.type === "orders/fetchOpenOrders/fulfilled") {
-        console.log(result.payload)
+        console.log(result.payload);
         if (openJobs?.length === 0) {
-          console.log(result.payload)
+          console.log(result.payload);
           setOpenJobs(result.payload.orders);
         } else {
-          console.log(result.payload)
+          console.log(result.payload);
           const uniqueOrders = result.payload.orders.filter(
             (newOrder) =>
               !openJobs.some(
@@ -493,15 +504,11 @@ const HomePageWorker = () => {
           );
 
           // Append the unique orders to pastOrders
-          setOpenJobs((prevOpenJobs) => [
-            ...prevOpenJobs,
-            ...uniqueOrders,
-          ]);
+          setOpenJobs((prevOpenJobs) => [...prevOpenJobs, ...uniqueOrders]);
         }
       }
     }
   };
-
 
   const activeOrders = () => {
     toggleTab("4");
@@ -660,7 +667,6 @@ const HomePageWorker = () => {
             </Row>
           </TabPane>
         </TabContent>
-
       </Row>
       {gotOffer ? (
         <>
@@ -685,7 +691,17 @@ const HomePageWorker = () => {
       ) : (
         <></>
       )}
-      {/* <ChatPopup /> */}
+      {startBidVerified ? (
+        <>
+          <OpenJobResult
+            confirmed={startBidStatus}
+            orderId={oId}
+            setStartBidVerified={setStartBidVerified}
+          />
+        </>
+      ) : (
+        <></>
+      )}
     </Container>
   );
 };
