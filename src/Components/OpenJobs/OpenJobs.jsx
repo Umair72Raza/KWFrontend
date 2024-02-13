@@ -172,26 +172,17 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         icon: "error",
       });
     }
-   // setGlobalStartButtonDisabled(true);
-    // setStartButtonDisabledMap((prevMap) => ({
-    //   ...prevMap,
-    //   [order._id]: true,
-    // }));
+    
+    const worker = {
+      workerId: user._id,
+      workerfirstName: user.firstName,
+      workerlastName: user.lastName,}
 
     const data = {
       order,
       Uid,
-      workerId: user._id
+      worker
     };
-
-    // setTimeout(() => {
-    //   setGlobalStartButtonDisabled(false);
-    //   setStartButtonDisabledMap((prevMap) => ({
-    //     ...prevMap,
-    //     [order._id]: false,
-    //   }));
-    // }, 60000); // 1 minute
-
     socket.emit("startBid-accept-reject", data);
     Swal.fire({
       title: "Accept Job request sent!",
@@ -334,9 +325,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                     </CardText>
                     <CardText className="d-flex justify-content-around align-items-center">
                       <Button
-                        onClick={() =>
-                          sendBid(order, order?.user?._id)
-                        }
+                        onClick={() => sendBid(order, order?.user?._id)}
                         color="success"
                       >
                         Accept

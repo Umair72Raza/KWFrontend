@@ -3,7 +3,7 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT,
 });
 
-export const fetchOrders = async (data) => {
+export const fetchPastOrders = async (data) => {
   try {
     const { users, status, token } = data;
     const response = await API.get(
@@ -140,7 +140,6 @@ export const cancelOrder = async (dataWithToken) => {
 export const activateOrder = async (data) => {
   try {
     const { orderId, token } = data;
-    console.log(orderId, "orderId");
     const data1 = { orderId };
     const response = await API.put("order/activateStatus", data1, {
       headers: {
@@ -154,6 +153,27 @@ export const activateOrder = async (data) => {
     throw error.response.data;
   }
 };
+
+//schedulizeOrder.
+
+
+export const schedulizeOrder = async (data) => {
+  try {
+    const { orderId, token, workerId } = data;
+    const data1 = { orderId, workerId };
+    const response = await API.put("order/schedulizeOrder", data1, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const changeToPast = async (data) => {
   try {
     const { orderId, token } = data;

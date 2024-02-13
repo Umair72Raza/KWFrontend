@@ -62,14 +62,13 @@ const OfferResult = () => {
       const data = params;
       const formData = new FormData();
       for (const key in data) {
-        if (
-          data.hasOwnProperty(key) &&
-          key != "users" &&
-          key != "Status" &&
-          key != "service" &&
-          key != "location"
-        ) {
-          formData.append(key, data[key]);
+        if (data.hasOwnProperty(key) && key !== "service" && key !== "location") {
+          if (key === "users") {
+            // Append only the first user._id to formData
+            formData.append("users[]", data[key][0]);
+          } else {
+            formData.append(key, data[key]);
+          }
         }
       }
                     // Append location coordinates to FormData
@@ -108,7 +107,7 @@ const OfferResult = () => {
     if (newOrder !== null && newOrder.Status !== "Pending") {
       const data = { newOrder: newOrder, Uid: newOrder?.users[1]?._id };
       if (newOrder.Status === "Scheduled") {
-        console.log("I ran");
+        console.log("I ran",data);
         socket?.emit("new-order-created", data);
       } else if (newOrder.Status === "Posted") {
       }

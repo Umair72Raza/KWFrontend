@@ -348,7 +348,7 @@ const ScheduledOrdersCardWorker = ({
                       </CardText>
                       <CardText>
                         <b>Order By:</b>{" "}
-                        {order.users.length > 0 && order?.users[0]?.firstName}
+                        {order?.users?.length > 0 && order?.users[0]?.firstName}
                       </CardText>
                       <CardText>
                         <b>Address: </b>
