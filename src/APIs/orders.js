@@ -212,7 +212,7 @@ export const checkStatus = async (data) => {
   try {
     const { id, token } = data;
     console.log(id,token, "id n token")
-    const response = await API.delete(`order/checkOrderStatus/${id}`,{
+    const response = await API.get(`order/checkOrderStatus/${id}`,{
       headers: {
         Authorization: `Bearer ${token}`,
       },

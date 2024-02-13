@@ -17,7 +17,10 @@ import { PopUpState } from "../../Context/PopUpProvider";
 import { useDispatch, useSelector } from "react-redux";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { fetchOpenOrdersAsync } from "../../Redux/Slices/OrderSlice";
+import {
+  checkTheStatusAsync,
+  fetchOpenOrdersAsync,
+} from "../../Redux/Slices/OrderSlice";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const {
@@ -33,14 +36,9 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     setAvailableJobOffer,
   } = ChatState();
 
-  const {
-    openJobs,
-    setOpenJobs,
-  } = PopUpState();
-  const dispatch = useDispatch(); 
-  const {
-    token
-  } = useSelector((state) => state.auth);
+  const { openJobs, setOpenJobs } = PopUpState();
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
   const { setFromAvailableJobs } = PopUpState();
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
@@ -175,8 +173,20 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
 
   const sendBid = async (order, Uid) => {
     //  emit socket event to show Worker wants to start the job modal.
+    const creds = { id: order._id, token: token };
+    const result = await dispatch(checkTheStatusAsync(creds));
+    if (result.type === "orders/checkStatus/fulfilled") {
+      if (result.payload.message != "true") {
+        const filteredOpenJobs = openJobs.filter(
+          (order) => order._id !== orderIdToRemove
+        );
 
-    // const checkingOrderStatusAsync 
+        // Update state with the filtered openJobs array
+        setOpenJobs(filteredOpenJobs);
+        Swal.fire(result.payload.message);
+        return;
+      }
+    }
 
     if (user.status !== "online") {
       return Swal.fire({
@@ -188,12 +198,13 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     const worker = {
       workerId: user._id,
       workerfirstName: user.firstName,
-      workerlastName: user.lastName,}
+      workerlastName: user.lastName,
+    };
 
     const data = {
       order,
       Uid,
-      worker
+      worker,
     };
     socket.emit("startBid-accept-reject", data);
     Swal.fire({
@@ -202,8 +213,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     });
   };
 
-
-  const handleRefresh =  async () => {
+  const handleRefresh = async () => {
     let result = await dispatch(fetchOpenOrdersAsync(token));
     console.log(result);
     if (result.type === "orders/fetchOpenOrders/fulfilled") {
@@ -224,7 +234,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         setOpenJobs((prevOpenJobs) => [...prevOpenJobs, ...uniqueOrders]);
       }
     }
-  }
+  };
 
   return (
     <Container>
@@ -234,11 +244,20 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         </div>
       ) : (
         <>
-           <Button className=" fw-bold" color="primary" onClick={handleRefresh} style={{width:"100px"}}>Refresh Jobs</Button>
+          <Button
+            className=" fw-bold"
+            color="primary"
+            onClick={handleRefresh}
+            style={{ width: "100px" }}
+          >
+            Refresh Jobs
+          </Button>
           <Row>
-         
-      
-         {scheduledOrdersObject?.length === 0 && (<div className="w-100 vh-100 d-flex justify-content-center mt-5"><h4>No Open Jobs!</h4></div>)}
+            {scheduledOrdersObject?.length === 0 && (
+              <div className="w-100 vh-100 d-flex justify-content-center mt-5">
+                <h4>No Open Jobs!</h4>
+              </div>
+            )}
             {scheduledOrdersObject?.map((order, index) => (
               <Col
                 key={index}
