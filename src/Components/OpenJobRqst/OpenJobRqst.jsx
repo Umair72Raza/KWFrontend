@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { PopUpState } from "../../Context/PopUpProvider";
 import {  schedulizeOrderAsync } from "../../Redux/Slices/OrderSlice";
+import { set } from "lodash";
 
 const OpenJobRqst = () => {
     const dispatch = useDispatch();
@@ -32,6 +33,9 @@ const OpenJobRqst = () => {
       setFinalizeButtonLabel("Yes");
       setCancelButtonLabel("Cancel");
       toggleModal();
+      setTimeout(() => {  
+        setIsModalOpen(false);
+      }, 120000);
     });
     return () => {
       socket?.off("startBid-request");

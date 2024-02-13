@@ -218,6 +218,9 @@ const HomePageWorker = () => {
   useEffect(() => {
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
+      Corder.cancelReason={
+        reason:data.reason
+      }
       let reason = data.reason;
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {

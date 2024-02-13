@@ -30,7 +30,9 @@ function App() {
     socket?.on("order-canceled", (data) => {
       const Corder = data.order;
       let reason = data.reason;
-
+Corder.cancelReason={
+  reason:reason
+}
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {
         reason = "Reason not mentioned";

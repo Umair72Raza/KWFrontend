@@ -240,7 +240,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         );
 
         // Append the unique orders to pastOrders
-        setOpenJobs((prevOpenJobs) => [...prevOpenJobs, ...uniqueOrders]);
+        setOpenJobs((prevOpenJobs) => [...uniqueOrders,...prevOpenJobs ]);
       }
     }
   };
