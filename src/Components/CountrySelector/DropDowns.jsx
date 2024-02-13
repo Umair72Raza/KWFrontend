@@ -110,7 +110,7 @@ const Dropdowns = ({
               value={region}
               onChange={handleRegionChange}
               className="form-select"
-              required
+              required = {country}
               invalid={!!errors.region_state}
               disabled={
                 !country ||
@@ -160,7 +160,7 @@ const Dropdowns = ({
               value={city}
               onChange={handleCityChange}
               className="form-select"
-              required
+              required = {country && region}
               invalid={!!(region && errors.city)}
               disabled={
                 !region ||
