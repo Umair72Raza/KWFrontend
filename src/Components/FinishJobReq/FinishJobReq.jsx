@@ -95,9 +95,9 @@ const FinishJobReq = () => {
     socket.emit("finishjob-response", data);
     setFinishOrderReq(false);
   };
-    useEffect(()=>{
-    console.log("first")
-    },[finishConfirmed])
+    // useEffect(()=>{
+    // console.log("first")
+    // },[finishConfirmed])
   return (
     <>
       <Modal

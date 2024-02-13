@@ -191,11 +191,11 @@ const ActiveOrders = ({
                       {" "}
                       {isUser ? (
                         <>
-                          <b>Worker:</b> {order.users[1].firstName}{order.users[1]?.lastName}
+                          <b>Worker:</b> {order?.users[1]?.firstName} {order.users[1]?.lastName}
                         </>
                       ) : (
                         <>
-                          <b>User:</b> {order.users[0].firstName}{order.users[0]?.lastName}
+                          <b>User:</b> {order?.users[0]?.firstName} {order?.users[0]?.lastName}
                         </>
                       )}
                     </CardText>

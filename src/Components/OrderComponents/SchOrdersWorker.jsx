@@ -127,7 +127,10 @@ const ScheduledOrdersCardWorker = ({
 
   const cancelingOrder = () => {
     //dispatch cancel order
-    const order = orderToCancel;
+    const  order ={ ...orderToCancel,cancelReason:{
+      reason: cancelReason,
+    }};
+   
     const data = {
       userId: userId,
       orderId: order._id,
