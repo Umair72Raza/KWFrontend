@@ -135,7 +135,8 @@ export const validateEmail = (email, errors) => {
 export const validatePhoneNumber = (phoneNumber, errors) => {
   if (phoneNumber && !isValidPhoneNumber(phoneNumber)) {
     errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber;
-  }
+  } 
+
 };
 
 export const validateServices = (ShowServices, services, errors) => {
