@@ -46,10 +46,6 @@ const ScheduledOrdersCardWorker = ({
   const [cancelReason, setCancelReason] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [startButtonDisabledMap, setStartButtonDisabledMap] = useState({});
-  // const [globalStartButtonDisabled, setGlobalStartButtonDisabled] =
-  //   useState(false);
-
   let {
     startButtonDisabledMap,
     setStartButtonDisabledMap,
