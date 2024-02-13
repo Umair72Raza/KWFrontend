@@ -107,7 +107,18 @@ const OfferResult = () => {
     if (newOrder !== null && newOrder.Status !== "Pending") {
       const data = { newOrder: newOrder, Uid: newOrder?.users[1]?._id };
       if (newOrder.Status === "Scheduled") {
-        console.log("I ran",data);
+        if (scheduledOrders.length === 0) {
+          setScheduledOrders([newOrder]);
+          dispatch(setnewOrderValue(null));
+        } else {
+          setScheduledOrders((prevScheduledOrders) => [
+            ...prevScheduledOrders,
+            newOrder,
+          ]);
+          dispatch(setnewOrderValue(null));
+        }
+        
+
         socket?.emit("new-order-created", data);
       } else if (newOrder.Status === "Posted") {
       }
