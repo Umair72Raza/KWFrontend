@@ -112,11 +112,12 @@ const PostedJobs = ({ postedJobs }) => {
           </Col>
         </Row>
         <Container>
-          {spinnerVisible ? (
-            <div style={{ textAlign: "center" }}>
-              <Spinner />
-            </div>
-          ) : 
+          {
+          // spinnerVisible ? (
+          //   <div style={{ textAlign: "center" }}>
+          //     <Spinner />
+          //   </div>
+          // ) : 
           postedJobs?.length > 0 ? (
             <>
               <Row>
