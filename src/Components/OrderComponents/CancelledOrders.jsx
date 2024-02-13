@@ -52,9 +52,9 @@ const CancelledOrders = ({ scheduledOrdersObject, spinnerVisible }) => {
       [orderId]: !prevMap[orderId],
     }));
   };
-useEffect (() => {  
-  console.log("scheduledOrdersObject",scheduledOrdersObject)
-},[scheduledOrdersObject])
+// useEffect (() => {  
+//   console.log("scheduledOrdersObject",scheduledOrdersObject)
+// },[scheduledOrdersObject])
   return (
     <Container>
       {spinnerVisible ? (

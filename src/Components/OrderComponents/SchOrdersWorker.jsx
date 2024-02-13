@@ -233,7 +233,7 @@ const ScheduledOrdersCardWorker = ({
           </div>
         ) : scheduledOrdersObject?.length > 0 ? (
           <>
-            {console.log(scheduledOrdersObject)}
+           
             <Row>
               {scheduledOrdersObject?.map((order) => (
                 <Col

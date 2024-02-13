@@ -5,22 +5,9 @@ const API = axios.create({
 
 export const createOrder = async (formData,token) => {
   try {
-  // console.log(data.params,"data in api")
-  //   const {
-  //     Title,
-  //     Status,
-  //     users,
-  //     date,
-  //     time,
-  //     details,
-  //     amount,
-  //     service,
-  //     address,
-  //     tasktime,
-  //     images,
-  //     location,
-  //   } = data.params;
-    console.log(formData,"data in api")
+ 
+
+
     const response = await API.post(`order/postanOrder`,formData, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -35,7 +22,7 @@ export const createOrder = async (formData,token) => {
 
 export const editOrder = async(formData,token, id) => {
   try {
-      console.log(formData,"data in api")
+    
       const formDataObject = {};
       formData.forEach((value, key) => {
         formDataObject[key] = value;

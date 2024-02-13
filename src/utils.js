@@ -124,7 +124,7 @@ export const handleNameChange = (
   }
 };
 export const validateEmail = (email, errors) => {
-  console.log(email);
+ 
   if (!email || !email.includes("@") || !email.includes(".com")) {
     errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
   } else if (hasOnlyWhiteSpace(email)) {

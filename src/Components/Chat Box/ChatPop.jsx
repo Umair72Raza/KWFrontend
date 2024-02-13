@@ -239,7 +239,7 @@ const ChatPopup = () => {
   useEffect(() => {
     if (!socket) return;
     socket?.on("updatedCount", (data) => {
-      console.log(data, "  data");
+     
       // Use a callback function to update the state based on the previous state
       setUnreadMessages((prevUnreadMessages) => {
         // Check if the chat ID already exists in the unreadMessages state
@@ -371,7 +371,7 @@ const ChatPopup = () => {
     setImagesLoading(true);
 
     // Update chat-related states
-    console.log("chat", chat);
+   
     setChat(chat);
     setSelectedChatCompare(chat);
     setSelectedChat(() => SelectChat(chat));

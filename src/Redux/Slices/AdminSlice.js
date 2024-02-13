@@ -57,7 +57,6 @@ export const allServicesAsync = createAsyncThunk(
   async () => {
     try {
       const response = await getAllServicesAdmin();
-      console.log(response,"response")
       const responseString = JSON.stringify(response);
       localStorage.setItem("services", responseString);
       return response;

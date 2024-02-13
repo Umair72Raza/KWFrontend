@@ -72,7 +72,7 @@ const SignUpOtpVerify = ({ formData, setFormData }) => {
 
     try {
       const email = decodedData.email;
-      console.log(email, "email");
+  
 
       dispatch(changeEmailStatus({ email })).then((result) => {
         if (result.type === "auth/changeEmailStatus/fulfilled") {

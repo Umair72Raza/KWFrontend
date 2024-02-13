@@ -25,7 +25,7 @@ const OnOffButton = () => {
     const id = user._id;
     const data = { id, status, token };
     const result = await dispatch(toggleStatusAsync(data));
-    console.log(result)
+
     if (result.type === "/auth/toggleStatus/fulfilled") {
       setIsOn(!isOn);
     }

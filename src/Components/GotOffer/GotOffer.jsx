@@ -146,7 +146,7 @@ const GotOffer = ({ formattedOfferDetails, User, onConfirm, onCancel }) => {
         (chatUser) => formattedOfferDetails?.users[0] === chatUser?._id
       )
     );
-    console.log(copyOfChats, "isWorkerInChats");
+  
     if (!isWorkerInChats) {
       // Create a fake chat
       const fakeChat = {

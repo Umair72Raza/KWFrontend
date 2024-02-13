@@ -275,9 +275,9 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         {
-          // console.log(params,"params")
+        
           const result = await dispatch(CreateOrder({ formData, token }));
-          console.log(result);
+        
           Swal.fire({
             title: "Job Posted",
             icon: "success",

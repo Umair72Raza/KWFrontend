@@ -78,7 +78,7 @@ const Settings = () => {
       const data = { token: token };
       const result = await dispatch(getSettings(data));
       if (result?.type === "/admin/getSettings/fulfilled") {
-        console.log("Success", result?.payload);
+    
         setNotificationTimeLimit(result?.payload?.notificationsLife);
         setScheduledOrderOffset(result?.payload?.scheduleOffestTime);
         setRadius(result?.payload?.radius);
@@ -116,7 +116,7 @@ const Settings = () => {
           const resp = await dispatch(updateSettingsAsync(data));
 
           if (resp.type === "/admin/updateSettings/fulfilled") {
-            console.log(resp, "payload in the update notifications");
+    
             successToast("Notifications time limit updated successfully");
             setNotificationTimeLimit(resp.payload.notificationsLife);
             setDisableNotificationsButton(false);
@@ -162,7 +162,7 @@ const Settings = () => {
           const resp = await dispatch(updateSettingsAsync(data));
 
           if (resp.type === "/admin/updateSettings/fulfilled") {
-            console.log(resp, "payload in the update scheduled");
+          
             successToast("Scheduled orders offset updated successfully");
             setScheduledOrderOffset(resp.payload.scheduleOffestTime);
             setDisableSchOrderButton(false);
@@ -209,7 +209,7 @@ const Settings = () => {
           const resp = await dispatch(updateSettingsAsync(data));
 
           if (resp.type === "/admin/updateSettings/fulfilled") {
-            console.log(resp, "payload in the update radius");
+         
             successToast("Radius updated successfully");
             setRadius(resp.payload.radius);
             setDisableRadiusButton(false);

@@ -87,7 +87,7 @@ const PendingOrders = ({ pendingOrders }) => {
         const id = order._id;
         const data = { id: id, token: token };
         const result = await disaptch(deleteTheOrderAsync(data));
-        console.log(result?.payload, "payload");
+    
         if (result?.type === "orders/deleteOrder/fulfilled") {
           if (result.payload.message === "Order deleted") {
             Swal.fire({

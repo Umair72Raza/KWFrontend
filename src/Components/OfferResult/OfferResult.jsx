@@ -49,7 +49,6 @@ const OfferResult = () => {
         setResult(result);
         setOfferResult("false");
       } else if (result == "timeup") {
-        console.log("offer expired time up");
         setOfferResult("timeup");
       }
     });

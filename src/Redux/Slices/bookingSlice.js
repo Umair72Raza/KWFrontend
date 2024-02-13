@@ -3,7 +3,7 @@ import { createOrder, editOrder } from "../../APIs/booking";
 
 export const CreateOrder = createAsyncThunk("booking", async (data) => {
   const { formData, token } = data;
-  console.log(data, "from booking slice ");
+
   const response = await createOrder(formData, token);
   return response.newOrder;
 });
@@ -14,8 +14,7 @@ export const editOrderAsync = createAsyncThunk("editing", async (data) => {
     formDataObject[key] = value;
   });
 
-  console.log(formDataObject, "formData in thunk");
-  console.log(data, "from booking slice ");
+ 
   const response = await editOrder(formData, token, id);
   return response.updatedOrder;
 });

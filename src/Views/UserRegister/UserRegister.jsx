@@ -350,7 +350,7 @@ const UserRegister = ({ ShowServices }) => {
             );
             navigate("/auth/login");
           }
-          console.log("Sign up successful!", formData);
+       
           // Reset form data on successful signup
           setFormData({
             firstName: "",

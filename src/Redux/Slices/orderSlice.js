@@ -84,7 +84,7 @@ export const fetchOpenOrdersAsync = createAsyncThunk(
     const userId = user._id;
     const data = { token: token, userId: userId };
     const response = await fetchOpenOrders(data);
-    console.log(response, "resp in think");
+   
     return response;
   }
 );
@@ -145,11 +145,11 @@ export const checkTheStatusAsync = createAsyncThunk(
   async (data, {rejectWithValue}) => {
     try {
       const response = await checkStatus(data);
-      console.log(response)
+  
       return response;
     } catch (error) {
       if (error) {
-        console.log(error)
+       
         return rejectWithValue(error.message);
       }
     }
