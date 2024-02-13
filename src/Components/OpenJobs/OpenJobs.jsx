@@ -14,9 +14,10 @@ import { SelectChat, truncateText } from "../../utils";
 import { FiMessageCircle } from "react-icons/fi";
 import { ChatState } from "../../Context/ChatProvider";
 import { PopUpState } from "../../Context/PopUpProvider";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { fetchOpenOrdersAsync } from "../../Redux/Slices/OrderSlice";
 
 const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const {
@@ -31,6 +32,15 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     unreadMessages,
     setAvailableJobOffer,
   } = ChatState();
+
+  const {
+    openJobs,
+    setOpenJobs,
+  } = PopUpState();
+  const dispatch = useDispatch(); 
+  const {
+    token
+  } = useSelector((state) => state.auth);
   const { setFromAvailableJobs } = PopUpState();
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
@@ -192,6 +202,30 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     });
   };
 
+
+  const handleRefresh =  async () => {
+    let result = await dispatch(fetchOpenOrdersAsync(token));
+    console.log(result);
+    if (result.type === "orders/fetchOpenOrders/fulfilled") {
+      console.log(result.payload);
+      if (openJobs?.length === 0) {
+        console.log(result.payload);
+        setOpenJobs(result.payload.orders);
+      } else {
+        console.log(result.payload);
+        const uniqueOrders = result.payload.orders.filter(
+          (newOrder) =>
+            !openJobs.some(
+              (existingOrder) => existingOrder._id === newOrder._id
+            )
+        );
+
+        // Append the unique orders to pastOrders
+        setOpenJobs((prevOpenJobs) => [...prevOpenJobs, ...uniqueOrders]);
+      }
+    }
+  }
+
   return (
     <Container>
       {spinnerVisible ? (
@@ -200,7 +234,11 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         </div>
       ) : (
         <>
+           <Button className=" fw-bold" color="primary" onClick={handleRefresh} style={{width:"100px"}}>Refresh Jobs</Button>
           <Row>
+         
+      
+         {scheduledOrdersObject?.length === 0 && (<div className="w-100 vh-100 d-flex justify-content-center mt-5"><h4>No Open Jobs!</h4></div>)}
             {scheduledOrdersObject?.map((order, index) => (
               <Col
                 key={index}

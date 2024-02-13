@@ -2,21 +2,36 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, FormGroup, Label, Input } from "reactstrap";
 import { Country, State, City } from "country-state-city";
 import { RegisterPage } from "../../Constants/Constants";
-import { set } from "lodash";
 
-const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
+const Dropdowns = ({
+  setFormData,
+  errors,
+  setErrors,
+  loading,
+  editMode,
+  formData,
+}) => {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
+  const [allCountries, setAllCountries] = useState([]);
 
+  useEffect(() => {
+    setAllCountries(Country.getAllCountries());
+  }, []);
+
+  useEffect(() => {
+    if ( formData) {
+      setCountry(formData?.country || "");
+      setRegion(formData?.region_state || "");
+      setCity(formData?.city || "");
+    }
+  }, [editMode, formData]);
 
   const handleCountryChange = (event) => {
     const selectedCountry = event.target.value;
     setFormData((prev) => ({ ...prev, country: selectedCountry }));
-    setErrors((prevErrors) => ({  
-      ...prevErrors,
-      country: "",
-    }));
+    setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
     setCountry(selectedCountry);
 
     // Reset state and city if the country has no states
@@ -28,19 +43,13 @@ const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
 
   const handleRegionChange = (event) => {
     setFormData((prev) => ({ ...prev, region_state: event.target.value }));
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      region_state: "",
-    }));
+    setErrors((prevErrors) => ({ ...prevErrors, region_state: "" }));
     setRegion(event.target.value);
   };
 
   const handleCityChange = (event) => {
     setFormData((prev) => ({ ...prev, city: event.target.value }));
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      city: "",
-    }));
+    setErrors((prevErrors) => ({ ...prevErrors, city: "" }));
     setCity(event.target.value);
   };
 
@@ -65,10 +74,22 @@ const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
               invalid={!!errors.country}
               disabled={loading}
             >
-              <option value="">Select Country</option>
-              {Country.getAllCountries().map((country) => (
-                <option key={country.isoCode} value={country.isoCode}>
-                  {country.name}
+             {!formData && (<option value="">Select Country</option>)} 
+              {formData && !country ? (
+                <option value={formData.country} selected={true}>
+                  {allCountries.find(
+                    (country) => country.isoCode === formData.country
+                  )?.name || formData.country}
+                </option>
+              ) : null}
+
+              {allCountries.map((countryObj) => (
+                <option
+                  key={countryObj.isoCode}
+                  value={countryObj.isoCode}
+                  selected={country === countryObj.isoCode}
+                >
+                  {countryObj.name}
                 </option>
               ))}
             </Input>
@@ -92,8 +113,10 @@ const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
               required
               invalid={!!errors.region_state}
               disabled={
-                !country || State.getStatesOfCountry(country).length === 0
-              || loading }
+                !country ||
+                State.getStatesOfCountry(country).length === 0 ||
+                loading
+              }
             >
               {country ? (
                 State.getStatesOfCountry(country).length > 0 ? (
@@ -105,7 +128,7 @@ const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
                       </span>
                     </option>
                     {State.getStatesOfCountry(country).map((state) => (
-                      <option key={state.isoCode} value={state.isoCode}>
+                      <option key={state.isoCode} value={state.isoCode} selected={formData?.region_state || null}>
                         {state.name}
                       </option>
                     ))}
@@ -140,8 +163,10 @@ const Dropdowns = ({ setFormData,errors,setErrors,loading }) => {
               required
               invalid={!!(region && errors.city)}
               disabled={
-                !region || City.getCitiesOfState(country, region).length === 0
-              || loading}
+                !region ||
+                City.getCitiesOfState(country, region).length === 0 ||
+                loading
+              }
             >
               {region ? (
                 City.getCitiesOfState(country, region).length > 0 ? (
