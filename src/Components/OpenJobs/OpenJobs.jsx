@@ -36,13 +36,14 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     setAvailableJobOffer,
   } = ChatState();
 
-  const { openJobs, setOpenJobs } = PopUpState();
+  const { openJobs, setOpenJobs,disableAcceptButton, setDisableAcceptButton } = PopUpState();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const { setFromAvailableJobs } = PopUpState();
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
+  
   const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
@@ -172,45 +173,53 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   };
 
   const sendBid = async (order, Uid) => {
+    setDisableAcceptButton(true);
+    setTimeout(()=>{
+      setDisableAcceptButton(false);
+    },120000)
     //  emit socket event to show Worker wants to start the job modal.
     const creds = { id: order._id, token: token };
     const result = await dispatch(checkTheStatusAsync(creds));
     if (result.type === "orders/checkStatus/fulfilled") {
-      if (result.payload.message != "true") {
+      console.log(result)
+      if (result.payload.message === "false") {
+        const orderIdToRemove = order;
         const filteredOpenJobs = openJobs.filter(
-          (order) => order._id !== orderIdToRemove
+          (order) => order !== orderIdToRemove
         );
 
         // Update state with the filtered openJobs array
         setOpenJobs(filteredOpenJobs);
-        Swal.fire(result.payload.message);
+        Swal.fire("This order is already accepted by another worker");
         return;
+      } else {
+        if (user.status !== "online") {
+          return Swal.fire({
+            title: "You are not online",
+            icon: "error",
+          });
+        }
+    
+        const worker = {
+          workerId: user._id,
+          workerfirstName: user.firstName,
+          workerlastName: user.lastName,
+        };
+    
+        const data = {
+          order,
+          Uid,
+          worker,
+        };
+        socket.emit("startBid-accept-reject", data);
+        Swal.fire({
+          title: "Accept Job request sent!",
+          icon: "success",
+        });
       }
     }
 
-    if (user.status !== "online") {
-      return Swal.fire({
-        title: "You are not online",
-        icon: "error",
-      });
-    }
-
-    const worker = {
-      workerId: user._id,
-      workerfirstName: user.firstName,
-      workerlastName: user.lastName,
-    };
-
-    const data = {
-      order,
-      Uid,
-      worker,
-    };
-    socket.emit("startBid-accept-reject", data);
-    Swal.fire({
-      title: "Accept Job request sent!",
-      icon: "success",
-    });
+   
   };
 
   const handleRefresh = async () => {
@@ -386,6 +395,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       <Button
                         onClick={() => sendBid(order, order?.user?._id)}
                         color="success"
+                        disabled={disableAcceptButton}
                       >
                         Accept
                       </Button>
