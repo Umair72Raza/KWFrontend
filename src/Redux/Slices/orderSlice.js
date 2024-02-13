@@ -13,6 +13,7 @@ import {
   deleteTheOrder,
   fetchPastOrders,
   schedulizeOrder,
+  checkStatus,
 } from "../../APIs/orders";
 
 export const getAllTheOrders = createAsyncThunk(
@@ -136,6 +137,23 @@ export const deleteTheOrderAsync = createAsyncThunk(
   async (data) => {
     const response = await deleteTheOrder(data);
     return response;
+  }
+);
+
+export const checkTheStatusAsync = createAsyncThunk(
+  "orders/checkStatus",
+  async (data, {rejectWithValue}) => {
+    try {
+      const response = await checkStatus(data);
+      console.log(response)
+      return response;
+    } catch (error) {
+      if (error) {
+        console.log(error)
+        return rejectWithValue(error.message);
+      }
+    }
+  
   }
 );
 

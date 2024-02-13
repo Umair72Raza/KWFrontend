@@ -166,13 +166,15 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const sendBid = async (order, Uid) => {
     //  emit socket event to show Worker wants to start the job modal.
 
+    // const checkingOrderStatusAsync 
+
     if (user.status !== "online") {
       return Swal.fire({
         title: "You are not online",
         icon: "error",
       });
     }
-    
+
     const worker = {
       workerId: user._id,
       workerfirstName: user.firstName,

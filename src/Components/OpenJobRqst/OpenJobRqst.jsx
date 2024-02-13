@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { PopUpState } from "../../Context/PopUpProvider";
-import { activateOrderAsync, schedulizeOrderAsync } from "../../Redux/Slices/OrderSlice";
+import {  schedulizeOrderAsync } from "../../Redux/Slices/OrderSlice";
 
 const OpenJobRqst = () => {
     const dispatch = useDispatch();

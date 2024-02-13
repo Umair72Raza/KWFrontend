@@ -207,3 +207,19 @@ export const deleteTheOrder = async (data) => {
     throw error.response.data;
   }
 };
+
+export const checkStatus = async (data) => {
+  try {
+    const { id, token } = data;
+    console.log(id,token, "id n token")
+    const response = await API.delete(`order/checkOrderStatus/${id}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response.data, "checking status")
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+}

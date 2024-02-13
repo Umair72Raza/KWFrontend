@@ -246,7 +246,7 @@ const ScheduledOrdersCardWorker = ({
                 >
                   <Card
                     className="shadow"
-                    style={{ backgroundColor: "#f6f8fc", }}
+                    style={{ backgroundColor: "#f6f8fc" }}
                   >
                     <CardBody>
                       <CardTitle>
@@ -348,7 +348,12 @@ const ScheduledOrdersCardWorker = ({
                       </CardText>
                       <CardText>
                         <b>Order By:</b>{" "}
-                        {order?.users?.length > 0 && order?.users[0]?.firstName}
+                        {order?.users?.length > 0 ? (
+                          <>
+                            {order?.users[0]?.firstName}{" "}
+                            {order?.users[0]?.lastName}
+                          </>
+                        ) : null}
                       </CardText>
                       <CardText>
                         <b>Address: </b>
@@ -435,7 +440,7 @@ const ScheduledOrdersCardWorker = ({
             Cancel
           </Button>
           <Button color="danger" onClick={cancelingOrder}>
-            Finalize 
+            Finalize
           </Button>
         </ModalFooter>
       </Modal>
