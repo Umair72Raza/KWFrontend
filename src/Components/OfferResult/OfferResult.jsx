@@ -12,7 +12,7 @@ import {
 import { truncateText } from "../../utils";
 import accpetance from "../../assets/images/OfferResultpngs/acceptance.png";
 import failure from "../../assets/images/OfferResultpngs/failure.png";
-import { CreateOrder } from "../../Redux/Slices/BookingSlice";
+import { CreateOrder, setnewOrderValue } from "../../Redux/Slices/BookingSlice";
 import { PopUpState } from "../../Context/PopUpProvider";
 import { useDispatch, useSelector } from "react-redux";
 
