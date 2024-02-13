@@ -133,10 +133,11 @@ const HomePageWorker = () => {
           return obj.params.users[0] === data.params.users[0];
         });
         if (!alreadyPresent) {
+          const timeOutForNotification = JSON.parse(localStorage.getItem("settings"));
           SetONotification([data, ...offerNotification]);
           addNotificationTimeout(
             data,
-            setTimeout(() => offerTimeUp(data.params), 1 * 60 * 1000)
+            setTimeout(() => offerTimeUp(data.params), (timeOutForNotification[0]?.notificationsLife) * 60 * 1000)
           );
         }
       } else {

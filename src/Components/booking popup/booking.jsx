@@ -53,7 +53,6 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       taskTime <= 9 &&
       serviceOption.length > 0;
 
-
     setFormComplete(isFormComplete);
   }, [
     taskTitle,
@@ -66,47 +65,40 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
 
   const handleImageChange = (e) => {
     const selectedImages = Array.from(e.target.files);
-    setTimeout(()=>{
-     setImageError("")
-    },3000)
+    setTimeout(() => {
+      setImageError("");
+    }, 3000);
 
-   // Filter images that are less than or equal to 1MB
-   const filteredImages = selectedImages.filter((image) => image.size <= 1024 * 1024);
+    // Filter images that are less than or equal to 1MB
+    const filteredImages = selectedImages.filter(
+      (image) => image.size <= 1024 * 1024
+    );
 
-   // Limit the selected images to the number needed to reach 5
-   const remainingSlots = 5 - images?.length || 0;
-   const limitedFilteredImages = filteredImages.slice(0, remainingSlots);
+    // Limit the selected images to the number needed to reach 5
+    const remainingSlots = 5 - images?.length || 0;
+    const limitedFilteredImages = filteredImages.slice(0, remainingSlots);
 
-    if( remainingSlots > 0){
+    if (remainingSlots > 0) {
       // All selected images are within the size limit, update the images state
       setImages((prevImages) => [...prevImages, ...limitedFilteredImages]);
       setImageError(""); // Clear any previous error message
-      e.target.value=null
+      e.target.value = null;
     }
-  // If there are images exceeding the size limit, set the error message
-  if (filteredImages?.length !== selectedImages?.length) {
-    setImageError("Each image must be less than 1MB.");
-    // Clear the input value
-    e.target.value = null;
-  } 
+    // If there are images exceeding the size limit, set the error message
+    if (filteredImages?.length !== selectedImages?.length) {
+      setImageError("Each image must be less than 1MB.");
+      // Clear the input value
+      e.target.value = null;
+    }
     // Check if selecting additional images exceeds the limit after adding filtered images
-    if ( selectedImages.length > 5 || images?.length + selectedImages?.length > 5) {
+    if (
+      selectedImages.length > 5 ||
+      images?.length + selectedImages?.length > 5
+    ) {
       setImageError("You can select only five images.");
       e.target.value = null; // Clear the input value
     }
   };
-  
-  
-  
-  
-  
-  
-  
-
-  useEffect(() => { 
-    console.log(images,"images")
-  }, [images]);
-
 
   const handleDateTimeChange = (e) => {
     const selectedDateTime = e.target.value;
@@ -124,53 +116,64 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const handleSend = () => {
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
-    const Users = [user._id, worker._id]
-    let status = "Scheduled"
+    const Users = [user._id, worker._id];
+    let status = "Scheduled";
     if (selectedDate > currentDate) {
       const data = {
         Title: taskTitle,
         Status: status,
-        users: [user._id, worker._id],
+        users: [user?._id, worker?._id],
         date: datePart,
         time: timePart,
         details: taskDetails.replace(/\n/g, "<br>"),
         amount: amountPerHour,
         service: serviceOption,
-        address: user.address,
-        tasktime: taskTime
-        , images,
+        address: user?.address,
+        tasktime: taskTime,
+        images,
         location: user?.location || {},
       };
       const formData = new FormData();
 
-
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key !== "service" && key!== "location") {
+        if (
+          data.hasOwnProperty(key) &&
+          key !== "service" &&
+          key !== "location" &&
+          key !== "images" &&
+          key !== "address"
+        ) {
           if (key === "users") {
             // Append only the first user._id to formData
             formData.append("users[]", data[key][0]);
-            formData.append("users[]",data[key][1])
+            formData.append("users[]", data[key][1]);
           } else {
             formData.append(key, data[key]);
           }
         }
       }
-              // Append location coordinates to FormData
-  if (user.location && user.location.coordinates) {
-    formData.append('location[type]', 'Point');
-    formData.append('location[coordinates][]', user.location.coordinates[0]);
-    formData.append('location[coordinates][]', user.location.coordinates[1]);
-  }
-
-      serviceOption.forEach((s,index)=>{
+      // Append location coordinates to FormData
+      if (user.location && user.location.coordinates) {
+        formData.append("location[type]", "Point");
+        formData.append(
+          "location[coordinates][]",
+          user.location.coordinates[0]
+        );
+        formData.append(
+          "location[coordinates][]",
+          user.location.coordinates[1]
+        );
+      }
+      formData.set("address", data?.address);
+      serviceOption.forEach((s, index) => {
         formData.append(`service`, s);
-      })
+      });
       images.forEach((image, index) => {
         formData.append(`images`, image);
       });
 
       SetParam(formData);
-      SetParams(data)
+      SetParams(data);
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         if (removedUsers) {
@@ -178,9 +181,8 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           if (present !== -1) {
             failureToast("Worker Gets Offline!");
             toggle();
-          } 
-          else {
-            resetForm()
+          } else {
+            resetForm();
             socket?.emit("newOffer", {
               params: data,
               Wid: worker._id,
@@ -197,26 +199,20 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               socket?.off("newOffer");
             };
           }
-          
         }
-        
+      } else {
+        setAmountError("Enter amount in range 5-100000");
+        setClicked(true);
       }
-      else {
 
-        setAmountError("Enter amount in range 5-100000")
-        setClicked(true)
-      }
-     
-       //setClicked(true)
-    }
-    else {
-        
+      //setClicked(true)
+    } else {
       failureToast("Time is in past! select the future time");
       setDateTime("");
-      setClicked(false)
-      setFormComplete(false)
+      setClicked(false);
+      setFormComplete(false);
     }
-    };
+  };
 
   const handlePost = async () => {
     const currentDate = new Date();
@@ -224,26 +220,30 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     const Users = [user._id];
     let status = "Posted";
     if (selectedDate > currentDate) {
-      const data = 
-        {
-          Title: taskTitle,
-          Status: status,
-          users: [user._id],
-          date: datePart,
-          time: timePart,
-          details: taskDetails.replace(/\n/g, "<br>"),
-          amount: amountPerHour,
-          service: serviceOption,
-          address: user.address,
-          tasktime: taskTime,
-          images,
-          // location: user?.location || {},
-        
+      const data = {
+        Title: taskTitle,
+        Status: status,
+        users: [user._id],
+        date: datePart,
+        time: timePart,
+        details: taskDetails.replace(/\n/g, "<br>"),
+        amount: amountPerHour,
+        service: serviceOption,
+        address: user.address,
+        tasktime: taskTime,
+        images,
+        // location: user?.location || {},
       };
       const formData = new FormData();
 
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key !== "service" && key !== "location") {
+        if (
+          data.hasOwnProperty(key) &&
+          key !== "service" &&
+          key !== "location" &&
+          key !== "images" &&
+          key !== "address"
+        ) {
           if (key === "users") {
             // Append only the first user._id to formData
             formData.append("users[]", data[key][0]);
@@ -253,13 +253,19 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         }
       }
 
-        // Append location coordinates to FormData
-  if (user.location && user.location.coordinates) {
-    formData.append('location[type]', 'Point');
-    formData.append('location[coordinates][]', user.location.coordinates[0]);
-    formData.append('location[coordinates][]', user.location.coordinates[1]);
-  }
-
+      // Append location coordinates to FormData
+      if (user.location && user.location.coordinates) {
+        formData.append("location[type]", "Point");
+        formData.append(
+          "location[coordinates][]",
+          user.location.coordinates[0]
+        );
+        formData.append(
+          "location[coordinates][]",
+          user.location.coordinates[1]
+        );
+      }
+      formData.set("address", data?.address);
       serviceOption.forEach((s, index) => {
         formData.append(`service`, s);
       });
@@ -270,7 +276,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         {
           // console.log(params,"params")
-          const result = await dispatch(CreateOrder({formData,token}));
+          const result = await dispatch(CreateOrder({ formData, token }));
           console.log(result);
           Swal.fire({
             title: "Job Posted",
@@ -326,7 +332,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     }
   }, [clear]);
   const resetForm = () => {
-    if(images?.length>0){
+    if (images?.length > 0) {
       document.getElementById("OfferImages").value = null;
     }
     setTaskTitle("");
@@ -605,7 +611,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               {BookingConstants.Labels.images}
             </Label>
             <Input
-            id="OfferImages"
+              id="OfferImages"
               type="file"
               accept="image/*"
               onChange={handleImageChange}

@@ -22,7 +22,15 @@ const OfferResult = () => {
   const [offerResult, setOfferResult] = useState("");
   const [result, setResult] = useState("");
   const { user, token } = useSelector((state) => state.auth);
-  let { params, clear, setClear, param, SetParam, scheduledOrders, setScheduledOrders } = PopUpState();
+  let {
+    params,
+    clear,
+    setClear,
+    param,
+    SetParam,
+    scheduledOrders,
+    setScheduledOrders,
+  } = PopUpState();
   const { newOrder } = useSelector((state) => state.booking);
 
   const socket = useSelector((state) => state?.socket?.socket);
@@ -62,7 +70,13 @@ const OfferResult = () => {
       const data = params;
       const formData = new FormData();
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key !== "service" && key !== "location") {
+        if (
+          data.hasOwnProperty(key) &&
+          key !== "service" &&
+          key !== "location" &&
+          key !== "images" &&
+          key !== "address"
+        ) {
           if (key === "users") {
             // Append only the first user._id to formData
             formData.append("users[]", data[key][0]);
@@ -71,13 +85,21 @@ const OfferResult = () => {
           }
         }
       }
-                    // Append location coordinates to FormData
-  if (user.location && user.location.coordinates) {
-    formData.append('location[type]', 'Point');
-    formData.append('location[coordinates][]', user.location.coordinates[0]);
-    formData.append('location[coordinates][]', user.location.coordinates[1]);
-  }
-  formData.set('Status', 'Pending');
+      // Append location coordinates to FormData
+      if (user.location && user.location.coordinates) {
+        formData.append("location[type]", "Point");
+        formData.append(
+          "location[coordinates][]",
+          user.location.coordinates[0]
+        );
+        formData.append(
+          "location[coordinates][]",
+          user.location.coordinates[1]
+        );
+      }
+
+      formData.set("address",data?.address)
+      formData.set("Status", "Pending");
       data?.images?.forEach((image, index) => {
         formData.append(`images`, image);
       });
@@ -117,7 +139,6 @@ const OfferResult = () => {
           ]);
           dispatch(setnewOrderValue(null));
         }
-        
 
         socket?.emit("new-order-created", data);
       } else if (newOrder.Status === "Posted") {

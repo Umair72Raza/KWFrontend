@@ -23,6 +23,7 @@ export const loginAsync = createAsyncThunk(
       const response = await loginUser(email, password);
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("settings",JSON.stringify(response.settings));
       const result = response;
       return result;
     } catch (error) {
