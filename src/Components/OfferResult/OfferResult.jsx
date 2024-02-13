@@ -22,7 +22,7 @@ const OfferResult = () => {
   const [offerResult, setOfferResult] = useState("");
   const [result, setResult] = useState("");
   const { user, token } = useSelector((state) => state.auth);
-  let { params, clear, setClear, param, SetParam } = PopUpState();
+  let { params, clear, setClear, param, SetParam, scheduledOrders, setScheduledOrders } = PopUpState();
   const { newOrder } = useSelector((state) => state.booking);
 
   const socket = useSelector((state) => state?.socket?.socket);
@@ -107,7 +107,7 @@ const OfferResult = () => {
     if (newOrder !== null && newOrder.Status !== "Pending") {
       const data = { newOrder: newOrder, Uid: newOrder?.users[1]?._id };
       if (newOrder.Status === "Scheduled") {
-        if (scheduledOrders.length === 0) {
+        if (scheduledOrders?.length === 0) {
           setScheduledOrders([newOrder]);
           dispatch(setnewOrderValue(null));
         } else {
