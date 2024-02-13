@@ -9,7 +9,7 @@ export const fetchUsersDataAsync = createAsyncThunk(
     try {
       const { id, token } = credentials;
       const response = await getUsersData(id, token);
-      console.log(response,"repon")
+  
       return response;
     } catch (error) {
       console.log(error, "error getting userData");
@@ -27,7 +27,7 @@ export const updateProfileAsync = createAsyncThunk(
       // const user = JSON.parse(localStorage.getItem("user"));
       // user.firstName = response.data;
       localStorage.setItem("user", JSON.stringify(response));
-      console.log(response,"response")
+  
       
       return response;
     } catch (error) {
@@ -57,7 +57,7 @@ export const updatePfpAsync = createAsyncThunk(
   "/setnewpfp",
   async (data, { rejectWithValue }) => {
     try {
-      //console.log("Data in thunk:", [...data.entries()]);
+     
       const { email, profilePicture } = data;
       const result = await updatePfp(email, profilePicture);
       return result;

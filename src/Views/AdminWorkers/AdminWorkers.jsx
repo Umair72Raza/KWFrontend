@@ -122,20 +122,18 @@ const AdminWorkers = () => {
 
   useEffect(() => {
     const disableOtherPopUps = () => {
-      console.log("Entering disableOtherPopUps");
+    
 
       if (showBlock) {
-        console.log(
-          "Closing other pop-ups: showDetailsCard, showFeedbacksState"
-        );
+   
         setShowDetailsCard(false);
         setShowFeedbacksState(false);
       } else if (showDetailsCard) {
-        console.log("Closing other pop-ups: showBlock, showFeedbacksState");
+       
         setShowBlock(false);
         setShowFeedbacksState(false);
       } else if (showFeedbacksState) {
-        console.log("Closing other pop-ups: showBlock, showDetailsCard");
+      
         setShowBlock(false);
         setShowDetailsCard(false);
       }

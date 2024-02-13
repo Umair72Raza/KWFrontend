@@ -38,8 +38,6 @@ const homepageSlice = createSlice({
         let worker=action.payload
         state.removeWorker = worker?.filter((u) => u.status == "offline");
         state.workers=worker?.filter((u)=> u.status == "online")
-        console.log(state.workers)
-        console.log(state.removeWorker)
       })
       .addCase(getAllWorker.rejected, (state, action) => {
         state.Status = "failed";

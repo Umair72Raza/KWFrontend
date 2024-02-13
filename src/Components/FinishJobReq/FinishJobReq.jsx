@@ -69,7 +69,7 @@ const FinishJobReq = () => {
       setActiveOrder((prevActiveOrders) =>
         prevActiveOrders.filter((activeOrder) => activeOrder._id !== fOrder._id)
       );
-      console.log(finishConfirmed,finishOrderReq,fOrder,"details in the popup")
+    
       setFinishConfirmed(true);
       //setFinishOrderReq(false)
       //globalize the past orders
@@ -91,7 +91,7 @@ const FinishJobReq = () => {
       order: fOrder,
       result: "false",
     };
-    console.log(fOrder, "order in cancel");
+
     socket.emit("finishjob-response", data);
     setFinishOrderReq(false);
   };

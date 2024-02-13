@@ -52,7 +52,7 @@ const ForgetPassword = () => {
       if (otpResp.type === "auth/requestOTPAsync/fulfilled") {
         if(otpResp.payload.data && otpResp.payload.status)
         {
-          console.log(otpResp.payload,"payload in forget password")
+          
           navigate("/auth/newpassword", { state: { email: email } });
           successToast("OTP sent successfully!");
         }

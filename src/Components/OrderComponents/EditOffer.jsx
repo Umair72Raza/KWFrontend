@@ -73,7 +73,7 @@ const EditOffer = ({ modal, toggle, order }) => {
       setTaskTime(1);
       setImages(order.images);
       setOrderId(order._id);
-      console.log(order.service);
+      
     }
   }, [order]);
 
@@ -88,7 +88,7 @@ const EditOffer = ({ modal, toggle, order }) => {
       taskTime <= 9 &&
       serviceOption.length > 0;
 
-    // console.log("Form Complete:", isFormComplete);
+  
     setFormComplete(isFormComplete);
   }, [
     taskTitle,
@@ -206,7 +206,7 @@ const EditOffer = ({ modal, toggle, order }) => {
               const data = { formData, token, id: orderId };
               const result = await dispatch(editOrderAsync(data));
     
-              console.log(result?.payload, "payload");
+            
               if (result.payload) {
                 if (order.Status === "Posted") {
                   setPostedJobs(

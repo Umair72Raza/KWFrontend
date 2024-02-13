@@ -133,10 +133,11 @@ const HomePageWorker = () => {
           return obj.params.users[0] === data.params.users[0];
         });
         if (!alreadyPresent) {
+          const timeOutForNotification = JSON.parse(localStorage.getItem("settings"));
           SetONotification([data, ...offerNotification]);
           addNotificationTimeout(
             data,
-            setTimeout(() => offerTimeUp(data.params), 1 * 60 * 1000)
+            setTimeout(() => offerTimeUp(data.params), (timeOutForNotification[0]?.notificationsLife) * 60 * 1000)
           );
         }
       } else {
@@ -156,8 +157,7 @@ const HomePageWorker = () => {
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
-        console.log(scheduledOrders, "all scheduled orders");
-        console.log(data.order, "order in start job data");
+
         setOid(data?.order?.Title);
         setScheduledOrders((prevScheduledOrders) =>
           prevScheduledOrders.filter(
@@ -187,14 +187,8 @@ const HomePageWorker = () => {
       if (data.result === "true") {
         setBidJobStatus("true");
         setStartBidVerified(true);
-        console.log(data.order, "order in start bid data");
-        //setOid(data?.order?.Title);
-
-        // setScheduledOrders((prevScheduledOrders) =>
-        //   prevScheduledOrders.filter(
-        //     (scheduledOrder) => scheduledOrder._id !== data.order._id
-        //   )
-        // );
+      
+  
         setOpenJobs((prevOpenJobs) =>
           prevOpenJobs.filter((openJob) => openJob._id !== data.order._id)
         );
@@ -202,7 +196,7 @@ const HomePageWorker = () => {
           ...prevScheduledOrders,
           data.order,
         ]);
-        // setActiveOrder((prevActiveOrders) => [...prevActiveOrders, data.order]);
+       
       } else if (data.result == "false") {
         setStartBidVerified(true);
         setBidJobStatus("false");
@@ -288,7 +282,7 @@ const HomePageWorker = () => {
       setNotificationTimeouts((prevTimeouts) =>
         prevTimeouts.filter((_, i) => i !== index)
       );
-      console.log(index, "offer expire deleted");
+   
     }
     socket?.emit("accept-reject", {
       result: "accept",
@@ -309,7 +303,7 @@ const HomePageWorker = () => {
       setNotificationTimeouts((prevTimeouts) =>
         prevTimeouts.filter((_, i) => i !== index)
       );
-      console.log(index, "offer expire deleted");
+    
     }
     socket?.emit("accept-reject", {
       result: "cancel",
@@ -331,7 +325,7 @@ const HomePageWorker = () => {
 
       // Handling incoming chat notifications from the server
       socket?.on("chat-notifications", (chatNotifications) => {
-        // console.log(chatNotifications);
+      
         const newUnreadMessages = {};
 
         // Update the unread message count state for each chat
@@ -488,14 +482,14 @@ const HomePageWorker = () => {
     if (openJobsClicked === false) {
       setOpenJobsClicked(true);
       let result = await dispatch(fetchOpenOrdersAsync(token));
-      console.log(result);
+   
       if (result.type === "orders/fetchOpenOrders/fulfilled") {
-        console.log(result.payload);
+    
         if (openJobs?.length === 0) {
-          console.log(result.payload);
+      
           setOpenJobs(result.payload.orders);
         } else {
-          console.log(result.payload);
+   
           const uniqueOrders = result.payload.orders.filter(
             (newOrder) =>
               !openJobs.some(

@@ -71,7 +71,6 @@ export const fetchPostedOrders = async (data) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data, "resp in api");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -87,7 +86,6 @@ export const fetchOpenOrders = async (data) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response, "reponse in api");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -177,7 +175,7 @@ export const schedulizeOrder = async (data) => {
 export const changeToPast = async (data) => {
   try {
     const { orderId, token } = data;
-    console.log(orderId);
+  
     const data1 = { orderId };
     const response = await API.put("order/changeToPast", data1, {
       headers: {
@@ -195,13 +193,13 @@ export const changeToPast = async (data) => {
 export const deleteTheOrder = async (data) => {
   try {
     const { id, token } = data;
-    console.log(id,token, "id n token")
+  
     const response = await API.delete(`order/deleteOrder/${id}`,{
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data)
+  
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -211,13 +209,13 @@ export const deleteTheOrder = async (data) => {
 export const checkStatus = async (data) => {
   try {
     const { id, token } = data;
-    console.log(id,token, "id n token")
+  
     const response = await API.get(`order/checkOrderStatus/${id}`,{
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response.data, "checking status")
+  
     return response.data;
   } catch (error) {
     throw error.response.data;
