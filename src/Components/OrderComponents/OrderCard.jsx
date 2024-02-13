@@ -41,7 +41,8 @@ const OrderCard = ({
     orderToCancel,
     setOrderToCancel,
     finalizeFunction,
-    setFinalizeFunction,scheduledOrders
+    setFinalizeFunction,
+    scheduledOrders,
   } = PopUpState();
 
   const toggleDetails = (orderId) => {
@@ -88,8 +89,13 @@ const OrderCard = ({
 
   const cancelingOrder = () => {
     //dispatch cancel order
- 
-    const order = orderToCancel;
+
+    const order = {
+      ...orderToCancel,
+      cancelReason: {
+        reason: cancelReason,
+      },
+    };
     const data = {
       userId: userId,
       orderId: order._id,
@@ -101,7 +107,6 @@ const OrderCard = ({
       reason: modalInputValue,
       order: order,
     };
-  
 
     const cancelOrderSocketEvent = () => {
       if (!socket) return;
@@ -211,9 +216,15 @@ const OrderCard = ({
                           </div>
                         </Col>
                       </CardText>
-                      <CardText><b>Time:</b> {order.time}</CardText>
-                      <CardText><b>Date:</b> {order.date}</CardText>
-                      <CardText><b>Amount:</b> ${order.amount}</CardText>
+                      <CardText>
+                        <b>Time:</b> {order.time}
+                      </CardText>
+                      <CardText>
+                        <b>Date:</b> {order.date}
+                      </CardText>
+                      <CardText>
+                        <b>Amount:</b> ${order.amount}
+                      </CardText>
                       <CardText>
                         <b>Details:</b>{" "}
                         <div
@@ -248,13 +259,13 @@ const OrderCard = ({
                       <CardText>
                         <b>Worker:</b>{" "}
                         <CardText>
-                        {order?.users?.length > 0 ? (
-                          <>
-                            {order?.users[1]?.firstName}{" "}
-                            {order?.users[1]?.lastName}
-                          </>
-                        ) : null}
-                      </CardText>
+                          {order?.users?.length > 0 ? (
+                            <>
+                              {order?.users[1]?.firstName}{" "}
+                              {order?.users[1]?.lastName}
+                            </>
+                          ) : null}
+                        </CardText>
                       </CardText>
                       <Row>
                         <Col></Col>
