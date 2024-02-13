@@ -77,13 +77,13 @@ const OfferResult = () => {
     formData.append('location[coordinates][]', user.location.coordinates[0]);
     formData.append('location[coordinates][]', user.location.coordinates[1]);
   }
-  formData?.append(`Status`, "Pending");
+  formData.set('Status', 'Pending');
       data?.images?.forEach((image, index) => {
         formData.append(`images`, image);
       });
-      data.users.forEach((u, index) => {
-        formData.append(`users`, u);
-      });
+      // data.users.forEach((u, index) => {
+      //   formData.append(`users`, u);
+      // });
       data.service.forEach((s, index) => {
         formData.append(`service`, s);
       });
