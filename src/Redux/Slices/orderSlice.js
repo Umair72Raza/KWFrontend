@@ -2,8 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   activateOrder,
   cancelOrder,
-  fetchCancOrders,
-  fetchOrders,
+  fetchCancOrders, 
   fetchSchOrders,
   changeToPast,
   fetchAllOrders,
@@ -12,6 +11,8 @@ import {
   fetchOpenOrders,
   fetchPostedOrders,
   deleteTheOrder,
+  fetchPastOrders,
+  schedulizeOrder,
 } from "../../APIs/orders";
 
 export const getAllTheOrders = createAsyncThunk(
@@ -39,7 +40,7 @@ export const fetchPastOrdersAsync = createAsyncThunk(
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user._id;
     const data = { token: token, users: userId, status: "Past" };
-    const response = await fetchOrders(data);
+    const response = await fetchPastOrders(data);
     return response;
   }
 );
@@ -114,6 +115,14 @@ export const activateOrderAsync = createAsyncThunk(
   }
 );
 
+export const schedulizeOrderAsync = createAsyncThunk(
+  "orders/schedulizeOrder",
+  async (data) => {
+    const response = await schedulizeOrder(data);
+    return response;
+  }
+);
+
 export const changeStatusToPastAsync = createAsyncThunk(
   "orders/changeToPastOrders",
   async (data) => {
@@ -142,6 +151,7 @@ const orderSlice = createSlice({
     orderActivated: false,
     openOrders: null,
     deletedOrder: null,
+    schedulizedOrder: null,
     data: null,
     error: null,
     status: null,
@@ -157,6 +167,20 @@ const orderSlice = createSlice({
       })
       .addCase(fetchScheduledOrdersAsync.rejected, (state, action) => {
         state.scheduledOrders = {
+          data: null,
+          status: "failed",
+          error: action.error.message,
+        };
+      })
+      .addCase(schedulizeOrderAsync.pending, (state) => {
+        state.schedulizedOrder = { data: null, status: "loading" };
+      })
+      .addCase(schedulizeOrderAsync.fulfilled, (state, action) => {
+        state.schedulizedOrder = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(schedulizeOrderAsync.rejected, (state, action) => {
+        state.schedulizedOrder = {
           data: null,
           status: "failed",
           error: action.error.message,

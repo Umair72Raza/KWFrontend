@@ -130,7 +130,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       const data = {
         Title: taskTitle,
         Status: status,
-        users: Users,
+        users: [user._id, worker._id],
         date: datePart,
         time: timePart,
         details: taskDetails.replace(/\n/g, "<br>"),
@@ -145,13 +145,14 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
 
 
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key != 'users'&&key!='service' && key != "location") {
-          formData.append(key, data[key]);
-        }
-        else {
-          Users.forEach((u, index) => {
-            formData.append(`users`, u);
-          })
+        if (data.hasOwnProperty(key) && key !== "service" && key!== "location") {
+          if (key === "users") {
+            // Append only the first user._id to formData
+            formData.append("users[]", data[key][0]);
+            formData.append("users[]",data[key][1])
+          } else {
+            formData.append(key, data[key]);
+          }
         }
       }
               // Append location coordinates to FormData
@@ -227,7 +228,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         {
           Title: taskTitle,
           Status: status,
-          users: Users,
+          users: [user._id],
           date: datePart,
           time: timePart,
           details: taskDetails.replace(/\n/g, "<br>"),
@@ -242,12 +243,13 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       const formData = new FormData();
 
       for (const key in data) {
-        if (data.hasOwnProperty(key) && key != "users" && key != "service" ) {
-          formData.append(key, data[key]);
-        } else {
-          Users.forEach((u, index) => {
-            formData.append(`users`, u);
-          });
+        if (data.hasOwnProperty(key) && key !== "service" && key !== "location") {
+          if (key === "users") {
+            // Append only the first user._id to formData
+            formData.append("users[]", data[key][0]);
+          } else {
+            formData.append(key, data[key]);
+          }
         }
       }
 
