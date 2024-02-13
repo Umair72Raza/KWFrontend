@@ -6,7 +6,7 @@ import {  schedulizeOrderAsync } from "../../Redux/Slices/OrderSlice";
 
 const OpenJobRqst = () => {
     const dispatch = useDispatch();
-  const { openJobs, setOpenJobs, postedJobs, setPostedJobs } = PopUpState();
+  const { openJobs, setOpenJobs, postedJobs, setPostedJobs, setScheduledOrders } = PopUpState();
   const {token} = useSelector((state)=>state.auth);
   const [modalHeader, setModalHeader] = useState("");
   const [isFinalize, setIsFinalize] = useState(false);

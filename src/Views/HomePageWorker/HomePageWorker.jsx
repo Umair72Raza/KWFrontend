@@ -93,6 +93,7 @@ const HomePageWorker = () => {
     setGlobalStartButtonDisabled,
     openJobs,
     setOpenJobs,
+    setDisableAcceptButton,
   } = PopUpState();
 
   const offerTimeUp = (data) => {
@@ -182,6 +183,7 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("startBid-result", (data) => {
+      setDisableAcceptButton(false);
       if (data.result === "true") {
         setBidJobStatus("true");
         setStartBidVerified(true);
