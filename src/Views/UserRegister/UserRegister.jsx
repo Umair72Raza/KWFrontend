@@ -321,6 +321,10 @@ const UserRegister = ({ ShowServices }) => {
       errors.profilePicture = "Profile picture is required";
     }
 
+    if(hasOnlyWhiteSpace(formData.phoneNumber)) {
+      errors.phone = RegisterPage.ERROR_MESSAGES.emptyPhone;
+    }
+
     return errors;
   };
 
