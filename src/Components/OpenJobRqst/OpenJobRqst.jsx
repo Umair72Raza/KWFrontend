@@ -3,10 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { PopUpState } from "../../Context/PopUpProvider";
 import {  schedulizeOrderAsync } from "../../Redux/Slices/OrderSlice";
+import { set } from "lodash";
 
 const OpenJobRqst = () => {
     const dispatch = useDispatch();
-  const { openJobs, setOpenJobs, postedJobs, setPostedJobs } = PopUpState();
+  const { openJobs, setOpenJobs, postedJobs, setPostedJobs,setScheduledOrders } = PopUpState();
   const {token} = useSelector((state)=>state.auth);
   const [modalHeader, setModalHeader] = useState("");
   const [isFinalize, setIsFinalize] = useState(false);
@@ -32,6 +33,9 @@ const OpenJobRqst = () => {
       setFinalizeButtonLabel("Yes");
       setCancelButtonLabel("Cancel");
       toggleModal();
+      setTimeout(() => {  
+        setIsModalOpen(false);
+      }, 120000);
     });
     return () => {
       socket?.off("startBid-request");
