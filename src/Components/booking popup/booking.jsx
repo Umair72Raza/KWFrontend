@@ -18,6 +18,7 @@ import { failureToast } from "../../utils.js";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { MdCancelPresentation } from "react-icons/md";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
+import { set } from "lodash";
 
 const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -41,6 +42,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const [clicked, setClicked] = useState(true);
   const [imageError, setImageError] = useState("");
   const [images, setImages] = useState([]);
+  const [postButtonDisabled, setPostButtonDisabled] = useState(false);
 
   useEffect(() => {
     const isFormComplete =
@@ -215,6 +217,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   };
 
   const handlePost = async () => {
+    setPostButtonDisabled(true);
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
     const Users = [user._id];
@@ -276,7 +279,11 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         {
           const result = await dispatch(CreateOrder({ formData, token }));
+           if (result?.type?.includes("fulfilled")){
+            setPostButtonDisabled(false);
+            }
 
+        
           Swal.fire({
             title: "Job Posted",
             icon: "success",
@@ -660,7 +667,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
             <>
               <Button
                 color="primary"
-                disabled={!formComplete}
+                disabled={!formComplete || postButtonDisabled}
                 onClick={() => {
                   setClicked(false);
                   handlePost();
