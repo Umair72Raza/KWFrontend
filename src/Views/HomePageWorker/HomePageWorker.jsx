@@ -137,7 +137,10 @@ const HomePageWorker = () => {
           SetONotification([data, ...offerNotification]);
           addNotificationTimeout(
             data,
-            setTimeout(() => offerTimeUp(data.params), (timeOutForNotification[0]?.notificationsLife) * 60 * 1000)
+            setTimeout(() =>{ offerTimeUp(data.params)
+            SetONotification(()=>offerNotification.filter((obj) => obj !== data))
+            }
+            , (timeOutForNotification[0]?.notificationsLife) * 60 * 1000)
           );
         }
       } else {
