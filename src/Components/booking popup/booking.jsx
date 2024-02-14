@@ -232,7 +232,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         address: null,
         tasktime: taskTime,
         images,
-        location: {},
+         location:  {},
       };
       const formData = new FormData();
 

@@ -93,7 +93,7 @@ const OrderCard = ({
     const order = {
       ...orderToCancel,
       cancelReason: {
-        reason: cancelReason,
+        reason: modalInputValue,
       },
     };
     const data = {
