@@ -24,11 +24,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import { IoIosNotifications } from "react-icons/io";
-import { CgProfile  } from "react-icons/cg";
+import { CgProfile } from "react-icons/cg";
 import { CiSettings } from "react-icons/ci";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
 import Swal from "sweetalert2";
+import { PopUpState } from "../../Context/PopUpProvider";
 // import { PopUpState } from "../../Context/PopUpProvider";
 //  const {setPostedJobs} = PopUpState();
 const UserNavbar = () => {
@@ -48,6 +49,10 @@ const UserNavbar = () => {
     unreadMessages,
     setUnreadMessages,
   } = ChatState();
+  let { sidebarVisible, setSidebarVisible } = PopUpState();
+  const toggleSidebar = () => {
+    setSidebarVisible(!sidebarVisible);
+  };
   const socket = useSelector((state) => state?.socket?.socket);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -67,7 +72,6 @@ const UserNavbar = () => {
     }
   }, [unreadMessages]);
 
-
   const Logout = async () => {
     Swal.fire({
       title: "Are You Sure You Want To Log Out?",
@@ -84,7 +88,6 @@ const UserNavbar = () => {
         await socket?.disconnect();
         // setPostedJobs([]);
         if (result.type === "auth/logout/fulfilled") {
-          
           navigate("/auth/login");
         }
       }
@@ -119,7 +122,6 @@ const UserNavbar = () => {
     setShowModal(true);
   };
 
-
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
     setGotOffer(true);
@@ -135,13 +137,11 @@ const UserNavbar = () => {
     }
   };
 
-  const HandleEditSettings = () =>{
-    if(user.role==="admin"){
+  const HandleEditSettings = () => {
+    if (user.role === "admin") {
       navigate("/admin/settings");
     }
-  }
-
-
+  };
 
   const toggleOffcanvas = () => {
     SetShowOffer(!offer);
@@ -187,6 +187,11 @@ const UserNavbar = () => {
                   ) : (
                     []
                   )}
+                </NavItem>
+                <NavItem>
+                  <Button className="d-md-none" onClick={toggleSidebar}>
+                    {sidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+                  </Button>
                 </NavItem>
                 <UncontrolledDropdown
                   className=" fs-3"
@@ -320,7 +325,7 @@ const UserNavbar = () => {
               <DropdownMenu className="p-2">
                 {user.role === "admin" ? (
                   <>
-                  <DropdownItem
+                    <DropdownItem
                       className="d-flex gap-2"
                       onClick={HandleEditSettings}
                     >

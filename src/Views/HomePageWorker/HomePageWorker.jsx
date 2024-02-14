@@ -528,9 +528,9 @@ const HomePageWorker = () => {
   });
   return (
     <Container>
-      <Row>
+      {/* <Row>
         <UserNavbar />
-      </Row>
+      </Row> */}
       <Row>
         <Nav tabs style={{ cursor: "pointer" }}>
           <NavItem>

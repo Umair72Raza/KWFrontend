@@ -1,12 +1,12 @@
 .greenButton {
-  background-color: #33cc33; 
-  color: #ffffff; 
+  background-color: #33cc33;
+  color: #ffffff;
   border: 1px solid #008000;
 }
 .redButton {
-  background-color: #ff4444; 
-  color: #ffffff; 
-  border: 1px solid #cc0000; 
+  background-color: #ff4444;
+  color: #ffffff;
+  border: 1px solid #cc0000;
 }
 .swal-content {
   max-height: 300px;
@@ -27,14 +27,13 @@
   cursor: pointer;
 }
 
-.custom-margin-service{
+.custom-margin-service {
   margin-left: 1% !important;
   border-radius: 3px;
 }
 
-.custom-padding-navbar-admin{
-  padding-left:50px !important
-
+.custom-padding-navbar-admin {
+  padding-left: 50px !important;
 }
 .settings-container {
   display: flex;
@@ -56,4 +55,18 @@
 .disabled-input {
   opacity: 0.5; /* Adjust opacity to make the input appear dimmed */
   /* Add any other styles to visually indicate that the input is disabled */
+}
+.sidebar {
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.sidebar-nav .nav-link {
+  color: #343a40;
+}
+
+.sidebar-nav .nav-link:hover {
+  color: #007bff;
+  background-color: transparent;
 }
