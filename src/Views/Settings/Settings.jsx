@@ -21,6 +21,7 @@ import {
   showSpinner,
 } from "../../Redux/Slices/LoaderSlice";
 import { capitalizeFirstLetter, failureToast, successToast } from "../../utils";
+import Swal from "sweetalert2";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -50,7 +51,13 @@ const Settings = () => {
 
     // Check if the newValue is a valid number and doesn't contain the '+' operator
     if (!/^[0-9]+$/.test(newValue)) {
-      failureToast(`${capitalized} must be a valid non-decimal number!`);
+      const message = `${capitalized} must be a valid non-decimal number!`;
+      Swal.fire({
+        title: "Value Error",
+        text: message,
+        icon: "error",
+        allowOutsideClick: false,
+      });
       return false;
     }
 
@@ -59,14 +66,22 @@ const Settings = () => {
 
     // Check the range
     if (numericValue > upperLimit) {
-      failureToast(
-        `${capitalized} cannot be more than ${upperLimit} ${units}!`
-      );
+      const message = `${capitalized} cannot be more than ${upperLimit} ${units}!`;
+      Swal.fire({
+        title: "Limit Error",
+        text: message,
+        icon: "error",
+        allowOutsideClick: false,
+      });
       return false;
     } else if (numericValue < lowerLimit) {
-      failureToast(
-        `${capitalized} cannot be less than ${lowerLimit} ${units}!`
-      );
+      const message = `${capitalized} cannot be less than ${lowerLimit} ${units}!`;
+      Swal.fire({
+        title: "Limit Error",
+        text: message,
+        icon: "error",
+        allowOutsideClick: false,
+      });
       return false;
     }
 
@@ -78,7 +93,6 @@ const Settings = () => {
       const data = { token: token };
       const result = await dispatch(getSettings(data));
       if (result?.type === "/admin/getSettings/fulfilled") {
-    
         setNotificationTimeLimit(result?.payload?.notificationsLife);
         setScheduledOrderOffset(result?.payload?.scheduleOffestTime);
         setRadius(result?.payload?.radius);
@@ -116,7 +130,6 @@ const Settings = () => {
           const resp = await dispatch(updateSettingsAsync(data));
 
           if (resp.type === "/admin/updateSettings/fulfilled") {
-    
             successToast("Notifications time limit updated successfully");
             setNotificationTimeLimit(resp.payload.notificationsLife);
             setDisableNotificationsButton(false);
@@ -162,7 +175,6 @@ const Settings = () => {
           const resp = await dispatch(updateSettingsAsync(data));
 
           if (resp.type === "/admin/updateSettings/fulfilled") {
-          
             successToast("Scheduled orders offset updated successfully");
             setScheduledOrderOffset(resp.payload.scheduleOffestTime);
             setDisableSchOrderButton(false);
@@ -209,7 +221,6 @@ const Settings = () => {
           const resp = await dispatch(updateSettingsAsync(data));
 
           if (resp.type === "/admin/updateSettings/fulfilled") {
-         
             successToast("Radius updated successfully");
             setRadius(resp.payload.radius);
             setDisableRadiusButton(false);
@@ -273,6 +284,16 @@ const Settings = () => {
           <Col>
             <Button onClick={() => navigate(-1)}>Back</Button>
           </Col>
+          <Col className="text-center "></Col>
+          <Col></Col>
+        </Row>
+        <Row>
+          <Col></Col>
+        </Row>
+      </Container>
+      <Container className="position-absolute mt-5">
+        <Row>
+          <Col></Col>
           <Col className="text-center ">
             <h1>Settings</h1>
           </Col>
@@ -286,7 +307,7 @@ const Settings = () => {
         </>
       ) : (
         <>
-          <div className="settings-container mt-2">
+          <div className="settings-container mt-5">
             <div>
               <Row>
                 <Col>

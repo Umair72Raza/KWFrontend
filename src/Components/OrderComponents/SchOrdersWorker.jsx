@@ -123,10 +123,13 @@ const ScheduledOrdersCardWorker = ({
 
   const cancelingOrder = () => {
     //dispatch cancel order
-    const  order ={ ...orderToCancel,cancelReason:{
-      reason: cancelReason,
-    }};
-   
+    const order = {
+      ...orderToCancel,
+      cancelReason: {
+        reason: cancelReason,
+      },
+    };
+
     const data = {
       userId: userId,
       orderId: order._id,
@@ -232,7 +235,6 @@ const ScheduledOrdersCardWorker = ({
           </div>
         ) : scheduledOrdersObject?.length > 0 ? (
           <>
-           
             <Row>
               {scheduledOrdersObject?.map((order) => (
                 <Col
@@ -377,6 +379,7 @@ const ScheduledOrdersCardWorker = ({
                             <Button
                               onClick={() => toggleModal(order)}
                               color="danger"
+                              disabled={globalStartButtonDisabled}
                             >
                               Cancel Job
                             </Button>

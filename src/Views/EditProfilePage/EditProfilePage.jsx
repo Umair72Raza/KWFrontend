@@ -114,7 +114,13 @@ const EditProfilePage = ({ ShowServices }) => {
       setUserDataLoading(true);
       dispatch(fetchUsersDataAsync({ id: user._id, token }))
         .then((result) => {
-          const { _id,phoneNumber,email,profilePicture, ...userDataWithoutId } = result.payload;
+          const {
+            _id,
+            phoneNumber,
+            email,
+            profilePicture,
+            ...userDataWithoutId
+          } = result.payload;
           setUserInfo(userDataWithoutId);
           setUserDataLoading(false);
         })
@@ -211,25 +217,24 @@ const EditProfilePage = ({ ShowServices }) => {
     }
 
     const areObjectsDifferent =
-    UserInfo &&
-    formData &&
-    Object.keys(UserInfo).some((key) => {
-      if (key === 'location') {
-        // Check if coordinates array is different
-        return (
-          formData[key]?.coordinates &&
-          UserInfo[key]?.coordinates &&
-          formData[key].coordinates.some(
-            (coord, index) => coord !== UserInfo[key].coordinates[index]
-          )
-        );
-      } else {
-        // Check if other keys are different
-        return formData[key] !== UserInfo[key];
-      }
-    });
-  
-  
+      UserInfo &&
+      formData &&
+      Object.keys(UserInfo).some((key) => {
+        if (key === "location") {
+          // Check if coordinates array is different
+          return (
+            formData[key]?.coordinates &&
+            UserInfo[key]?.coordinates &&
+            formData[key].coordinates.some(
+              (coord, index) => coord !== UserInfo[key].coordinates[index]
+            )
+          );
+        } else {
+          // Check if other keys are different
+          return formData[key] !== UserInfo[key];
+        }
+      });
+
     if (!areObjectsDifferent) {
       errors.noChanges = "No Changes Made";
     }
@@ -257,14 +262,12 @@ const EditProfilePage = ({ ShowServices }) => {
     });
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
+
     setEmailEdit(false);
     setEditProfile(false);
     setPhoneEdit(false);
-   
 
     const validationErrors = FormValidation(formData);
     setErrors(validationErrors);
@@ -274,25 +277,24 @@ const EditProfilePage = ({ ShowServices }) => {
         infoToast(validationErrors?.noChanges);
         setEditMode(false);
       }
-    
+
       return; // Early return for validation errors
     }
 
     setLoading(true);
 
     try {
-   
       const data = { id: UsersData?._id, token, formData };
       const result = await dispatch(updateProfileAsync(data));
       if (result.type === "/UpdateProfile/fulfilled") {
         dispatch(updateUser(result.payload));
-     
+
         const {
           firstName,
           lastName,
-    
+
           location,
-       
+
           country,
           city,
           address,
@@ -304,9 +306,9 @@ const EditProfilePage = ({ ShowServices }) => {
         setFormData({
           firstName,
           lastName,
-        
+
           location,
-       
+
           country,
           city,
           region_state,
@@ -314,7 +316,7 @@ const EditProfilePage = ({ ShowServices }) => {
           optionalAddress,
           services: services || [],
         });
-       
+
         setEditMode(false);
       } else if (result.type === "/UpdateProfile/rejected") {
         failureToast(result.payload);
@@ -325,8 +327,6 @@ const EditProfilePage = ({ ShowServices }) => {
       setLoading(false);
     }
   };
-
-  
 
   const handleEditModeToggle = () => {
     setEditMode(true);
@@ -403,7 +403,6 @@ const EditProfilePage = ({ ShowServices }) => {
     try {
       const otpResp = await dispatch(requestOTPforEmailAsync(data));
       if (otpResp.type === "auth/requestOTPforEmailAsync/fulfilled") {
-       
         if (
           otpResp?.payload?.data?.message ===
           "New Email already taken by someone else."
@@ -411,15 +410,30 @@ const EditProfilePage = ({ ShowServices }) => {
           const msg = `${newMail} is already taken by someone else.`;
           setShowModal(false);
           return failureToast(msg);
-        } else {
+        } else if (
+          otpResp?.payload?.data?.message ===
+          "Email reset email sent successfully"
+        ) {
+          const life = otpResp?.payload?.data?.otpLife;
+          localStorage.setItem("remainingTime", life);
+          console.log(life, "life");
           successToast("OTP sent successfully!");
           setShowModal(false);
+
           user.role === "worker"
             ? navigate("/worker/otpVerification", {
-                state: { email: UsersData.email, newMail: newMail },
+                state: {
+                  email: UsersData.email,
+                  newMail: newMail,
+                  otpLife: life,
+                },
               })
             : navigate("/user/otpVerification ", {
-                state: { email: UsersData.email, newMail: newMail },
+                state: {
+                  email: UsersData.email,
+                  newMail: newMail,
+                  otpLife: life,
+                },
               });
         }
       }
@@ -447,16 +461,29 @@ const EditProfilePage = ({ ShowServices }) => {
           const msg = `${newPhone} is already taken by someone else.`;
           setShowModal(false);
           return failureToast(msg);
-        } else {
-    
+        } else if (
+          otpResp?.payload?.data?.message ===
+          "Phone Number reset email sent successfully"
+        ) {
+          const life = otpResp?.payload?.data?.otpLife;
+          localStorage.setItem("remainingTime", life);
+          console.log(life, "life");
           successToast("OTP sent successfully!");
           setShowModal(false);
           user.role === "worker"
             ? navigate("/worker/otpVerification", {
-                state: { email: UsersData.email, newPhone: newPhone },
+                state: {
+                  email: UsersData.email,
+                  newPhone: newPhone,
+                  otpLife: life,
+                },
               })
             : navigate("/user/otpVerification ", {
-                state: { email: UsersData.email, newPhone: newPhone },
+                state: {
+                  email: UsersData.email,
+                  newPhone: newPhone,
+                  otpLife: life,
+                },
               });
         }
       } else if (otpResp.type === "auth/requestOTPforPhoneAsync/rejected") {
@@ -473,7 +500,7 @@ const EditProfilePage = ({ ShowServices }) => {
   const updatePhone = () => {
     toggleEditPhone();
     setModalContent("Test: Wait while you are being redirected...");
-  
+
     setShowModal(true);
     requestOTPforPhone();
   };
@@ -488,7 +515,7 @@ const EditProfilePage = ({ ShowServices }) => {
     // Check if entered email matches the regex
     const isValid = emailRegex.test(enteredEmail);
     setNewMailError(isValid);
-   
+
     setDisableUpdateEmail(!isValid);
     if (!newMail.trim()) {
       // If newMail is empty or contains only whitespaces, do not dispatch the request
@@ -544,14 +571,14 @@ const EditProfilePage = ({ ShowServices }) => {
   const handleProfilePictureChange = (event) => {
     const file = event.target.files[0];
     // Define file size limit and accepted file types
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const maxSize = 1 * 1024 * 1024; // 5MB in bytes
     const acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
 
     // Check if file size exceeds limit
     if (file.size > maxSize) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        profilePicture: "Select a file with size equal to or smaller than 5Mb.",
+        profilePicture: "Select a file with size equal to or smaller than 1MB.",
       }));
       clearFileInput();
       return;
@@ -587,7 +614,6 @@ const EditProfilePage = ({ ShowServices }) => {
     try {
       const response = await dispatch(updatePfpAsync(profileImgData));
       if (response.meta.requestStatus === "fulfilled") {
-      
         setDisableUpdateProfilePic(false);
         setProfileImgData({});
       }
@@ -600,7 +626,6 @@ const EditProfilePage = ({ ShowServices }) => {
       setProfileImgData({});
     }
   };
-
 
   return (
     <>

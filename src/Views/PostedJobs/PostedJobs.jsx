@@ -29,8 +29,8 @@ const PostedJobs = ({ postedJobs }) => {
   let { setPostedJobs } = PopUpState();
   const { token } = useSelector((state) => state.auth);
   const [modal, setModal] = useState(false);
-  const [modal1,setModal1] = useState(false);
-  const [order,setOrder] = useState(null);
+  const [modal1, setModal1] = useState(false);
+  const [order, setOrder] = useState(null);
   const spinnerVisible = useSelector(selectSpinnerVisibility);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [fromPostJob, setPostJob] = useState(true);
@@ -38,7 +38,7 @@ const PostedJobs = ({ postedJobs }) => {
 
   const toggleModal1 = () => {
     setModal1(!modal1);
-  }
+  };
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -64,19 +64,18 @@ const PostedJobs = ({ postedJobs }) => {
         const id = order._id;
         const data = { id: id, token: token };
         const result = await disaptch(deleteTheOrderAsync(data));
-   
+
         if (result?.type === "orders/deleteOrder/fulfilled") {
-          if(result.payload.message === "Order deleted"){
+          if (result.payload.message === "Order deleted") {
             Swal.fire({
               title: "Deleted!",
               text: "Your Order has been deleted.",
               icon: "success",
             });
-            setPostedJobs(prevOrders =>
-              prevOrders.filter(prevOrder => prevOrder._id !== order._id)
+            setPostedJobs((prevOrders) =>
+              prevOrders.filter((prevOrder) => prevOrder._id !== order._id)
             );
           }
-         
         } else {
           Swal.fire({
             title: "Not Deleted!",
@@ -93,14 +92,21 @@ const PostedJobs = ({ postedJobs }) => {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-     autoplaySpeed: 2000,
+    autoplaySpeed: 2000,
   };
 
   const editModal = (order) => {
     setModal1(true);
-    setOrder(order)
+    setOrder(order);
+  };
 
-  }
+  const toggleDetails = (orderId) => {
+    setShowFullDetailsMap((prevMap) => ({
+      ...prevMap,
+      [orderId]: !prevMap[orderId],
+    }));
+  };
+
   return (
     <div>
       <Container>
@@ -112,13 +118,7 @@ const PostedJobs = ({ postedJobs }) => {
           </Col>
         </Row>
         <Container>
-          {
-          // spinnerVisible ? (
-          //   <div style={{ textAlign: "center" }}>
-          //     <Spinner />
-          //   </div>
-          // ) : 
-          postedJobs?.length > 0 ? (
+          {postedJobs?.length > 0 ? (
             <>
               <Row>
                 {postedJobs?.map((order) => (
@@ -132,7 +132,7 @@ const PostedJobs = ({ postedJobs }) => {
                   >
                     <Card
                       className="shadow"
-                      style={{ backgroundColor: "#f6f8fc", }}
+                      style={{ backgroundColor: "#f6f8fc" }}
                     >
                       <CardBody>
                         <CardTitle>
@@ -174,7 +174,10 @@ const PostedJobs = ({ postedJobs }) => {
                               }}
                             >
                               <span
-                                style={{ marginTop: "10px", marginRight: "1%" }}
+                                style={{
+                                  marginTop: "10px",
+                                  marginRight: "1%",
+                                }}
                               >
                                 <b>Status: </b>
                                 {order.Status}
@@ -232,8 +235,12 @@ const PostedJobs = ({ postedJobs }) => {
                             )}
                           </div>
                         </CardText>
+
                         {order?.images?.length > 0 && (
                           <Row className="mb-5 justify-content-center">
+                            <CardText>
+                              <b>Images:</b>
+                            </CardText>
                             <Slider {...settings} className="">
                               {order.images?.map((image, index) => (
                                 <div className="text-center" key={index}>
@@ -273,7 +280,12 @@ const PostedJobs = ({ postedJobs }) => {
                               {" "}
                               {/* Half width on small screens, one-third width on medium and larger screens */}
                               <CardText>
-                                <Button onClick={()=>editModal(order)} color="info">Edit</Button>
+                                <Button
+                                  onClick={() => editModal(order)}
+                                  color="info"
+                                >
+                                  Edit
+                                </Button>
                               </CardText>
                             </Col>
                           </>
@@ -283,14 +295,18 @@ const PostedJobs = ({ postedJobs }) => {
                   </Col>
                 ))}
                 {modal1 == true ? (
-                <EditOffer modal={modal1} toggle={toggleModal1} order={order} />
-              ) : (
-                []
-              )}
+                  <EditOffer
+                    modal={modal1}
+                    toggle={toggleModal1}
+                    order={order}
+                  />
+                ) : (
+                  []
+                )}
               </Row>
             </>
           ) : (
-            <div>No Posted Orders</div>
+            <div className="text-center">No Posted Orders</div>
           )}
         </Container>
 

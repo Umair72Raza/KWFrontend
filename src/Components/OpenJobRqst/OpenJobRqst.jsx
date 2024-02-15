@@ -16,6 +16,8 @@ const OpenJobRqst = () => {
   const [finalizeButtonLabel, setFinalizeButtonLabel] = useState("");
   const [order, setOrder] = useState(null);
   const [workerId, setWorkerId] = useState(null);
+  const [workerfirstName, setWorkerfirstName] = useState(null);
+  const [workerlastName, setWorkerlastName] = useState(null);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -25,6 +27,10 @@ const OpenJobRqst = () => {
   useEffect(() => {
     socket?.on("startBid-request", (data) => {
       setWorkerId(data?.worker?.workerId);
+      setWorkerfirstName(data?.worker?.firstName);
+      setWorkerlastName(data?.worker?.lastName)
+
+      
       setOrder(data?.order);
       setModalHeader(
         `Order Bid by ${data?.worker?.workerfirstName} ${data?.worker?.workerlastName}`
@@ -66,8 +72,8 @@ const OpenJobRqst = () => {
         setPostedJobs((prevPostedJobs) =>
           prevPostedJobs.filter((postedJob) => postedJob._id !== order._id)
         );
-
-        setScheduledOrders((prevSchOrders) => [...prevSchOrders, order]);
+        //  order.status = "Scheduled";
+        setScheduledOrders((prevSchOrders) => [...prevSchOrders, data?.order]);
 
         setIsFinalize(false);
         setOrder(null);

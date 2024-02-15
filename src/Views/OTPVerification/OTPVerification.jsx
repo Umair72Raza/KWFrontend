@@ -9,78 +9,89 @@ const OTPVerification = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, token,signupOTP } = useSelector((state) => state.auth);
+  const { user, token, signupOTP } = useSelector((state) => state.auth);
   const [otpVisible, setOtpVisible] = useState(false);
   const [disabledOTP, setDisabledOTP] = useState(false);
   const email = location?.state?.email;
   const newMail = location?.state?.newMail;
   const newPhone = location?.state?.newPhone;
+  const otpLife = location?.state?.otpLife;
+  console.log(otpLife, "otpLife");
 
-  useEffect(()=>{
-    if(!email)
-    {
-      if(user.role==="worker")
-      {
-        navigate('/worker/homepage')
-      }
-      else if (user.role==="user")
-      {
-        navigate("/user/homepage")
-      }
-      
-    }
+  const [remainingTime, setRemainingTime] = useState(() =>
+    localStorage.getItem("remainingTime")
+  );
 
-  },[email])
+  useEffect(() => {
+    localStorage.setItem("remainingTime", remainingTime);
+  }, [remainingTime]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setRemainingTime((prevTime) => {
+        if (prevTime > 0) {
+          return prevTime - 1; // Decrease remaining time by 1 second
+        } else {
+          clearInterval(intervalId);
+          return 0;
+        }
+      });
+    }, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []); // Remove setRemainingTime from dependency array to prevent effect from re-running
+
+  const formatTimeMinutes = (timeInMinutes) => {
+    const totalMinutes = Math.floor(timeInMinutes);
+    const remainingSeconds = Math.floor((timeInMinutes - totalMinutes) * 60);
+    return `${totalMinutes}m `;
+  };
+
+  // Format time in seconds
+  const formatTimeSeconds = (timeInSeconds) => {
+    const totalSeconds = Math.floor(timeInSeconds);
+    return `${totalSeconds}s`;
+  };
 
   const [otp, setOtp] = useState("");
 
   const handleChange = (e) => {
-    const inputValue = e.target.value.replace(
-      /\D/g,
-      ""
-    ); // Remove non-numeric characters
+    const inputValue = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
     setOtp(inputValue);
   };
 
-  const verifyandChange = async() => {
-    if(newMail === undefined) {
+  const verifyandChange = async () => {
+    if (newMail === undefined) {
       VerifyOTPandChangePhone();
-    }
-    else if(newPhone === undefined)
-    {
+    } else if (newPhone === undefined) {
       VerifyOTPandChangeMail();
     }
-  }
+  };
   const VerifyOTPandChangePhone = async () => {
     // Implement the logic to verify OTP here
     if (!/^[0-9]+$/.test(otp)) {
-        failureToast(`OTP must be a valid non-decimal number!`);
-        return;
-    }
-    else if(otp.length > 4)
-    {
-        failureToast(`OTP must be a 4 digit number!`);
-        return;   
+      failureToast(`OTP must be a valid non-decimal number!`);
+      return;
+    } else if (otp.length > 4) {
+      failureToast(`OTP must be a 4 digit number!`);
+      return;
     }
 
     setDisabledOTP(true);
-  
-    let data = { newPhone, otp ,token};
-  
+
+    let data = { newPhone, otp, token };
 
     try {
       const resp = await dispatch(changePhone(data));
-  
+
       if (resp.type === "auth/otpverifyPhone/fulfilled") {
         if (resp.payload === undefined) {
-        
           failureToast("Phone was not changed!");
         } else {
-  
           successToast("Phone changed!");
           user.role === "worker"
-          ? navigate("/worker/editprofile")
-          : navigate("/user/editprofile ");
+            ? navigate("/worker/editprofile")
+            : navigate("/user/editprofile ");
         }
       }
     } catch (error) {
@@ -93,33 +104,28 @@ const OTPVerification = () => {
   const VerifyOTPandChangeMail = async () => {
     // Implement the logic to verify OTP here
     if (!/^[0-9]+$/.test(otp)) {
-        failureToast(`OTP must be a valid non-decimal number!`);
-        return;
-    }
-    else if(otp.length > 4)
-    {
-        failureToast(`OTP must be a 4 digit number!`);
-        return;   
+      failureToast(`OTP must be a valid non-decimal number!`);
+      return;
+    } else if (otp.length > 4) {
+      failureToast(`OTP must be a 4 digit number!`);
+      return;
     }
 
     setDisabledOTP(true);
-  
-    let data = { newMail, otp ,token};
-  
+
+    let data = { newMail, otp, token };
 
     try {
       const resp = await dispatch(changeEmail(data));
-   
+
       if (resp.type === "auth/otpverifyEmail/fulfilled") {
         if (resp.payload === undefined) {
-         
           failureToast("email did not changed!");
         } else {
-       
           successToast("email changed!");
           user.role === "worker"
-          ? navigate("/worker/editprofile")
-          : navigate("/user/editprofile ");
+            ? navigate("/worker/editprofile")
+            : navigate("/user/editprofile ");
         }
       }
     } catch (error) {
@@ -135,29 +141,27 @@ const OTPVerification = () => {
       failureToast("OTP must be a valid 4-digit number!");
       return;
     }
-  
+
     // Check OTP
     if (signupOTP !== otp) {
       failureToast("Invalid OTP");
       return;
     }
-  
+
     // Disable OTP input during sign-up process
     setDisabledOTP(true);
-  
+
     try {
       const result = await dispatch(signUpUserAsync(formData));
-  
+
       if (result.type === "auth/signup/fulfilled") {
-    
-  
         // Display success message
         const successMessage = ShowServices
           ? RegisterPage.SUCCESS_MESSAGES.WORKER_SIGNUP
           : RegisterPage.SUCCESS_MESSAGES.USER_SIGNUP;
-  
+
         successToast(successMessage);
-  
+
         // Navigate to login page after successful signup
         navigate("/auth/login");
       } else if (result.type === "auth/signup/rejected") {
@@ -172,7 +176,6 @@ const OTPVerification = () => {
       setDisabledOTP(false);
     }
   };
-  
 
   return (
     <div>
@@ -198,20 +201,17 @@ const OTPVerification = () => {
               pattern="\d*" // Only allow digits
               onPaste={(e) => {
                 e.preventDefault();
-                const pastedText =
-                  e.clipboardData.getData("text/plain");
-                const numericValue = pastedText.replace(
-                  /\D/g,
-                  ""
-                ); // Remove non-numeric characters
-                document.execCommand(
-                  "insertText",
-                  false,
-                  numericValue
-                );
+                const pastedText = e.clipboardData.getData("text/plain");
+                const numericValue = pastedText.replace(/\D/g, ""); // Remove non-numeric characters
+                document.execCommand("insertText", false, numericValue);
                 setOtp(numericValue);
               }}
             />
+            {otpLife && (
+              <>
+                <h6>Otp Expires in {formatTimeMinutes(remainingTime)} </h6>
+              </>
+            )}
             <Button
               color="primary"
               className="mb-3 text-center"
