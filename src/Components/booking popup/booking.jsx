@@ -18,6 +18,7 @@ import { failureToast } from "../../utils.js";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { MdCancelPresentation } from "react-icons/md";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
+import { set } from "lodash";
 
 const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -41,6 +42,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const [clicked, setClicked] = useState(true);
   const [imageError, setImageError] = useState("");
   const [images, setImages] = useState([]);
+  const [postButtonDisabled, setPostButtonDisabled] = useState(false);
 
   useEffect(() => {
     const isFormComplete =
@@ -128,10 +130,10 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         details: taskDetails.replace(/\n/g, "<br>"),
         amount: amountPerHour,
         service: serviceOption,
-        address: user?.address,
+        address: null,
         tasktime: taskTime,
         images,
-        location: user?.location || {},
+        location:  {},
       };
       const formData = new FormData();
 
@@ -153,18 +155,18 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         }
       }
       // Append location coordinates to FormData
-      if (user.location && user.location.coordinates) {
+      if (user?.location && user?.location?.coordinates) {
         formData.append("location[type]", "Point");
         formData.append(
           "location[coordinates][]",
-          user.location.coordinates[0]
+          user?.location?.coordinates[0]
         );
         formData.append(
           "location[coordinates][]",
-          user.location.coordinates[1]
+          user?.location?.coordinates[1]
         );
       }
-      formData.set("address", data?.address);
+      formData.set("address", user?.address);
       serviceOption.forEach((s, index) => {
         formData.append(`service`, s);
       });
@@ -215,6 +217,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   };
 
   const handlePost = async () => {
+    setPostButtonDisabled(true);
     const currentDate = new Date();
     const selectedDate = new Date(dateTime);
     const Users = [user._id];
@@ -229,10 +232,10 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         details: taskDetails.replace(/\n/g, "<br>"),
         amount: amountPerHour,
         service: serviceOption,
-        address: user.address,
+        address: null,
         tasktime: taskTime,
         images,
-        // location: user?.location || {},
+         location:  {},
       };
       const formData = new FormData();
 
@@ -254,18 +257,18 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       }
 
       // Append location coordinates to FormData
-      if (user.location && user.location.coordinates) {
+      if (user?.location && user?.location?.coordinates) {
         formData.append("location[type]", "Point");
         formData.append(
           "location[coordinates][]",
-          user.location.coordinates[0]
+          user?.location?.coordinates[0]
         );
         formData.append(
           "location[coordinates][]",
-          user.location.coordinates[1]
+          user?.location?.coordinates[1]
         );
       }
-      formData.set("address", data?.address);
+      formData.set("address", user?.address);
       serviceOption.forEach((s, index) => {
         formData.append(`service`, s);
       });
@@ -275,8 +278,11 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
 
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         {
-        
           const result = await dispatch(CreateOrder({ formData, token }));
+           if (result?.type?.includes("fulfilled")){
+            setPostButtonDisabled(false);
+            }
+
         
           Swal.fire({
             title: "Job Posted",
@@ -661,7 +667,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
             <>
               <Button
                 color="primary"
-                disabled={!formComplete}
+                disabled={!formComplete || postButtonDisabled}
                 onClick={() => {
                   setClicked(false);
                   handlePost();

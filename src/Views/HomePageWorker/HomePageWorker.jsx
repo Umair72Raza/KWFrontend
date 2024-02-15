@@ -137,7 +137,10 @@ const HomePageWorker = () => {
           SetONotification([data, ...offerNotification]);
           addNotificationTimeout(
             data,
-            setTimeout(() => offerTimeUp(data.params), (timeOutForNotification[0]?.notificationsLife) * 60 * 1000)
+            setTimeout(() =>{ offerTimeUp(data.params)
+            SetONotification(()=>offerNotification.filter((obj) => obj !== data))
+            }
+            , (timeOutForNotification[0]?.notificationsLife) * 60 * 1000)
           );
         }
       } else {
@@ -154,6 +157,8 @@ const HomePageWorker = () => {
 
   useEffect(() => {
     socket?.on("startjob-result", (data) => {
+      setGlobalStartButtonDisabled(false);
+
       if (data.result === "true") {
         setStartJobStatus("true");
         setStartJobVerified(true);
@@ -169,7 +174,7 @@ const HomePageWorker = () => {
       } else if (data.result == "false") {
         setStartJobStatus("false");
         setStartJobVerified(true);
-        setGlobalStartButtonDisabled(false);
+       // setGlobalStartButtonDisabled(false);
         setStartButtonDisabledMap((prevMap) => ({
           ...prevMap,
           [data.order._id]: false,

@@ -34,6 +34,7 @@ const ActiveOrders = ({
   const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     const handleFinishJobResult = (data) => {
+      setDisableFinishButton(false);
       if (data.result === "true") {
         setDisableFinishButton(false)
         SetConfirm("true");
