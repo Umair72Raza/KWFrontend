@@ -78,13 +78,13 @@ const Worker = () => {
   //   </>
   // );
   return (
-    <Container fluid className="mt-8 pb-5">
+    <Container fluid className="">
       <Row>
         <Col>
           <UserNavbar />
         </Col>
       </Row>
-      <Row className="justify-content-center">
+      <Row className="">
         {sidebarVisible && (
           <Col xs={12} sm={3} md={3} className="mb-3 mb-md-0">
             <SidebarWorker />

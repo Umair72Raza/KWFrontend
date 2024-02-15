@@ -190,7 +190,7 @@ const UserNavbar = () => {
                 </NavItem>
                 <NavItem>
                   <Button className="d-md-none" onClick={toggleSidebar}>
-                    {sidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+                    {sidebarVisible ? "HS" : "SS"}
                   </Button>
                 </NavItem>
                 <UncontrolledDropdown
