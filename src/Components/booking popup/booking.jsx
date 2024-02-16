@@ -19,6 +19,7 @@ import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { MdCancelPresentation } from "react-icons/md";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 import { set } from "lodash";
+import TheToolTip from "../ToolTip/ToolTip.jsx";
 
 const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -394,7 +395,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           <FormGroup>
             <Label for="taskTitle" className="fw-bold">
               {BookingConstants.Labels.taskTitle}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="text"
@@ -443,7 +444,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           <FormGroup>
             <Label for="taskDetails" className="fw-bold ">
               {BookingConstants.Labels.taskDetail}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="textarea"
@@ -465,7 +466,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               <FormGroup>
                 <Label for="serviceOption " className="fw-bold">
                   {BookingConstants.Labels.service}
-                  <span style={{ color: "red" }}>*</span>
+                  <TheToolTip label="*" isOptional={false} />
                 </Label>
 
                 <div
@@ -503,7 +504,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               <FormGroup>
                 <Label for="serviceOption " className="fw-bold">
                   {BookingConstants.Labels.service}
-                  <span style={{ color: "red" }}>*</span>
+                  <TheToolTip label="*" isOptional={false} />
                 </Label>
 
                 <div
@@ -563,7 +564,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           <FormGroup>
             <Label for="dateTime" className="fw-bold">
               {BookingConstants.Labels.datetime}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="datetime-local"
@@ -578,7 +579,8 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           </FormGroup>
           <FormGroup>
             <Label for="taskTime" className="fw-bold">
-              Task Time In Hours<span style={{ color: "red" }}>*</span>
+              Task Time In Hours
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="number"
@@ -605,7 +607,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           <FormGroup>
             <Label for="amountPerHour" className="fw-bold">
               {BookingConstants.Labels.amount}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="number"
@@ -655,52 +657,54 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
             )}
           </FormGroup> */}
 
-<FormGroup>
-  <Label for="images" className="fw-bold">
-    {BookingConstants.Labels.images}
-  </Label>
-  <div className="position-relative">
-    {/* Original file input, but hidden */}
-    <Input
-      id="OfferImages"
-      type="file"
-      accept="image/*"
-      onChange={handleImageChange}
-      multiple={images?.length < 5}
-      style={{ display: 'none' }} // Hide the original input
-    />
-    {/* Custom button to trigger file selection */}
-    <Button color="primary" onClick={() => document.getElementById('OfferImages').click()}>
-      Choose Image(s)
-    </Button>
-    {/* Display selected file names */}
-    {images.length > 0 && (
-      <div>
-        <p>Selected Images:</p>
-        {images.map((image, index) => (
-          <div key={index} className="d-flex flex-row gap-2">
-            <Progress value={100} max={100} className="w-50 mb-2">
-              {image.name}
-            </Progress>
-            <MdCancelPresentation
-              onClick={() => handleDeleteImage(index)}
-              text="dark"
-            />
-          </div>
-        ))}
-      </div>
-    )}
-    {/* Error message */}
-    {imageError && <div style={{ color: "red" }}>{imageError}</div>}
-    {/* Placeholder message */}
-    {images.length === 0 && !imageError && (
-      <div className="custom-file-placeholder">
-        <span>No file chosen</span>
-      </div>
-    )}
-  </div>
-</FormGroup>
-
+          <FormGroup>
+            <Label for="images" className="fw-bold">
+              {BookingConstants.Labels.images}
+            </Label>
+            <div className="position-relative">
+              {/* Original file input, but hidden */}
+              <Input
+                id="OfferImages"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                multiple={images?.length < 5}
+                style={{ display: "none" }} // Hide the original input
+              />
+              {/* Custom button to trigger file selection */}
+              <Button
+                color="primary"
+                onClick={() => document.getElementById("OfferImages").click()}
+              >
+                Choose Image(s)
+              </Button>
+              {/* Display selected file names */}
+              {images.length > 0 && (
+                <div>
+                  <p>Selected Images:</p>
+                  {images.map((image, index) => (
+                    <div key={index} className="d-flex flex-row gap-2">
+                      <Progress value={100} max={100} className="w-50 mb-2">
+                        {image.name}
+                      </Progress>
+                      <MdCancelPresentation
+                        onClick={() => handleDeleteImage(index)}
+                        text="dark"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Error message */}
+              {imageError && <div style={{ color: "red" }}>{imageError}</div>}
+              {/* Placeholder message */}
+              {images.length === 0 && !imageError && (
+                <div className="custom-file-placeholder">
+                  <span>No file chosen</span>
+                </div>
+              )}
+            </div>
+          </FormGroup>
         </ModalBody>
         <ModalFooter>
           {!fromPostJob ? (

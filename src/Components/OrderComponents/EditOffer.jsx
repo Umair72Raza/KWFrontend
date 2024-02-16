@@ -24,6 +24,7 @@ import {
   editOrderAsync,
 } from "../../Redux/Slices/BookingSlice.js";
 import Slider from "react-slick";
+import TheToolTip from "../ToolTip/ToolTip.jsx";
 
 const EditOffer = ({ modal, toggle, order }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -162,7 +163,7 @@ const EditOffer = ({ modal, toggle, order }) => {
         details: taskDetails.replace(/\n/g, "<br>"),
         amount: amountPerHour,
         service: serviceOption,
-        address: user.address,
+        address: user?.address,
         tasktime: taskTime,
         images,
         // location: user.location,
@@ -328,7 +329,7 @@ const EditOffer = ({ modal, toggle, order }) => {
           <FormGroup>
             <Label for="taskTitle" className="fw-bold">
               {BookingConstants.Labels.taskTitle}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="text"
@@ -349,7 +350,7 @@ const EditOffer = ({ modal, toggle, order }) => {
           <FormGroup>
             <Label for="taskDetails" className="fw-bold ">
               {BookingConstants.Labels.taskDetail}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="textarea"
@@ -369,7 +370,7 @@ const EditOffer = ({ modal, toggle, order }) => {
           <FormGroup>
             <Label for="serviceOption " className="fw-bold">
               {BookingConstants.Labels.service} (Max. 2 services)
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
 
             <div
@@ -406,7 +407,7 @@ const EditOffer = ({ modal, toggle, order }) => {
           <FormGroup>
             <Label for="dateTime" className="fw-bold">
               {BookingConstants.Labels.datetime}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="datetime-local"
@@ -421,7 +422,8 @@ const EditOffer = ({ modal, toggle, order }) => {
           </FormGroup>
           <FormGroup>
             <Label for="taskTime" className="fw-bold">
-              Task Time In Hours<span style={{ color: "red" }}>*</span>
+              Task Time In Hours
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="number"
@@ -443,7 +445,7 @@ const EditOffer = ({ modal, toggle, order }) => {
           <FormGroup>
             <Label for="amountPerHour" className="fw-bold">
               {BookingConstants.Labels.amount}
-              <span style={{ color: "red" }}>*</span>
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="number"

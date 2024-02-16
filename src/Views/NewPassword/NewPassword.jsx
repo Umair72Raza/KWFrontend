@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
+  Alert,
   Button,
   Col,
   Container,
@@ -45,6 +46,7 @@ const NewPassword = () => {
   const [attempts, setAttempts] = useState(0);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [inputError, setInputError] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     if (otpStatus === "succeeded") {
@@ -54,20 +56,35 @@ const NewPassword = () => {
   }, [otpStatus]);
 
   const handlePasswordChange = (e) => {
-    const password = e.target.value;
-    setNewPassword(password);
-    if (attempts > 0) {
-      setShowValidationErrors(true);
-      validatePassword(password, confirmNewPassword);
+    const newValue = e.target.value;
+    if (!newValue.includes(" ")) {
+      setNewPassword(newValue);
+    } else {
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 3000); // Remove the alert after 3 seconds
     }
+    //if (attempts > 0) {
+
+    validatePassword(newPassword, confirmNewPassword);
+    // }
   };
 
   const handleConfirmNewPassword = (e) => {
-    setConfirmNewPassword(e.target.value);
-    if (attempts > 0) {
-      setShowValidationErrors(true);
-      validatePassword(newPassword, confirmNewPassword);
+    const newValue = e.target.value;
+    if (!newValue.includes(" ")) {
+      setConfirmNewPassword(newValue);
+    } else {
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 3000); // Remove the alert after 3 seconds
     }
+    // if (attempts > 0) {
+    // setShowValidationErrors(true);
+    validatePassword(newPassword, confirmNewPassword);
+    // }
   };
 
   const verifyOTPSENT = async (e) => {
@@ -102,6 +119,10 @@ const NewPassword = () => {
       );
       return; // Stop execution if validation fails
     }
+    if (newPassword !== confirmNewPassword) {
+      failureToast("Passwords do not match.");
+      return; // Stop execution if passwords don't match
+    }
     try {
       if (email && newPassword === confirmNewPassword) {
         const data = { email, newPassword };
@@ -118,12 +139,15 @@ const NewPassword = () => {
     const passwordPattern = /^(?=.*[!@#$%^&*?])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
 
     if (!password.match(passwordPattern)) {
+      setShowValidationErrors(true);
       setNotEqualError(
         "Password must contain at least one special character, one uppercase letter, one number, and be at least 8 characters long."
       );
     } else if (password !== confirmPassword) {
+      setShowValidationErrors(true);
       setNotEqualError("Both Passwords must match");
     } else {
+      setShowValidationErrors(false);
       setNotEqualError(null);
     }
   };
@@ -131,11 +155,10 @@ const NewPassword = () => {
   const handleInputChange = (e) => {
     // Remove non-numeric characters from the input value
     const numericValue = e.target.value.replace(/[^0-9]/g, "");
-   // setError("Only numbers are allowed!")
+    // setError("Only numbers are allowed!")
     setOTP(numericValue);
     setInputError(!/^[0-9]*$/.test(e.target.value));
   };
-
 
   return (
     <>
@@ -174,37 +197,6 @@ const NewPassword = () => {
                     </Col>
                     <FormGroup>
                       <Row>
-                        {/* <Col
-                          style={{ textAlign: "center" }}
-                          md={{
-                            offset: 3,
-                            size: 6,
-                          }}
-                        > 
-                          {" "}
-                          <Label for="otp">
-                            {
-                              newpasswordConstants.NP_CONSTANTS
-                                .PROVIDE_OTP_LABEL
-                            }
-                          </Label>
-                          <InputGroup>
-                            <InputGroupText>
-                              <img src={otppng} alt="otppng" />
-                            </InputGroupText>
-                            <Input
-                              style={{ textAlign: "center" }}
-                              id="otp"
-                              name="otp"
-                              placeholder={otpVisible ? "" : "****"}
-                              type="text"
-                              value={OTP}
-                              onFocus={() => setOtpVisible(true)}
-                              onBlur={() => setOtpVisible(false)}
-                              onChange={(e) => setOTP(e.target.value)}
-                            />
-                          </InputGroup>
-                        </Col> */}
                         <Col
                           style={{ textAlign: "center" }}
                           md={{ offset: 3, size: 6 }}
@@ -232,7 +224,9 @@ const NewPassword = () => {
                               pattern="[0-9]*" // Allow only numeric values
                               invalid={inputError}
                             />
-                             <FormFeedback>{inputError && "Only numbers are allowed."}</FormFeedback>
+                            <FormFeedback>
+                              {inputError && "Only numbers are allowed."}
+                            </FormFeedback>
                           </InputGroup>
                         </Col>
                       </Row>
@@ -298,8 +292,8 @@ const NewPassword = () => {
                                   <Input
                                     style={{ textAlign: "center" }}
                                     type={showPassword ? "text" : "password"}
-                                    name="password"
-                                    id="password"
+                                    minLength={8}
+                                    maxLength={12}
                                     onFocus={() => setShowPassPlaceHolder(true)}
                                     onBlur={() => setShowPassPlaceHolder(false)}
                                     placeholder={
@@ -348,11 +342,11 @@ const NewPassword = () => {
                                       textAlign: "center",
                                       paddingLeft: "5%",
                                     }}
+                                    minLength={8}
+                                    maxLength={12}
                                     type={
                                       showConfirmPassword ? "text" : "password"
                                     }
-                                    id="confirmNewPassword"
-                                    name="confirmNewPassword"
                                     onFocus={() =>
                                       setShowConfPassPlaceholer(true)
                                     }
@@ -385,6 +379,11 @@ const NewPassword = () => {
                                     </Button>
                                   </InputGroupText>
                                 </InputGroup>
+                                {showAlert && (
+                                  <Alert style={{ color: "red" }}>
+                                    Spaces are not allowed in the password.
+                                  </Alert>
+                                )}
                                 {/* {notEqualError && saveClicked && (
                                   <span className="text-danger">
                                     {notEqualError}
@@ -410,7 +409,8 @@ const NewPassword = () => {
                                 </Col>
                               </Row>
                             )} */}
-                            {showValidationErrors && attempts > 0 && (
+                            {showValidationErrors && (
+                              // && attempts > 0
                               <Row>
                                 <Col
                                   style={{ textAlign: "center" }}

@@ -43,6 +43,8 @@ const OrderCard = ({
     finalizeFunction,
     setFinalizeFunction,
     scheduledOrders,
+    disableConfirm,
+    setDisableConfirm,
   } = PopUpState();
 
   const toggleDetails = (orderId) => {
@@ -83,6 +85,7 @@ const OrderCard = ({
 
   useEffect(() => {
     if (finalizeFunction == true) {
+      setDisableConfirm(true)
       cancelingOrder();
     }
   }, [finalizeFunction]);
@@ -134,6 +137,7 @@ const OrderCard = ({
     ]);
     Clear();
     setToggleCancel(!toggleCancel);
+    setDisableConfirm(false)
   };
 
   return (

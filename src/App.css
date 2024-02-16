@@ -57,3 +57,29 @@
   opacity: 0.5; /* Adjust opacity to make the input appear dimmed */
   /* Add any other styles to visually indicate that the input is disabled */
 }
+
+
+.field-with-details {
+  display: inline-block;
+}
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px; /* Adjust spacing between label and tooltip */
+}
+
+.tooltip-text {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 14px;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}

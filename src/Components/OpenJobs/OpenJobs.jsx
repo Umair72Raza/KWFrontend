@@ -36,14 +36,15 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     setAvailableJobOffer,
   } = ChatState();
 
-  const { openJobs, setOpenJobs,disableAcceptButton, setDisableAcceptButton } = PopUpState();
+  const { openJobs, setOpenJobs, disableAcceptButton, setDisableAcceptButton } =
+    PopUpState();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const { setFromAvailableJobs } = PopUpState();
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
-  
+
   const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
@@ -174,14 +175,14 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
 
   const sendBid = async (order, Uid) => {
     setDisableAcceptButton(true);
-    setTimeout(()=>{
+    setTimeout(() => {
       setDisableAcceptButton(false);
-    },120000)
+    }, 120000);
     //  emit socket event to show Worker wants to start the job modal.
     const creds = { id: order._id, token: token };
     const result = await dispatch(checkTheStatusAsync(creds));
     if (result.type === "orders/checkStatus/fulfilled") {
-    
+      console.log(result.payload, "payload of check status");
       if (result.payload.message === "false") {
         const orderIdToRemove = order;
         const filteredOpenJobs = openJobs.filter(
@@ -192,20 +193,31 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         setOpenJobs(filteredOpenJobs);
         Swal.fire("This order is already accepted by another worker");
         return;
+      } else if (result.payload.message === "NaN") {
+        const orderIdToRemove = order;
+        const filteredOpenJobs = openJobs.filter(
+          (order) => order !== orderIdToRemove
+        );
+        setDisableAcceptButton(false);
+        // Update state with the filtered openJobs array
+        setOpenJobs(filteredOpenJobs);
+        Swal.fire("This order was deleted");
+        return;
       } else {
+        console.log("I ran");
         if (user.status !== "online") {
           return Swal.fire({
             title: "You are not online",
             icon: "error",
           });
         }
-    
+
         const worker = {
           workerId: user._id,
           workerfirstName: user.firstName,
           workerlastName: user.lastName,
         };
-    
+
         const data = {
           order,
           Uid,
@@ -213,25 +225,20 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         };
         socket.emit("startBid-accept-reject", data);
         Swal.fire({
-          title: "Accept Job request sent!",
+          title: " Your job request has been sent!",
           icon: "success",
         });
       }
     }
-
-   
   };
 
   const handleRefresh = async () => {
     let result = await dispatch(fetchOpenOrdersAsync(token));
-  
+
     if (result.type === "orders/fetchOpenOrders/fulfilled") {
-    
       if (openJobs?.length === 0) {
-       
         setOpenJobs(result.payload.orders);
       } else {
-      
         const uniqueOrders = result.payload.orders.filter(
           (newOrder) =>
             !openJobs.some(
@@ -240,7 +247,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         );
 
         // Append the unique orders to pastOrders
-        setOpenJobs((prevOpenJobs) => [...uniqueOrders,...prevOpenJobs ]);
+        setOpenJobs((prevOpenJobs) => [...uniqueOrders, ...prevOpenJobs]);
       }
     }
   };

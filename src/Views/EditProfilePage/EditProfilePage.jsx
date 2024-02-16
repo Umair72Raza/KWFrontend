@@ -47,6 +47,7 @@ import {
   updateUser,
 } from "../../Redux/Slices/AuthSlice";
 import personPNG from "../../assets/images/dummyProfile/user.png";
+import camera from "../../assets/images/dummyProfile/camera.png";
 import { CiEdit } from "react-icons/ci";
 import { FcEditImage } from "react-icons/fc";
 
@@ -499,7 +500,7 @@ const EditProfilePage = ({ ShowServices }) => {
 
   const updatePhone = () => {
     toggleEditPhone();
-    setModalContent("Test: Wait while you are being redirected...");
+    setModalContent("Wait while you are being redirected...");
 
     setShowModal(true);
     requestOTPforPhone();
@@ -635,7 +636,12 @@ const EditProfilePage = ({ ShowServices }) => {
           <Row className="d-flex flex-row  align-items-center">
             {" "}
             {!editMode && (
-              <Col xs={2} md={1} className="text-start">
+              <Col
+                style={{ marginLeft: "-11px" }}
+                xs={2}
+                md={1}
+                className="text-start"
+              >
                 <Button color="danger" onClick={handleGoBack}>
                   <FontAwesomeIcon icon={faArrowLeft} />
                 </Button>
@@ -954,7 +960,11 @@ const EditProfilePage = ({ ShowServices }) => {
                                 color=""
                                 onClick={toggleEditProfile}
                               >
-                                <FcEditImage className="fs-2" />
+                                <img
+                                  src={camera}
+                                  alt="editpfp"
+                                  height={"30px"}
+                                />
                               </Button>
                             </Col>
                           </>
