@@ -48,6 +48,10 @@ const PopUpContext = ({ children }) => {
   const [order, setOrder] = useState("");
   const [fromAvailableJobs, setFromAvailableJobs] = useState(false);
   const [disableAcceptButton, setDisableAcceptButton] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(() =>
+    localStorage.getItem("remainingTime")
+  );
+  const [disableConfirm, setDisableConfirm] = useState(false);
   return (
     <PopupContext.Provider
       value={{
@@ -115,6 +119,8 @@ const PopUpContext = ({ children }) => {
         setPostedJobs,
         disableAcceptButton,
         setDisableAcceptButton,
+        disableConfirm,
+        setDisableConfirm,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Form,
@@ -36,9 +36,12 @@ const ModalComponent = () => {
     setFinalizeButtonLabel,
     setCancelButtonLabel,
     setScheduledOrders,
-    setActiveOrder
+    setActiveOrder,
+    disableConfirm,
+    setDisableConfirm,
   } = PopUpState();
-  const {token} = useSelector((state)=>state.auth)
+  const { token } = useSelector((state) => state.auth);
+  const [disableCancel, setDisableCancel] = useState(false);
   useEffect(() => {
     socket?.on("startjob-request", (order) => {
       setOrder(order);
@@ -47,7 +50,6 @@ const ModalComponent = () => {
       setFinalizeButtonLabel("Yes");
       setCancelButtonLabel("Cancel");
       toggleModal();
-
     });
     return () => {
       socket?.off("startjob-request");
@@ -55,7 +57,9 @@ const ModalComponent = () => {
   });
 
   const activatingOrder = async () => {
-    const data = {orderId: order._id, token:token}
+    setDisableConfirm(true);
+    setDisableCancel(true);
+    const data = { orderId: order._id, token: token };
     const result = await dispatch(activateOrderAsync(data));
     if (result.type === "orders/activateOrders/fulfilled") {
       if (result.payload.Status === "Active") {
@@ -75,20 +79,18 @@ const ModalComponent = () => {
         };
         startJobSocket();
 
-
         setScheduledOrders((prevScheduledOrders) =>
-        prevScheduledOrders.filter(
-          (scheduledOrder) => scheduledOrder._id !== order._id
-        ));
-          
-      setActiveOrder((prevActiveOrders) => [
-        ...prevActiveOrders,
-        order,
-      ]);
+          prevScheduledOrders.filter(
+            (scheduledOrder) => scheduledOrder._id !== order._id
+          )
+        );
 
+        setActiveOrder((prevActiveOrders) => [...prevActiveOrders, order]);
 
         setIsFinalize(false);
         setOrder(null);
+        setDisableConfirm(false);
+        setDisableCancel(false);
       }
     }
   };
@@ -141,7 +143,6 @@ const ModalComponent = () => {
               <Label for="cancelReason">{inputLabel}</Label>
               <Input
                 type="text"
-                id="cancelReason"
                 placeholder="Enter reason"
                 value={modalInputValue}
                 onChange={(e) => setModalInputValue(e.target.value)}
@@ -166,6 +167,7 @@ const ModalComponent = () => {
         </Button>
         <Button
           color={isFinalize ? "success" : "danger"}
+          disabled={disableConfirm}
           onClick={
             isFinalize
               ? () => {
