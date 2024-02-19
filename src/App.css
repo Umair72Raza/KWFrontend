@@ -1,12 +1,12 @@
 .greenButton {
-  background-color: #33cc33; 
-  color: #ffffff; 
+  background-color: #33cc33;
+  color: #ffffff;
   border: 1px solid #008000;
 }
 .redButton {
-  background-color: #ff4444; 
-  color: #ffffff; 
-  border: 1px solid #cc0000; 
+  background-color: #ff4444;
+  color: #ffffff;
+  border: 1px solid #cc0000;
 }
 .swal-content {
   max-height: 300px;
@@ -27,14 +27,13 @@
   cursor: pointer;
 }
 
-.custom-margin-service{
+.custom-margin-service {
   margin-left: 1% !important;
   border-radius: 3px;
 }
 
-.custom-padding-navbar-admin{
-  padding-left:50px !important
-
+.custom-padding-navbar-admin {
+  padding-left: 50px !important;
 }
 .settings-container {
   display: flex;
@@ -57,7 +56,6 @@
   opacity: 0.5; /* Adjust opacity to make the input appear dimmed */
   /* Add any other styles to visually indicate that the input is disabled */
 }
-
 
 .field-with-details {
   display: inline-block;
@@ -82,4 +80,10 @@
   color: #333;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 999;
+}
+
+.card-container {
+  max-width: 500px !important; /* Adjust the value according to your design */
+  margin: 0 auto; /* Center the card horizontally */
+  
 }

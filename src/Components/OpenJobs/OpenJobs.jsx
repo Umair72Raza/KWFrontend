@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardText,
   Col,
   Container,
@@ -282,7 +283,10 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                 lg="4"
                 style={{ marginTop: "10px" }}
               >
-                <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
+                <Card
+                  className="shadow"
+                  style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                >
                   <CardBody>
                     <h5
                       style={{
@@ -388,7 +392,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         )}
                       </CardText>
                     )}
-                    <CardText>
+                    {/* <CardText>
                       {" "}
                       <Button
                         onClick={() => openGoogleMaps(order?.user?.location)}
@@ -412,12 +416,65 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         onClick={() => handleMessageIconClick(order)}
                         style={{
                           color: "white",
+                          marginBottom: "10px",
                         }}
                       >
                         <FiMessageCircle className="fs-4 " /> Chat{" "}
                       </Button>
-                    </CardText>
+                    </CardText> */}
                   </CardBody>
+                  {order?.images?.length > 0 && (
+                    <CardFooter className="d-flex justify-content-around align-items-center">
+                      <Button
+                        onClick={() => openGoogleMaps(order?.user?.location)}
+                        color="primary"
+                        className="ms-2"
+                      >
+                        Directions <FaMapMarkerAlt />
+                      </Button>
+                      <Button
+                        onClick={() => sendBid(order, order?.user?._id)}
+                        color="success"
+                        disabled={disableAcceptButton}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        color="info"
+                        className="fw-bold hover-pointer"
+                        onClick={() => handleMessageIconClick(order)}
+                        style={{ color: "white", marginBottom: "10px" }}
+                      >
+                        <FiMessageCircle className="fs-4" /> Chat
+                      </Button>
+                    </CardFooter>
+                  )}
+                  {order?.images?.length === 0 && (
+                    <CardFooter className="d-flex justify-content-around align-items-center">
+                      <Button
+                        onClick={() => openGoogleMaps(order?.user?.location)}
+                        color="primary"
+                        className="ms-2"
+                      >
+                        Directions <FaMapMarkerAlt />
+                      </Button>
+                      <Button
+                        onClick={() => sendBid(order, order?.user?._id)}
+                        color="success"
+                        disabled={disableAcceptButton}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        color="info"
+                        className="fw-bold hover-pointer"
+                        onClick={() => handleMessageIconClick(order)}
+                        style={{ color: "white", marginBottom: "10px" }}
+                      >
+                        <FiMessageCircle className="fs-4" /> Chat
+                      </Button>
+                    </CardFooter>
+                  )}
                 </Card>
               </Col>
             ))}

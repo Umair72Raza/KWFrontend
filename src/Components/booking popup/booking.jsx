@@ -22,7 +22,8 @@ import { set } from "lodash";
 import TheToolTip from "../ToolTip/ToolTip.jsx";
 
 const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
-  const { user, token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
+  const user = JSON.parse(localStorage.getItem("user"));
   const socket = useSelector((state) => state?.socket?.socket);
   let list = useSelector((state) => state?.admin?.services);
   const dispatch = useDispatch();
@@ -439,7 +440,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
 
           <FormGroup>
             <Label className="fw-bold">Address</Label>
-            <div>{user.address}</div>
+            <div>{user?.address}</div>
           </FormGroup>
           <FormGroup>
             <Label for="taskDetails" className="fw-bold ">

@@ -9,6 +9,9 @@ import {
   Label,
   Container,
   Spinner,
+  CardHeader,
+  Card,
+  CardBody,
 } from "reactstrap";
 import {
   getSettings,
@@ -22,6 +25,7 @@ import {
 } from "../../Redux/Slices/LoaderSlice";
 import { capitalizeFirstLetter, failureToast, successToast } from "../../utils";
 import Swal from "sweetalert2";
+import bkg from "../../assets/images/Settings/bkg.jpg";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -291,241 +295,234 @@ const Settings = () => {
           <Col></Col>
         </Row>
       </Container>
-      <Container className="position-absolute mt-5">
-        <Row>
-          <Col></Col>
-          <Col className="text-center ">
+      <div className="card-container" lg={6}>
+        <Card className="shadow " lg={6} md={4}>
+          <CardHeader className="d-flex align-items-center justify-content-center ">
             <h1>Settings</h1>
-          </Col>
-          <Col></Col>
-        </Row>
-      </Container>
+          </CardHeader>
+          <CardBody>
+            {spinnerVisible ? (
+              <>
+                <Spinner />
+              </>
+            ) : (
+              <>
+                <div className="d-flex align-items-center justify-content-center">
+                  <div>
+                    <FormGroup>
+                      <Label for="notificationTimeLimit">
+                        Notification Time Limit:
+                      </Label>
+                      <div className="d-flex align-items-center text-center">
+                        {isEditingNotification ? (
+                          <>
+                            <Input
+                              type="text"
+                              id="notificationTimeLimit"
+                              value={newNotificationsLimit}
+                              onChange={(e) => {
+                                const inputValue = e.target.value.replace(
+                                  /\D/g,
+                                  ""
+                                ); // Remove non-numeric characters
+                                setNewNotificationsLimit(inputValue);
+                              }}
+                              onPaste={(e) => {
+                                e.preventDefault();
+                                const pastedText =
+                                  e.clipboardData.getData("text/plain");
+                                const numericValue = pastedText.replace(
+                                  /\D/g,
+                                  ""
+                                ); // Remove non-numeric characters
+                                document.execCommand(
+                                  "insertText",
+                                  false,
+                                  numericValue
+                                );
+                                setNewNotificationsLimit(numericValue);
+                              }}
+                              className=""
+                              pattern="\d*"
+                              maxLength={3}
+                            />
+                            <Button
+                              color="success"
+                              onClick={handleUpdateNotification}
+                              disabled={disableNotificationsButton}
+                            >
+                              Update
+                            </Button>
+                            <Button
+                              color="danger"
+                              className=" "
+                              onClick={handleCancelNotification}
+                            >
+                              Cancel
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <div className="">
+                              {notificationTimeLimit} minutes
+                            </div>
+                            <Button
+                              color="primary"
+                              style={{ marginLeft: "3%" }}
+                              onClick={handleEditNotifiTime}
+                            >
+                              Edit
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </FormGroup>
 
-      {spinnerVisible ? (
-        <>
-          <Spinner />
-        </>
-      ) : (
-        <>
-          <div className="settings-container mt-5">
-            <div>
-              <Row>
-                <Col>
-                  <FormGroup>
-                    <Label for="notificationTimeLimit">
-                      Notification Time Limit:
-                    </Label>
-                    <div className="d-flex align-items-center text-center">
-                      {isEditingNotification ? (
-                        <>
-                          <Input
-                            type="text"
-                            id="notificationTimeLimit"
-                            value={newNotificationsLimit}
-                            onChange={(e) => {
-                              const inputValue = e.target.value.replace(
-                                /\D/g,
-                                ""
-                              ); // Remove non-numeric characters
-                              setNewNotificationsLimit(inputValue);
-                            }}
-                            onPaste={(e) => {
-                              e.preventDefault();
-                              const pastedText =
-                                e.clipboardData.getData("text/plain");
-                              const numericValue = pastedText.replace(
-                                /\D/g,
-                                ""
-                              ); // Remove non-numeric characters
-                              document.execCommand(
-                                "insertText",
-                                false,
-                                numericValue
-                              );
-                              setNewNotificationsLimit(numericValue);
-                            }}
-                            className=""
-                            pattern="\d*"
-                            maxLength={3}
-                          />
+                    <FormGroup>
+                      <Label for="scheduledOrderOffset">
+                        Scheduled Order Offset Time:
+                      </Label>
+                      <div className="d-flex align-items-center">
+                        {isEditingScheduledOrder ? (
+                          <>
+                            <Input
+                              type="text"
+                              id="scheduledOrderOffset"
+                              value={newScheduledOrderOffset}
+                              onChange={(e) => {
+                                const inputValue = e.target.value.replace(
+                                  /\D/g,
+                                  ""
+                                ); // Remove non-numeric characters
+                                setNewScheduledOrderOffset(inputValue);
+                              }}
+                              onPaste={(e) => {
+                                e.preventDefault();
+                                const pastedText =
+                                  e.clipboardData.getData("text/plain");
+                                const numericValue = pastedText.replace(
+                                  /\D/g,
+                                  ""
+                                ); // Remove non-numeric characters
+                                document.execCommand(
+                                  "insertText",
+                                  false,
+                                  numericValue
+                                );
+                                setNewScheduledOrderOffset(numericValue);
+                              }}
+                              className=" "
+                              pattern="\d*"
+                              maxLength={2}
+                            />
+                            <Button
+                              color="success"
+                              onClick={handleUpdateScheduledOrder}
+                              disabled={disableSchOrderButton}
+                            >
+                              Update
+                            </Button>
+                            <Button
+                              color="danger"
+                              className=" "
+                              onClick={handleCancelScheduledOrder}
+                            >
+                              Cancel
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <div>{scheduledOrderOffset} minutes</div>
+                            <Button
+                              color="primary"
+                              style={{ marginLeft: "3%" }}
+                              onClick={handleEditSchOffset}
+                            >
+                              Edit
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </FormGroup>
 
-                          <Button
-                            color="success"
-                            onClick={handleUpdateNotification}
-                            disabled={disableNotificationsButton}
-                          >
-                            Update
-                          </Button>
-                          <Button
-                            color="danger"
-                            className=" "
-                            onClick={handleCancelNotification}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <div className="">
-                            {notificationTimeLimit} minutes
+                    <Row>
+                      <Col>
+                        <FormGroup>
+                          <Label for="radius">
+                            Radius of Vicinity Distance:
+                          </Label>
+                          <div className="d-flex align-items-center">
+                            {isEditingRadius ? (
+                              <>
+                                <Input
+                                  type="text"
+                                  id="radius"
+                                  value={newRadius}
+                                  onChange={(e) => {
+                                    const inputValue = e.target.value.replace(
+                                      /\D/g,
+                                      ""
+                                    ); // Remove non-numeric characters
+                                    setNewRadius(inputValue);
+                                  }}
+                                  onPaste={(e) => {
+                                    e.preventDefault();
+                                    const pastedText =
+                                      e.clipboardData.getData("text/plain");
+                                    const numericValue = pastedText.replace(
+                                      /\D/g,
+                                      ""
+                                    ); // Remove non-numeric characters
+                                    document.execCommand(
+                                      "insertText",
+                                      false,
+                                      numericValue
+                                    );
+                                    setNewRadius(numericValue);
+                                  }}
+                                  className=""
+                                  pattern="\d*"
+                                  maxLength={2}
+                                />
+
+                                <Button
+                                  color="success"
+                                  onClick={handleUpdateRadius}
+                                  disabled={disableRadiusButton}
+                                >
+                                  Update
+                                </Button>
+                                <Button
+                                  color="danger"
+                                  className=" "
+                                  onClick={handleCancelRadius}
+                                >
+                                  Cancel
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <div className=" ">{radius} Kms</div>
+                                <Button
+                                  color="primary"
+                                  style={{ marginLeft: "17%" }}
+                                  onClick={handleEditRadius}
+                                >
+                                  Edit
+                                </Button>
+                              </>
+                            )}
                           </div>
-                          <Button
-                            color="primary"
-                            style={{ marginLeft: "3%" }}
-                            onClick={handleEditNotifiTime}
-                          >
-                            Edit
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </FormGroup>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <FormGroup>
-                    <Label for="scheduledOrderOffset">
-                      Scheduled Order Offset Time:
-                    </Label>
-                    <div className="d-flex align-items-center">
-                      {isEditingScheduledOrder ? (
-                        <>
-                          <Input
-                            type="text"
-                            id="scheduledOrderOffset"
-                            value={newScheduledOrderOffset}
-                            onChange={(e) => {
-                              const inputValue = e.target.value.replace(
-                                /\D/g,
-                                ""
-                              ); // Remove non-numeric characters
-                              setNewScheduledOrderOffset(inputValue);
-                            }}
-                            onPaste={(e) => {
-                              e.preventDefault();
-                              const pastedText =
-                                e.clipboardData.getData("text/plain");
-                              const numericValue = pastedText.replace(
-                                /\D/g,
-                                ""
-                              ); // Remove non-numeric characters
-                              document.execCommand(
-                                "insertText",
-                                false,
-                                numericValue
-                              );
-                              setNewScheduledOrderOffset(numericValue);
-                            }}
-                            className=" "
-                            pattern="\d*"
-                            maxLength={2}
-                          />
-                          <Button
-                            color="success"
-                            onClick={handleUpdateScheduledOrder}
-                            disabled={disableSchOrderButton}
-                          >
-                            Update
-                          </Button>
-                          <Button
-                            color="danger"
-                            className=" "
-                            onClick={handleCancelScheduledOrder}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <div>{scheduledOrderOffset} minutes</div>
-                          <Button
-                            color="primary"
-                            style={{ marginLeft: "3%" }}
-                            onClick={handleEditSchOffset}
-                          >
-                            Edit
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </FormGroup>
-                </Col>
-              </Row>
-
-              <Row>
-                <Col>
-                  <FormGroup>
-                    <Label for="radius">Radius of Vicinity Distance:</Label>
-                    <div className="d-flex align-items-center">
-                      {isEditingRadius ? (
-                        <>
-                          <Input
-                            type="text"
-                            id="radius"
-                            value={newRadius}
-                            onChange={(e) => {
-                              const inputValue = e.target.value.replace(
-                                /\D/g,
-                                ""
-                              ); // Remove non-numeric characters
-                              setNewRadius(inputValue);
-                            }}
-                            onPaste={(e) => {
-                              e.preventDefault();
-                              const pastedText =
-                                e.clipboardData.getData("text/plain");
-                              const numericValue = pastedText.replace(
-                                /\D/g,
-                                ""
-                              ); // Remove non-numeric characters
-                              document.execCommand(
-                                "insertText",
-                                false,
-                                numericValue
-                              );
-                              setNewRadius(numericValue);
-                            }}
-                            className=""
-                            pattern="\d*"
-                            maxLength={2}
-                          />
-
-                          <Button
-                            color="success"
-                            onClick={handleUpdateRadius}
-                            disabled={disableRadiusButton}
-                          >
-                            Update
-                          </Button>
-                          <Button
-                            color="danger"
-                            className=" "
-                            onClick={handleCancelRadius}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <div className=" ">{radius} Kms</div>
-                          <Button
-                            color="primary"
-                            style={{ marginLeft: "17%" }}
-                            onClick={handleEditRadius}
-                          >
-                            Edit
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </FormGroup>
-                </Col>
-              </Row>
-            </div>
-          </div>
-        </>
-      )}
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                  </div>
+                </div>
+              </>
+            )}
+          </CardBody>
+        </Card>
+      </div>
     </>
   );
 };

@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardText,
   CardTitle,
   Col,
@@ -132,7 +133,7 @@ const PostedJobs = ({ postedJobs }) => {
                   >
                     <Card
                       className="shadow"
-                      style={{ backgroundColor: "#f6f8fc" }}
+                      style={{ backgroundColor: "#f6f8fc", height:"100%" }}
                     >
                       <CardBody>
                         <CardTitle>
@@ -262,7 +263,10 @@ const PostedJobs = ({ postedJobs }) => {
                             </Slider>
                           </Row>
                         )}
-                        <Row>
+
+                      </CardBody>
+                      <CardFooter>
+                      <Row>
                           <Col style={{ margin: "2%" }} xs="12" md="5">
                             {" "}
                             <CardText>
@@ -290,7 +294,7 @@ const PostedJobs = ({ postedJobs }) => {
                             </Col>
                           </>
                         </Row>
-                      </CardBody>
+                      </CardFooter>
                     </Card>
                   </Col>
                 ))}
