@@ -16,7 +16,7 @@ import {
   ModalHeader,
   ModalBody,
 } from "reactstrap";
-// import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
+import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
 // import { City } from "country-state-city";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -635,7 +635,7 @@ const EditProfilePage = ({ ShowServices }) => {
         <Container>
           <Row className="d-flex flex-row  align-items-center">
             {" "}
-            {!editMode && (
+            {!editMode && !emailEdit && !phoneEdit && !editProfile && (
               <Col
                 style={{ marginLeft: "-11px" }}
                 xs={2}
@@ -722,12 +722,14 @@ const EditProfilePage = ({ ShowServices }) => {
                   </Row>
 
                   <Row md={12}>
-                    <Dropdowns
-                      setFormData={setFormData}
-                      errors={errors}
-                      setErrors={setErrors}
-                      formData={formData}
-                    />
+                    <FormGroup>
+                      <Dropdowns
+                        setFormData={setFormData}
+                        errors={errors}
+                        setErrors={setErrors}
+                        formData={formData}
+                      />
+                    </FormGroup>
                   </Row>
                   <Row md={11}>
                     <Col>

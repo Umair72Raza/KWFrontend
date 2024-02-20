@@ -384,3 +384,88 @@ export const ADMIN_USERS = {
   NO_ACTIVE_USERS: "No Active Users found",
   NO_INACTIVE_USERS: "No Inactive Users found",
 };
+
+export const countriesData = [
+  {
+    name: "United States",
+    code: "US",
+    states: [
+      {
+        name: "New York",
+        cities: ["New York City", "Buffalo", "Rochester"]
+      },
+      {
+        name: "California",
+        cities: ["Los Angeles", "San Francisco", "San Diego"]
+      }
+    ]
+  },
+  {
+    name: "Canada",
+    code: "CA",
+    states: [
+      {
+        name: "Ontario",
+        cities: ["Toronto", "Ottawa", "Hamilton"]
+      },
+      {
+        name: "Quebec",
+        cities: ["Montreal", "Quebec City", "Laval"]
+      }
+    ]
+  },
+  {
+    name: "Pakistan",
+    code: "PK",
+    states: [
+      {
+        name: "Punjab",
+        cities: [
+          "Lahore", "Faisalabad", "Rawalpindi", "Gujranwala", "Multan",
+          "Bahawalpur", "Sargodha", "Sialkot", "Gujrat", "Jhang",
+          "Sheikhupura", "Rahim Yar Khan", "Okara", "Wah", "Dera Ghazi Khan"
+        ]
+      },
+      {
+        name: "Sindh",
+        cities: [
+          "Karachi", "Hyderabad", "Sukkur", "Larkana", "Mirpur Khas",
+          "Shikarpur", "Jacobabad", "Dadu", "Nawabshah", "Khairpur",
+          "Tando Allahyar", "Tando Adam", "Ratodero", "Ghotki", "Badin"
+        ]
+      },
+      {
+        name: "Khyber Pakhtunkhwa",
+        cities: [
+          "Peshawar", "Abbottabad", "Mardan", "Swat", "Mansehra",
+          "Charsadda", "Nowshera", "Kohat", "Dera Ismail Khan", "Haripur",
+          "Chitral", "Bannu", "Dir", "Tank", "Lakki Marwat"
+        ]
+      },
+      {
+        name: "Balochistan",
+        cities: [
+          "Quetta", "Gwadar", "Turbat", "Khuzdar", "Chaman",
+          "Sibi", "Zhob", "Loralai", "Nushki", "Kharan",
+          "Kalat", "Mastung", "Pasni", "Panjgur", "Kech"
+        ]
+      },
+      {
+        name: "Gilgit-Baltistan",
+        cities: [
+          "Gilgit", "Skardu", "Chilas", "Ghizer", "Astore",
+          "Hunza", "Khaplu", "Shigar", "Gupis", "Diamer",
+          "Nagar", "Shimshal", "Darel", "Tangir", "Rondu"
+        ]
+      },
+      {
+        name: "Azad Jammu and Kashmir",
+        cities: [
+          "Muzaffarabad", "Mirpur", "Bhimber", "Kotli", "Rawalakot",
+          "Bagh", "Hattian Bala", "Haveli", "Neelam", "Leepa",
+          "Sudhanoti", "Mangla", "Pallandri", "Las Danna", "Samahni"
+        ]
+      }
+    ]
+  },
+];
