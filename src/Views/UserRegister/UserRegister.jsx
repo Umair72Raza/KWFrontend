@@ -41,12 +41,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FaCheckCircle } from "react-icons/fa";
 import { set } from "lodash";
-import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
-import { City } from "country-state-city";
+// import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
+// import { City } from "country-state-city";
 import SignUpOtpVerify from "../../Components/SingUpOtpVerify/SignUpOtpVerify.jsx";
 
 const UserRegister = ({ ShowServices }) => {
-  let list = useSelector((state) => state?.admin?.services);
+  // let list = useSelector((state) => state?.admin?.services);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -724,14 +724,14 @@ const UserRegister = ({ ShowServices }) => {
                 </FormGroup>
               </Col>
               <Col md={12}>
-                <FormGroup>
+                {/* <FormGroup>
                   <Dropdowns
                     setFormData={setFormData}
                     errors={errors}
                     setErrors={setErrors}
                     loading={loading}
                   />
-                </FormGroup>
+                </FormGroup> */}
               </Col>
             </Row>
             <Row>
@@ -790,6 +790,7 @@ const UserRegister = ({ ShowServices }) => {
         </Col>
       </Row>
     </Container>
+    // <>Heelloo</>
   );
 };
 

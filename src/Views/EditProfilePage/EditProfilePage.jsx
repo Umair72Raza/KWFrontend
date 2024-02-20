@@ -16,8 +16,8 @@ import {
   ModalHeader,
   ModalBody,
 } from "reactstrap";
-import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
-import { City } from "country-state-city";
+// import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
+// import { City } from "country-state-city";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faTimes } from "@fortawesome/free-solid-svg-icons";
 import UserNavbar from "../../Components/Navbar/UserNavbar";

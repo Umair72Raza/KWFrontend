@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, FormGroup, Label, Input } from "reactstrap";
-import { Country, State, City } from "country-state-city";
+// import { Country, State, City } from "country-state-city";
 import { RegisterPage } from "../../Constants/Constants";
 
 const Dropdowns = ({

@@ -65,7 +65,7 @@ const Settings = () => {
       return false;
     }
 
-    // Convert newValue to a number
+  //   // Convert newValue to a number
     const numericValue = Number(newValue);
 
     // Check the range

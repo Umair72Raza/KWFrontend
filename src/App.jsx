@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AuthLayout from "./Layouts/AuthLayout";
-import UserLayout from "./Layouts/UserLayout";
+ import UserLayout from "./Layouts/UserLayout";
 import { checkRole, checkToken } from "./utils";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -25,14 +25,14 @@ function App() {
   let { setScheduledOrders, setCancelledOrders, scheduledOrders } =
     PopUpState();
 
-  /// cancel order message
+  // /// cancel order message
   useEffect(() => {
     socket?.on("order-canceled", (data) => {
       const Corder = data.order;
       let reason = data.reason;
-Corder.cancelReason={
-  reason:reason
-}
+      Corder.cancelReason = {
+        reason: reason,
+      };
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {
         reason = "Reason not mentioned";
@@ -88,7 +88,7 @@ Corder.cancelReason={
 
   useEffect(() => {
     let isMounted = true;
-
+    console.log(isMounted);
     const fetchData = async () => {
       if (isMounted) {
         const authenticated = checkToken();
@@ -96,6 +96,7 @@ Corder.cancelReason={
         if (authenticated) {
           const loginRole = checkRole();
           setRole(loginRole);
+          console.log(role);
         }
       }
     };
@@ -164,6 +165,7 @@ Corder.cancelReason={
         <Routes>{routes}</Routes>
       </BrowserRouter>
     </>
+    // <>APPS</>
   );
 }
 
