@@ -20,10 +20,10 @@ import confirmpassword from "../../assets/images/NewPasswordpngs/confirmpassword
 import otppng from "../../assets/images/NewPasswordpngs/securedata.png";
 import { failureToast, successToast } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  requestOTPverification,
-  setNewPassAsync,
-} from "../../Redux/Slices/AuthSlice";
+// import {
+//   requestOTPverification,
+//   setNewPassAsync,
+// } from "../../Redux/Slices/AuthSlice";
 
 const NewPassword = () => {
   const location = useLocation();
