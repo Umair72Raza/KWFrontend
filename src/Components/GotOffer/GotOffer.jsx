@@ -126,15 +126,23 @@ const GotOffer = ({ formattedOfferDetails, User, onConfirm, onCancel }) => {
   //     </Button></div>
   //   );
   // };
+  // const settings = {
+  //   mobileFirst: true,
+  //   dots: true,
+  //   infinite: false,
+  //   speed: 500,
+  //   slidesToShow: 3,
+  //   slidesToScroll: 1,
+  //   //  prevArrow: <CustomPrevArrow />,
+  //   //  nextArrow: <CustomNextArrow />,
+  // };
   const settings = {
-    mobileFirst: true,
     dots: true,
     infinite: false,
-    speed: 500,
-    slidesToShow: 3,
+    slidesToShow: 1,
     slidesToScroll: 1,
-    //  prevArrow: <CustomPrevArrow />,
-    //  nextArrow: <CustomNextArrow />,
+    autoplay: true,
+    autoplaySpeed: 2000,
   };
 
   const HandleChat = () => {
@@ -146,7 +154,7 @@ const GotOffer = ({ formattedOfferDetails, User, onConfirm, onCancel }) => {
         (chatUser) => formattedOfferDetails?.users[0] === chatUser?._id
       )
     );
-  
+
     if (!isWorkerInChats) {
       // Create a fake chat
       const fakeChat = {
@@ -217,10 +225,13 @@ const GotOffer = ({ formattedOfferDetails, User, onConfirm, onCancel }) => {
             <strong>{GOTOFFER.OFFER_AMOUNT}</strong>$
             {formattedOfferDetails?.amount}
           </p>
-          <p>
-            <strong>{GOTOFFER.OFFER_SERVICE}</strong>{" "}
-            {formattedOfferDetails?.service}
-          </p>
+          <strong>{GOTOFFER.OFFER_SERVICE}</strong>
+          {formattedOfferDetails?.service.map((service, index) => (
+            <p key={index}>
+              <b>{index + 1}:</b> {service}
+            </p>
+          ))}
+
           <p style={{ maxHeight: "100px", overflowY: "scroll" }}>
             <strong>{GOTOFFER.OFFER_DETAILS}</strong>
             <div
@@ -242,10 +253,12 @@ const GotOffer = ({ formattedOfferDetails, User, onConfirm, onCancel }) => {
               </Button>
             )}
           </p>
-{formattedOfferDetails?.images?.length > 0 && (  <p>
-            <strong>Task Pictures</strong>
-          </p>)}
-        
+          {formattedOfferDetails?.images?.length > 0 && (
+            <p>
+              <strong>Task Pictures</strong>
+            </p>
+          )}
+
           <Row className="">
             <Col>
               {imageDataURL?.length > 2 ? (
@@ -285,10 +298,11 @@ const GotOffer = ({ formattedOfferDetails, User, onConfirm, onCancel }) => {
           <Button color="danger" onClick={handleCancel}>
             {GOTOFFER.REJECT_BUTTON}
           </Button>{" "}
-          {!selectedChatCompare && (   <Button color="success" onClick={HandleChat}>
-            Chat
-          </Button>)}
-        
+          {!selectedChatCompare && (
+            <Button color="success" onClick={HandleChat}>
+              Chat
+            </Button>
+          )}
         </ModalFooter>
       </Modal>
     </div>

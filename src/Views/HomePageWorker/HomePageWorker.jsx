@@ -133,14 +133,18 @@ const HomePageWorker = () => {
           return obj.params.users[0] === data.params.users[0];
         });
         if (!alreadyPresent) {
-          const timeOutForNotification = JSON.parse(localStorage.getItem("settings"));
+          const timeOutForNotification = JSON.parse(
+            localStorage.getItem("settings")
+          );
           SetONotification([data, ...offerNotification]);
           addNotificationTimeout(
             data,
-            setTimeout(() =>{ offerTimeUp(data.params)
-            SetONotification(()=>offerNotification.filter((obj) => obj !== data))
-            }
-            , (timeOutForNotification[0]?.notificationsLife) * 60 * 1000)
+            setTimeout(() => {
+              offerTimeUp(data.params);
+              SetONotification(() =>
+                offerNotification.filter((obj) => obj !== data)
+              );
+            }, timeOutForNotification[0]?.notificationsLife * 60 * 1000)
           );
         }
       } else {
@@ -174,7 +178,7 @@ const HomePageWorker = () => {
       } else if (data.result == "false") {
         setStartJobStatus("false");
         setStartJobVerified(true);
-       // setGlobalStartButtonDisabled(false);
+        // setGlobalStartButtonDisabled(false);
         setStartButtonDisabledMap((prevMap) => ({
           ...prevMap,
           [data.order._id]: false,
@@ -192,8 +196,7 @@ const HomePageWorker = () => {
       if (data.result === "true") {
         setBidJobStatus("true");
         setStartBidVerified(true);
-      
-  
+
         setOpenJobs((prevOpenJobs) =>
           prevOpenJobs.filter((openJob) => openJob._id !== data.order._id)
         );
@@ -201,7 +204,6 @@ const HomePageWorker = () => {
           ...prevScheduledOrders,
           data.order,
         ]);
-       
       } else if (data.result == "false") {
         setStartBidVerified(true);
         setBidJobStatus("false");
@@ -215,9 +217,9 @@ const HomePageWorker = () => {
   useEffect(() => {
     socket?.on("order-cancelled", (data) => {
       const Corder = data.order;
-      Corder.cancelReason={
-        reason:data.reason
-      }
+      Corder.cancelReason = {
+        reason: data.reason,
+      };
       let reason = data.reason;
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {
@@ -287,7 +289,6 @@ const HomePageWorker = () => {
       setNotificationTimeouts((prevTimeouts) =>
         prevTimeouts.filter((_, i) => i !== index)
       );
-   
     }
     socket?.emit("accept-reject", {
       result: "accept",
@@ -308,7 +309,6 @@ const HomePageWorker = () => {
       setNotificationTimeouts((prevTimeouts) =>
         prevTimeouts.filter((_, i) => i !== index)
       );
-    
     }
     socket?.emit("accept-reject", {
       result: "cancel",
@@ -330,7 +330,6 @@ const HomePageWorker = () => {
 
       // Handling incoming chat notifications from the server
       socket?.on("chat-notifications", (chatNotifications) => {
-      
         const newUnreadMessages = {};
 
         // Update the unread message count state for each chat
@@ -487,14 +486,11 @@ const HomePageWorker = () => {
     if (openJobsClicked === false) {
       setOpenJobsClicked(true);
       let result = await dispatch(fetchOpenOrdersAsync(token));
-   
+
       if (result.type === "orders/fetchOpenOrders/fulfilled") {
-    
         if (openJobs?.length === 0) {
-      
           setOpenJobs(result.payload.orders);
         } else {
-   
           const uniqueOrders = result.payload.orders.filter(
             (newOrder) =>
               !openJobs.some(
@@ -543,6 +539,15 @@ const HomePageWorker = () => {
           </NavItem>
           <NavItem>
             <NavLink
+              className={classnames({ active: activeTab === "4" })}
+              onClick={activeOrders}
+              setPastOrders={setPastOrders}
+            >
+              {TABS.ACTIVE}
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
               className={classnames({ active: activeTab === "2" })}
               onClick={pastClick}
             >
@@ -557,15 +562,7 @@ const HomePageWorker = () => {
               {TABS.CANCELLED}
             </NavLink>
           </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: activeTab === "4" })}
-              onClick={activeOrders}
-              setPastOrders={setPastOrders}
-            >
-              {TABS.ACTIVE}
-            </NavLink>
-          </NavItem>
+
           <NavItem>
             <NavLink
               className={classnames({ active: activeTab === "5" })}

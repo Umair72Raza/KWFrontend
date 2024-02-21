@@ -184,7 +184,12 @@ const OfferResult = () => {
                 <b>Title</b>: {params?.Title}
               </CardText>
               <CardText>
-                <b>Service</b>: {params?.service}
+                <b>Service</b>:
+                 {params?.service?.map((service, index) => (
+            <p key={index}>
+              <b>{index + 1}:</b> {service}
+            </p>
+          ))}
               </CardText>
               <CardText>
                 {" "}

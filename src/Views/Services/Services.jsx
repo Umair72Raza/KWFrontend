@@ -108,7 +108,7 @@ const Services = () => {
         }
       } else {
         displayErrorMessage(
-          "Service already exists! Please try a different service name!"
+          "Service already exists. Please try a different service name"
         );
         setAddButtonDisabled(false); // Enable the button
       }
@@ -149,7 +149,6 @@ const Services = () => {
           const removeResult = await dispatch(deleteServiceAsync(data));
 
           if (removeResult.type === "/admin/deleteService/fulfilled") {
-          
             if (removeResult.payload === undefined) {
               Swal.fire("Cannot Remove!", "This service is taken.", "error");
             } else {
@@ -175,7 +174,6 @@ const Services = () => {
     setShowEditButton(!showEditButtons);
   };
 
-  
   const handleEditService = async (service) => {
     setUpdateButtonDisabled(true);
     const servName = service.name;
@@ -216,35 +214,29 @@ const Services = () => {
           };
           const result = await dispatch(updateServiceAsync(data));
           if (result.type === "/admin/updateService/fulfilled") {
-       
             if (result.payload.message === "Required") {
               setEditedService({ id: null, name: "" });
-      
+
               await displayEditErrorMessage(
                 "Name is required for updating a service"
               );
-              return
-            } else if (
-              result.payload.message === "taken"
-            ) {
-           
+              return;
+            } else if (result.payload.message === "taken") {
               setEditedService({ id: null, name: "" });
               await displayEditErrorMessage(
                 "Service is taken by a worker. Cannot Update"
               );
-              return
-            }
-            else {
+              return;
+            } else {
               setServices((prevServices) =>
-              prevServices.map((s) =>
-                s._id === editedService.id
-                  ? { ...s, name: trimmedEditedService }
-                  : s
-              )
-            );
-            setEditedService({ id: null, name: "" });
+                prevServices.map((s) =>
+                  s._id === editedService.id
+                    ? { ...s, name: trimmedEditedService }
+                    : s
+                )
+              );
+              setEditedService({ id: null, name: "" });
             }
-           
           } else {
             displayErrorMessage("Failed to update the service!");
           }
@@ -258,7 +250,7 @@ const Services = () => {
         }
       } else {
         displayErrorMessage(
-          "Service already exists! Please add a different service name"
+          "Service already exists. Please add a different service name"
         );
         setUpdateButtonDisabled(false);
       }

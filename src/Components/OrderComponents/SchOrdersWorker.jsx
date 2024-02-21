@@ -19,11 +19,12 @@ import {
   Label,
   Input,
   Spinner,
+  CardFooter,
 } from "reactstrap";
 
 import completedtask from "../../assets/completedtask.png";
 import activeOrderspng from "../../assets/activestatus.png";
-import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
+import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { truncateText } from "../../utils";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
@@ -57,6 +58,7 @@ const ScheduledOrdersCardWorker = ({
 
   const fetchAddressFromCoordinates = (coordinates, orderId) => {
     const geocoder = new window.google.maps.Geocoder();
+    console.log(coordinates, "coordinates");
     geocoder.geocode(
       { location: { lat: coordinates[1], lng: coordinates[0] } },
       (results, status) => {
@@ -86,26 +88,27 @@ const ScheduledOrdersCardWorker = ({
     );
   };
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${
-      import.meta.env.VITE_GOOGLE_API
-    }&libraries=${import.meta.env.VITE_GOOGLE_API_LIBARARY}`;
-    script.async = true;
-    script.defer = true;
-    script.addEventListener("load", () => {
-      // Initialize the fetchAddressFromCoordinates function here
-      scheduledOrdersObject.forEach((order) => {
-        fetchAddressFromCoordinates(order?.loc?.coordinates, order._id);
-      });
-    });
-    document.head.appendChild(script);
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   script.src = `https://maps.googleapis.com/maps/api/js?key=${
+  //     import.meta.env.VITE_GOOGLE_API
+  //   }&libraries=${import.meta.env.VITE_GOOGLE_API_LIBARARY}`;
+  //   script.async = true;
+  //   script.defer = true;
+  //   script.addEventListener("load", () => {
+  //     // Initialize the fetchAddressFromCoordinates function here
+  //     scheduledOrdersObject.forEach((order) => {
+  //       console.log("order loc", order);
+  //       fetchAddressFromCoordinates(order?.loc?.coordinates, order._id);
+  //     });
+  //   });
+  //   document.head.appendChild(script);
 
-    return () => {
-      // Remove the script when the component unmounts
-      document.head.removeChild(script);
-    };
-  }, [scheduledOrdersObject]);
+  //   return () => {
+  //     // Remove the script when the component unmounts
+  //     document.head.removeChild(script);
+  //   };
+  // }, [scheduledOrdersObject]);
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -123,10 +126,13 @@ const ScheduledOrdersCardWorker = ({
 
   const cancelingOrder = () => {
     //dispatch cancel order
-    const  order ={ ...orderToCancel,cancelReason:{
-      reason: cancelReason,
-    }};
-   
+    const order = {
+      ...orderToCancel,
+      cancelReason: {
+        reason: cancelReason,
+      },
+    };
+
     const data = {
       userId: userId,
       orderId: order._id,
@@ -232,7 +238,6 @@ const ScheduledOrdersCardWorker = ({
           </div>
         ) : scheduledOrdersObject?.length > 0 ? (
           <>
-           
             <Row>
               {scheduledOrdersObject?.map((order) => (
                 <Col
@@ -316,7 +321,29 @@ const ScheduledOrdersCardWorker = ({
                         <b>Amount:</b> ${order?.amount}
                       </CardText>
                       <CardText>
-                        <b>Details:</b>{" "}
+                        <div>
+                          <Row>
+                            <Col>
+                              <b>Details:</b>
+                            </Col>
+                            <Col>
+                              {order.details.length > 30 && (
+                                <Button
+                                  style={{
+                                    marginTop: "-5px",
+                                    marginLeft: "10px",
+                                  }} // Adjust spacing as needed
+                                  color="link"
+                                  onClick={() => toggleDetails(order?._id)}
+                                >
+                                  {showFullDetailsMap[order?._id]
+                                    ? "Show Less"
+                                    : "Show More"}
+                                </Button>
+                              )}
+                            </Col>
+                          </Row>
+                        </div>
                         <div
                           style={{
                             maxHeight: "100px",
@@ -330,21 +357,11 @@ const ScheduledOrdersCardWorker = ({
                               }}
                             />
                           ) : (
-                            transformOrderDetails(order)
-                          )}
-                          {order.details.length > 30 && (
-                            <Button
-                              style={{ marginTop: "-5px" }}
-                              color="link"
-                              onClick={() => toggleDetails(order?._id)}
-                            >
-                              {showFullDetailsMap[order?._id]
-                                ? "Show Less"
-                                : "Show More"}
-                            </Button>
+                            transformOrderDetails(order).slice(0, 30) // Truncate details
                           )}
                         </div>
                       </CardText>
+
                       <CardText>
                         <b>Order By:</b>{" "}
                         {order?.users?.length > 0 ? (
@@ -353,6 +370,14 @@ const ScheduledOrdersCardWorker = ({
                             {order?.users[0]?.lastName}
                           </>
                         ) : null}
+                      </CardText>
+                      <CardText>
+                        <b>Services:</b>
+                        {order?.service.map((service, index) => (
+                          <p key={index}>
+                            <b>{index + 1}:</b> {service}
+                          </p>
+                        ))}
                       </CardText>
                       <CardText>
                         <b>Address: </b>
@@ -369,45 +394,32 @@ const ScheduledOrdersCardWorker = ({
                           Open in Google Maps
                         </Button>
                       </CardText>
-                      <Row>
-                        <Col style={{ margin: "2%" }} xs="12" md="5">
-                          {" "}
-                          {/* Full width on small screens, half width on medium and larger screens */}
-                          <CardText>
-                            <Button
-                              onClick={() => toggleModal(order)}
-                              color="danger"
-                            >
-                              Cancel Job
-                            </Button>
-                          </CardText>
-                        </Col>
-
-                        <>
-                          <Col style={{ margin: "2%" }} xs="12" md="5">
-                            {" "}
-                            {/* Half width on small screens, one-third width on medium and larger screens */}
-                            <CardText>
-                              <Button
-                                onClick={() =>
-                                  sendStartRequest(order, order?.users[0]?._id)
-                                }
-                                color="success"
-                                className={
-                                  globalStartButtonDisabled ||
-                                  startButtonDisabledMap[order?._id] ||
-                                  activeOrder?.length > 0
-                                    ? "disabled"
-                                    : ""
-                                }
-                              >
-                                Start Job
-                              </Button>
-                            </CardText>
-                          </Col>
-                        </>
-                      </Row>
                     </CardBody>
+                    <CardFooter className="d-flex justify-content-between">
+                      {" "}
+                      <Button
+                        onClick={() => toggleModal(order)}
+                        color="danger"
+                        disabled={globalStartButtonDisabled}
+                      >
+                        Cancel Job
+                      </Button>{" "}
+                      <Button
+                        onClick={() =>
+                          sendStartRequest(order, order?.users[0]?._id)
+                        }
+                        color="success"
+                        className={
+                          globalStartButtonDisabled ||
+                          startButtonDisabledMap[order?._id] ||
+                          activeOrder?.length > 0
+                            ? "disabled"
+                            : ""
+                        }
+                      >
+                        Start Job
+                      </Button>
+                    </CardFooter>
                   </Card>
                 </Col>
               ))}

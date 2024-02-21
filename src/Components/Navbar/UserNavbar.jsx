@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { ChatState } from "../../Context/ChatProvider";
 import { IoIosNotifications } from "react-icons/io";
-import { CgProfile  } from "react-icons/cg";
+import { CgProfile } from "react-icons/cg";
 import { CiSettings } from "react-icons/ci";
 import { SelectChat } from "../../utils";
 import OnOffButton from "../OnOffButton/OnOffButton";
@@ -67,7 +67,6 @@ const UserNavbar = () => {
     }
   }, [unreadMessages]);
 
-
   const Logout = async () => {
     Swal.fire({
       title: "Are You Sure You Want To Log Out?",
@@ -84,7 +83,6 @@ const UserNavbar = () => {
         await socket?.disconnect();
         // setPostedJobs([]);
         if (result.type === "auth/logout/fulfilled") {
-          
           navigate("/auth/login");
         }
       }
@@ -119,7 +117,6 @@ const UserNavbar = () => {
     setShowModal(true);
   };
 
-
   const HandleOrderSelection = (notify) => {
     SetONotification(offerNotification.filter((n) => n !== notify));
     setGotOffer(true);
@@ -135,13 +132,11 @@ const UserNavbar = () => {
     }
   };
 
-  const HandleEditSettings = () =>{
-    if(user.role==="admin"){
+  const HandleEditSettings = () => {
+    if (user.role === "admin") {
       navigate("/admin/settings");
     }
-  }
-
-
+  };
 
   const toggleOffcanvas = () => {
     SetShowOffer(!offer);
@@ -320,7 +315,7 @@ const UserNavbar = () => {
               <DropdownMenu className="p-2">
                 {user.role === "admin" ? (
                   <>
-                  <DropdownItem
+                    <DropdownItem
                       className="d-flex gap-2"
                       onClick={HandleEditSettings}
                     >
@@ -331,13 +326,15 @@ const UserNavbar = () => {
                   </>
                 ) : (
                   <>
-                    <DropdownItem
-                      className="d-flex gap-2"
-                      onClick={HandleEditProfile}
-                    >
+                    <DropdownItem className="d-flex gap-2">
                       {" "}
-                      <CgProfile className="fs-4" />{" "}
-                      <b className="align-self-center">Edit Profile</b>
+                      <Button
+                        onClick={HandleEditProfile}
+                        color="info"
+                        className="align-self-center"
+                      >
+                        <CgProfile className="fs-5 mb-1" /> Edit Profile
+                      </Button>
                     </DropdownItem>
                   </>
                 )}

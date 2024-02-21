@@ -23,7 +23,7 @@ export const loginAsync = createAsyncThunk(
       const response = await loginUser(email, password);
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
-      localStorage.setItem("settings",JSON.stringify(response.settings));
+      localStorage.setItem("settings", JSON.stringify(response.settings));
       const result = response;
       return result;
     } catch (error) {
@@ -129,9 +129,7 @@ export const requestOTPAsync = createAsyncThunk(
   "auth/requestOTPAsync",
   async (email) => {
     try {
-
       const response = await sendOTP(email);
-  
 
       const serializableResponse = {
         data: response.data,
@@ -151,7 +149,6 @@ export const requestOTPforEmailAsync = createAsyncThunk(
   async (data) => {
     try {
       const response = await sendOTPforEmail(data);
-   
 
       const serializableResponse = {
         data: response.data,
@@ -171,14 +168,13 @@ export const requestOTPforPhoneAsync = createAsyncThunk(
   "auth/requestOTPforPhoneAsync",
   async (data) => {
     try {
-
       const response = await sendOTPforPhone(data);
       const serializableResponse = {
         data: response.data,
         status: response.status,
         // other serializable properties
       };
-   
+
       return serializableResponse;
     } catch (error) {
       console.log(error);
@@ -192,7 +188,7 @@ export const requestOTPverification = createAsyncThunk(
   async (otp, { rejectWithValue }) => {
     try {
       const response = await OTPverify(otp);
-     
+
       return response.status;
     } catch (error) {
       if (error) return rejectWithValue(error);
@@ -206,9 +202,8 @@ export const changeEmail = createAsyncThunk(
   "auth/otpverifyEmail",
   async (data) => {
     try {
-   
       const response = await OTPverifyforEmail(data);
-   
+
       return response.data;
     } catch (error) {
       console.log(error);
@@ -220,9 +215,8 @@ export const changePhone = createAsyncThunk(
   "auth/otpverifyPhone",
   async (data) => {
     try {
-  
       const response = await OTPverifyforPhone(data);
-  
+
       return response.data;
     } catch (error) {
       console.log(error);

@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardText,
   Col,
   Container,
@@ -36,14 +37,15 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
     setAvailableJobOffer,
   } = ChatState();
 
-  const { openJobs, setOpenJobs,disableAcceptButton, setDisableAcceptButton } = PopUpState();
+  const { openJobs, setOpenJobs, disableAcceptButton, setDisableAcceptButton } =
+    PopUpState();
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
   const { setFromAvailableJobs } = PopUpState();
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
-  
+  const [disableRefresh, setDisableRefresh] = useState(false);
   const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
@@ -174,14 +176,14 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
 
   const sendBid = async (order, Uid) => {
     setDisableAcceptButton(true);
-    setTimeout(()=>{
+    setTimeout(() => {
       setDisableAcceptButton(false);
-    },120000)
+    }, 120000);
     //  emit socket event to show Worker wants to start the job modal.
     const creds = { id: order._id, token: token };
     const result = await dispatch(checkTheStatusAsync(creds));
     if (result.type === "orders/checkStatus/fulfilled") {
-    
+      console.log(result.payload, "payload of check status");
       if (result.payload.message === "false") {
         const orderIdToRemove = order;
         const filteredOpenJobs = openJobs.filter(
@@ -192,20 +194,31 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         setOpenJobs(filteredOpenJobs);
         Swal.fire("This order is already accepted by another worker");
         return;
+      } else if (result.payload.message === "NaN") {
+        const orderIdToRemove = order;
+        const filteredOpenJobs = openJobs.filter(
+          (order) => order !== orderIdToRemove
+        );
+        setDisableAcceptButton(false);
+        // Update state with the filtered openJobs array
+        setOpenJobs(filteredOpenJobs);
+        Swal.fire("This order was deleted");
+        return;
       } else {
+        console.log("I ran");
         if (user.status !== "online") {
           return Swal.fire({
             title: "You are not online",
             icon: "error",
           });
         }
-    
+
         const worker = {
           workerId: user._id,
           workerfirstName: user.firstName,
           workerlastName: user.lastName,
         };
-    
+
         const data = {
           order,
           Uid,
@@ -213,25 +226,21 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         };
         socket.emit("startBid-accept-reject", data);
         Swal.fire({
-          title: "Accept Job request sent!",
+          title: " Your job request has been sent!",
           icon: "success",
         });
       }
     }
-
-   
   };
 
   const handleRefresh = async () => {
+    setDisableRefresh(true);
     let result = await dispatch(fetchOpenOrdersAsync(token));
-  
+
     if (result.type === "orders/fetchOpenOrders/fulfilled") {
-    
       if (openJobs?.length === 0) {
-       
         setOpenJobs(result.payload.orders);
       } else {
-      
         const uniqueOrders = result.payload.orders.filter(
           (newOrder) =>
             !openJobs.some(
@@ -240,9 +249,10 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         );
 
         // Append the unique orders to pastOrders
-        setOpenJobs((prevOpenJobs) => [...uniqueOrders,...prevOpenJobs ]);
+        setOpenJobs((prevOpenJobs) => [...uniqueOrders, ...prevOpenJobs]);
       }
     }
+    setDisableRefresh(false);
   };
 
   return (
@@ -258,6 +268,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
             color="primary"
             onClick={handleRefresh}
             style={{ width: "100px" }}
+            disabled={disableRefresh}
           >
             Refresh Jobs
           </Button>
@@ -267,6 +278,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                 <h4>No Open Jobs!</h4>
               </div>
             )}
+
             {scheduledOrdersObject?.map((order, index) => (
               <Col
                 key={index}
@@ -275,7 +287,10 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                 lg="4"
                 style={{ marginTop: "10px" }}
               >
-                <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
+                <Card
+                  className="shadow"
+                  style={{ backgroundColor: "#f6f8fc", height: "100%" }}
+                >
                   <CardBody>
                     <h5
                       style={{
@@ -324,32 +339,43 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       )}
                     </div>
                     <CardText>
-                      <b>Details:</b>{" "}
+                      <div>
+                        <Row>
+                          <Col>
+                            <b>Details:</b>
+                          </Col>
+                          <Col>
+                            {order.details.length > 30 && (
+                              <Button
+                                style={{
+                                  marginTop: "-5px",
+                                  marginLeft: "10px",
+                                }} // Adjust spacing as needed
+                                color="link"
+                                onClick={() => toggleDetails(order?._id)}
+                              >
+                                {showFullDetailsMap[order?._id]
+                                  ? "Show Less"
+                                  : "Show More"}
+                              </Button>
+                            )}
+                          </Col>
+                        </Row>
+                      </div>
                       <div
                         style={{
                           maxHeight: "100px",
                           overflowY: "auto",
                         }}
                       >
-                        {showFullDetailsMap[order.id] ? (
+                        {showFullDetailsMap[order?._id] ? (
                           <div
                             dangerouslySetInnerHTML={{
                               __html: order?.details,
                             }}
                           />
                         ) : (
-                          transformOrderDetails(order)
-                        )}
-                        {order?.details?.length > 30 && (
-                          <Button
-                            style={{ marginTop: "-5px" }}
-                            color="link"
-                            onClick={() => toggleDetails(order?.id)}
-                          >
-                            {showFullDetailsMap[order?.id]
-                              ? "Show Less"
-                              : "Show More"}
-                          </Button>
+                          transformOrderDetails(order).slice(0, 30) // Truncate details
                         )}
                       </div>
                     </CardText>
@@ -360,7 +386,10 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                           <Row>
                             <Slider {...settings} className="">
                               {order.images?.map((image, index) => (
-                                <div className="text-center" key={index}>
+                                <div
+                                  className="d-flex justify-content-center"
+                                  key={index}
+                                >
                                   <img
                                     key={index}
                                     src={`${
@@ -381,7 +410,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         )}
                       </CardText>
                     )}
-                    <CardText>
+                    {/* <CardText>
                       {" "}
                       <Button
                         onClick={() => openGoogleMaps(order?.user?.location)}
@@ -405,12 +434,65 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         onClick={() => handleMessageIconClick(order)}
                         style={{
                           color: "white",
+                          marginBottom: "10px",
                         }}
                       >
                         <FiMessageCircle className="fs-4 " /> Chat{" "}
                       </Button>
-                    </CardText>
+                    </CardText> */}
                   </CardBody>
+                  {order?.images?.length > 0 && (
+                    <CardFooter className="d-flex justify-content-around align-items-center">
+                      <Button
+                        onClick={() => openGoogleMaps(order?.user?.location)}
+                        color="primary"
+                        className="ms-2"
+                      >
+                        Directions <FaMapMarkerAlt />
+                      </Button>
+                      <Button
+                        onClick={() => sendBid(order, order?.user?._id)}
+                        color="success"
+                        disabled={disableAcceptButton}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        color="info"
+                        className="fw-bold hover-pointer"
+                        onClick={() => handleMessageIconClick(order)}
+                        style={{ color: "white", marginBottom: "" }}
+                      >
+                        <FiMessageCircle className="fs-4" /> Chat
+                      </Button>
+                    </CardFooter>
+                  )}
+                  {order?.images?.length === 0 && (
+                    <CardFooter className="d-flex justify-content-around align-items-center">
+                      <Button
+                        onClick={() => openGoogleMaps(order?.user?.location)}
+                        color="primary"
+                        className="ms-2"
+                      >
+                        Directions <FaMapMarkerAlt />
+                      </Button>
+                      <Button
+                        onClick={() => sendBid(order, order?.user?._id)}
+                        color="success"
+                        disabled={disableAcceptButton}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        color="info"
+                        className="fw-bold hover-pointer"
+                        onClick={() => handleMessageIconClick(order)}
+                        style={{ color: "white", marginBottom: "" }}
+                      >
+                        <FiMessageCircle className="fs-4" /> Chat
+                      </Button>
+                    </CardFooter>
+                  )}
                 </Card>
               </Col>
             ))}

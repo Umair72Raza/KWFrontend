@@ -42,7 +42,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FaCheckCircle } from "react-icons/fa";
 import { set } from "lodash";
 import Dropdowns from "../../Components/CountrySelector/DropDowns.jsx";
-import { City } from "country-state-city";
+// import { City } from "country-state-city";
 import SignUpOtpVerify from "../../Components/SingUpOtpVerify/SignUpOtpVerify.jsx";
 
 const UserRegister = ({ ShowServices }) => {
@@ -321,7 +321,7 @@ const UserRegister = ({ ShowServices }) => {
       errors.profilePicture = "Profile picture is required";
     }
 
-    if(hasOnlyWhiteSpace(formData.phoneNumber)) {
+    if (hasOnlyWhiteSpace(formData.phoneNumber)) {
       errors.phone = RegisterPage.ERROR_MESSAGES.emptyPhone;
     }
 
@@ -354,7 +354,7 @@ const UserRegister = ({ ShowServices }) => {
             );
             navigate("/auth/login");
           }
-       
+
           // Reset form data on successful signup
           setFormData({
             firstName: "",
@@ -466,8 +466,8 @@ const UserRegister = ({ ShowServices }) => {
                       )
                     }
                   />{" "}
-                  {errors.firstName && (
-                    <span className="text-danger">{errors.firstName}</span>
+                  {errors.lastName && (
+                    <span className="text-danger">{errors.lastName}</span>
                   )}
                 </FormGroup>
               </Col>
@@ -542,7 +542,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper">
                     <Input
-                      invalid={errors.password ? true : false}
+                      // invalid={errors.password ? true : false}
                       type={showPassword ? "text" : "password"}
                       name="password"
                       id="password"
@@ -551,7 +551,7 @@ const UserRegister = ({ ShowServices }) => {
                       }
                       required
                       disabled={loading}
-                      maxLength={24}
+                      maxLength={12}
                       value={formData.password}
                       onChange={handlePasswordChange}
                       autoComplete="new-password"
@@ -596,7 +596,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper ">
                     <Input
-                      invalid={errors.confirmPassword ? true : false}
+                      // invalid={errors.confirmPassword ? true : false}
                       type={showConfirmPassword ? "text" : "password"}
                       name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
@@ -606,7 +606,7 @@ const UserRegister = ({ ShowServices }) => {
                       required
                       disabled={loading}
                       value={formData.confirmPassword || ""}
-                      maxLength={24}
+                      maxLength={12}
                       onChange={handleConfirmPasswordChange}
                       autoComplete="new-password"
                     />
@@ -693,7 +693,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <Input
                     type="text"
-                    placeholder="Enter your address(Optional)."
+                    placeholder="Enter your address."
                     value={formData?.optionalAddress}
                     onChange={handleOptionalAddress}
                     disabled={loading}
@@ -790,6 +790,7 @@ const UserRegister = ({ ShowServices }) => {
         </Col>
       </Row>
     </Container>
+    // <>Heelloo</>
   );
 };
 

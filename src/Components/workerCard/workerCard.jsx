@@ -29,7 +29,10 @@ const WorkerCard = ({ worker }) => {
     setSelectedChatCompare,
     setChat,
     chatFromWorkerCard,
-    setChatFromWorkerCard,setNotification
+    setChatFromWorkerCard,
+    setNotification,
+    setUnreadMessages,
+    unreadMessages,
   } = ChatState();
   const [modal, setModal] = useState(false);
   const [bookingWorker, SetBookingWorker] = useState();
@@ -45,15 +48,14 @@ const WorkerCard = ({ worker }) => {
     return stars;
   };
 
-
   const HandleChat = () => {
     setShowModal(true);
     setChatFromWorkerCard(true);
-  
-    const isWorkerInChats = copyOfChats?.some(
-      (chat) => chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
+
+    const isWorkerInChats = copyOfChats?.some((chat) =>
+      chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
     );
-  
+
     if (!isWorkerInChats) {
       // Create a fake chat
       const fakeChat = {
@@ -63,42 +65,41 @@ const WorkerCard = ({ worker }) => {
         latestMessage: null,
         seen: true,
       };
-  
+
       setCopyOfChats((prevCopyOfChats) => {
-        const updatedChats = prevCopyOfChats.length > 0
-          ? [fakeChat, ...prevCopyOfChats]
-          : [fakeChat];
-        
+        const updatedChats =
+          prevCopyOfChats.length > 0
+            ? [fakeChat, ...prevCopyOfChats]
+            : [fakeChat];
+
         setChat(fakeChat);
         setSelectedChatCompare(fakeChat);
         setSelectedChat(() => SelectChat(fakeChat));
-  
+
         return updatedChats;
       });
     } else {
-      const workerChat = copyOfChats.find(
-        (chat) => chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
+      const workerChat = copyOfChats.find((chat) =>
+        chat?.users?.some((chatUser) => chatUser?._id === worker?._id)
       );
-  
+
       if (worker.access === "accepted") {
         setChat(workerChat);
         setSelectedChatCompare(workerChat);
         setSelectedChat(() => SelectChat(workerChat));
         setNotification((prevNotifications) =>
-        prevNotifications.filter((n) => n?.chat?._id !== workerChat?._id)
-      );
-      if (unreadMessages[workerChat._id]) {
-        setUnreadMessages((prevCount) => ({
-          ...prevCount,
-          [workerChat._id]: 0,
-        }));
-      }
+          prevNotifications.filter((n) => n?.chat?._id !== workerChat?._id)
+        );
+        if (unreadMessages[workerChat._id]) {
+          setUnreadMessages((prevCount) => ({
+            ...prevCount,
+            [workerChat._id]: 0,
+          }));
+        }
       }
     }
   };
-  
- 
-  
+
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -107,65 +108,103 @@ const WorkerCard = ({ worker }) => {
     SetBookingWorker(worker);
     toggleModal();
   };
-  
 
   return (
     <Container className="mt-2 ">
       <Row className="d-flex justify-content-center">
-          {worker && worker?.status == "online" ? (
-            <>
-              <Card className="d-flex flex-column flex-md-row  h-100" >
-                <CardBody className=" h-100 "  >
-                  <CardTitle className="fw-bold  fs-3" style={{minHeight:'65px', maxHeight:'65px'} }>
-                    {worker.firstName + " " + worker.lastName}
-                  </CardTitle>
-                  <CardSubtitle className="d-flex flex-row  justify-content-between" >
-                    <CardText className="fw-bold" >Status:</CardText> {worker.status == "online" ? <CardText className="text-success" >{worker.status}</CardText>:[]}
-                  </CardSubtitle>
-                  <CardSubtitle><b className="fw-bold">{workerCardConstants.WorkerCardText.Services}</b></CardSubtitle>
-                  <CardSubtitle className=" mt-1" style={{ minHeight: '60px' ,maxHeight: '60px' ,overflowY:'auto'}}>
-                    {worker?.services.map((service, key) => (
-                      <div
-                        key={key}
-                        className="d-flex flex-row  justify-content-between"
-                        
-                      >
-                        <div>
-                          <CardSubtitle>{service.name}</CardSubtitle>
-                        </div>
-                        <div>
-                          <CardSubtitle>{service.rate + "$"}</CardSubtitle>
-                        </div>
+        {worker && worker?.status == "online" ? (
+          <>
+            <Card className="d-flex flex-column flex-md-row  h-100">
+              <CardBody className=" h-100 ">
+                <CardTitle
+                  className="fw-bold  fs-3"
+                  style={{ minHeight: "65px", maxHeight: "65px" }}
+                >
+                  {worker.firstName + " " + worker.lastName}
+                </CardTitle>
+                <CardSubtitle className="d-flex flex-row  justify-content-between">
+                  <CardText className="fw-bold">Status:</CardText>{" "}
+                  {worker.status == "online" ? (
+                    <CardText className="text-success">
+                      {worker.status}
+                    </CardText>
+                  ) : (
+                    []
+                  )}
+                </CardSubtitle>
+                <CardSubtitle>
+                  <b className="fw-bold">
+                    {workerCardConstants.WorkerCardText.Services}
+                  </b>
+                </CardSubtitle>
+                <CardSubtitle
+                  className=" mt-1"
+                  style={{
+                    minHeight: "60px",
+                    maxHeight: "60px",
+                    overflowY: "auto",
+                  }}
+                >
+                  {worker?.services.map((service, key) => (
+                    <div
+                      key={key}
+                      className="d-flex flex-row  justify-content-between"
+                    >
+                      <div>
+                        <CardSubtitle>{service.name}</CardSubtitle>
                       </div>
-                    ))}
-                  </CardSubtitle>
-                  <CardSubtitle className="d-flex flex-row justify-content-between">
-                    <div>
-                      <b className="fw-bold mt-1">Rating:</b>{" "}
+                      <div>
+                        <CardSubtitle>{service.rate + "$"}</CardSubtitle>
+                      </div>
                     </div>
-                    <div>
-                      {worker.rating > 0
-                        ? starRating(worker.rating)
-                        : "not rated yet"}
-                    </div>
-                  </CardSubtitle>
-                  <CardSubtitle className="d-flex flex-row  justify-content-between">
-                    <div className="fw-bold mt-1">Distance: </div> <div>{worker.distance} </div>
-                  </CardSubtitle>
-                  <div className="gap-1 d-flex flex-md-column ">
-                    <Button color="primary" onClick={HandleChat}>
-                      {workerCardConstants.WorkerCardButtons.chat}
-                    </Button>
-                    <Button color="primary" onClick={() => book(worker)}>
-                      {workerCardConstants.WorkerCardButtons.book}
-                    </Button>
+                  ))}
+                </CardSubtitle>
+                <CardSubtitle className="d-flex flex-row justify-content-between">
+                  <div>
+                    <b className="fw-bold mt-1">Rating:</b>{" "}
                   </div>
-                </CardBody>
-              </Card>
-            </>
-          ) : (
-            []
-          )}
+                  <div>
+                    {worker.rating > 0
+                      ? starRating(worker.rating)
+                      : "not rated yet"}
+                  </div>
+                </CardSubtitle>
+                <CardSubtitle className="d-flex flex-row  justify-content-between">
+                  <div className="fw-bold mt-1">Distance: </div>
+                  {/* <div>{worker.distance} </div> */}
+                  <>
+                    {worker.distance !== undefined && (
+                      <>
+                        {worker.distance >= 0 && worker.distance <= 10 && (
+                          <div> 0 - 10 Kms approx.</div>
+                        )}
+                        {worker.distance > 10 && worker.distance <= 15 && (
+                          <> 10 - 15 Kms approx.</>
+                        )}
+                        {worker.distance > 15 && worker.distance <= 20 && (
+                          <div> 15 - 20 Kms approx.</div>
+                        )}
+                        {worker.distance > 20 && (
+                          <div>Worker is more than 20 Kms away.</div>
+                        )}
+                      </>
+                    )}
+                  </>
+                </CardSubtitle>
+                <div className="gap-1 d-flex flex-md-column ">
+                  <Button color="primary" onClick={HandleChat}>
+                    {workerCardConstants.WorkerCardButtons.chat}
+                  </Button>
+                  <Button color="primary" onClick={() => book(worker)}>
+                    {workerCardConstants.WorkerCardButtons.book}
+                  </Button>
+                </div>
+              </CardBody>
+            </Card>
+          </>
+        ) : (
+          []
+        )}
       </Row>
       <Booking
         modal={modal}

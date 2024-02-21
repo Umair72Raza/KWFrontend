@@ -23,9 +23,13 @@ const FinishJobReq = () => {
     finishOrderReq,
     setFinishOrderReq,
     setActiveOrder,
-    setPastOrders,finishConfirmed, setFinishConfirmed
+    setPastOrders,
+    finishConfirmed,
+    setFinishConfirmed,
   } = PopUpState();
   const { token } = useSelector((state) => state.auth);
+  const [disableConfirm, setDisableConfirm] = useState(false);
+  const [disableCancel, setDisableCancel] = useState(false);
   useEffect(() => {
     if (!socket) return;
     socket?.on("finishjob-request", (order) => {
@@ -40,7 +44,6 @@ const FinishJobReq = () => {
   const dispatch = useDispatch();
   const [modal, setModal] = useState(true);
   const [showMoreDetails, setShowMoreDetails] = useState(false);
-  
 
   const toggleDetails = () => {
     setShowMoreDetails(!showMoreDetails);
@@ -52,10 +55,9 @@ const FinishJobReq = () => {
   };
 
   const handleConfirm = async () => {
-    const data = {orderId: fOrder._id, token:token}
-    const result = await dispatch(
-      changeStatusToPastAsync(data)
-    );
+    setDisableConfirm(true);
+    const data = { orderId: fOrder._id, token: token };
+    const result = await dispatch(changeStatusToPastAsync(data));
 
     if (
       result.type === "orders/changeToPastOrders/fulfilled" &&
@@ -69,24 +71,23 @@ const FinishJobReq = () => {
       setActiveOrder((prevActiveOrders) =>
         prevActiveOrders.filter((activeOrder) => activeOrder._id !== fOrder._id)
       );
-    
+
       setFinishConfirmed(true);
       //setFinishOrderReq(false)
       //globalize the past orders
-      setPastOrders((prevPastOrders) => [
-        ...prevPastOrders,
-        fOrder,
-      ]);
+      setPastOrders((prevPastOrders) => [...prevPastOrders, fOrder]);
 
       socket?.emit("finishjob-response", data);
       setFinishOrderReq(false);
+      setDisableConfirm(false);
       //setIsModalOpen(true)
-     
     }
     // setModal(true);
   };
 
   const handleCancel = () => {
+    setDisableCancel(true);
+    setDisableConfirm(true);
     const data = {
       order: fOrder,
       result: "false",
@@ -94,10 +95,12 @@ const FinishJobReq = () => {
 
     socket.emit("finishjob-response", data);
     setFinishOrderReq(false);
+    setDisableCancel(false);
+    setDisableConfirm(false);
   };
-    // useEffect(()=>{
-    // console.log("first")
-    // },[finishConfirmed])
+  // useEffect(()=>{
+  // console.log("first")
+  // },[finishConfirmed])
   return (
     <>
       <Modal
@@ -107,9 +110,7 @@ const FinishJobReq = () => {
         backdrop="static"
         keyboard={false}
       >
-        <ModalHeader className="text-center">
-          Job Finished
-        </ModalHeader>
+        <ModalHeader className="text-center">Job Finished</ModalHeader>
         <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
           <Container>
             <Row>
@@ -156,10 +157,18 @@ const FinishJobReq = () => {
 
         <ModalFooter style={{ textAlign: "center" }}>
           <Container style={{ marginTop: "2%" }}>
-            <Button color="success" onClick={handleConfirm}>
+            <Button
+              disabled={disableConfirm}
+              color="success"
+              onClick={handleConfirm}
+            >
               Yes
             </Button>{" "}
-            <Button color="danger" onClick={handleCancel}>
+            <Button
+              disabled={disableCancel}
+              color="danger"
+              onClick={handleCancel}
+            >
               Cancel
             </Button>
           </Container>

@@ -1,5 +1,5 @@
 export const LoginPage = {
-  TITLE:"Welcome to KaamWala App!",
+  TITLE: "Welcome to KaamWala App!",
   ROUTES: {
     LOGIN: "/auth/login",
     REGISTER: "/auth/createAccount",
@@ -73,20 +73,22 @@ export const RegisterPage = {
     ADDRESS: "Enter your address",
     SERVICES: "Select a service",
   },
-  SUCCESS_MESSAGES:{
-    WORKER_SIGNUP:"Worker ID  is created successfully. Please login into your Account.",
-    USER_SIGNUP:"User ID is created successfully. Please login into your Account.",
+  SUCCESS_MESSAGES: {
+    WORKER_SIGNUP:
+      "Worker ID  is created successfully. Please login into your Account.",
+    USER_SIGNUP:
+      "User ID is created successfully. Please login into your Account.",
   },
   ERROR_MESSAGES: {
     invalidEmail: "Invalid email address.",
-    emptyEmail:"Email cannot be empty",
+    emptyEmail: "Email cannot be empty",
     invalidPhoneNumber: "Please enter a valid phone number.",
     invalidPassword:
       "Password must contain at least one special character, one uppercase letter, one number, and atleast 8 characters long.",
     passwordsNotMatch: "Passwords do not match.",
     emptyPassword: "Password cannot be empty",
     enterAllFields: "Enter all the fields to sign up.",
-    invalidRate: "Rate is outside the valid range (10 to 999)$/hr.",
+    invalidRate: "Please set rate between $10 and $999 per hour",
     invalidAddress: "Address cannot be empty",
     invalidLastName: "Last Name cannot be empty",
     invalidFirstName: "First Name cannot be empty",
@@ -99,11 +101,11 @@ export const RegisterPage = {
   },
   LOADER_MESSAGES: {
     SERVICES_LOADING: "Loading Services...",
-    LIST_NOT_AVAILABLE:"No services listed by admin yet.",
+    LIST_NOT_AVAILABLE: "No services listed by admin yet.",
   },
-TOOLTIPS: {
-  ALL_FIELDS:"Enter all fields to sign up!",
-},
+  TOOLTIPS: {
+    ALL_FIELDS: "Enter all fields to sign up!",
+  },
   FORM_GROUPS: {
     PERSONAL_INFO: "Personal Information",
     ACCOUNT_INFO: "Account Information",
@@ -144,11 +146,11 @@ TOOLTIPS: {
       name: "services",
       type: "select",
       placeholder: "Select a service",
-      rate:"($/hr)"
+      rate: "($/hr)",
     },
   },
-  SERVICES_INFO :{
-SERVICES_SELECTION_LIMIT:"You can select upto 5 services.",
+  SERVICES_INFO: {
+    SERVICES_SELECTION_LIMIT: "You can select upto 5 services.",
   },
   SERVICES_MAPPING: [
     { name: "Plumber", label: "Plumber" },
@@ -196,7 +198,7 @@ export const TABS = {
   NO_CANC_ORDERS: "No Cancelled Orders",
   ACTIVE_ORDERS: "Active Orders",
   NO_ACTIVE_ORDERS: "No Active Orders!",
-  Pending:"Pending Orders"
+  Pending: "Pending Orders",
 };
 
 export const GOTOFFER = {
@@ -241,12 +243,12 @@ export const EDITPROFILE_PAGE = {
     CITY: "City:",
     REGION_STATE: "Region/State:",
     OPTIONAL: "Optional",
-    NO_OPT_ADDRESS: "No optional address added."
+    NO_OPT_ADDRESS: "No optional address added.",
   },
-  ROUTES:{
-    BACK_USER:"/user/homepage",
-    BACK_WORKER:"/worker/workerHomepage"
-  }
+  ROUTES: {
+    BACK_USER: "/user/homepage",
+    BACK_WORKER: "/worker/workerHomepage",
+  },
 };
 
 export const HomePageUserConst = {
@@ -280,7 +282,7 @@ export const BookingConstants = {
     taskDetail: "Task Details",
     service: "Service Type",
     datetime: "Date and Time",
-    images:"Upload Images",
+    images: "Upload Images",
     amount: "Amount Per Job ($)",
   },
 };
@@ -382,3 +384,88 @@ export const ADMIN_USERS = {
   NO_ACTIVE_USERS: "No Active Users found",
   NO_INACTIVE_USERS: "No Inactive Users found",
 };
+
+export const countriesData = [
+  {
+    name: "United States",
+    code: "US",
+    states: [
+      {
+        name: "New York",
+        cities: ["New York City", "Buffalo", "Rochester"]
+      },
+      {
+        name: "California",
+        cities: ["Los Angeles", "San Francisco", "San Diego"]
+      }
+    ]
+  },
+  {
+    name: "Canada",
+    code: "CA",
+    states: [
+      {
+        name: "Ontario",
+        cities: ["Toronto", "Ottawa", "Hamilton"]
+      },
+      {
+        name: "Quebec",
+        cities: ["Montreal", "Quebec City", "Laval"]
+      }
+    ]
+  },
+  {
+    name: "Pakistan",
+    code: "PK",
+    states: [
+      {
+        name: "Punjab",
+        cities: [
+          "Lahore", "Faisalabad", "Rawalpindi", "Gujranwala", "Multan",
+          "Bahawalpur", "Sargodha", "Sialkot", "Gujrat", "Jhang",
+          "Sheikhupura", "Rahim Yar Khan", "Okara", "Wah", "Dera Ghazi Khan"
+        ]
+      },
+      {
+        name: "Sindh",
+        cities: [
+          "Karachi", "Hyderabad", "Sukkur", "Larkana", "Mirpur Khas",
+          "Shikarpur", "Jacobabad", "Dadu", "Nawabshah", "Khairpur",
+          "Tando Allahyar", "Tando Adam", "Ratodero", "Ghotki", "Badin"
+        ]
+      },
+      {
+        name: "Khyber Pakhtunkhwa",
+        cities: [
+          "Peshawar", "Abbottabad", "Mardan", "Swat", "Mansehra",
+          "Charsadda", "Nowshera", "Kohat", "Dera Ismail Khan", "Haripur",
+          "Chitral", "Bannu", "Dir", "Tank", "Lakki Marwat"
+        ]
+      },
+      {
+        name: "Balochistan",
+        cities: [
+          "Quetta", "Gwadar", "Turbat", "Khuzdar", "Chaman",
+          "Sibi", "Zhob", "Loralai", "Nushki", "Kharan",
+          "Kalat", "Mastung", "Pasni", "Panjgur", "Kech"
+        ]
+      },
+      {
+        name: "Gilgit-Baltistan",
+        cities: [
+          "Gilgit", "Skardu", "Chilas", "Ghizer", "Astore",
+          "Hunza", "Khaplu", "Shigar", "Gupis", "Diamer",
+          "Nagar", "Shimshal", "Darel", "Tangir", "Rondu"
+        ]
+      },
+      {
+        name: "Azad Jammu and Kashmir",
+        cities: [
+          "Muzaffarabad", "Mirpur", "Bhimber", "Kotli", "Rawalakot",
+          "Bagh", "Hattian Bala", "Haveli", "Neelam", "Leepa",
+          "Sudhanoti", "Mangla", "Pallandri", "Las Danna", "Samahni"
+        ]
+      }
+    ]
+  },
+];

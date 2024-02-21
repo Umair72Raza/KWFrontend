@@ -13,7 +13,12 @@ import {
   Tooltip,
 } from "reactstrap";
 import { LoginPage, RegisterPage } from "../../Constants/Constants"; // Import constants
-import { emailPattern, failureToast, successToast, validateEmail } from "../../utils";
+import {
+  emailPattern,
+  failureToast,
+  successToast,
+  validateEmail,
+} from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync, toggleStatusAsync } from "../../Redux/Slices/AuthSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,7 +30,7 @@ const Login = () => {
     [LoginPage.FORM_FIELDS.EMAIL]: "",
     [LoginPage.FORM_FIELDS.PASSWORD]: "",
   });
-  let {isOn, setIsOn}=PopUpState()
+  let { isOn, setIsOn } = PopUpState();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState("");
   const [loginDisabled, setLoginDisabled] = useState(true);
@@ -33,12 +38,11 @@ const Login = () => {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const socket = useSelector((state) => state?.socket?.socket);
+  // const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
     const isFormValid = !errors.email && formData.email && formData.password;
     setLoginDisabled(!isFormValid);
-
   }, [errors, formData]);
 
   const handleEmailChange = (e) => {
@@ -83,18 +87,17 @@ const Login = () => {
               [LoginPage.FORM_FIELDS.PASSWORD]: "",
             });
             successToast("Login successful! Welcome back!");
-            
-              const id = result.payload.user._id;
-              const data = { id, status: "online", token: result.payload.token };
-              const Result = await dispatch(toggleStatusAsync(data));
-              await socket?.emit("online-offline", Result.payload.updatedStatus);
-               if (result.payload.user.role == "worker") {
-              await setIsOn(true)
+
+            const id = result.payload.user._id;
+            const data = { id, status: "online", token: result.payload.token };
+            const Result = await dispatch(toggleStatusAsync(data));
+            await socket?.emit("online-offline", Result.payload.updatedStatus);
+            if (result.payload.user.role == "worker") {
+              await setIsOn(true);
               navigate("/worker/workerHomepage");
+            } else {
+              navigate("/user/homepage");
             }
-            else
-            {
-            navigate("/user/homepage");}
           }
         } else if (result.type === "auth/login/rejected") {
           failureToast(result.payload);
@@ -108,9 +111,14 @@ const Login = () => {
   };
 
   return (
-    <Container className="d-flex flex-column gap-5 justify-content-center align-items-center" style={{ minHeight: "90vh" }}>
+    <Container
+      className="d-flex flex-column gap-5 justify-content-center align-items-center"
+      style={{ minHeight: "90vh" }}
+    >
       <Row>
-        <Col><h1>{LoginPage.TITLE}</h1></Col>
+        <Col>
+          <h1>{LoginPage.TITLE}</h1>
+        </Col>
       </Row>
       <Row className="w-100 d-flex justify-content-center">
         <Col md={6} lg={4} xl={3}>
@@ -169,15 +177,17 @@ const Login = () => {
                   required
                   autoComplete="new-password"
                 />
-                {formData.password && formData.password.length > 0 && ( <div
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  <FontAwesomeIcon
-                    icon={showPassword ? faEye : faEyeSlash}
-                    className="password-icon"
-                  />
-                </div>) }
+                {formData.password && formData.password.length > 0 && (
+                  <div
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEye : faEyeSlash}
+                      className="password-icon"
+                    />
+                  </div>
+                )}
               </div>
             </FormGroup>
             <Link id="Login" style={{ textDecoration: "none" }}>
@@ -236,7 +246,6 @@ const Login = () => {
           </Col>
         </Col>
       </Row>
-      
     </Container>
   );
 };

@@ -19,9 +19,11 @@ import { PopUpState } from "../../Context/PopUpProvider.jsx";
 import { MdCancelPresentation } from "react-icons/md";
 import { CreateOrder } from "../../Redux/Slices/BookingSlice.js";
 import { set } from "lodash";
+import TheToolTip from "../ToolTip/ToolTip.jsx";
 
 const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
-  const { user, token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
+  const user = JSON.parse(localStorage.getItem("user"));
   const socket = useSelector((state) => state?.socket?.socket);
   let list = useSelector((state) => state?.admin?.services);
   const dispatch = useDispatch();
@@ -43,6 +45,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const [imageError, setImageError] = useState("");
   const [images, setImages] = useState([]);
   const [postButtonDisabled, setPostButtonDisabled] = useState(false);
+  const [extraServicesError, setExtraServicesError] = useState(false);
 
   useEffect(() => {
     const isFormComplete =
@@ -133,7 +136,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         address: null,
         tasktime: taskTime,
         images,
-        location:  {},
+        location: {},
       };
       const formData = new FormData();
 
@@ -235,7 +238,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
         address: null,
         tasktime: taskTime,
         images,
-         location:  {},
+        location: {},
       };
       const formData = new FormData();
 
@@ -279,11 +282,10 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
       if (amountPerHour >= 5 && amountPerHour <= 100000) {
         {
           const result = await dispatch(CreateOrder({ formData, token }));
-           if (result?.type?.includes("fulfilled")){
+          if (result?.type?.includes("fulfilled")) {
             setPostButtonDisabled(false);
-            }
+          }
 
-        
           Swal.fire({
             title: "Job Posted",
             icon: "success",
@@ -328,9 +330,15 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     } else {
       if (serviceOption.length < 2) {
         setServiceOption([...serviceOption, serviceName]);
+      } else {
+        setExtraServicesError(true); // Show error message
+        setTimeout(() => {
+          setExtraServicesError(false); // Hide error message after 3 seconds
+        }, 3000); // 3000 milliseconds = 3 seconds
       }
     }
   };
+
   useEffect(() => {
     if (clear == true) {
       resetForm();
@@ -350,6 +358,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     setTaskTime(1);
     setImages([]);
     setFormComplete(false);
+    setExtraServicesError(false);
   };
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -395,10 +404,11 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           <FormGroup>
             <Label for="taskTitle" className="fw-bold">
               {BookingConstants.Labels.taskTitle}
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="text"
-              id="taskTitle"
+              // id="taskTitle"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
               maxLength={50}
@@ -438,11 +448,12 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
 
           <FormGroup>
             <Label className="fw-bold">Address</Label>
-            <div>{user.address}</div>
+            <div>{user?.address}</div>
           </FormGroup>
           <FormGroup>
             <Label for="taskDetails" className="fw-bold ">
               {BookingConstants.Labels.taskDetail}
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="textarea"
@@ -464,6 +475,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               <FormGroup>
                 <Label for="serviceOption " className="fw-bold">
                   {BookingConstants.Labels.service}
+                  <TheToolTip label="*" isOptional={false} />
                 </Label>
 
                 <div
@@ -473,7 +485,27 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
                     overflowY: "auto",
                   }}
                 >
-                  {" "}
+                  {/* {" "}
+                  {worker?.services?.map((service, key) => (
+                    <div key={key} className="form-check">
+                      <Input
+                        type="checkbox"
+                        id={`serviceCheckbox_${key}`}
+                        className="form-check-input"
+                        value={service.name}
+                        checked={serviceOption.includes(service.name)}
+                        onChange={() => handleServiceOptionChange(service.name)}
+                      />
+
+                      <Label
+                        htmlFor={`serviceCheckbox_${key}`}
+                        className="form-check-label"
+                      >
+                        {service.name}
+                      </Label>
+                    </div>
+                  ))} */}
+
                   {worker?.services?.map((service, key) => (
                     <div key={key} className="form-check">
                       <Input
@@ -501,6 +533,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               <FormGroup>
                 <Label for="serviceOption " className="fw-bold">
                   {BookingConstants.Labels.service}
+                  <TheToolTip label="*" isOptional={false} />
                 </Label>
 
                 <div
@@ -556,10 +589,15 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               </FormGroup>
             </>
           )}
-
+          {extraServicesError && (
+            <div className="error-message" style={{ color: "red" }}>
+              Only two services can be selected.
+            </div>
+          )}
           <FormGroup>
             <Label for="dateTime" className="fw-bold">
               {BookingConstants.Labels.datetime}
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="datetime-local"
@@ -575,12 +613,19 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
           <FormGroup>
             <Label for="taskTime" className="fw-bold">
               Task Time In Hours
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="number"
               id="taskTime"
               value={taskTime}
-              onChange={(e) => setTaskTime(e.target.value)}
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                if (inputValue === '' || (inputValue > 0 && inputValue <= 8)) {
+                  setTaskTime(inputValue);
+                }
+              }}
+          
               min={1}
               max={8}
               onKeyDown={(e) => {
@@ -589,13 +634,14 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
                 }
               }}
             />
-            {taskTime.length > 1 && (
+            {taskTime.length > 1  && (
               <div style={{ color: "red" }}>Task time should be 1-8 hours </div>
             )}
           </FormGroup>
           <FormGroup>
             <Label for="amountPerHour" className="fw-bold">
               {BookingConstants.Labels.amount}
+              <TheToolTip label="*" isOptional={false} />
             </Label>
             <Input
               type="number"
@@ -612,6 +658,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
             />
             {amountError && <div style={{ color: "red" }}>{amountError}</div>}
           </FormGroup>
+          {/* 
           <FormGroup>
             <Label for="images" className="fw-bold">
               {BookingConstants.Labels.images}
@@ -632,21 +679,65 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
                     <Progress value={100} max={100} className="w-50 mb-2">
                       {image.name}{" "}
                     </Progress>
-                    {/* <Button
-                        type="button"
-                        className="px-0 pt"
-                        onClick={() => handleDeleteImage(index)}> */}
                     <MdCancelPresentation
                       onClick={() => handleDeleteImage(index)}
                       text="dark"
                     >
                       {" "}
                     </MdCancelPresentation>
-                    {/* </Button> */}
                   </div>
                 ))}
               </div>
             )}
+          </FormGroup> */}
+
+          <FormGroup>
+            <Label for="images" className="fw-bold">
+              {BookingConstants.Labels.images}
+            </Label>
+            <div className="position-relative">
+              {/* Original file input, but hidden */}
+              <Input
+                id="OfferImages"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                multiple={images?.length < 5}
+                style={{ display: "none" }} // Hide the original input
+              />
+              {/* Custom button to trigger file selection */}
+              <Button
+                color="primary"
+                onClick={() => document.getElementById("OfferImages").click()}
+              >
+                Choose Image(s)
+              </Button>
+              {/* Display selected file names */}
+              {images.length > 0 && (
+                <div>
+                  <p>Selected Images:</p>
+                  {images.map((image, index) => (
+                    <div key={index} className="d-flex flex-row gap-2">
+                      <Progress value={100} max={100} className="w-50 mb-2">
+                        {image.name}
+                      </Progress>
+                      <MdCancelPresentation
+                        onClick={() => handleDeleteImage(index)}
+                        text="dark"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Error message */}
+              {imageError && <div style={{ color: "red" }}>{imageError}</div>}
+              {/* Placeholder message */}
+              {images.length === 0 && !imageError && (
+                <div className="custom-file-placeholder">
+                  <span>No file chosen</span>
+                </div>
+              )}
+            </div>
           </FormGroup>
         </ModalBody>
         <ModalFooter>

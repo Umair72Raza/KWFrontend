@@ -13,8 +13,9 @@ export const Toast_Notification = (string, type) => {
 export const Logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  localStorage.removeItem("services")
-  
+  localStorage.removeItem("services");
+  localStorage.removeItem("settings");
+  localStorage.removeItem("loglevel");
   return "200";
 };
 
@@ -124,7 +125,6 @@ export const handleNameChange = (
   }
 };
 export const validateEmail = (email, errors) => {
- 
   if (!email || !email.includes("@") || !email.includes(".com")) {
     errors.email = RegisterPage.ERROR_MESSAGES.invalidEmail;
   } else if (hasOnlyWhiteSpace(email)) {
@@ -135,8 +135,7 @@ export const validateEmail = (email, errors) => {
 export const validatePhoneNumber = (phoneNumber, errors) => {
   if (phoneNumber && !isValidPhoneNumber(phoneNumber)) {
     errors.phone = RegisterPage.ERROR_MESSAGES.invalidPhoneNumber;
-  } 
-
+  }
 };
 
 export const validateServices = (ShowServices, services, errors) => {

@@ -25,14 +25,14 @@ function App() {
   let { setScheduledOrders, setCancelledOrders, scheduledOrders } =
     PopUpState();
 
-  /// cancel order message
+  // /// cancel order message
   useEffect(() => {
     socket?.on("order-canceled", (data) => {
       const Corder = data.order;
       let reason = data.reason;
-Corder.cancelReason={
-  reason:reason
-}
+      Corder.cancelReason = {
+        reason: reason,
+      };
       // Check if reason is empty and set a default message
       if (!reason || !reason?.length) {
         reason = "Reason not mentioned";
@@ -88,7 +88,7 @@ Corder.cancelReason={
 
   useEffect(() => {
     let isMounted = true;
-
+    // console.log(isMounted);
     const fetchData = async () => {
       if (isMounted) {
         const authenticated = checkToken();
@@ -164,6 +164,7 @@ Corder.cancelReason={
         <Routes>{routes}</Routes>
       </BrowserRouter>
     </>
+    // <>APPS</>
   );
 }
 
