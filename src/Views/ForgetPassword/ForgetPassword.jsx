@@ -12,7 +12,10 @@ import {
 } from "reactstrap";
 import forgotpng from "../../assets/images/ForgetPasswordpng/forgot.png";
 import { failureToast, successToast } from "../../utils";
-import { requestOTPAsync, updateOtpStatus } from "../../Redux/Slices/AuthSlice.js";
+import {
+  requestOTPAsync,
+  updateOtpStatus,
+} from "../../Redux/Slices/AuthSlice.js";
 import { useDispatch } from "react-redux";
 import {
   FORGET_PASSWORD,
@@ -27,7 +30,7 @@ const ForgetPassword = () => {
   const [email, setEmail] = useState("");
   const [isValidEmail, setIsValidEmail] = useState(true);
   const [enableButton, setEnableButton] = useState(false);
-  const [disableBack,setDisableBack] = useState(false);
+  const [disableBack, setDisableBack] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -50,14 +53,12 @@ const ForgetPassword = () => {
       dispatch(showSpinner());
       const otpResp = await dispatch(requestOTPAsync(email));
       if (otpResp.type === "auth/requestOTPAsync/fulfilled") {
-        if(otpResp.payload.data && otpResp.payload.status)
-        {
-          
+        console.log(otpResp, "otprespo");
+        if (otpResp.payload.data && otpResp.payload.status) {
           navigate("/auth/newpassword", { state: { email: email } });
           successToast("OTP sent successfully!");
-        }
-        else{
-          failureToast("Email not registered")
+        } else {
+          failureToast("Email not registered");
         }
       }
     } catch (error) {
@@ -137,19 +138,23 @@ const ForgetPassword = () => {
                   Back
                 </Button>
 
-                  <Button
-                    disabled={!enableButton}
-                    onClick={requestOTP}
-                    color="primary"
-                  >
-                    {isLoading ? (
-                      <><Button color="primary" size="sm"><Spinner/></Button> </>
-                      ):(
-                      <>
-                      <div>{FORGET_PASSWORD.SEND_OTP_BUTTON}</div> 
-                      </>)
-                   }
-                  </Button>
+                <Button
+                  disabled={!enableButton}
+                  onClick={requestOTP}
+                  color="primary"
+                >
+                  {isLoading ? (
+                    <>
+                      <Button color="primary" size="sm">
+                        <Spinner />
+                      </Button>{" "}
+                    </>
+                  ) : (
+                    <>
+                      <div>{FORGET_PASSWORD.SEND_OTP_BUTTON}</div>
+                    </>
+                  )}
+                </Button>
               </Col>
             </Row>
           </Form>

@@ -20,10 +20,10 @@ import confirmpassword from "../../assets/images/NewPasswordpngs/confirmpassword
 import otppng from "../../assets/images/NewPasswordpngs/securedata.png";
 import { failureToast, successToast } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   requestOTPverification,
-//   setNewPassAsync,
-// } from "../../Redux/Slices/AuthSlice";
+import {
+  requestOTPverification,
+  setNewPassAsync,
+} from "../../Redux/Slices/AuthSlice";
 
 const NewPassword = () => {
   const location = useLocation();
@@ -89,12 +89,14 @@ const NewPassword = () => {
 
   const verifyOTPSENT = async (e) => {
     //send the otp to the backend for the confirmation to reset the password
-
+    console.log("I ran ", OTP)
     e.preventDefault();
     try {
       setDisabledOTP(true);
       const resp = await dispatch(requestOTPverification(OTP));
+      console.log("response", resp.payload)
       if (resp.payload === 200) {
+
         successToast("OTP verified, Enter new Password");
         setOtpVerified(true);
       } else {
