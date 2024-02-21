@@ -9,6 +9,7 @@ import {
   CardTitle,
   CardText,
   Button,
+  CardFooter,
 } from "reactstrap";
 import completedtask from "../../assets/completedtask.png";
 import activeOrder from "../../assets/activestatus.png";
@@ -85,7 +86,7 @@ const OrderCard = ({
 
   useEffect(() => {
     if (finalizeFunction == true) {
-      setDisableConfirm(true)
+      setDisableConfirm(true);
       cancelingOrder();
     }
   }, [finalizeFunction]);
@@ -137,7 +138,7 @@ const OrderCard = ({
     ]);
     Clear();
     setToggleCancel(!toggleCancel);
-    setDisableConfirm(false)
+    setDisableConfirm(false);
   };
 
   return (
@@ -160,6 +161,7 @@ const OrderCard = ({
                     style={{
                       backgroundColor: "#f6f8fc",
                       color: "",
+                      height: "100%",
                     }}
                   >
                     <CardBody>
@@ -230,32 +232,43 @@ const OrderCard = ({
                         <b>Amount:</b> ${order.amount}
                       </CardText>
                       <CardText>
-                        <b>Details:</b>{" "}
+                        <div>
+                          <Row>
+                            <Col>
+                              <b>Details:</b>
+                            </Col>
+                            <Col>
+                              {order.details.length > 30 && (
+                                <Button
+                                  style={{
+                                    marginTop: "-5px",
+                                    marginLeft: "10px",
+                                  }} // Adjust spacing as needed
+                                  color="link"
+                                  onClick={() => toggleDetails(order?._id)}
+                                >
+                                  {showFullDetailsMap[order?._id]
+                                    ? "Show Less"
+                                    : "Show More"}
+                                </Button>
+                              )}
+                            </Col>
+                          </Row>
+                        </div>
                         <div
                           style={{
                             maxHeight: "100px",
                             overflowY: "auto",
                           }}
                         >
-                          {showFullDetailsMap[order._id] ? (
+                          {showFullDetailsMap[order?._id] ? (
                             <div
                               dangerouslySetInnerHTML={{
-                                __html: order.details,
+                                __html: order?.details,
                               }}
                             />
                           ) : (
-                            transformOrderDetails(order)
-                          )}
-                          {order.details.length > 5 && (
-                            <Button
-                              style={{ marginTop: "-5px" }}
-                              color="link"
-                              onClick={() => toggleDetails(order._id)}
-                            >
-                              {showFullDetailsMap[order._id]
-                                ? "Show Less"
-                                : "Show More"}
-                            </Button>
+                            transformOrderDetails(order).slice(0, 30) // Truncate details
                           )}
                         </div>
                       </CardText>
@@ -271,26 +284,26 @@ const OrderCard = ({
                           ) : null}
                         </CardText>
                       </CardText>
-                      <Row>
-                        <Col></Col>
-                        <Col>
-                          {" "}
-                          {/* Full width on small screens, half width on medium and larger screens */}
-                          <CardText>
-                            <Button
-                              onClick={() => {
-                                //setOrderToCancel(order)
-                                CancelOrder(order);
-                              }}
-                              color="danger"
-                            >
-                              Cancel Order
-                            </Button>
-                          </CardText>
-                        </Col>
-                        <Col></Col>
-                      </Row>
+                      <CardText>
+                        <b>Services:</b>
+                        {order?.service.map((service, index) => (
+                          <p key={index}>
+                            <b>{index + 1}:</b> {service}
+                          </p>
+                        ))}
+                      </CardText>
                     </CardBody>
+                    <CardFooter>
+                      <Button
+                        onClick={() => {
+                          //setOrderToCancel(order)
+                          CancelOrder(order);
+                        }}
+                        color="danger"
+                      >
+                        Cancel Order
+                      </Button>
+                    </CardFooter>
                   </Card>
                 </Col>
               ))}

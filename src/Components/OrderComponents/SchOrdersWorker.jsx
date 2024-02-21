@@ -19,11 +19,12 @@ import {
   Label,
   Input,
   Spinner,
+  CardFooter,
 } from "reactstrap";
 
 import completedtask from "../../assets/completedtask.png";
 import activeOrderspng from "../../assets/activestatus.png";
-import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice";
+import { cancelOrderAsync } from "../../Redux/Slices/OrderSlice.js";
 import Swal from "sweetalert2";
 import { truncateText } from "../../utils";
 import { PopUpState } from "../../Context/PopUpProvider.jsx";
@@ -393,46 +394,32 @@ const ScheduledOrdersCardWorker = ({
                           Open in Google Maps
                         </Button>
                       </CardText>
-                      <Row>
-                        <Col style={{ margin: "2%" }} xs="12" md="5">
-                          {" "}
-                          {/* Full width on small screens, half width on medium and larger screens */}
-                          <CardText>
-                            <Button
-                              onClick={() => toggleModal(order)}
-                              color="danger"
-                              disabled={globalStartButtonDisabled}
-                            >
-                              Cancel Job
-                            </Button>
-                          </CardText>
-                        </Col>
-
-                        <>
-                          <Col style={{ margin: "2%" }} xs="12" md="5">
-                            {" "}
-                            {/* Half width on small screens, one-third width on medium and larger screens */}
-                            <CardText>
-                              <Button
-                                onClick={() =>
-                                  sendStartRequest(order, order?.users[0]?._id)
-                                }
-                                color="success"
-                                className={
-                                  globalStartButtonDisabled ||
-                                  startButtonDisabledMap[order?._id] ||
-                                  activeOrder?.length > 0
-                                    ? "disabled"
-                                    : ""
-                                }
-                              >
-                                Start Job
-                              </Button>
-                            </CardText>
-                          </Col>
-                        </>
-                      </Row>
                     </CardBody>
+                    <CardFooter className="d-flex justify-content-between">
+                      {" "}
+                      <Button
+                        onClick={() => toggleModal(order)}
+                        color="danger"
+                        disabled={globalStartButtonDisabled}
+                      >
+                        Cancel Job
+                      </Button>{" "}
+                      <Button
+                        onClick={() =>
+                          sendStartRequest(order, order?.users[0]?._id)
+                        }
+                        color="success"
+                        className={
+                          globalStartButtonDisabled ||
+                          startButtonDisabledMap[order?._id] ||
+                          activeOrder?.length > 0
+                            ? "disabled"
+                            : ""
+                        }
+                      >
+                        Start Job
+                      </Button>
+                    </CardFooter>
                   </Card>
                 </Col>
               ))}

@@ -53,8 +53,10 @@ const OpenJobRqst = () => {
           socket.emit("startBid-response", data);
         }
         setPostedJobs((prevPostedJobs) =>
-                  prevPostedJobs.filter((postedJob) => postedJob._id !== data?.order._id)
-                );
+          prevPostedJobs.filter(
+            (postedJob) => postedJob._id !== data?.order._id
+          )
+        );
         // Cancel other modals with the same order ID and different worker ID
         modals.forEach((modal) => {
           if (modal.order._id === order._id && modal.workerId !== workerId) {
