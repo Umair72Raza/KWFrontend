@@ -303,17 +303,16 @@ const UserRegister = ({ ShowServices }) => {
       RegisterPage.ERROR_MESSAGES.invalidAddress,
       errors
     );
+    
     if (!formData.country) {
       errors.country = "Country is required";
     }
+
     if (!formData.region_state) {
       errors.region_state = "Region/State is required";
     }
-    if (
-      formData.region &&
-      !City.getCitiesOfState(formData.country, formData.region_state).length ===
-        0
-    ) {
+
+    if (!formData?.city) {
       errors.city = "City is required";
     }
 
