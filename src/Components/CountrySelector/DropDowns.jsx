@@ -407,7 +407,7 @@ const Dropdowns = ({
     setCountryFound(country);
     setSelectedState(null);
     setSelectedCity(null);
-    setFormData((prev) => ({ ...prev, country: country.name }));
+    setFormData((prev) => ({ ...prev, country: country?.name }));
   };
 
   const handleStateChange = (event) => {
@@ -415,14 +415,14 @@ const Dropdowns = ({
     const selectedStateName = event.target.value;
 
     const state = countryFound?.states?.find(
-      (state) => state.name === selectedStateName
+      (state) => state?.name === selectedStateName
     );
 
     setSelectedState(state);
     setStateFound(state);
     setSelectedCity(null);
 
-    setFormData((prev) => ({ ...prev, region_state: state.name }));
+    setFormData((prev) => ({ ...prev, region_state: state?.name }));
   };
 
   const handleCityChange = (event) => {
