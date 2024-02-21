@@ -403,33 +403,31 @@ const Dropdowns = ({
     const country = countriesData.find(
       (country) => country.code === selectedCountryCode
     );
-
+    setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
     setSelectedCountry(country);
     setCountryFound(country);
     setSelectedState(null);
     setSelectedCity(null);
-    setFormData((prev) => ({ ...prev, country: country.name }));
+    setFormData((prev) => ({ ...prev, country: country?.name }));
   };
 
   const handleStateChange = (event) => {
     event.preventDefault();
     const selectedStateName = event.target.value;
-
     const state = countryFound?.states?.find(
       (state) => state.name === selectedStateName
     );
-
+    setErrors((prevErrors) => ({ ...prevErrors, region_state: "" }));
     setSelectedState(state);
     setStateFound(state);
     setSelectedCity(null);
-
-    setFormData((prev) => ({ ...prev, region_state: state.name }));
+    setFormData((prev) => ({ ...prev, region_state: state?.name }));
   };
 
   const handleCityChange = (event) => {
     const selectedCityName = event.target.value;
     setSelectedCity(selectedCityName);
-
+    setErrors((prevErrors) => ({ ...prevErrors, city: "" }));
     setFormData((prev) => ({ ...prev, city: selectedCityName }));
   };
 
@@ -443,7 +441,7 @@ const Dropdowns = ({
         <Input
           type="select"
           id="country"
-          value={selectedCountry ? selectedCountry.code : ""}
+          value={selectedCountry ? selectedCountry?.code : ""}
           onChange={handleCountryChange}
           className="form-select"
           required
