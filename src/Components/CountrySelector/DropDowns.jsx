@@ -16,6 +16,7 @@ const Dropdowns = ({
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
   const [allCountries, setAllCountries] = useState([]);
+  
 
   useEffect(() => {
     setAllCountries(Country.getAllCountries());
@@ -28,7 +29,7 @@ const Dropdowns = ({
     console.log("city:", city);
   
     // Check if formData exists and is not empty
-    if (formData && Object.keys(UserData).length !== 0) {
+    if (UserData && Object.keys(UserData).length !== 0) {
       if (
         UserData.country !== country ||
         UserData.region_state !== region ||
@@ -39,7 +40,7 @@ const Dropdowns = ({
         setCity(UserData?.city || "");
       }
     }
-  }, [editMode, UserData, country, region, city]);
+  }, [editMode]);
   
 
   const handleCountryChange = (event) => {
