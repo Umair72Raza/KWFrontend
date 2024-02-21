@@ -959,14 +959,10 @@ const EditProfilePage = ({ ShowServices }) => {
 
                               <Button
                                 className="mt-5"
-                                color=""
+                                color="primary"
                                 onClick={toggleEditProfile}
                               >
-                                <img
-                                  src={camera}
-                                  alt="editpfp"
-                                  height={"30px"}
-                                />
+                                <CiEdit />
                               </Button>
                             </Col>
                           </>

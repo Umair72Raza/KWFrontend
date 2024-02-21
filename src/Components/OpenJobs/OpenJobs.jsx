@@ -45,7 +45,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   const { user } = useSelector((state) => state.auth);
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [imageDataURL, setImageDataURL] = useState([]);
-
+  const [disableRefresh, setDisableRefresh] = useState(false);
   const socket = useSelector((state) => state?.socket?.socket);
 
   useEffect(() => {
@@ -234,6 +234,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
   };
 
   const handleRefresh = async () => {
+    setDisableRefresh(true);
     let result = await dispatch(fetchOpenOrdersAsync(token));
 
     if (result.type === "orders/fetchOpenOrders/fulfilled") {
@@ -251,6 +252,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
         setOpenJobs((prevOpenJobs) => [...uniqueOrders, ...prevOpenJobs]);
       }
     }
+    setDisableRefresh(false);
   };
 
   return (
@@ -266,6 +268,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
             color="primary"
             onClick={handleRefresh}
             style={{ width: "100px" }}
+            disabled={disableRefresh}
           >
             Refresh Jobs
           </Button>
@@ -275,6 +278,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                 <h4>No Open Jobs!</h4>
               </div>
             )}
+
             {scheduledOrdersObject?.map((order, index) => (
               <Col
                 key={index}
@@ -335,32 +339,43 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                       )}
                     </div>
                     <CardText>
-                      <b>Details:</b>{" "}
+                      <div>
+                        <Row>
+                          <Col>
+                            <b>Details:</b>
+                          </Col>
+                          <Col>
+                            {order.details.length > 30 && (
+                              <Button
+                                style={{
+                                  marginTop: "-5px",
+                                  marginLeft: "10px",
+                                }} // Adjust spacing as needed
+                                color="link"
+                                onClick={() => toggleDetails(order?._id)}
+                              >
+                                {showFullDetailsMap[order?._id]
+                                  ? "Show Less"
+                                  : "Show More"}
+                              </Button>
+                            )}
+                          </Col>
+                        </Row>
+                      </div>
                       <div
                         style={{
                           maxHeight: "100px",
                           overflowY: "auto",
                         }}
                       >
-                        {showFullDetailsMap[order.id] ? (
+                        {showFullDetailsMap[order?._id] ? (
                           <div
                             dangerouslySetInnerHTML={{
                               __html: order?.details,
                             }}
                           />
                         ) : (
-                          transformOrderDetails(order)
-                        )}
-                        {order?.details?.length > 30 && (
-                          <Button
-                            style={{ marginTop: "-5px" }}
-                            color="link"
-                            onClick={() => toggleDetails(order?.id)}
-                          >
-                            {showFullDetailsMap[order?.id]
-                              ? "Show Less"
-                              : "Show More"}
-                          </Button>
+                          transformOrderDetails(order).slice(0, 30) // Truncate details
                         )}
                       </div>
                     </CardText>
@@ -371,7 +386,10 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                           <Row>
                             <Slider {...settings} className="">
                               {order.images?.map((image, index) => (
-                                <div className="text-center" key={index}>
+                                <div
+                                  className="d-flex justify-content-center"
+                                  key={index}
+                                >
                                   <img
                                     key={index}
                                     src={`${
@@ -443,7 +461,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         color="info"
                         className="fw-bold hover-pointer"
                         onClick={() => handleMessageIconClick(order)}
-                        style={{ color: "white", marginBottom: "10px" }}
+                        style={{ color: "white", marginBottom: "" }}
                       >
                         <FiMessageCircle className="fs-4" /> Chat
                       </Button>
@@ -469,7 +487,7 @@ const OpenJobs = ({ spinnerVisible, scheduledOrdersObject }) => {
                         color="info"
                         className="fw-bold hover-pointer"
                         onClick={() => handleMessageIconClick(order)}
-                        style={{ color: "white", marginBottom: "10px" }}
+                        style={{ color: "white", marginBottom: "" }}
                       >
                         <FiMessageCircle className="fs-4" /> Chat
                       </Button>

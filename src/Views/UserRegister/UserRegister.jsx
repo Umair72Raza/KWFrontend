@@ -542,7 +542,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper">
                     <Input
-                      invalid={errors.password ? true : false}
+                      // invalid={errors.password ? true : false}
                       type={showPassword ? "text" : "password"}
                       name="password"
                       id="password"
@@ -596,7 +596,7 @@ const UserRegister = ({ ShowServices }) => {
                   </Label>
                   <div className="password-input-wrapper ">
                     <Input
-                      invalid={errors.confirmPassword ? true : false}
+                      // invalid={errors.confirmPassword ? true : false}
                       type={showConfirmPassword ? "text" : "password"}
                       name={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}
                       id={RegisterPage.INPUT_FIELDS.CONFIRM_PASSWORD.name}

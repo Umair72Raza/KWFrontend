@@ -45,6 +45,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
   const [imageError, setImageError] = useState("");
   const [images, setImages] = useState([]);
   const [postButtonDisabled, setPostButtonDisabled] = useState(false);
+  const [extraServicesError, setExtraServicesError] = useState(false);
 
   useEffect(() => {
     const isFormComplete =
@@ -329,9 +330,15 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     } else {
       if (serviceOption.length < 2) {
         setServiceOption([...serviceOption, serviceName]);
+      } else {
+        setExtraServicesError(true); // Show error message
+        setTimeout(() => {
+          setExtraServicesError(false); // Hide error message after 3 seconds
+        }, 3000); // 3000 milliseconds = 3 seconds
       }
     }
   };
+
   useEffect(() => {
     if (clear == true) {
       resetForm();
@@ -351,6 +358,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
     setTaskTime(1);
     setImages([]);
     setFormComplete(false);
+    setExtraServicesError(false);
   };
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -477,7 +485,27 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
                     overflowY: "auto",
                   }}
                 >
-                  {" "}
+                  {/* {" "}
+                  {worker?.services?.map((service, key) => (
+                    <div key={key} className="form-check">
+                      <Input
+                        type="checkbox"
+                        id={`serviceCheckbox_${key}`}
+                        className="form-check-input"
+                        value={service.name}
+                        checked={serviceOption.includes(service.name)}
+                        onChange={() => handleServiceOptionChange(service.name)}
+                      />
+
+                      <Label
+                        htmlFor={`serviceCheckbox_${key}`}
+                        className="form-check-label"
+                      >
+                        {service.name}
+                      </Label>
+                    </div>
+                  ))} */}
+
                   {worker?.services?.map((service, key) => (
                     <div key={key} className="form-check">
                       <Input
@@ -561,7 +589,11 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               </FormGroup>
             </>
           )}
-
+          {extraServicesError && (
+            <div className="error-message" style={{ color: "red" }}>
+              Only two services can be selected.
+            </div>
+          )}
           <FormGroup>
             <Label for="dateTime" className="fw-bold">
               {BookingConstants.Labels.datetime}
@@ -589,10 +621,11 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
               value={taskTime}
               onChange={(e) => {
                 const inputValue = e.target.value;
-                if (inputValue <= 8) {
+                if (inputValue === '' || (inputValue > 0 && inputValue <= 8)) {
                   setTaskTime(inputValue);
                 }
               }}
+          
               min={1}
               max={8}
               onKeyDown={(e) => {
@@ -601,7 +634,7 @@ const Booking = ({ modal, toggle, worker, chat, fromPostJob }) => {
                 }
               }}
             />
-            {taskTime.length > 1 && (
+            {taskTime.length > 1  && (
               <div style={{ color: "red" }}>Task time should be 1-8 hours </div>
             )}
           </FormGroup>

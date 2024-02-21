@@ -27,7 +27,8 @@ import Slider from "react-slick";
 import TheToolTip from "../ToolTip/ToolTip.jsx";
 
 const EditOffer = ({ modal, toggle, order }) => {
-  const { user, token } = useSelector((state) => state.auth);
+  const {  token } = useSelector((state) => state.auth);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const dispatch = useDispatch();
   let {

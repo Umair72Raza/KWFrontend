@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AuthLayout from "./Layouts/AuthLayout";
- import UserLayout from "./Layouts/UserLayout";
+import UserLayout from "./Layouts/UserLayout";
 import { checkRole, checkToken } from "./utils";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -88,7 +88,7 @@ function App() {
 
   useEffect(() => {
     let isMounted = true;
-    console.log(isMounted);
+    // console.log(isMounted);
     const fetchData = async () => {
       if (isMounted) {
         const authenticated = checkToken();
@@ -96,7 +96,6 @@ function App() {
         if (authenticated) {
           const loginRole = checkRole();
           setRole(loginRole);
-          console.log(role);
         }
       }
     };

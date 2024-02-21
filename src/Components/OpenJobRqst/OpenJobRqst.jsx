@@ -105,7 +105,7 @@ const OpenJobRqst = () => {
           keyboard={false}
         >
           <ModalHeader>
-            {`Order Bid by ${modal.workerfirstName} ${modal.workerlastName}`}
+            {`Order Request by ${modal.workerfirstName} ${modal.workerlastName}`}
           </ModalHeader>
           <ModalBody style={{ maxHeight: "200px", overflowY: "auto" }}>
             <>

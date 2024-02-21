@@ -29,14 +29,14 @@ const ActiveOrders = ({
 
   const [showFullDetailsMap, setShowFullDetailsMap] = useState({});
   const [finishJobVerified, setFinishJobVerified] = useState(false);
-  const [disableFinishButton,setDisableFinishButton] = useState(false)
+  const [disableFinishButton, setDisableFinishButton] = useState(false);
   const [confirmed, SetConfirm] = useState("");
   const socket = useSelector((state) => state?.socket?.socket);
   useEffect(() => {
     const handleFinishJobResult = (data) => {
       setDisableFinishButton(false);
       if (data.result === "true") {
-        setDisableFinishButton(false)
+        setDisableFinishButton(false);
         SetConfirm("true");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -50,7 +50,7 @@ const ActiveOrders = ({
         // Add the removed order to the past orders
         setPastOrders((prevPastOrders) => [...prevPastOrders, data.order]);
       } else if (data.result === "false") {
-        setDisableFinishButton(false)
+        setDisableFinishButton(false);
         SetConfirm("false");
         SetOrder(data.order);
         setFinishJobVerified(true);
@@ -108,14 +108,11 @@ const ActiveOrders = ({
               <Col
                 key={order._id}
                 sm="6"
-                md="4"
-                lg="3"
+                md="8"
+                lg="5"
                 style={{ marginTop: "10px" }}
               >
-                <Card
-                  className="shadow"
-                  style={{ backgroundColor: "#f6f8fc", }}
-                >
+                <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
                   <CardBody>
                     <Col
                       style={{
@@ -146,7 +143,7 @@ const ActiveOrders = ({
                     >
                       {" "}
                       <span style={{ marginTop: "10px" }}>
-                        <b>Status:</b>  Active
+                        <b>Status:</b> Active
                       </span>
                     </CardText>
                     <CardText>
@@ -158,7 +155,7 @@ const ActiveOrders = ({
                     <CardText>
                       <b>Amount:</b> ${order.amount}
                     </CardText>
-                    <CardText>
+                    {/* <CardText>
                       <b>Details:</b>{" "}
                       <div
                         style={{
@@ -187,16 +184,59 @@ const ActiveOrders = ({
                           </Button>
                         )}
                       </div>
+                    </CardText> */}
+                    <CardText>
+                      <div>
+                        <Row>
+                          <Col>
+                            <b>Details:</b>
+                          </Col>
+                          <Col>
+                            {order.details.length > 30 && (
+                              <Button
+                                style={{
+                                  marginTop: "-5px",
+                                  marginLeft: "10px",
+                                }} // Adjust spacing as needed
+                                color="link"
+                                onClick={() => toggleDetails(order?._id)}
+                              >
+                                {showFullDetailsMap[order?._id]
+                                  ? "Show Less"
+                                  : "Show More"}
+                              </Button>
+                            )}
+                          </Col>
+                        </Row>
+                      </div>
+                      <div
+                        style={{
+                          maxHeight: "100px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {showFullDetailsMap[order?._id] ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order?.details,
+                            }}
+                          />
+                        ) : (
+                          transformOrderDetails(order).slice(0, 30) // Truncate details
+                        )}
+                      </div>
                     </CardText>
                     <CardText>
                       {" "}
                       {isUser ? (
                         <>
-                          <b>Worker:</b> {order?.users[1]?.firstName} {order.users[1]?.lastName}
+                          <b>Worker:</b> {order?.users[1]?.firstName}{" "}
+                          {order.users[1]?.lastName}
                         </>
                       ) : (
                         <>
-                          <b>User:</b> {order?.users[0]?.firstName} {order?.users[0]?.lastName}
+                          <b>User:</b> {order?.users[0]?.firstName}{" "}
+                          {order?.users[0]?.lastName}
                         </>
                       )}
                     </CardText>

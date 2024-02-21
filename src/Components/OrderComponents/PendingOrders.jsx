@@ -56,7 +56,7 @@ const PendingOrders = ({ pendingOrders }) => {
   };
   const toggleModal1 = () => {
     setModal1(!modal1);
-  }
+  };
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
       ...prevMap,
@@ -87,7 +87,7 @@ const PendingOrders = ({ pendingOrders }) => {
         const id = order._id;
         const data = { id: id, token: token };
         const result = await disaptch(deleteTheOrderAsync(data));
-    
+
         if (result?.type === "orders/deleteOrder/fulfilled") {
           if (result.payload.message === "Order deleted") {
             Swal.fire({
@@ -116,103 +116,97 @@ const PendingOrders = ({ pendingOrders }) => {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-     autoplaySpeed: 2000,
+    autoplaySpeed: 2000,
   };
 
   const editModal = (order) => {
     setModal1(true);
-    setOrder(order)
-
-  }
+    setOrder(order);
+  };
   return (
-      <Container>
-        {
-      
-         pendingOrders?.length > 0 ? (
-          <>
-            <Row>
-              {pendingOrders?.map((order) => (
-                <Col
-                  key={order._id}
-                  sm="6"
-                  md="4"
-                  lg="4"
-                  xl="4"
-                  style={{ marginTop: "10px" }}
-                >
-                  <Card
-                    className="shadow"
-                    style={{ backgroundColor: "#f6f8fc",  }}
-                  >
-                    <CardBody>
-                      <CardTitle>
-                        <Col>
-                          <div
+    <Container>
+      {pendingOrders?.length > 0 ? (
+        <>
+          <Row>
+            {pendingOrders?.map((order) => (
+              <Col
+                key={order._id}
+                sm="6"
+                md="4"
+                lg="4"
+                xl="4"
+                style={{ marginTop: "10px" }}
+              >
+                <Card className="shadow" style={{ backgroundColor: "#f6f8fc" }}>
+                  <CardBody>
+                    <CardTitle>
+                      <Col>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <img
+                            src={completedtask}
+                            alt="schTask"
+                            style={{ marginRight: "10px" }}
+                          />
+                          <h5
                             style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
+                              marginTop: "4%",
+                              textAlign: "center",
+                              overflow: "hidden",
+                              whiteSpace: "nowrap",
+                              textOverflow: "ellipsis",
+                              maxWidth: "100%",
                             }}
                           >
-                            <img
-                              src={completedtask}
-                              alt="schTask"
-                              style={{ marginRight: "10px" }}
-                            />
-                            <h5
-                              style={{
-                                marginTop: "4%",
-                                textAlign: "center",
-                                overflow: "hidden",
-                                whiteSpace: "nowrap",
-                                textOverflow: "ellipsis",
-                                maxWidth: "100%",
-                              }}
-                            >
-                              {order.Title}
-                            </h5>
-                          </div>
-                        </Col>{" "}
-                      </CardTitle>
-                      <CardText>
-                        <Col>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
+                            {order.Title}
+                          </h5>
+                        </div>
+                      </Col>{" "}
+                    </CardTitle>
+                    <CardText>
+                      <Col>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <span
+                            style={{ marginTop: "10px", marginRight: "1%" }}
                           >
-                            <span
-                              style={{ marginTop: "10px", marginRight: "1%" }}
-                            >
-                              <b>Status: </b>
-                              {order.Status}
-                            </span>
-                            <img
-                              src={activeOrderspng}
-                              alt="schTask"
-                              style={{
-                                height: "12px",
-                                marginLeft: "-1%",
-                                zIndex: "0",
-                                marginTop: "3.75%",
-                                opacity: "90%",
-                              }}
-                            />
-                          </div>
-                        </Col>
-                      </CardText>
-                      <CardText>
-                        <b>Time:</b> {order.time}
-                      </CardText>
-                      <CardText>
-                        <b>Date:</b> {order.date}
-                      </CardText>
-                      <CardText>
-                        <b>Amount:</b> ${order.amount}
-                      </CardText>
-                      <CardText>
+                            <b>Status: </b>
+                            {order.Status}
+                          </span>
+                          <img
+                            src={activeOrderspng}
+                            alt="schTask"
+                            style={{
+                              height: "12px",
+                              marginLeft: "-1%",
+                              zIndex: "0",
+                              marginTop: "3.75%",
+                              opacity: "90%",
+                            }}
+                          />
+                        </div>
+                      </Col>
+                    </CardText>
+                    <CardText>
+                      <b>Time:</b> {order.time}
+                    </CardText>
+                    <CardText>
+                      <b>Date:</b> {order.date}
+                    </CardText>
+                    <CardText>
+                      <b>Amount:</b> ${order.amount}
+                    </CardText>
+                    {/* <CardText>
                         <b>Details:</b>{" "}
                         <div
                           style={{
@@ -241,76 +235,119 @@ const PendingOrders = ({ pendingOrders }) => {
                             </Button>
                           )}
                         </div>
-                      </CardText>
-                      {order?.images?.length > 0 && (
-                        <CardText className="mb-3">
-                          <b>Images:</b>
-                          <Row>
-                            <Slider {...settings} className="">
-                              {order.images?.map((image, index) => (
-                                <div className="text-center" key={index}>
-                                  <img
-                                    key={index}
-                                    src={`${
-                                      import.meta.env
-                                        .VITE_LOCAL_BACKEND_ENDPOINT
-                                    }${image}`}
-                                    alt={`Modal Image ${index}`}
-                                    className="img-fluid"
-                                    style={{
-                                      height: "100px",
-                                      textAlign: "center",
-                                    }}
-                                  />
-                                </div>
-                              ))}
-                            </Slider>
-                          </Row>
-                        </CardText>
-                      )}
+                      </CardText> */}
+                    <CardText>
+                      <div>
+                        <Row>
+                          <Col>
+                            <b>Details:</b>
+                          </Col>
+                          <Col>
+                            {order.details.length > 30 && (
+                              <Button
+                                style={{
+                                  marginTop: "-5px",
+                                  marginLeft: "10px",
+                                }} // Adjust spacing as needed
+                                color="link"
+                                onClick={() => toggleDetails(order?._id)}
+                              >
+                                {showFullDetailsMap[order?._id]
+                                  ? "Show Less"
+                                  : "Show More"}
+                              </Button>
+                            )}
+                          </Col>
+                        </Row>
+                      </div>
+                      <div
+                        style={{
+                          maxHeight: "100px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {showFullDetailsMap[order?._id] ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: order?.details,
+                            }}
+                          />
+                        ) : (
+                          transformOrderDetails(order).slice(0, 30) // Truncate details
+                        )}
+                      </div>
+                    </CardText>
 
-                      <Row>
+                    {order?.images?.length > 0 && (
+                      <CardText className="mb-3">
+                        <b>Images:</b>
+                        <Row>
+                          <Slider {...settings} className="">
+                            {order.images?.map((image, index) => (
+                              <div className="text-center" key={index}>
+                                <img
+                                  key={index}
+                                  src={`${
+                                    import.meta.env.VITE_LOCAL_BACKEND_ENDPOINT
+                                  }${image}`}
+                                  alt={`Modal Image ${index}`}
+                                  className="img-fluid"
+                                  style={{
+                                    height: "100px",
+                                    textAlign: "center",
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </Slider>
+                        </Row>
+                      </CardText>
+                    )}
+
+                    <Row>
+                      <Col style={{ margin: "2%" }} xs="12" md="5">
+                        {" "}
+                        {/* Full width on small screens, half width on medium and larger screens */}
+                        <CardText>
+                          <Button
+                            onClick={() => deleteAlert(order)}
+                            color="danger"
+                          >
+                            Delete
+                          </Button>
+                        </CardText>
+                      </Col>
+
+                      <>
                         <Col style={{ margin: "2%" }} xs="12" md="5">
                           {" "}
-                          {/* Full width on small screens, half width on medium and larger screens */}
+                          {/* Half width on small screens, one-third width on medium and larger screens */}
                           <CardText>
                             <Button
-                              onClick={() => deleteAlert(order)}
-                              color="danger"
+                              onClick={() => editModal(order)}
+                              color="info"
                             >
-                              Delete
+                              Post
                             </Button>
                           </CardText>
                         </Col>
-
-                        <>
-                          <Col style={{ margin: "2%" }} xs="12" md="5">
-                            {" "}
-                            {/* Half width on small screens, one-third width on medium and larger screens */}
-                            <CardText>
-                            <Button onClick={()=>editModal(order)} color="info">Post</Button>
-                            </CardText>
-                          </Col>
-                        </>
-                      </Row>
-                    </CardBody>
-                  </Card>
-                </Col>
-              ))}
-              {modal1 == true ? (
-                <EditOffer modal={modal1} toggle={toggleModal1} order={order} />
-              ) : (
-                []
-              )}
-            </Row>
-          </>
-        ) 
-        : (
-          <div>No Pending Orders</div>
-        )}
-      </Container>
-
-    
+                      </>
+                    </Row>
+                  </CardBody>
+                </Card>
+              </Col>
+            ))}
+            {modal1 == true ? (
+              <EditOffer modal={modal1} toggle={toggleModal1} order={order} />
+            ) : (
+              []
+            )}
+          </Row>
+        </>
+      ) : (
+        <div>No Pending Orders</div>
+      )}
+    </Container>
   );
 };
 

@@ -133,7 +133,7 @@ const PostedJobs = ({ postedJobs }) => {
                   >
                     <Card
                       className="shadow"
-                      style={{ backgroundColor: "#f6f8fc", height:"100%" }}
+                      style={{ backgroundColor: "#f6f8fc", height: "100%" }}
                     >
                       <CardBody>
                         <CardTitle>
@@ -207,32 +207,43 @@ const PostedJobs = ({ postedJobs }) => {
                           <b>Amount:</b> ${order.amount}
                         </CardText>
                         <CardText>
-                          <b>Details:</b>{" "}
+                          <div>
+                            <Row>
+                              <Col>
+                                <b>Details:</b>
+                              </Col>
+                              <Col>
+                                {order.details.length > 30 && (
+                                  <Button
+                                    style={{
+                                      marginTop: "-5px",
+                                      marginLeft: "10px",
+                                    }} // Adjust spacing as needed
+                                    color="link"
+                                    onClick={() => toggleDetails(order?._id)}
+                                  >
+                                    {showFullDetailsMap[order?._id]
+                                      ? "Show Less"
+                                      : "Show More"}
+                                  </Button>
+                                )}
+                              </Col>
+                            </Row>
+                          </div>
                           <div
                             style={{
                               maxHeight: "100px",
                               overflowY: "auto",
                             }}
                           >
-                            {showFullDetailsMap[order._id] ? (
+                            {showFullDetailsMap[order?._id] ? (
                               <div
                                 dangerouslySetInnerHTML={{
-                                  __html: order.details,
+                                  __html: order?.details,
                                 }}
                               />
                             ) : (
-                              transformOrderDetails(order)
-                            )}
-                            {order.details.length > 30 && (
-                              <Button
-                                style={{ marginTop: "-5px" }}
-                                color="link"
-                                onClick={() => toggleDetails(order._id)}
-                              >
-                                {showFullDetailsMap[order._id]
-                                  ? "Show Less"
-                                  : "Show More"}
-                              </Button>
+                              transformOrderDetails(order).slice(0, 30) // Truncate details
                             )}
                           </div>
                         </CardText>
@@ -244,7 +255,10 @@ const PostedJobs = ({ postedJobs }) => {
                             </CardText>
                             <Slider {...settings} className="">
                               {order.images?.map((image, index) => (
-                                <div className="text-center" key={index}>
+                                <div
+                                  className="d-flex justify-content-center"
+                                  key={index}
+                                >
                                   <img
                                     key={index}
                                     src={`${
@@ -263,10 +277,9 @@ const PostedJobs = ({ postedJobs }) => {
                             </Slider>
                           </Row>
                         )}
-
                       </CardBody>
                       <CardFooter>
-                      <Row>
+                        <Row>
                           <Col style={{ margin: "2%" }} xs="12" md="5">
                             {" "}
                             <CardText>

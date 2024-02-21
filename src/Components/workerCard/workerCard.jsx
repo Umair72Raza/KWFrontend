@@ -31,6 +31,8 @@ const WorkerCard = ({ worker }) => {
     chatFromWorkerCard,
     setChatFromWorkerCard,
     setNotification,
+    setUnreadMessages,
+    unreadMessages,
   } = ChatState();
   const [modal, setModal] = useState(false);
   const [bookingWorker, SetBookingWorker] = useState();

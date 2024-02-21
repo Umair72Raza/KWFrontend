@@ -43,7 +43,7 @@ const Orders = () => {
   const [toggleCancel, setToggleCancel] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
   const [cancelledClicked, setcancelledClicked] = useState(false); //checks if cancel was ever clicked
-  const [postedClicked,setPostedClicked] = useState(false)
+  const [postedClicked, setPostedClicked] = useState(false);
   const dispatch = useDispatch();
   //const [pastOrders, setPastOrders] = useState([]);
   // const [activeOrder, setActiveOrder] = useState([]);
@@ -68,7 +68,7 @@ const Orders = () => {
     pendingOrders,
     setPendingOrders,
     postedJobs,
-    setPostedJobs
+    setPostedJobs,
   } = PopUpState();
 
   const navigate = useNavigate();
@@ -141,7 +141,7 @@ const Orders = () => {
           }
           dispatch(hideSpinner());
           break;
-          case "6":
+        case "6":
           dispatch(showSpinner());
           // Check if pendingOrders is already available locally
           if (!isPostedOrdersFetched) {
@@ -176,16 +176,13 @@ const Orders = () => {
     toggleTab("2");
   };
 
-
   const postedClick = async () => {
     toggleTab("6");
     if (postedClicked === false) {
       setPostedClicked(true);
       let result = await dispatch(fetchPostedOrdersAsync(token));
       if (result.type === "orders/fetchPostedOrders/fulfilled") {
-  
         if (postedJobs.length === 0) {
-
           setPostedJobs(result.payload.orders);
         } else {
           const uniqueOrders = result.payload.orders.filter(
@@ -204,7 +201,6 @@ const Orders = () => {
       }
     }
   };
-
 
   const cancelOrders = async () => {
     toggleTab("3");
@@ -252,20 +248,14 @@ const Orders = () => {
           ]);
           dispatch(setnewOrderValue(null));
         }
-      }
-      else if(newOrder !== null && newOrder.Status === "Posted")
-      {
+      } else if (newOrder !== null && newOrder.Status === "Posted") {
         if (postedJobs.length === 0) {
           setPostedJobs([newOrder]);
           dispatch(setnewOrderValue(null));
         } else {
-          setPostedJobs((prevPostedOrders) => [
-            ...prevPostedOrders,
-            newOrder,
-          ]);
+          setPostedJobs((prevPostedOrders) => [...prevPostedOrders, newOrder]);
           dispatch(setnewOrderValue(null));
         }
-
       }
 
       dispatch(setnewOrderValue(null));
@@ -304,6 +294,14 @@ const Orders = () => {
             </NavItem>
             <NavItem>
               <NavLink
+                className={classnames({ active: activeTab === "4" })}
+                onClick={activeOrders}
+              >
+                {TABS.ACTIVE}
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
                 className={classnames({ active: activeTab === "2" })}
                 onClick={pastClick}
               >
@@ -318,14 +316,7 @@ const Orders = () => {
                 {TABS.CANCELLED}
               </NavLink>
             </NavItem>
-            <NavItem>
-              <NavLink
-                className={classnames({ active: activeTab === "4" })}
-                onClick={activeOrders}
-              >
-                {TABS.ACTIVE}
-              </NavLink>
-            </NavItem>
+
             <NavItem>
               <NavLink
                 className={classnames({ active: activeTab === "5" })}

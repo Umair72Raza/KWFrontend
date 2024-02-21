@@ -57,6 +57,7 @@ const ScheduledOrdersCardWorker = ({
 
   const fetchAddressFromCoordinates = (coordinates, orderId) => {
     const geocoder = new window.google.maps.Geocoder();
+    console.log(coordinates, "coordinates");
     geocoder.geocode(
       { location: { lat: coordinates[1], lng: coordinates[0] } },
       (results, status) => {
@@ -86,26 +87,27 @@ const ScheduledOrdersCardWorker = ({
     );
   };
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${
-      import.meta.env.VITE_GOOGLE_API
-    }&libraries=${import.meta.env.VITE_GOOGLE_API_LIBARARY}`;
-    script.async = true;
-    script.defer = true;
-    script.addEventListener("load", () => {
-      // Initialize the fetchAddressFromCoordinates function here
-      scheduledOrdersObject.forEach((order) => {
-        fetchAddressFromCoordinates(order?.loc?.coordinates, order._id);
-      });
-    });
-    document.head.appendChild(script);
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   script.src = `https://maps.googleapis.com/maps/api/js?key=${
+  //     import.meta.env.VITE_GOOGLE_API
+  //   }&libraries=${import.meta.env.VITE_GOOGLE_API_LIBARARY}`;
+  //   script.async = true;
+  //   script.defer = true;
+  //   script.addEventListener("load", () => {
+  //     // Initialize the fetchAddressFromCoordinates function here
+  //     scheduledOrdersObject.forEach((order) => {
+  //       console.log("order loc", order);
+  //       fetchAddressFromCoordinates(order?.loc?.coordinates, order._id);
+  //     });
+  //   });
+  //   document.head.appendChild(script);
 
-    return () => {
-      // Remove the script when the component unmounts
-      document.head.removeChild(script);
-    };
-  }, [scheduledOrdersObject]);
+  //   return () => {
+  //     // Remove the script when the component unmounts
+  //     document.head.removeChild(script);
+  //   };
+  // }, [scheduledOrdersObject]);
 
   const toggleDetails = (orderId) => {
     setShowFullDetailsMap((prevMap) => ({
@@ -318,7 +320,29 @@ const ScheduledOrdersCardWorker = ({
                         <b>Amount:</b> ${order?.amount}
                       </CardText>
                       <CardText>
-                        <b>Details:</b>{" "}
+                        <div>
+                          <Row>
+                            <Col>
+                              <b>Details:</b>
+                            </Col>
+                            <Col>
+                              {order.details.length > 30 && (
+                                <Button
+                                  style={{
+                                    marginTop: "-5px",
+                                    marginLeft: "10px",
+                                  }} // Adjust spacing as needed
+                                  color="link"
+                                  onClick={() => toggleDetails(order?._id)}
+                                >
+                                  {showFullDetailsMap[order?._id]
+                                    ? "Show Less"
+                                    : "Show More"}
+                                </Button>
+                              )}
+                            </Col>
+                          </Row>
+                        </div>
                         <div
                           style={{
                             maxHeight: "100px",
@@ -332,21 +356,11 @@ const ScheduledOrdersCardWorker = ({
                               }}
                             />
                           ) : (
-                            transformOrderDetails(order)
-                          )}
-                          {order.details.length > 30 && (
-                            <Button
-                              style={{ marginTop: "-5px" }}
-                              color="link"
-                              onClick={() => toggleDetails(order?._id)}
-                            >
-                              {showFullDetailsMap[order?._id]
-                                ? "Show Less"
-                                : "Show More"}
-                            </Button>
+                            transformOrderDetails(order).slice(0, 30) // Truncate details
                           )}
                         </div>
                       </CardText>
+
                       <CardText>
                         <b>Order By:</b>{" "}
                         {order?.users?.length > 0 ? (
@@ -355,6 +369,14 @@ const ScheduledOrdersCardWorker = ({
                             {order?.users[0]?.lastName}
                           </>
                         ) : null}
+                      </CardText>
+                      <CardText>
+                        <b>Services:</b>
+                        {order?.service.map((service, index) => (
+                          <p key={index}>
+                            <b>{index + 1}:</b> {service}
+                          </p>
+                        ))}
                       </CardText>
                       <CardText>
                         <b>Address: </b>
