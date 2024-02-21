@@ -10,6 +10,7 @@ const Dropdowns = ({
   loading,
   editMode,
   formData,
+  UserData
 }) => {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
@@ -21,12 +22,25 @@ const Dropdowns = ({
   }, []);
 
   useEffect(() => {
-    if ( formData) {
-      setCountry(formData?.country || "");
-      setRegion(formData?.region_state || "");
-      setCity(formData?.city || "");
+    console.log("formData:", UserData);
+    console.log("country:", country);
+    console.log("region:", region);
+    console.log("city:", city);
+  
+    // Check if formData exists and is not empty
+    if (formData && Object.keys(UserData).length !== 0) {
+      if (
+        UserData.country !== country ||
+        UserData.region_state !== region ||
+        UserData.city !== city
+      ) {
+        setCountry(UserData?.Country || "");
+        setRegion(UserData?.region_state || "");
+        setCity(UserData?.city || "");
+      }
     }
-  }, [editMode, formData]);
+  }, [editMode, UserData, country, region, city]);
+  
 
   const handleCountryChange = (event) => {
     const selectedCountry = event.target.value;
@@ -74,7 +88,7 @@ const Dropdowns = ({
               invalid={!!errors.country}
               disabled={loading}
             >
-             {!formData && (<option value="">Select Country</option>)} 
+              {!formData && <option value="">Select Country</option>}
               {formData && !country ? (
                 <option value={formData.country} selected={true}>
                   {allCountries.find(
@@ -110,7 +124,7 @@ const Dropdowns = ({
               value={region}
               onChange={handleRegionChange}
               className="form-select"
-              required = {country}
+              required={country}
               invalid={!!errors.region_state}
               disabled={
                 !country ||
@@ -128,7 +142,11 @@ const Dropdowns = ({
                       </span>
                     </option>
                     {State.getStatesOfCountry(country).map((state) => (
-                      <option key={state.isoCode} value={state.isoCode} selected={formData?.region_state || null}>
+                      <option
+                        key={state.isoCode}
+                        value={state.isoCode}
+                        selected={formData?.region_state || null}
+                      >
                         {state.name}
                       </option>
                     ))}
@@ -160,7 +178,7 @@ const Dropdowns = ({
               value={city}
               onChange={handleCityChange}
               className="form-select"
-              required = {country && region}
+              required={country && region}
               invalid={!!(region && errors.city)}
               disabled={
                 !region ||

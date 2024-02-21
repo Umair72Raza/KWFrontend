@@ -696,6 +696,7 @@ const EditProfilePage = ({ ShowServices }) => {
                       errors={errors}
                       setErrors={setErrors}
                       formData={formData}
+                      UserData={UsersData}
                     />
                   </Row>
                   <Row md={11}>
